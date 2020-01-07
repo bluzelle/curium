@@ -307,7 +307,7 @@ func (app *CRUDApp) ModuleAccountAddrs() map[string]bool {
 	return modAccAddrs
 }
 
-func (app *CRUDApp) ExportAppStateAndValidators(forZeroHeight bool, jailWhiteList []string) (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
+func (app *CRUDApp) ExportAppStateAndValidators(_ bool, _ []string) (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 
 	// as if they could withdraw from the start of the next block
 	ctx := app.NewContext(true, abci.Header{Height: app.LastBlockHeight()})

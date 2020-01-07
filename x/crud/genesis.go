@@ -25,7 +25,7 @@ type GenesisState struct {
 	BlzValues []types.BLZValue
 }
 
-func NewGenesisState(data []types.BLZValue) GenesisState {
+func NewGenesisState(_ []types.BLZValue) GenesisState {
 	return GenesisState{BlzValues: nil}
 }
 
