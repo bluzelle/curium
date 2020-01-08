@@ -1,0 +1,17 @@
+dist: bionic
+
+language: go
+
+go: stable
+
+env:
+  - GO111MODULE=on
+
+git:
+  depth: 1
+
+install: true
+
+script:
+  - make install
+  - ls -l $GOPATH/bin
