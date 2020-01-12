@@ -21,3 +21,11 @@ type QueryResultRead struct {
 func (r QueryResultRead) String() string {
 	return r.Value
 }
+
+type QueryResultHas struct {
+	Value string
+}
+
+func (r QueryResultHas) String() string {
+	return r.Value
+}
