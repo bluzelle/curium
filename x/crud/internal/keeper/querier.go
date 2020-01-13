@@ -24,6 +24,7 @@ import (
 const (
 	QueryRead = "read"
 	QueryHas  = "has"
+	QueryKeys = "keys"
 )
 
 func NewQuerier(keeper Keeper) sdk.Querier {
@@ -33,6 +34,8 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 			return queryRead(ctx, path[1:], req, keeper)
 		case QueryHas:
 			return queryHas(ctx, path[1:], req, keeper)
+		case QueryKeys:
+			return queryKeys(ctx, path[1:], req, keeper)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown crud query endpoint")
 		}
@@ -57,6 +60,17 @@ func queryHas(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper Keeper
 	value := keeper.IsKeyPresent(ctx, path[0], path[1])
 
 	res, err := codec.MarshalJSONIndent(keeper.cdc, types.QueryResultHas{Value: value})
+	if err != nil {
+		panic("could not marshal result to JSON")
+	}
+
+	return res, nil
+}
+
+func queryKeys(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+	keys := keeper.GetKeys(ctx, path[0])
+
+	res, err := codec.MarshalJSONIndent(keeper.cdc, types.QueryResultKeys{keys})
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}

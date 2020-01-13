@@ -34,6 +34,7 @@ func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 
 	crudQueryCmd.AddCommand(client.GetCommands(GetCmdBLZQRead(storeKey, cdc))...)
 	crudQueryCmd.AddCommand(client.GetCommands(GetCmdBLZQHas(storeKey, cdc))...)
+	crudQueryCmd.AddCommand(client.GetCommands(GetCmdBLZQKeys(storeKey, cdc))...)
 
 	return crudQueryCmd
 }
@@ -72,6 +73,23 @@ func GetCmdBLZQHas(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			res, _, _ := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/has/%s/%s", queryRoute, UUID, key), nil)
 
 			var out types.QueryResultHas
+			cdc.MustUnmarshalJSON(res, &out)
+			return cliCtx.PrintOutput(out)
+		},
+	}
+}
+
+func GetCmdBLZQKeys(queryRoute string, cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "keys [UUID]",
+		Short: "keys UUID",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			UUID := args[0]
+			res, _, _ := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/keys/%s", queryRoute, UUID), nil)
+
+			var out types.QueryResultKeys
 			cdc.MustUnmarshalJSON(res, &out)
 			return cliCtx.PrintOutput(out)
 		},

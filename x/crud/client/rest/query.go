@@ -44,3 +44,13 @@ func BlzQHasHandler(cliCtx context.CLIContext, storeName string) http.HandlerFun
 		rest.PostProcessResponse(w, cliCtx, res)
 	}
 }
+
+func BlzQKeysHandler(cliCtx context.CLIContext, storeName string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+
+		res, _, _ := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/keys/%s", storeName, vars["UUID"]), nil)
+
+		rest.PostProcessResponse(w, cliCtx, res)
+	}
+}
