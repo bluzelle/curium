@@ -55,7 +55,7 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) []abci.Valid
 // TODO - fix key value issues
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	var records []types.BLZValue
-	iterator := k.GetNamesIterator(ctx)
+	iterator := k.GetValuesIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
 		key := string(iterator.Key())
 		value := k.GetBLZValue(ctx, "UUID-Genesis", key)

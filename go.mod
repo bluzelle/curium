@@ -4,7 +4,6 @@ go 1.13
 
 require (
 	github.com/cosmos/cosmos-sdk v0.37.4
-	github.com/cosmos/sdk-tutorials/nameservice v0.0.0-20191202124946-cb51b5bd7575
 	github.com/gogo/protobuf v1.3.1
 	github.com/gorilla/mux v1.7.3
 	github.com/spf13/cobra v0.0.5

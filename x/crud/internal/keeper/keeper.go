@@ -64,9 +64,22 @@ func (k Keeper) IsUUIDKeyPresent(ctx sdk.Context, key string) bool {
 	return store.Has([]byte(key))
 }
 
-func (k Keeper) GetNamesIterator(ctx sdk.Context) sdk.Iterator {
+func (k Keeper) GetValuesIterator(ctx sdk.Context) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, []byte{})
+}
+
+func (k Keeper) GetKeys(ctx sdk.Context, UUID string) []string {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, []byte(UUID))
+
+	keys := []string{}
+
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		keys = append(keys, string(iterator.Key())[len(UUID):])
+	}
+	return keys
 }
 
 func NewKeeper(coinKeeper bank.Keeper, storeKey sdk.StoreKey, cdc *codec.Codec) Keeper {
