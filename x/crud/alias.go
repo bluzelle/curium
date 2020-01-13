@@ -39,4 +39,5 @@ type (
 	MsgBLZUpdate    = types.MsgBLZUpdate
 	MsgBLZDelete    = types.MsgBLZDelete
 	QueryResultRead = types.QueryResultRead
+	QueryResultHas  = types.QueryResultHas
 )

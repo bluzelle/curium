@@ -18,6 +18,22 @@ type QueryResultRead struct {
 	Value string
 }
 
+// implement fmt.Stringer
+
 func (r QueryResultRead) String() string {
 	return r.Value
+}
+
+type QueryResultHas struct {
+	Value bool `json:"result"`
+}
+
+// implement fmt.Stringer
+
+func (r QueryResultHas) String() string {
+	if (r.Value) {
+		return "true"
+	} else {
+		return "false"
+	}
 }

@@ -38,7 +38,7 @@ func (k Keeper) SetBLZValue(ctx sdk.Context, UUID string, key string, value type
 func (k Keeper) GetBLZValue(ctx sdk.Context, UUID string, key string) types.BLZValue {
 	BLZKey := UUID + key
 	store := ctx.KVStore(k.storeKey)
-	if !k.IsNamePresent(ctx, BLZKey) {
+	if !k.IsUUIDKeyPresent(ctx, BLZKey) {
 		return types.NewBLZValue()
 	}
 
@@ -53,7 +53,13 @@ func (k Keeper) DeleteBLZValue(ctx sdk.Context, UUID string, key string) {
 	store.Delete([]byte(UUID + key))
 }
 
-func (k Keeper) IsNamePresent(ctx sdk.Context, key string) bool {
+func (k Keeper) IsKeyPresent(ctx sdk.Context, UUID string, key string) bool {
+	BLZKey := UUID + key
+
+	return k.IsUUIDKeyPresent(ctx, BLZKey)
+}
+
+func (k Keeper) IsUUIDKeyPresent(ctx sdk.Context, key string) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has([]byte(key))
 }

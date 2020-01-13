@@ -25,21 +25,21 @@ import (
 
 // curl
 //	-XPOST
-//	-s http://localhost:1317/nameservice/names
+//	-s http://localhost:1317/crud/names
 //	--data-binary '
 //	{
 //		"base_req":
 //		{
-//			"from":"'$(nscli keys show jack -a)'",
-//			"chain_id":"namechain"
+//			"from":"'$(blzcli keys show jack -a)'",
+//			"chain_id":"crudchain"
 //		},
 //		"name":"jack1.id",
-//			"amount":"5nametoken",
-//			"owner":"'$(nscli keys show jack -a)'"
+//			"amount":"5crudtoken",
+//			"owner":"'$(bzcli keys show jack -a)'"
 //	}' > unsignedTx.json
 
-//curl -XPOST -s http://localhost:1317/crud/create --data-binary '{"base_req":{"from":"'$(blzcli keys show jack -a)'","chain_id":"namechain"},"UUID":"a5831e10-c49a-4e21-a89b-6d26e93ca6a0", "Key":"akey","Value":"A nice Value","Owner":"'$(blzcli keys show jack -a)'" }}' > unsignedTx.json
-// curl -XPOST http://localhost:1317/crud/create --data-binary '{"BaseReq":{"from":"'$(blzcli keys show jack -a)'","chain_id":"namechain"},"UUID":"a5831e10-c49a-4e21-a89b-6d26e93ca6a0", "Key":"akey","Value":"A nice Value","Owner":"'$(blzcli keys show jack -a)'" }'
+//curl -XPOST -s http://localhost:1317/crud/create --data-binary '{"base_req":{"from":"'$(blzcli keys show jack -a)'","chain_id":"crudchain"},"UUID":"a5831e10-c49a-4e21-a89b-6d26e93ca6a0", "Key":"akey","Value":"A nice Value","Owner":"'$(blzcli keys show jack -a)'" }}' > unsignedTx.json
+// curl -XPOST http://localhost:1317/crud/create --data-binary '{"BaseReq":{"from":"'$(blzcli keys show jack -a)'","chain_id":"crudchain"},"UUID":"a5831e10-c49a-4e21-a89b-6d26e93ca6a0", "Key":"akey","Value":"A nice Value","Owner":"'$(blzcli keys show jack -a)'" }'
 
 type createReq struct {
 	BaseReq rest.BaseReq

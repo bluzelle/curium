@@ -200,7 +200,7 @@ func NewCRUDApp(
 			app.slashingKeeper.Hooks()),
 	)
 
-	// The NameserviceKeeper is the Keeper from the module for this tutorial
+	// The CrudKeeper is the Keeper from the module
 	// It handles interactions with the namestore
 	app.crudKeeper = crud.NewKeeper(
 		app.bankKeeper,
