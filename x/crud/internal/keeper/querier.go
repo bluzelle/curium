@@ -56,13 +56,7 @@ func queryRead(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper Keepe
 func queryHas(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	value := keeper.IsKeyPresent(ctx, path[0], path[1])
 
-	hasValue := "false"
-
-	if (value) {
-		hasValue = "true"
-	}
-
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.QueryResultHas{Value: hasValue})
+	res, err := codec.MarshalJSONIndent(keeper.cdc, types.QueryResultHas{Value: value})
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
