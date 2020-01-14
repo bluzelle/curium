@@ -19,6 +19,7 @@ import (
 	"github.com/bluzelle/curium/x/crud/internal/keeper"
 	"github.com/bluzelle/curium/x/crud/internal/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"strings"
 )
 
 func NewHandler(keeper keeper.Keeper) sdk.Handler {
@@ -32,9 +33,10 @@ func NewHandler(keeper keeper.Keeper) sdk.Handler {
 			return handleMsgBLZUpdate(ctx, keeper, msg)
 		case types.MsgBLZDelete:
 			return handleMsgBLZDelete(ctx, keeper, msg)
+		case types.MsgBLZKeys:
+			return handleMsgBLZKeys(ctx, keeper, msg)
 		default:
-			errMsg := fmt.Sprintf("Unrecognized crud Msg type: %v", msg.Type())
-			return sdk.ErrUnknownRequest(errMsg).Result()
+			return sdk.ErrUnknownRequest(fmt.Sprintf("Unrecognized crud Msg type: %v", msg.Type())).Result()
 		}
 	}
 }
@@ -87,4 +89,8 @@ func handleMsgBLZDelete(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBLZD
 	keeper.DeleteBLZValue(ctx, msg.UUID, msg.Key)
 
 	return sdk.Result{}
+}
+
+func handleMsgBLZKeys(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBLZKeys) sdk.Result {
+	return sdk.Result{Data: []byte(strings.Join(keeper.GetKeys(ctx, msg.UUID), ", "))}
 }

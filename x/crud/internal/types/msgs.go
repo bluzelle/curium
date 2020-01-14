@@ -146,6 +146,41 @@ func NewMsgBLZDelete(UUID string, key string, owner sdk.AccAddress) MsgBLZDelete
 	}
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+type MsgBLZKeys struct {
+	UUID  string
+	Owner sdk.AccAddress
+}
+
+func NewMsgBLZKeys(UUID string, owner sdk.AccAddress) MsgBLZKeys {
+	return MsgBLZKeys{UUID: UUID, Owner: owner}
+}
+
+func (msg MsgBLZKeys) Route() string { return RouterKey }
+
+func (msg MsgBLZKeys) Type() string { return "keys" }
+
+func (msg MsgBLZKeys) ValidateBasic() sdk.Error {
+	if msg.Owner.Empty() {
+		return sdk.ErrInvalidAddress(msg.Owner.String())
+	}
+
+	if len(msg.UUID) == 0 {
+		return sdk.ErrInvalidPubKey("UUID empty")
+	}
+	return nil
+}
+
+func (msg MsgBLZKeys) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
+
+func (msg MsgBLZKeys) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Owner}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 func (msg MsgBLZDelete) Route() string { return RouterKey }
 
 func (msg MsgBLZDelete) Type() string { return "read" }
