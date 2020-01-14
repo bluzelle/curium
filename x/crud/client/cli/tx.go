@@ -39,6 +39,7 @@ func GetTxCmd(_ string, cdc *codec.Codec) *cobra.Command {
 		GetCmdBLZDelete(cdc),
 		GetCmdBLZRead(cdc),
 		GetCmdBLZKeys(cdc),
+		GetCmdBLZHas(cdc),
 	)...)
 
 	return crudTxCmd
@@ -143,6 +144,28 @@ func GetCmdBLZKeys(cdc *codec.Codec) *cobra.Command {
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
 			msg := types.NewMsgBLZKeys(args[0], cliCtx.GetFromAddress())
+
+			err := msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+		},
+	}
+}
+
+func GetCmdBLZHas(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "has [UUID] [key]",
+		Short: "returns true if the key value pair exists",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+
+			msg := types.NewMsgBLZHas(args[0], args[1], cliCtx.GetFromAddress())
 
 			err := msg.ValidateBasic()
 			if err != nil {

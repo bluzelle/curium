@@ -180,6 +180,44 @@ func (msg MsgBLZKeys) GetSigners() []sdk.AccAddress {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+type MsgBLZHas struct {
+	UUID  string
+	Key   string
+	Owner sdk.AccAddress
+}
+
+func NewMsgBLZHas(UUID string, key string, owner sdk.AccAddress) MsgBLZHas {
+	return MsgBLZHas{UUID: UUID, Key: key, Owner: owner}
+}
+
+func (msg MsgBLZHas) Route() string { return RouterKey }
+
+func (msg MsgBLZHas) Type() string { return "has" }
+
+func (msg MsgBLZHas) ValidateBasic() sdk.Error {
+	if msg.Owner.Empty() {
+		return sdk.ErrInvalidAddress(msg.Owner.String())
+	}
+
+	if len(msg.UUID) == 0 {
+		return sdk.ErrInvalidPubKey("UUID empty")
+	}
+
+	if len(msg.Key) == 0 {
+		return sdk.ErrInvalidPubKey("key empty")
+	}
+	return nil
+}
+
+func (msg MsgBLZHas) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
+
+func (msg MsgBLZHas) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Owner}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 func (msg MsgBLZDelete) Route() string { return RouterKey }
 
