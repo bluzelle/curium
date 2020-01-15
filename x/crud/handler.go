@@ -35,6 +35,8 @@ func NewHandler(keeper keeper.Keeper) sdk.Handler {
 			return handleMsgBLZDelete(ctx, keeper, msg)
 		case types.MsgBLZKeys:
 			return handleMsgBLZKeys(ctx, keeper, msg)
+		case types.MsgBLZHas:
+			return handleMsgBLZHas(ctx, keeper, msg)
 		default:
 			return sdk.ErrUnknownRequest(fmt.Sprintf("Unrecognized crud Msg type: %v", msg.Type())).Result()
 		}
@@ -93,4 +95,13 @@ func handleMsgBLZDelete(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBLZD
 
 func handleMsgBLZKeys(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBLZKeys) sdk.Result {
 	return sdk.Result{Data: []byte(strings.Join(keeper.GetKeys(ctx, msg.UUID), ", "))}
+}
+
+func handleMsgBLZHas(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBLZHas) sdk.Result {
+	owner := keeper.GetOwner(ctx, msg.UUID, msg.Key)
+	if owner.Empty() {
+		return sdk.ErrInternal("Key does not exist").Result()
+	}
+	retval := sdk.Result{Data: []byte("true")}
+	return retval
 }
