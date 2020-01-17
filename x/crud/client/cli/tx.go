@@ -35,9 +35,9 @@ func GetTxCmd(_ string, cdc *codec.Codec) *cobra.Command {
 	}
 	crudTxCmd.AddCommand(client.PostCommands(
 		GetCmdBLZCreate(cdc),
+		GetCmdBLZRead(cdc),
 		GetCmdBLZUpdate(cdc),
 		GetCmdBLZDelete(cdc),
-		GetCmdBLZRead(cdc),
 		GetCmdBLZKeys(cdc),
 		GetCmdBLZHas(cdc),
 	)...)
@@ -52,9 +52,7 @@ func GetCmdBLZCreate(cdc *codec.Codec) *cobra.Command {
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
-
 			msg := types.NewMsgBLZCreate(args[0], args[1], args[2], cliCtx.GetFromAddress())
 
 			err := msg.ValidateBasic()
@@ -74,9 +72,7 @@ func GetCmdBLZRead(cdc *codec.Codec) *cobra.Command {
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
-
 			msg := types.NewMsgBLZRead(args[0], args[1], cliCtx.GetFromAddress())
 
 			err := msg.ValidateBasic()
@@ -96,9 +92,7 @@ func GetCmdBLZUpdate(cdc *codec.Codec) *cobra.Command {
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
-
 			msg := types.NewMsgBLZUpdate(args[0], args[1], args[2], cliCtx.GetFromAddress())
 
 			err := msg.ValidateBasic()
@@ -118,9 +112,7 @@ func GetCmdBLZDelete(cdc *codec.Codec) *cobra.Command {
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
-
 			msg := types.NewMsgBLZDelete(args[0], args[1], cliCtx.GetFromAddress())
 
 			err := msg.ValidateBasic()
@@ -140,9 +132,7 @@ func GetCmdBLZKeys(cdc *codec.Codec) *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
-
 			msg := types.NewMsgBLZKeys(args[0], cliCtx.GetFromAddress())
 
 			err := msg.ValidateBasic()
@@ -162,9 +152,7 @@ func GetCmdBLZHas(cdc *codec.Codec) *cobra.Command {
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
-
 			msg := types.NewMsgBLZHas(args[0], args[1], cliCtx.GetFromAddress())
 
 			err := msg.ValidateBasic()

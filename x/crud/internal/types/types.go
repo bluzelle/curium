@@ -21,8 +21,8 @@ import (
 )
 
 type BLZValue struct {
-	Value string
-	Owner sdk.AccAddress
+	Value string         `json:"value"`
+	Owner sdk.AccAddress `json:"owner"`
 }
 
 func NewBLZValue() BLZValue {

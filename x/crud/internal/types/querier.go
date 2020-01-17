@@ -17,19 +17,25 @@ package types
 import "strings"
 
 type QueryResultRead struct {
-	Value string
+	UUID  string `json:"uuid"`
+	Key   string `json:"key"`
+	Value string `json:"value"`
 }
 
+// for fmt.Stringer
 func (r QueryResultRead) String() string {
 	return r.Value
 }
 
 type QueryResultHas struct {
-	Value bool `json:"result"`
+	UUID string `json:"uuid"`
+	Key  string `json:"key"`
+	Has  bool   `json:"has"`
 }
 
+// for fmt.Stringer
 func (r QueryResultHas) String() string {
-	if r.Value {
+	if r.Has {
 		return "true"
 	} else {
 		return "false"
@@ -37,9 +43,11 @@ func (r QueryResultHas) String() string {
 }
 
 type QueryResultKeys struct {
-	Keys []string
+	UUID string   `json:"uuid"`
+	Keys []string `json:"keys"`
 }
 
+// for fmt.Stringer
 func (r QueryResultKeys) String() string {
 	return strings.Join(r.Keys, ", ")
 }

@@ -23,6 +23,8 @@ import (
 	"net/http"
 )
 
+///////////////////////////////////////////////////////////////////////////////
+// Create
 type createReq struct {
 	BaseReq rest.BaseReq
 	UUID    string
@@ -62,7 +64,8 @@ func BlzCreateHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
-// read
+///////////////////////////////////////////////////////////////////////////////
+// Read
 type readReq struct {
 	BaseReq rest.BaseReq
 	UUID    string
@@ -102,7 +105,8 @@ func BlzReadHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
-// update
+///////////////////////////////////////////////////////////////////////////////
+// Update
 type updateReq struct {
 	BaseReq rest.BaseReq
 	UUID    string
@@ -142,7 +146,8 @@ func BlzUpdateHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
-// delete
+///////////////////////////////////////////////////////////////////////////////
+// Delete
 type deleteReq struct {
 	BaseReq rest.BaseReq
 	UUID    string
@@ -181,13 +186,13 @@ func BlzDeleteHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
-
-// has
+///////////////////////////////////////////////////////////////////////////////
+// Has
 type hasReq struct {
 	BaseReq rest.BaseReq
 	UUID    string
-	Key 	string
-	Owner	string
+	Key     string
+	Owner   string
 }
 
 func BlzHasHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -210,7 +215,6 @@ func BlzHasHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		// create the message
 		msg := types.NewMsgBLZHas(req.UUID, req.Key, addr)
 		err = msg.ValidateBasic()
 		if err != nil {
@@ -222,12 +226,12 @@ func BlzHasHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
-
-// keys
+///////////////////////////////////////////////////////////////////////////////
+// Keys
 type keysReq struct {
 	BaseReq rest.BaseReq
 	UUID    string
-	Owner	string
+	Owner   string
 }
 
 func BlzKeysHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -250,7 +254,6 @@ func BlzKeysHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		// create the message
 		msg := types.NewMsgBLZKeys(req.UUID, addr)
 		err = msg.ValidateBasic()
 		if err != nil {
@@ -261,6 +264,3 @@ func BlzKeysHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		utils.WriteGenerateStdTxResponse(w, cliCtx, baseReq, []sdk.Msg{msg})
 	}
 }
-
-
-

@@ -15,11 +15,11 @@
 package crud
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/bluzelle/curium/x/crud/internal/keeper"
 	"github.com/bluzelle/curium/x/crud/internal/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"strings"
 )
 
 func NewHandler(keeper keeper.Keeper) sdk.Handler {
@@ -38,13 +38,12 @@ func NewHandler(keeper keeper.Keeper) sdk.Handler {
 		case types.MsgBLZHas:
 			return handleMsgBLZHas(ctx, keeper, msg)
 		default:
-			return sdk.ErrUnknownRequest(fmt.Sprintf("Unrecognized crud Msg type: %v", msg.Type())).Result()
+			return sdk.ErrUnknownRequest(fmt.Sprintf("Unrecognized crud msg type: %v", msg.Type())).Result()
 		}
 	}
 }
 
 func handleMsgBLZCreate(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBLZCreate) sdk.Result {
-
 	if !keeper.GetBLZValue(ctx, msg.UUID, msg.Key).Owner.Empty() {
 		return sdk.ErrUnauthorized("Key already exists").Result()
 	}
@@ -62,9 +61,13 @@ func handleMsgBLZRead(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBLZRea
 		return sdk.ErrInternal("Key does not exist").Result()
 	}
 
-	retval := sdk.Result{}
-	retval.Data = []byte(keeper.GetBLZValue(ctx, msg.UUID, msg.Key).Value)
-	return retval
+	json_data, err := json.Marshal(keeper.GetBLZValue(ctx, msg.UUID, msg.Key))
+	if err != nil {
+		fmt.Println(err)
+		return sdk.ErrInternal("could not marshal result to JSON").Result()
+	}
+
+	return sdk.Result{Data: json_data}
 }
 
 func handleMsgBLZUpdate(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBLZUpdate) sdk.Result {
@@ -72,9 +75,11 @@ func handleMsgBLZUpdate(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBLZU
 	if owner.Empty() {
 		return sdk.ErrInternal("Key does not exist").Result()
 	}
+
 	if !msg.Owner.Equals(owner) {
 		return sdk.ErrUnauthorized("Incorrect Owner").Result()
 	}
+
 	keeper.SetBLZValue(ctx, msg.UUID, msg.Key, types.BLZValue{Value: msg.Value, Owner: msg.Owner})
 
 	return sdk.Result{}
@@ -85,23 +90,32 @@ func handleMsgBLZDelete(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBLZD
 	if owner.Empty() {
 		return sdk.ErrInternal("Key does not exist").Result()
 	}
+
 	if !msg.Owner.Equals(owner) {
 		return sdk.ErrUnauthorized("Incorrect Owner").Result()
 	}
+
 	keeper.DeleteBLZValue(ctx, msg.UUID, msg.Key)
 
 	return sdk.Result{}
 }
 
 func handleMsgBLZKeys(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBLZKeys) sdk.Result {
-	return sdk.Result{Data: []byte(strings.Join(keeper.GetKeys(ctx, msg.UUID), ", "))}
+	json_data, err := json.Marshal(keeper.GetKeys(ctx, msg.UUID))
+	if err != nil {
+		fmt.Println(err)
+		return sdk.ErrInternal("could not marshal result to JSON").Result()
+	}
+
+	return sdk.Result{Data: json_data}
 }
 
 func handleMsgBLZHas(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBLZHas) sdk.Result {
-	owner := keeper.GetOwner(ctx, msg.UUID, msg.Key)
-	if owner.Empty() {
-		return sdk.ErrInternal("Key does not exist").Result()
+	json_data, err := json.Marshal(types.QueryResultHas{UUID: msg.UUID, Key: msg.Key, Has: !keeper.GetOwner(ctx, msg.UUID, msg.Key).Empty()})
+	if err != nil {
+		fmt.Println(err)
+		return sdk.ErrInternal("could not marshal result to JSON").Result()
 	}
-	retval := sdk.Result{Data: []byte("true")}
-	return retval
+
+	return sdk.Result{Data: json_data}
 }
