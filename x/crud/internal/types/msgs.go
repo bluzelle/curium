@@ -20,6 +20,8 @@ import (
 
 const RouterKey = ModuleName
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Create
 type MsgBLZCreate struct {
 	UUID  string
 	Key   string
@@ -27,7 +29,6 @@ type MsgBLZCreate struct {
 	Owner sdk.AccAddress
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 func NewMsgBLZCreate(UUID string, key string, value string, owner sdk.AccAddress) MsgBLZCreate {
 	return MsgBLZCreate{
 		UUID:  UUID,
@@ -60,6 +61,7 @@ func (msg MsgBLZCreate) GetSigners() []sdk.AccAddress {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Read
 type MsgBLZRead struct {
 	UUID  string
 	Key   string
@@ -93,6 +95,7 @@ func (msg MsgBLZRead) GetSigners() []sdk.AccAddress {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Update
 type MsgBLZUpdate struct {
 	UUID  string
 	Key   string
@@ -132,6 +135,7 @@ func (msg MsgBLZUpdate) GetSigners() []sdk.AccAddress {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Delete
 type MsgBLZDelete struct {
 	UUID  string
 	Key   string
@@ -146,7 +150,30 @@ func NewMsgBLZDelete(UUID string, key string, owner sdk.AccAddress) MsgBLZDelete
 	}
 }
 
+func (msg MsgBLZDelete) Route() string { return RouterKey }
+
+func (msg MsgBLZDelete) Type() string { return "delete" }
+
+func (msg MsgBLZDelete) ValidateBasic() sdk.Error {
+	if msg.Owner.Empty() {
+		return sdk.ErrInvalidAddress(msg.Owner.String())
+	}
+	if len(msg.UUID) == 0 || len(msg.Key) == 0 {
+		return sdk.ErrInvalidPubKey("UUID or key Empty")
+	}
+	return nil
+}
+
+func (msg MsgBLZDelete) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
+
+func (msg MsgBLZDelete) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Owner}
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Keys
 type MsgBLZKeys struct {
 	UUID  string
 	Owner sdk.AccAddress
@@ -180,6 +207,7 @@ func (msg MsgBLZKeys) GetSigners() []sdk.AccAddress {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Has
 type MsgBLZHas struct {
 	UUID  string
 	Key   string
@@ -214,29 +242,5 @@ func (msg MsgBLZHas) GetSignBytes() []byte {
 }
 
 func (msg MsgBLZHas) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Owner}
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-func (msg MsgBLZDelete) Route() string { return RouterKey }
-
-func (msg MsgBLZDelete) Type() string { return "read" }
-
-func (msg MsgBLZDelete) ValidateBasic() sdk.Error {
-	if msg.Owner.Empty() {
-		return sdk.ErrInvalidAddress(msg.Owner.String())
-	}
-	if len(msg.UUID) == 0 || len(msg.Key) == 0 {
-		return sdk.ErrInvalidPubKey("UUID or key Empty")
-	}
-	return nil
-}
-
-func (msg MsgBLZDelete) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
-}
-
-func (msg MsgBLZDelete) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner}
 }

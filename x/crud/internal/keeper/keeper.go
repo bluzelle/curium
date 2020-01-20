@@ -69,15 +69,14 @@ func (k Keeper) GetValuesIterator(ctx sdk.Context) sdk.Iterator {
 	return sdk.KVStorePrefixIterator(store, []byte{})
 }
 
-func (k Keeper) GetKeys(ctx sdk.Context, UUID string) []string {
+func (k Keeper) GetKeys(ctx sdk.Context, UUID string) types.QueryResultKeys {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, []byte(UUID))
-
-	keys := []string{}
+	keys := types.QueryResultKeys{UUID: UUID}
 
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
-		keys = append(keys, string(iterator.Key())[len(UUID):])
+		keys.Keys = append(keys.Keys, string(iterator.Key())[len(UUID):])
 	}
 	return keys
 }

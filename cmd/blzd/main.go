@@ -49,8 +49,9 @@ func main() {
 	ctx := server.NewDefaultContext()
 
 	rootCmd := &cobra.Command{
-		Use:               "blzd",
-		Short:             "crud App Daemon (server)",
+		Use:   "blzd",
+		Short: "Bluzelle CRUD Daemon (server)",
+
 		PersistentPreRunE: server.PersistentPreRunEFn(ctx),
 	}
 	// CLI commands to initialize the chain

@@ -48,7 +48,7 @@ func queryRead(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper Keepe
 		return []byte{}, sdk.ErrUnknownRequest("could not read key")
 	}
 
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.QueryResultRead{Value: value})
+	res, err := codec.MarshalJSONIndent(keeper.cdc, types.QueryResultRead{UUID: path[0], Key: path[1], Value: value})
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
@@ -57,9 +57,9 @@ func queryRead(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper Keepe
 }
 
 func queryHas(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	value := keeper.IsKeyPresent(ctx, path[0], path[1])
+	has := keeper.IsKeyPresent(ctx, path[0], path[1])
 
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.QueryResultHas{Value: value})
+	res, err := codec.MarshalJSONIndent(keeper.cdc, types.QueryResultHas{UUID: path[0], Key: path[1], Has: has})
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
@@ -68,9 +68,7 @@ func queryHas(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper Keeper
 }
 
 func queryKeys(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	keys := keeper.GetKeys(ctx, path[0])
-
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.QueryResultKeys{keys})
+	res, err := codec.MarshalJSONIndent(keeper.cdc, keeper.GetKeys(ctx, path[0]))
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
