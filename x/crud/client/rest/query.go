@@ -16,11 +16,13 @@ package rest
 
 import (
 	"fmt"
+	"github.com/bluzelle/curium/x/crud/internal/types"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
 	"net/http"
 )
+
 
 func BlzQReadHandler(cliCtx context.CLIContext, storeName string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -32,6 +34,23 @@ func BlzQReadHandler(cliCtx context.CLIContext, storeName string) http.HandlerFu
 			return
 		}
 		rest.PostProcessResponse(w, cliCtx, res)
+	}
+}
+
+func BlzQProvenReadHandler(cliCtx context.CLIContext, storeName string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+
+		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("/store/%s/key", storeName), []byte(vars["UUID"] + vars["key"]))
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
+			return
+		}
+
+		value := types.BLZValue{}.Unmarshal(res)
+		resp := types.QueryResultRead {UUID: vars["UUID"], Key: vars["key"], Value: value.Value}
+
+		rest.PostProcessResponse(w, cliCtx, resp)
 	}
 }
 

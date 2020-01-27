@@ -16,6 +16,7 @@ package types
 
 import (
 	"fmt"
+	cc "github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"strings"
 )
@@ -30,6 +31,13 @@ func NewBLZValue() BLZValue {
 		Value: "",
 		Owner: nil,
 	}
+}
+
+func (kv BLZValue) Unmarshal(b []byte) BLZValue {
+	var cdc = cc.New()
+	value := BLZValue{}
+	cdc.UnmarshalBinaryBare(b, &value)
+	return value
 }
 
 func (kv BLZValue) String() string {
