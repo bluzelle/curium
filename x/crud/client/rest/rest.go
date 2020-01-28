@@ -21,7 +21,7 @@ import (
 )
 
 // RegisterRoutes - Central function to define routes that get registered by the main application
-func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, storeName string/*, cdc *codec.Codec*/) {
+func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, storeName string) {
 	r.HandleFunc(fmt.Sprintf("/%s/create", storeName), BlzCreateHandler(cliCtx)).Methods("POST")
 	r.HandleFunc(fmt.Sprintf("/%s/read/{UUID}/{key}", storeName), BlzQReadHandler(cliCtx, storeName)).Methods("GET")
 	r.HandleFunc(fmt.Sprintf("/%s/pread/{UUID}/{key}", storeName), BlzQProvenReadHandler(cliCtx, storeName)).Methods("GET")
