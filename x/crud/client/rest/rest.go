@@ -24,6 +24,7 @@ import (
 func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, storeName string) {
 	r.HandleFunc(fmt.Sprintf("/%s/create", storeName), BlzCreateHandler(cliCtx)).Methods("POST")
 	r.HandleFunc(fmt.Sprintf("/%s/read/{UUID}/{key}", storeName), BlzQReadHandler(cliCtx, storeName)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/pread/{UUID}/{key}", storeName), BlzQProvenReadHandler(cliCtx, storeName)).Methods("GET")
 	r.HandleFunc(fmt.Sprintf("/%s/has/{UUID}/{key}", storeName), BlzQHasHandler(cliCtx, storeName)).Methods("GET")
 	r.HandleFunc(fmt.Sprintf("/%s/keys/{UUID}", storeName), BlzQKeysHandler(cliCtx, storeName)).Methods("GET")
 	r.HandleFunc(fmt.Sprintf("/%s/read", storeName), BlzReadHandler(cliCtx)).Methods("POST")
