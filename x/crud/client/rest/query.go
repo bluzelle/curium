@@ -16,13 +16,13 @@ package rest
 
 import (
 	"fmt"
+	"github.com/bluzelle/curium/x/crud/internal/keeper"
 	"github.com/bluzelle/curium/x/crud/internal/types"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
 	"net/http"
 )
-
 
 func BlzQReadHandler(cliCtx context.CLIContext, storeName string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -41,14 +41,19 @@ func BlzQProvenReadHandler(cliCtx context.CLIContext, storeName string) http.Han
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
-		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("/store/%s/key", storeName), []byte(vars["UUID"] + vars["key"]))
+		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("/store/%s/key", storeName), []byte(keeper.MakeMetaKey(vars["UUID"], vars["key"])))
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
 
+		if res == nil {
+			rest.WriteErrorResponse(w, http.StatusNotFound, "could not read key")
+			return
+		}
+
 		value := types.BLZValue{}.Unmarshal(res)
-		resp := types.QueryResultRead {UUID: vars["UUID"], Key: vars["key"], Value: value.Value}
+		resp := types.QueryResultRead{UUID: vars["UUID"], Key: vars["key"], Value: value.Value}
 
 		rest.PostProcessResponse(w, cliCtx, resp)
 	}
