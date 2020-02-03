@@ -22,8 +22,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/genaccounts"
 	genaccscli "github.com/cosmos/cosmos-sdk/x/genaccounts/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/staking"
+        "github.com/cosmos/cosmos-sdk/baseapp"
 
 	"github.com/spf13/cobra"
+        "github.com/spf13/viper"
+
 	"github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/log"
 
@@ -78,7 +81,7 @@ func main() {
 }
 
 func newApp(logger log.Logger, db dbm.DB, _ io.Writer) abci.Application {
-	return app.NewCRUDApp(logger, db)
+	return app.NewCRUDApp(logger, db, baseapp.SetMinGasPrices(viper.GetString(server.FlagMinGasPrices)))
 }
 
 func exportAppStateAndTMValidators(
