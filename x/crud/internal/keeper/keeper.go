@@ -27,16 +27,20 @@ type Keeper struct {
 	cdc        *codec.Codec
 }
 
+func MakeMetaKey(UUID string, key string) string {
+	return UUID + "\x00" + key
+}
+
 func (k Keeper) SetBLZValue(ctx sdk.Context, UUID string, key string, value types.BLZValue) {
 	if len(value.Value) == 0 {
 		return
 	}
 	store := ctx.KVStore(k.storeKey)
-	store.Set([]byte(UUID+key), k.cdc.MustMarshalBinaryBare(value))
+	store.Set([]byte(MakeMetaKey(UUID, key)), k.cdc.MustMarshalBinaryBare(value))
 }
 
 func (k Keeper) GetBLZValue(ctx sdk.Context, UUID string, key string) types.BLZValue {
-	BLZKey := UUID + key
+	BLZKey := MakeMetaKey(UUID, key)
 	store := ctx.KVStore(k.storeKey)
 	if !k.IsUUIDKeyPresent(ctx, BLZKey) {
 		return types.NewBLZValue()
@@ -50,13 +54,11 @@ func (k Keeper) GetBLZValue(ctx sdk.Context, UUID string, key string) types.BLZV
 
 func (k Keeper) DeleteBLZValue(ctx sdk.Context, UUID string, key string) {
 	store := ctx.KVStore(k.storeKey)
-	store.Delete([]byte(UUID + key))
+	store.Delete([]byte(MakeMetaKey(UUID, key)))
 }
 
 func (k Keeper) IsKeyPresent(ctx sdk.Context, UUID string, key string) bool {
-	BLZKey := UUID + key
-
-	return k.IsUUIDKeyPresent(ctx, BLZKey)
+	return k.IsUUIDKeyPresent(ctx, MakeMetaKey(UUID, key))
 }
 
 func (k Keeper) IsUUIDKeyPresent(ctx sdk.Context, key string) bool {
@@ -71,12 +73,13 @@ func (k Keeper) GetValuesIterator(ctx sdk.Context) sdk.Iterator {
 
 func (k Keeper) GetKeys(ctx sdk.Context, UUID string) types.QueryResultKeys {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, []byte(UUID))
+	prefix := UUID + "\x00"
+	iterator := sdk.KVStorePrefixIterator(store, []byte(prefix))
 	keys := types.QueryResultKeys{UUID: UUID}
 
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
-		keys.Keys = append(keys.Keys, string(iterator.Key())[len(UUID):])
+		keys.Keys = append(keys.Keys, string(iterator.Key())[len(prefix):])
 	}
 	return keys
 }
