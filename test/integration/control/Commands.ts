@@ -1,0 +1,5 @@
+
+
+interface CommandResponse {
+    ok: boolean
+}
