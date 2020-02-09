@@ -4,12 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha -r ts-node/register **/*.spec.ts"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/chai": "^4.2.8",
+    "@types/mocha": "^7.0.1",
     "chai": "^4.2.0",
-    "mocha": "^7.0.1"
+    "mocha": "^7.0.1",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.7.5"
   }
 }

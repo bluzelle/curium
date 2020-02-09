@@ -18,4 +18,5 @@ export const startContainer = (prefix: string, imageName: string, containerName:
         .then(container => container.start());
 
 export const listContainers = ():Promise<Container[]> =>
-    docker.container.list();
+    docker.container.list({all: true})
+

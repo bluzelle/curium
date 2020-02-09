@@ -1,7 +1,7 @@
 import {createImageFromFile, listImages} from "./ImageManager";
 import {DockerImage} from "./DockerImage";
 import {listContainers, startContainer} from "./ContainerManager";
-import {Container as DockerContainer} from 'node-docker-api/lib/container'
+import {Daemon} from "./Daemon";
 
 export const listDaemonImages = (): Promise<DockerImage[]> =>
     listImages('integration');
@@ -14,48 +14,20 @@ const ensureBaseImage = (): Promise<boolean> =>
 
 export const startDaemon = async (name: string): Promise<boolean> => {
     await ensureBaseImage();
-    startContainer('integration', 'base-image', name);
-    return new Promise(() => {});
+    return startContainer('integration', 'base-image', name)
+        .then(() => true)
 };
 
-export const listDaemons = async (): Promise<Daemon[]> => {
-    return listContainers()
+export const listDaemons = (): Promise<Daemon[]> =>
+     listContainers()
         .then(containers => containers.map(c => new Daemon(c)))
-};
-
-export const stopDaemons = async (): Promise<boolean> => {
-
-    console.log(await listContainers());
-    return true;
-
-};
-
-export class Daemon {
-    id: string;
-    created: number;
-    ports: any;
-    state: string;
-    container: DockerContainer;
-
-    stop(): Promise<boolean> {
-        console.log('xxxxx', (this.container.data as any).Status);
-        return this.container.kill()
-            .then((container: DockerContainer) => (container.data as any).Status === 'exited')
-            .then((stopped: boolean) => stopped ? !!this.container.delete() : stopped)
-    }
-
-    constructor(dc: DockerContainer) {
-        this.id = (dc.data as any).Id;
-        this.ports = (dc.data as any).Ports;
-        this.state = (dc.data as any).State;
-        this.created = (dc.data as any).Created;
-        this.container = dc;
-    }
-}
 
 
+export const stopDaemons = (): Promise<boolean[]> =>
+    listDaemons()
+        .then(daemons => Promise.all(daemons.map(d => d.stop())));
 
-listDaemons().then(daemons => daemons.map(d => d.stop()));
+
 
 //startDaemon('testing');
 
