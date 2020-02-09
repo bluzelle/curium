@@ -1,7 +1,7 @@
 import {expect} from 'chai'
 import {startDaemon, stopDaemons} from "../control/manager";
 
-const {bluzelle} = require('../scripts/blz-tmclient/lib/bluzelle-node');
+//const {bluzelle} = require('../scripts/blz-tmclient/lib/bluzelle-node');
 
 let bz;
 beforeEach(async () => {

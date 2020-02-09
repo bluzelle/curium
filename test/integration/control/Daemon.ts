@@ -8,16 +8,24 @@ export class Daemon {
         this.container = dc;
     }
 
-    status(): Promise<any> {
+    exec(cmd: string): Promise<string> {
         return this.container.exec.create({
             AttachStdout: true,
             AttachStderr: true,
-            Cmd: ['blzcli', 'status']
+            Cmd: cmd.split(' ')
         })
-            .then(exec => exec.start({Detach: false}))
+            .then(exec => exec.start({Detatch: false}))
             .then(promisifyStream)
+    }
+
+    status(): Promise<any> {
+        return this.exec('blzcli status')
             .then(status => {
-                return status.includes('ERROR:') ? null : status;
+                status = status
+                    .split('\n')
+                    .join('')
+                    .replace(/.*?(\{.*\}).*/, '$1');
+                return status.includes('ERROR:') ? null : JSON.parse(status);
             })
     }
 
