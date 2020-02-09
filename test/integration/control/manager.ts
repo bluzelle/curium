@@ -12,15 +12,16 @@ const ensureBaseImage = (): Promise<boolean> =>
         .then(result => result ? result : !!createImageFromFile('integration', 'base-image'));
 
 
-export const startDaemon = async (name: string): Promise<boolean> => {
+export const startDaemon = async (name: string): Promise<Daemon> => {
     await ensureBaseImage();
     return startContainer('integration', 'base-image', name)
-        .then(() => true)
+        .then(container => new Daemon(container))
+        .then(daemon => daemon.waitUntilRunning())
 };
 
 export const listDaemons = (): Promise<Daemon[]> =>
      listContainers()
-        .then(containers => containers.map(c => new Daemon(c)))
+        .then(containers => containers.map(c => new Daemon(c)));
 
 
 export const stopDaemons = (): Promise<boolean[]> =>

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -r ts-node/register **/*.spec.ts"
+    "test": "mocha --timeout=10000 -r ts-node/register **/*.spec.ts "
   },
   "author": "",
   "license": "ISC",

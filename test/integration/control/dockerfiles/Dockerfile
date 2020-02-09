@@ -29,7 +29,7 @@ COPY --from=build-env /go/bin/blzcli /usr/bin/blzcli
 
 ENV DEFAULT_PASS=jackjack
 
-ENTRYPOINT blzd init docker --chain-id bluzelle \
+ENTRYPOINT blzd init docker --chain-id integration \
            && blzcli config chain-id namechain  \
            && blzcli config output json         \
            && blzcli config indent true         \

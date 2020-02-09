@@ -1,30 +1,50 @@
 import {Container as DockerContainer} from "node-docker-api/lib/container";
 
 export class Daemon {
-    id: string;
-    created: number;
-    ports: any;
-    state: string;
     container: DockerContainer;
 
 
     constructor(dc: DockerContainer) {
-        this.id = (dc.data as any).Id;
-        this.ports = (dc.data as any).Ports;
-        this.state = (dc.data as any).State;
-        this.created = (dc.data as any).Created;
         this.container = dc;
     }
 
-    async stop(): Promise<boolean> {
-        return this.isRunning()
-            .then(async (isRunning): Promise<any> => isRunning && this.container.kill())
-            .then(() => this.container.delete())
+    status(): Promise<any> {
+        return this.container.exec.create({
+            AttachStdout: true,
+            AttachStderr: true,
+            Cmd: ['blzcli', 'status']
+        })
+            .then(exec => exec.start({Detach: false}))
+            .then(promisifyStream)
+            .then(status => {
+                return status.includes('ERROR:') ? null : status;
+            })
+    }
+
+    stop(): Promise<boolean> {
+        return this.container.kill()
+            .finally(() => this.container.delete())
             .then(() => true);
     }
 
+    waitUntilRunning(): Promise<Daemon> {
+        return new Promise(resolve => {
+            const looper = async () => {
+                await this.isRunning() ? resolve(this) : setTimeout(looper, 100);
+            };
+            looper();
+        })
+    }
+
     async isRunning(): Promise<boolean> {
-        const container = await this.container.status();
-        return (container.data as any).State.Status === 'running'
+        return this.status()
+            .then(status => !!status)
     }
 }
+
+const promisifyStream = (stream: any): Promise<string> => new Promise((resolve, reject) => {
+    let result: string = '';
+    stream.on('data', (data: any) => result = `${result}${data}`);
+    stream.on('end', () => resolve(result));
+    stream.on('error', reject)
+});
