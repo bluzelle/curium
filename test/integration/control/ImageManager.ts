@@ -1,12 +1,9 @@
 import {Image} from "node-docker-api/lib/image";
-import {Docker} from "node-docker-api";
 import {DockerImage} from "./DockerImage";
 import {Stream} from "stream";
-import {Container} from "node-docker-api/lib/container";
+import {docker} from "./DockerManager";
 
 const tar = require('tar-fs');
-
-const docker = new Docker({socketPath: '/var/run/docker.sock'});
 
 const promisifyStream = (stream: Stream): Promise<Stream> => new Promise((resolve, reject) => {
     stream.on('data', data => console.log(data.toString()));
@@ -33,21 +30,5 @@ export const createImageFromFile = (prefix:string, name:string): Promise<DockerI
         .then(() => docker.image.get(`${prefix}/${name}`).status())
         .then(image => new DockerImage(image))
 };
-
-export const startContainer = (prefix: string, imageName: string, containerName: string): Promise<Container> =>
-    docker.container.create({
-        Image: `${prefix}/${imageName}`,
-        name: containerName,
-        HostName: 'integration',
-        ExposedPorts:{
-            "26657/tcp": { }
-        },
-        HostConfig: {
-            PortBindings: {
-                '26657/tcp': [{HostPort: '26657'}]
-            }
-        }
-    })
-        .then(container => container.start());
 
 
