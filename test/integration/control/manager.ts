@@ -1,5 +1,4 @@
-//import {createImageFromFile, listImages} from "./ImageManager";
-import {createImageFromFile, listImages} from "./ImageManager";
+import {createImageFromFile, listImages, startContainer} from "./ImageManager";
 import {DockerImage} from "./DockerImage";
 
 export const listDaemonImages = (): Promise<DockerImage[]> =>
@@ -13,11 +12,15 @@ const ensureBaseImage = (): Promise<boolean> =>
 
 export const startDaemon = async (name: string): Promise<boolean> => {
     await ensureBaseImage();
-
+    startContainer('integration', 'base-image', name);
     return new Promise(() => {});
 };
 
-startDaemon('testing');
+// export const stopDaemons = async (): Promise<boolean> => {
+//
+// };
+
+//startDaemon('testing');
 
 //createImageFromFile('integration', 'base-image');
 
