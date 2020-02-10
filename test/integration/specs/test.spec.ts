@@ -14,14 +14,18 @@ beforeEach(async () => {
     bz = await bluzelle({
         address: auth.address,
         mnemonic: auth.mnemonic,
-        endpoint: "http://localhost:26657",
+        endpoint: "http://localhost:1317",
         chain_id: "integration"
     });
 });
 
 describe('a suite', () => {
-    it('should pass', () => {
-        expect(true).to.be.true
+    it('should pass', async () => {
+        await bz.create('mykey', 'myvalue', {'gas_price': '0.01'});
+        // await new Promise(resolve => setTimeout(resolve, 5000));
+        // const x = await bz.quickread('myKey');
+        // console.log('*******', x);
+
     })
 });
 
