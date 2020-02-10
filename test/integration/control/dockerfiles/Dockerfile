@@ -30,13 +30,13 @@ COPY --from=build-env /go/bin/blzcli /usr/bin/blzcli
 ENV DEFAULT_PASS=jackjack
 
 ENTRYPOINT blzd init docker --chain-id integration \
-           && blzcli config chain-id namechain  \
+           && blzcli config chain-id integration  \
            && blzcli config output json         \
            && blzcli config indent true         \
            && blzcli config trust-node true     \
-           && echo $DEFAULT_PASS | blzcli keys add validator \
-           && echo $DEFAULT_PASS | blzd add-genesis-account $(blzcli keys show validator -a) 10000000000bnt \
-           && echo $DEFAULT_PASS | blzd gentx --name validator --amount 100000000bnt                        \
+           && echo $DEFAULT_PASS | blzcli keys add validator 2> keys-add-validator \
+           && echo $DEFAULT_PASS | blzd add-genesis-account $(blzcli keys show validator -a) 10000000000bnt 2> add-genesis-account\
+           && echo $DEFAULT_PASS | blzd gentx --name validator --amount 100000000bnt 2> gentx                       \
            && sed -i -e 's/minimum-gas-prices = ""/minimum-gas-prices = "0.01bnt"/g' .blzd/config/app.toml  \
            && sed -i -e 's/"bond_denom": "stake"/"bond_denom": "bnt"/g' .blzd/config/genesis.json           \
            && echo $DEFAULT_PASS | blzd collect-gentxs \

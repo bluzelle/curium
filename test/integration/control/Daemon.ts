@@ -28,30 +28,31 @@ export class Daemon {
         this.container = dc;
     }
 
+    async getAuth(): Promise<DaemonAuth> {
+        const result = await this.exec<DaemonAuth>('cat /root/keys-add-validator');
+        return typeof result === 'string' ? {} as DaemonAuth : result;
+    }
+
     getId(): Promise<string> {
         return this.status()
             .then(status => status.node_info.id);
     }
 
-    exec(cmd: string): Promise<string> {
+    exec<T = any>(cmd: string): Promise<T | string> {
         return this.container.exec.create({
             AttachStdout: true,
             AttachStderr: true,
-            Cmd: cmd.split(' ')
+            Cmd: cmd.split(' '),
+
         })
             .then(exec => exec.start({Detatch: false}))
             .then(promisifyStream)
+            .then(result => parseJson<T>(result))
     }
 
-    status(): Promise<any> {
+    status<T = any>(): Promise<T> {
         return this.exec('blzcli status')
-            .then(status => {
-                status = status
-                    .split('\n')
-                    .join('')
-                    .replace(/.*?(\{.*\}).*/, '$1');
-                return status.includes('ERROR:') ? null : JSON.parse(status);
-            })
+            .then(status => typeof status === 'string' ? null : status)
     }
 
     stop(): Promise<boolean> {
@@ -63,7 +64,7 @@ export class Daemon {
     waitUntilRunning(): Promise<Daemon> {
         return new Promise(resolve => {
             const looper = async () => {
-                await this.isRunning() ? resolve(this) : setTimeout(looper, 100);
+                await this.isRunning() ? resolve(this) : setTimeout(looper, 1000);
             };
             looper();
         })
@@ -85,4 +86,22 @@ const promisifyStream = (stream: any): Promise<string> => new Promise((resolve, 
 const ensureBaseImageExists = (): Promise<boolean> =>
     listImages('integration')
         .then(images => !!images.find(image => image.shortName === 'base-image'))
-        .then(result => result ? result : !!createImageFromFile('integration', 'base-image'));
+        .then(result => result ? result : createImageFromFile('integration', 'base-image'));
+
+const parseJson = <T>(string: string): T | string => {
+    string = string
+        .split('\n')
+        .join('')
+        .replace(/.*?(\{.*\}).*/, '$1');
+    try {
+        return JSON.parse(string)
+    } catch(e) {
+        return string
+    }
+};
+
+export interface DaemonAuth {
+    address: string
+    pubkey: string
+    mnemonic: string
+}

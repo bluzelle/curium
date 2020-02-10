@@ -5,7 +5,7 @@ export const startContainer = (prefix: string, imageName: string, containerName:
     docker.container.create({
         Image: `${prefix}/${imageName}`,
         name: containerName,
-        HostName: 'integration',
+        HostName: containerName,
         ExposedPorts: {
             "26657/tcp": {}
         },
@@ -18,5 +18,5 @@ export const startContainer = (prefix: string, imageName: string, containerName:
         .then(container => container.start());
 
 export const listContainers = ():Promise<Container[]> =>
-    docker.container.list({all: true})
+    docker.container.list({all: true});
 

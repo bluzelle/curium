@@ -21,14 +21,14 @@ export const listImages = (prefix: string): Promise<DockerImage[]> => {
         .then((images: Image[]) => images.map<DockerImage>((image: Image): DockerImage => new DockerImage(image)));
 };
 
-export const createImageFromFile = (prefix:string, name:string): Promise<DockerImage> => {
-    var tarStream = tar.pack(`${__dirname}/dockerfiles`);
+export const createImageFromFile = (prefix: string, name: string): Promise<boolean> => {
+    const tarStream = tar.pack(`${__dirname}/dockerfiles`);
     return (docker.image.build(tarStream, {
         t: `${prefix}/${name}`
     }) as Promise<Stream>)
         .then((stream: Stream) => promisifyStream(stream))
         .then(() => docker.image.get(`${prefix}/${name}`).status())
-        .then(image => new DockerImage(image))
+        .then(status => !!status)
 };
 
 
