@@ -1,19 +1,21 @@
 import {expect} from 'chai'
-import {startDaemon, stopDaemons} from "../control/manager";
+import {Daemon} from "../control/Daemon";
 
-//const {bluzelle} = require('../scripts/blz-tmclient/lib/bluzelle-node');
+const {bluzelle} = require('../scripts/blz-tmclient/lib/bluzelle-node');
 
 let bz;
 beforeEach(async () => {
-    await stopDaemons();
-    const daemon = await startDaemon('daemon1');
-    console.log(await daemon.status())
-    // bz = await bluzelle({
-    //     address: '6d4fd6b408572a31986bfa8a3b252a9130e270a2',
-    //     mnemonic: 'uniform tumble fragile define modify boy burger nose lizard hub shine novel brass document aerobic tomorrow jaguar now since sentence person auction dignity miss',
-    //     endpoint: "http://localhost:26657",
-    //     chain_id: "integration"
-    // });
+   await Daemon.stopDaemons();
+   const daemon:Daemon = await Daemon.startDaemon('daemon1');
+   const status = await daemon.status();
+   console.log(status);
+
+    bz = await bluzelle({
+        address: 'cosmos17jfr2dqreyfctfga2y4p99vwrypvc4q6usapdj',
+        mnemonic: 'uniform tumble fragile define modify boy burger nose lizard hub shine novel brass document aerobic tomorrow jaguar now since sentence person auction dignity miss',
+        endpoint: "http://localhost:26657",
+        chain_id: "integration"
+    });
 });
 
 describe('a suite', () => {
