@@ -9,5 +9,6 @@ else
     cd blz-tmclient
     git checkout prototype
 fi
-npm install
-npx webpack
+
+npm install \
+&& npx webpack
