@@ -1,15 +1,17 @@
 import {expect} from 'chai'
 import {Daemon, DaemonAuth} from "../control/Daemon";
+import delay from 'delay'
 
 const {bluzelle} = require('../scripts/blz-tmclient/lib/bluzelle-node');
 
 let bz;
 beforeEach(async () => {
-   await Daemon.stopDaemons();
-   const daemon:Daemon = await Daemon.startDaemon('daemon1');
-   const auth:DaemonAuth = await daemon.getAuth();
+    await Daemon.stopDaemons();
+    const daemon: Daemon = await Daemon.startDaemon('daemon1');
+    await delay(10000);
+    const auth: DaemonAuth = await daemon.getAuth();
 
-   console.log(auth);
+    console.log(auth);
 
     bz = await bluzelle({
         address: auth.address,
@@ -22,9 +24,9 @@ beforeEach(async () => {
 describe('a suite', () => {
     it('should pass', async () => {
         await bz.create('mykey', 'myvalue', {'gas_price': '0.01'});
-        // await new Promise(resolve => setTimeout(resolve, 5000));
-        // const x = await bz.quickread('myKey');
-        // console.log('*******', x);
+        await delay(10000);
+        const x = await bz.quickread('myKey');
+        console.log('*******', x);
 
     })
 });

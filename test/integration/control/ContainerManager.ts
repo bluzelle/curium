@@ -10,6 +10,7 @@ export const startContainer = (prefix: string, imageName: string, containerName:
             "26657/tcp": {}
         },
         HostConfig: {
+
             PortBindings: {
                 '26657/tcp': [{HostPort: '26657'}]
             }
