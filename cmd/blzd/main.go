@@ -25,6 +25,8 @@ import (
 	genaccscli "github.com/cosmos/cosmos-sdk/x/genaccounts/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 
+	bluzellechain "github.com/bluzelle/curium/types"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -45,9 +47,9 @@ func main() {
 	cdc := app.MakeCodec()
 
 	config := sdk.GetConfig()
-	config.SetBech32PrefixForAccount(sdk.Bech32PrefixAccAddr, sdk.Bech32PrefixAccPub)
-	config.SetBech32PrefixForValidator(sdk.Bech32PrefixValAddr, sdk.Bech32PrefixValPub)
-	config.SetBech32PrefixForConsensusNode(sdk.Bech32PrefixConsAddr, sdk.Bech32PrefixConsPub)
+	config.SetBech32PrefixForAccount(bluzellechain.Bech32PrefixAccAddr, bluzellechain.Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(bluzellechain.Bech32PrefixValAddr, bluzellechain.Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(bluzellechain.Bech32PrefixConsAddr, bluzellechain.Bech32PrefixConsPub)
 	config.Seal()
 
 	ctx := server.NewDefaultContext()
