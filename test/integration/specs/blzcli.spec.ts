@@ -1,6 +1,5 @@
 import {Daemon} from "../control/Daemon";
 import {expect} from 'chai'
-
 describe('blzcli', function()  {
     this.timeout(20000);
     let daemon: Daemon;

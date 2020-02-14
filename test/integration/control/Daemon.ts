@@ -1,6 +1,9 @@
 import {Container as DockerContainer} from "node-docker-api/lib/container";
 import {listContainers, startContainer} from "./ContainerManager";
 import {createImageFromFile, listImages} from "./ImageManager";
+const delay = require('delay');
+const {pack} = require('tar-stream');
+
 
 export class Daemon {
     container: DockerContainer;
@@ -20,12 +23,49 @@ export class Daemon {
         await ensureBaseImageExists();
         return startContainer('integration', 'base-image', `blz-${name}`)
             .then(container => new Daemon(container))
+
+            //TODO: this is a hack to wait for the bluzelle stuff to initalize in the container, need to change to something more deterministic
+            .then(async (daemon: Daemon): Promise<Daemon> => {
+                await delay(2000);
+                return daemon
+            })
+            .then(async (daemon: Daemon) => {
+                const DEFAULT_PASS = 'jackjack';
+                const script = `
+                    echo "${DEFAULT_PASS}" | blzd add-genesis-account $(blzcli keys show validator -a) 10000000000bnt
+                    echo ${DEFAULT_PASS} | blzd gentx --name validator --amount 100000000bnt
+                    echo ${DEFAULT_PASS} | blzd collect-gentxs
+                    sed -i -e \'s/minimum-gas-prices = ""/minimum-gas-prices = "0.01bnt"/g\' .blzd/config/app.toml
+                    sed -i -e \'s/"bond_denom": "stake"/"bond_denom": "bnt"/g\' .blzd/config/genesis.json
+                    sed -i -e \'s/127.0.0.1:26657/0.0.0.0:26657/g\' .blzd/config/config.toml
+                    blzd start 
+                `;
+                await daemon.writeTextFile('setup.sh', script);
+                await daemon.exec('/bin/sh -C /root/setup.sh', {Detatch: true, AttachStdout: false, AttachStderr: false});
+                return daemon;
+            })
             .then(daemon => daemon.waitUntilRunning())
     };
 
 
     constructor(dc: DockerContainer) {
         this.container = dc;
+    }
+
+    async writeTextFile(name: string, text: string, path: string = '/root'): Promise<Daemon> {
+        return new Promise<Daemon>((resolve, reject) => {
+            const p = pack();
+            p.entry({name: name}, text, (err: Error) => {
+                    if(err) {
+                        reject(err)
+                    } else {
+                        p.finalize()
+                    }
+                    this.container.fs.put(p, {path: path})
+                        .then(() => resolve(this))
+                }
+            );
+        })
     }
 
     async getAuth(): Promise<DaemonAuth> {
@@ -38,15 +78,17 @@ export class Daemon {
             .then(status => status.node_info.id);
     }
 
-    exec<T = any>(cmd: string): Promise<T | string> {
+    exec<T = any>(cmd: string, options = {}): Promise<T | string> {
         return this.container.exec.create({
             AttachStdout: true,
             AttachStderr: true,
             Cmd: cmd.split(' '),
+            ...options
 
         })
-            .then(exec => exec.start({Detatch: false}))
+            .then(exec => exec.start({Detatch: false, ...options}))
             .then(promisifyStream)
+            .then(x => x.substr(8)) // knock off the 8 byte header
             .then(result => parseJson<T>(result))
     }
 
@@ -89,10 +131,6 @@ const ensureBaseImageExists = (): Promise<boolean> =>
         .then(result => result ? result : createImageFromFile('integration', 'base-image'));
 
 const parseJson = <T>(string: string): T | string => {
-    string = string
-        .split('\n')
-        .join('')
-        .replace(/.*?(\{.*\}).*/, '$1');
     try {
         return JSON.parse(string)
     } catch(e) {
