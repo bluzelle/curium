@@ -41,10 +41,12 @@ export class Daemon {
                     blzd start 
                 `;
                 await daemon.writeTextFile('setup.sh', script);
-                await daemon.exec('/bin/sh -C /root/setup.sh', {Detatch: true, AttachStdout: false, AttachStderr: false});
+                await daemon.exec('/bin/sh -C /root/setup.sh', {detatched: true});
                 return daemon;
             })
             .then(daemon => daemon.waitUntilRunning())
+            // TODO: Hack to allow some setup otherwise tests fail.  Need something more deterministic
+            .then(async (daemon) => {await delay(5000); return daemon})
     };
 
 
@@ -78,15 +80,13 @@ export class Daemon {
             .then(status => status.node_info.id);
     }
 
-    exec<T = any>(cmd: string, options = {}): Promise<T | string> {
+    exec<T = any>(cmd: string, {detatched = false}: ExecOptions = {detatched: false}): Promise<T | string> {
         return this.container.exec.create({
-            AttachStdout: true,
-            AttachStderr: true,
+            AttachStdout: !detatched,
+            AttachStderr: !detatched,
             Cmd: cmd.split(' '),
-            ...options
-
         })
-            .then(exec => exec.start({Detatch: false, ...options}))
+            .then(exec => exec.start({Detatch: detatched}))
             .then(promisifyStream)
             .then(x => x.substr(8)) // knock off the 8 byte header
             .then(result => parseJson<T>(result))
@@ -124,6 +124,10 @@ const promisifyStream = (stream: any): Promise<string> => new Promise((resolve, 
     stream.on('end', () => resolve(result));
     stream.on('error', reject)
 });
+
+interface ExecOptions {
+    detatched: boolean
+}
 
 const ensureBaseImageExists = (): Promise<boolean> =>
     listImages('integration')

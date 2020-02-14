@@ -1,6 +1,5 @@
 import {expect} from 'chai'
 import {Daemon, DaemonAuth} from "../control/Daemon";
-import delay from 'delay'
 
 const {bluzelle} = require('../scripts/blz-tmclient/lib/bluzelle-node');
 describe('with single daemon', function() {
@@ -9,7 +8,6 @@ describe('with single daemon', function() {
     beforeEach(async () => {
         await Daemon.stopDaemons();
         const daemon: Daemon = await Daemon.startDaemon('daemon1');
-        await delay(5000);
         const auth: DaemonAuth = await daemon.getAuth();
 
         bz = await bluzelle({
@@ -30,7 +28,7 @@ describe('with single daemon', function() {
 
         it('should return true if key exists', async () => {
             await bz.create('someKey', 'someValue', {'gas_price': '0.01'});
-            expect(await bz.has('someKey')).to.be.true
+            expect(await bz.has('someKey', {'gas_price': '0.01'})).to.have.property('Value', true);
         });
     });
 
