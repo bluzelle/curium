@@ -1,10 +1,17 @@
 import {expect} from 'chai'
 import {Daemon, DaemonAuth} from "../control/Daemon";
+import {API, bluzelle} from "../scripts/blz-tmclient/lib/bluzelle-node"
 
-const {bluzelle} = require('../scripts/blz-tmclient/lib/bluzelle-node');
+
+//const {bluzelle} = require('../scripts/blz-tmclient/lib/bluzelle-node');
 describe('with single daemon', function() {
     this.timeout(20000);
-    let bz;
+
+    let bz: API;
+
+
+    const x = bluz
+
     beforeEach(async () => {
         await Daemon.stopDaemons();
         const daemon: Daemon = await Daemon.startDaemon('daemon1');
@@ -20,10 +27,9 @@ describe('with single daemon', function() {
 
 
     describe('has()', () => {
-        it('should throw error if key does not exist', (done) => {
-            bz.has('someKey')
-                .then(() => done('has was supposed to throw'))
-                .catch((e) => done())
+        it('should return false if the key does not exist', async () => {
+            const result = await bz.has('someKey', {gas_price: '0.01'});
+            expect(result).to.have.property('Value', false)
         });
 
         it('should return true if key exists', async () => {
