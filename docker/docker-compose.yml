@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  swarm01:
+    image: bluzelle-curium:latest
+    ports:
+      - "26656:26656"
+      - "1317:1317"
+    environment:
+      NODE_NAME: "swarm01"
+    networks:
+      - swarmnet
+    expose:
+      - "26656"
+      - "1317"
+
+  swarm02:
+    image: bluzelle-curium:latest
+    environment:
+      NODE_NAME: "swarm02"
+      LOCAL_IP: ${LOCAL_IP}
+    networks:
+      - swarmnet
+
+  #swarm03:
+  #   image: bluzelle-curium:latest
+  #   environment:
+  #     NODE_NAME: "swarm03"
+  #     LOCAL_IP: ${LOCAL_IP}
+  #   networks:
+  #     - swarmnet
+
+  # swarm04:
+  #   image: bluzelle-curium:latest
+  #   environment:
+  #     SWARM_NAME: "swarm04"
+  #     LOCAL_IP: ${LOCAL_IP}
+  #   networks:
+  #     - swarmnet
+
+networks:
+  swarmnet:
+    driver: bridge
