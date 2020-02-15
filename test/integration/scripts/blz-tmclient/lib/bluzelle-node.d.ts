@@ -16,8 +16,8 @@ interface Result {
 }
 
 declare class API {
-    create: (key: string, value: string, gasInfo: GasInfo) => Promise<Result>;
-    has: (key: string, gasInfo: GasInfo) => Promise<Result>;
+    create: (key: string, value: string, gasInfo?: GasInfo) => Promise<Result>;
+    has: (key: string, gasInfo?: GasInfo) => Promise<Result>;
     quickread: (key: string) => Promise<Result>;
 }
 

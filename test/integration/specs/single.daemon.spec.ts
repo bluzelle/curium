@@ -10,8 +10,6 @@ describe('with single daemon', function() {
     let bz: API;
 
 
-    const x = bluz
-
     beforeEach(async () => {
         await Daemon.stopDaemons();
         const daemon: Daemon = await Daemon.startDaemon('daemon1');
