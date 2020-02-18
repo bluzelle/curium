@@ -21,7 +21,7 @@ before_script:
 script:
   - ls -a
   - echo ${TRAVIS_PULL_REQUEST}
-  - if [ "${TRAVIS_PULL_REQUEST}" == "false"  ]; then make install;make test;ls -l $GOPATH/bin; else ls -a; chmod +x /trigger-travis/trigger-travis.sh;/trigger-travis/trigger-travis.sh --pro --branch task/milagan/cm-89 matteyu curium-test ${TRAV_TOKEN} "Trigger for Integration Testing"; fi
+  - if [ "${TRAVIS_PULL_REQUEST}" == "false"  ]; then make install;make test;ls -l $GOPATH/bin; else ls -a; chmod +x trigger-travis/trigger-travis.sh; trigger-travis/trigger-travis.sh --pro --branch task/milagan/cm-89 matteyu curium-test ${TRAV_TOKEN} "Trigger for Integration Testing"; fi
 
 
   
