@@ -60,8 +60,7 @@ func handleMsgBLZRead(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBLZRea
 	if owner.Empty() {
 		return sdk.ErrInternal("Key does not exist").Result()
 	}
-
-	json_data, err := json.Marshal(keeper.GetBLZValue(ctx, msg.UUID, msg.Key))
+	json_data, err := json.Marshal(types.QueryResultRead{msg.UUID, msg.Key, keeper.GetBLZValue(ctx, msg.UUID, msg.Key).Value})
 	if err != nil {
 		fmt.Println(err)
 		return sdk.ErrInternal("could not marshal result to JSON").Result()
