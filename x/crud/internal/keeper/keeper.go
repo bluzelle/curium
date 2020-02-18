@@ -12,6 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+//go:generate mockgen -destination=../../mocks/mock_keeper.go -package=mocks github.com/bluzelle/curium/x/crud/internal/keeper IKeeper
 package keeper
 
 import (
@@ -20,6 +21,17 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 )
+
+type IKeeper interface {
+	SetBLZValue(ctx sdk.Context, UUID string, key string, value types.BLZValue)
+	GetBLZValue(ctx sdk.Context, UUID string, key string) types.BLZValue
+	DeleteBLZValue(ctx sdk.Context, UUID string, key string)
+	IsKeyPresent(ctx sdk.Context, UUID string, key string) bool
+	IsUUIDKeyPresent(ctx sdk.Context, key string) bool
+	GetValuesIterator(ctx sdk.Context) sdk.Iterator
+	GetKeys(ctx sdk.Context, UUID string) types.QueryResultKeys
+	GetOwner(ctx sdk.Context, UUID string, key string) sdk.AccAddress
+}
 
 type Keeper struct {
 	CoinKeeper bank.Keeper

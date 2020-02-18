@@ -22,7 +22,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func NewHandler(keeper keeper.Keeper) sdk.Handler {
+func NewHandler(keeper keeper.IKeeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
 		case types.MsgBLZCreate:
@@ -43,7 +43,11 @@ func NewHandler(keeper keeper.Keeper) sdk.Handler {
 	}
 }
 
-func handleMsgBLZCreate(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBLZCreate) sdk.Result {
+func handleMsgBLZCreate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZCreate) sdk.Result {
+	if len(msg.UUID) == 0 || len(msg.Key) == 0 || msg.Owner.Empty() {
+		return sdk.ErrInternal("Invalid message").Result()
+	}
+
 	if !keeper.GetBLZValue(ctx, msg.UUID, msg.Key).Owner.Empty() {
 		return sdk.ErrUnauthorized("Key already exists").Result()
 	}
@@ -55,21 +59,29 @@ func handleMsgBLZCreate(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBLZC
 	return sdk.Result{}
 }
 
-func handleMsgBLZRead(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBLZRead) sdk.Result {
+func handleMsgBLZRead(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZRead) sdk.Result {
+	if len(msg.UUID) == 0 || len(msg.Key) == 0 || msg.Owner.Empty() {
+		return sdk.ErrInternal("Invalid message").Result()
+	}
+
 	owner := keeper.GetOwner(ctx, msg.UUID, msg.Key)
 	if owner.Empty() {
 		return sdk.ErrInternal("Key does not exist").Result()
 	}
+
 	json_data, err := json.Marshal(types.QueryResultRead{msg.UUID, msg.Key, keeper.GetBLZValue(ctx, msg.UUID, msg.Key).Value})
 	if err != nil {
-		fmt.Println(err)
 		return sdk.ErrInternal("could not marshal result to JSON").Result()
 	}
 
 	return sdk.Result{Data: json_data}
 }
 
-func handleMsgBLZUpdate(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBLZUpdate) sdk.Result {
+func handleMsgBLZUpdate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZUpdate) sdk.Result {
+	if len(msg.UUID) == 0 || len(msg.Key) == 0 || msg.Owner.Empty() {
+		return sdk.ErrInternal("Invalid message").Result()
+	}
+
 	owner := keeper.GetOwner(ctx, msg.UUID, msg.Key)
 	if owner.Empty() {
 		return sdk.ErrInternal("Key does not exist").Result()
@@ -84,7 +96,11 @@ func handleMsgBLZUpdate(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBLZU
 	return sdk.Result{}
 }
 
-func handleMsgBLZDelete(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBLZDelete) sdk.Result {
+func handleMsgBLZDelete(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZDelete) sdk.Result {
+	if len(msg.UUID) == 0 || len(msg.Key) == 0 || msg.Owner.Empty() {
+		return sdk.ErrInternal("Invalid message").Result()
+	}
+
 	owner := keeper.GetOwner(ctx, msg.UUID, msg.Key)
 	if owner.Empty() {
 		return sdk.ErrInternal("Key does not exist").Result()
@@ -99,7 +115,11 @@ func handleMsgBLZDelete(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBLZD
 	return sdk.Result{}
 }
 
-func handleMsgBLZKeys(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBLZKeys) sdk.Result {
+func handleMsgBLZKeys(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZKeys) sdk.Result {
+	if len(msg.UUID) == 0 || msg.Owner.Empty() {
+		return sdk.ErrInternal("Invalid message").Result()
+	}
+
 	json_data, err := json.Marshal(keeper.GetKeys(ctx, msg.UUID))
 	if err != nil {
 		fmt.Println(err)
@@ -109,7 +129,11 @@ func handleMsgBLZKeys(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBLZKey
 	return sdk.Result{Data: json_data}
 }
 
-func handleMsgBLZHas(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBLZHas) sdk.Result {
+func handleMsgBLZHas(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZHas) sdk.Result {
+	if len(msg.UUID) == 0 || len(msg.Key) == 0 || msg.Owner.Empty() {
+		return sdk.ErrInternal("Invalid message").Result()
+	}
+
 	json_data, err := json.Marshal(types.QueryResultHas{UUID: msg.UUID, Key: msg.Key, Has: !keeper.GetOwner(ctx, msg.UUID, msg.Key).Empty()})
 	if err != nil {
 		fmt.Println(err)
