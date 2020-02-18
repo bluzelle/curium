@@ -5,14 +5,21 @@ language: go
 go: stable
 
 env:
+  global:
   - GO111MODULE=on
+  - secure: "WFU7ihwJpsKBQxxrFFFElZNIv1zbCI0mJFE4EJGN581kqwQqScCFnTfupGDWTt/G7MpzWfKwxv3CbNWX/4BDDFpZDduV4LMHaTADPDuIOEFI92dj7JrQaMBjOqCV89mpgh5iImNS8TLpcbOAIe74i43odX+NBeCxp2MFOwhouRIFN/kTdUwwaV9s7Xft6ANEo//WAnDENaPWZ3KWJ9CBN4dxSyzVyrY2c8KUwfbuHSsyP6IgxY0bRY7/glUVesaWBQORNYp38tDI7JRkWOSvrQJX27Jsp9rhgNI4GNuofL2C9IAXu9nrSxGdbcUsuRKCLyKkNAHkgcd6mXI6h7OPVFJsacdSatLW6MhNa+YqyPdDKXALUQMYZAGKmr9ouviutyN3HPI/45XekTefwfSrRhAnr+jc8vBN72kWrGii+5lX2NfUt8qyZ8UgrNqDVvhIhQKLzO0V4VP/ZUu/G/XJDUrwUbrK6dy/DPFhIdbwBHUxkfYSNBUsAzuYrEiAFrmbKDNqwGySp81UWq0+J+hiDafbJHfgPJTfEeFAcHyBbyrve2JfIAIKvigcud21PSd5oI8Vg4mLzyqOEloitGeLnCG2ySqoADGTAUSHraNO+Xsw5wps4Jr8hLGIf0KkSofLdtXQZPwIYOnfhKHwFXoAPTDYHXRI+v51AzlpTRpSGE0="
 
 git:
   depth: 1
 
 install: true
 
+before_script:
+  - sudo apt-get install ruby-dev && sudo gem install travis
+  - git clone https://github.com/plume-lib/trigger-travis.git
+
 script:
-  - make install
-  - make test
-  - ls -l $GOPATH/bin
+  - '[ "${TRAVIS_PULL_REQUEST}" = "false" ] && make install;make test;ls -l $GOPATH/bin || cd trigger-travis; ./trigger-travis.sh --pro --branch task/milagan/cm-89 matteyu curium-test ${TRAV_TOKEN} "Trigger for Integration Testing"'
+
+
+  
