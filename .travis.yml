@@ -19,6 +19,8 @@ before_script:
   - git clone https://github.com/plume-lib/trigger-travis.git
 
 script:
+  - ls -a
+  - echo ${TRAVIS_PULL_REQUEST}
   - if [ "${TRAVIS_PULL_REQUEST}" == "false"  ]; then make install;make test;ls -l $GOPATH/bin; else ./trigger-travis.sh --pro --branch task/milagan/cm-89 matteyu curium-test ${TRAV_TOKEN} "Trigger for Integration Testing"; fi
 
 
