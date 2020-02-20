@@ -16,12 +16,11 @@ install: true
 
 before_script:
   - sudo apt-get install ruby-dev && sudo gem install travis
-  - git clone https://github.com/plume-lib/trigger-travis.git
 
 script:
   - ls -a
   - echo ${TRAVIS_PULL_REQUEST}
-  - if [ "${TRAVIS_PULL_REQUEST}" == "false"  ]; then make install;make test;ls -l $GOPATH/bin; else ls -l trigger-travis; chmod +x trigger-travis/trigger-travis.sh; trigger-travis/trigger-travis.sh --pro --branch task/milagan/cm-89 matteyu curium-test ${TRAV_TOKEN} "Trigger for Integration Testing"; fi
+  - if [ "${TRAVIS_PULL_REQUEST}" == "false"  ]; then make install;make test;ls -l $GOPATH/bin; else travis restart -r bluzelle/curium-test; fi
 
 
   
