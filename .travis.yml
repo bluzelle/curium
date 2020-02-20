@@ -20,7 +20,8 @@ before_script:
 script:
   - ls -a
   - echo ${TRAVIS_PULL_REQUEST}
-  - if [ "${TRAVIS_PULL_REQUEST}" == "false"  ]; then make install;make test;ls -l $GOPATH/bin; else travis restart -r bluzelle/curium-test; fi
+  - echo "y" | travis login --github-token $TRAV_TOKEN
+  - if [ "${TRAVIS_PULL_REQUEST}" == "false"  ]; then make install;make test;ls -l $GOPATH/bin; else echo "y" | travis restart -r bluzelle/curium-test; fi
 
 
   
