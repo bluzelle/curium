@@ -2,6 +2,7 @@ PACKAGES=$(shell go list ./... | grep -v '/simulation')
 
 VERSION := $(shell echo $(shell git describe --tags) | sed 's/^v//')
 COMMIT := $(shell git log -1 --format='%H')
+COSMOS_SDK := $(shell grep -i cosmos-sdk go.mod | awk '{print $$2}')
 
 include Makefile.ledger
 
@@ -20,7 +21,7 @@ ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=BluzelleService \
 	-X github.com/cosmos/cosmos-sdk/version.ClientName=blzcli \
 	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
-	-X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)"
+	-X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep),cosmos-sdk $(COSMOS_SDK)"
 
 BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
 
