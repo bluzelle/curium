@@ -31,24 +31,25 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err sdk.Error) {
 		switch path[0] {
 		case QueryRead:
-			return queryRead(ctx, path[1:], req, keeper)
+			return queryRead(ctx, path[1:], req, keeper, keeper.cdc)
 		case QueryHas:
-			return queryHas(ctx, path[1:], req, keeper)
+			return queryHas(ctx, path[1:], req, keeper, keeper.cdc)
 		case QueryKeys:
-			return queryKeys(ctx, path[1:], req, keeper)
+			return queryKeys(ctx, path[1:], req, keeper, keeper.cdc)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown crud query endpoint")
 		}
 	}
 }
 
-func queryRead(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	value := keeper.GetBLZValue(ctx, path[0], path[1]).Value
-	if len(value) == 0 {
-		return []byte{}, sdk.ErrUnknownRequest("could not read key")
+func queryRead(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, sdk.Error) {
+	blzValue := keeper.GetBLZValue(ctx, path[0], path[1])
+
+	if len(blzValue.Owner) == 0 {
+		return []byte{}, sdk.ErrUnknownRequest("key not found")
 	}
 
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.QueryResultRead{UUID: path[0], Key: path[1], Value: value})
+	res, err := codec.MarshalJSONIndent(cdc, types.QueryResultRead{UUID: path[0], Key: path[1], Value: blzValue.Value})
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
@@ -56,10 +57,10 @@ func queryRead(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper Keepe
 	return res, nil
 }
 
-func queryHas(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+func queryHas(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, sdk.Error) {
 	has := keeper.IsKeyPresent(ctx, path[0], path[1])
 
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.QueryResultHas{UUID: path[0], Key: path[1], Has: has})
+	res, err := codec.MarshalJSONIndent(cdc, types.QueryResultHas{UUID: path[0], Key: path[1], Has: has})
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
@@ -67,8 +68,8 @@ func queryHas(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper Keeper
 	return res, nil
 }
 
-func queryKeys(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	res, err := codec.MarshalJSONIndent(keeper.cdc, keeper.GetKeys(ctx, path[0]))
+func queryKeys(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, sdk.Error) {
+	res, err := codec.MarshalJSONIndent(cdc, keeper.GetKeys(ctx, path[0]))
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
