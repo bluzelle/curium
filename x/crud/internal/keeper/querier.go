@@ -43,7 +43,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 }
 
 func queryRead(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, sdk.Error) {
-	blzValue := keeper.GetBLZValue(ctx, path[0], path[1])
+	blzValue := keeper.GetBLZValue(ctx, keeper.GetKVStore(ctx), path[0], path[1])
 
 	if len(blzValue.Owner) == 0 {
 		return []byte{}, sdk.ErrUnknownRequest("key not found")
@@ -58,7 +58,7 @@ func queryRead(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeep
 }
 
 func queryHas(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, sdk.Error) {
-	has := keeper.IsKeyPresent(ctx, path[0], path[1])
+	has := keeper.IsKeyPresent(ctx, keeper.GetKVStore(ctx), path[0], path[1])
 
 	res, err := codec.MarshalJSONIndent(cdc, types.QueryResultHas{UUID: path[0], Key: path[1], Has: has})
 	if err != nil {
@@ -69,7 +69,7 @@ func queryHas(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeepe
 }
 
 func queryKeys(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, sdk.Error) {
-	res, err := codec.MarshalJSONIndent(cdc, keeper.GetKeys(ctx, path[0]))
+	res, err := codec.MarshalJSONIndent(cdc, keeper.GetKeys(ctx, keeper.GetKVStore(ctx), path[0]))
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}

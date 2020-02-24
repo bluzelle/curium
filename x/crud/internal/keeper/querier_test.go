@@ -7,6 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"reflect"
 	"testing"
@@ -29,7 +30,10 @@ func Test_queryRead(t *testing.T) {
 	expectedValue := "value"
 	expectedOwner := []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
 
-	mockKeeper.EXPECT().GetBLZValue(ctx, "uuid", "key").
+	// always return nil for a store...
+	mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
+
+	mockKeeper.EXPECT().GetBLZValue(ctx, nil, "uuid", "key").
 		Return(types.BLZValue{
 			Value: expectedValue,
 			Owner: expectedOwner,
@@ -37,29 +41,27 @@ func Test_queryRead(t *testing.T) {
 
 	result, err := queryRead(ctx, []string{"uuid", "key"}, abci.RequestQuery{}, mockKeeper, cdc)
 
-	if err != nil {
-		t.Error("Expected nil error")
-	}
+	assert.Nil(t, err)
 
 	json_result := types.BLZValue{}
 	json.Unmarshal(result, &json_result)
-	if json_result.Value != expectedValue {
-		t.Errorf("Expected value is [%s], actual value is %s", expectedValue, json_result.Value)
-	}
+
+	assert.Equal(t, json_result.Value, expectedValue)
 
 	// item does not exist.
-	mockKeeper.EXPECT().GetBLZValue(ctx, "uuid", "key")
+	mockKeeper.EXPECT().GetBLZValue(ctx, nil, "uuid", "key")
 	result, err = queryRead(ctx, []string{"uuid", "key"}, abci.RequestQuery{}, mockKeeper, cdc)
 
-	if err == nil {
-		t.Error("Expected an error")
-	}
+	assert.NotNil(t, err)
 }
 
 func Test_queryHas(t *testing.T) {
 	ctx, cdc, mockKeeper := initTest(t)
 
-	mockKeeper.EXPECT().IsKeyPresent(ctx, "uuid", "key").Return(true)
+	// always return nil for a store...
+	mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
+
+	mockKeeper.EXPECT().IsKeyPresent(ctx, nil, "uuid", "key").Return(true)
 
 	result, err := queryHas(ctx, []string{"uuid", "key"}, abci.RequestQuery{}, mockKeeper, cdc)
 
@@ -69,30 +71,28 @@ func Test_queryHas(t *testing.T) {
 
 	json_result := types.QueryResultHas{}
 	json.Unmarshal(result, &json_result)
-	if !json_result.Has {
-		t.Error("Expected value is true")
-	}
+
+	assert.True(t, json_result.Has)
 }
 
 func Test_queryKeys(t *testing.T) {
 	ctx, cdc, mockKeeper := initTest(t)
 	acceptedKeys := []string{"key", "key1"}
 
-	mockKeeper.EXPECT().GetKeys(ctx, "uuid").Return(types.QueryResultKeys{
+	// always return nil for a store...
+	mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
+
+	mockKeeper.EXPECT().GetKeys(ctx, nil, "uuid").Return(types.QueryResultKeys{
 		UUID: "uuid",
 		Keys: acceptedKeys,
 	})
 
 	result, err := queryKeys(ctx, []string{"uuid", "key"}, abci.RequestQuery{}, mockKeeper, cdc)
 
-	if err != nil {
-		t.Error("Expected nil error")
-	}
+	assert.Nil(t, err)
 
 	json_result := types.QueryResultKeys{}
 	json.Unmarshal(result, &json_result)
 
-	if !reflect.DeepEqual(acceptedKeys, json_result.Keys) {
-		t.Error("Expected value not returned")
-	}
+	assert.True(t, reflect.DeepEqual(acceptedKeys, json_result.Keys))
 }
