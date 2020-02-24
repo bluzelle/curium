@@ -87,7 +87,7 @@ func (k Keeper) GetKeys(ctx sdk.Context, UUID string) types.QueryResultKeys {
 	store := ctx.KVStore(k.storeKey)
 	prefix := UUID + "\x00"
 	iterator := sdk.KVStorePrefixIterator(store, []byte(prefix))
-	keys := types.QueryResultKeys{UUID: UUID}
+	keys := types.QueryResultKeys{UUID: UUID, Keys: make([]string, 0)}
 
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
