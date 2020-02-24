@@ -91,6 +91,12 @@ func GetCmdBLZQKeys(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 			var out types.QueryResultKeys
 			cdc.MustUnmarshalJSON(res, &out)
+
+			// ensure we don't lose the fact that the keys list is empty...
+			if out.Keys == nil {
+				out.Keys = make([]string, 0)
+			}
+
 			return cliCtx.PrintOutput(out)
 		},
 	}
