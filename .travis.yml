@@ -7,8 +7,8 @@ go: stable
 env:
   global:
   - GO111MODULE=on
-  - secure: "WFU7ihwJpsKBQxxrFFFElZNIv1zbCI0mJFE4EJGN581kqwQqScCFnTfupGDWTt/G7MpzWfKwxv3CbNWX/4BDDFpZDduV4LMHaTADPDuIOEFI92dj7JrQaMBjOqCV89mpgh5iImNS8TLpcbOAIe74i43odX+NBeCxp2MFOwhouRIFN/kTdUwwaV9s7Xft6ANEo//WAnDENaPWZ3KWJ9CBN4dxSyzVyrY2c8KUwfbuHSsyP6IgxY0bRY7/glUVesaWBQORNYp38tDI7JRkWOSvrQJX27Jsp9rhgNI4GNuofL2C9IAXu9nrSxGdbcUsuRKCLyKkNAHkgcd6mXI6h7OPVFJsacdSatLW6MhNa+YqyPdDKXALUQMYZAGKmr9ouviutyN3HPI/45XekTefwfSrRhAnr+jc8vBN72kWrGii+5lX2NfUt8qyZ8UgrNqDVvhIhQKLzO0V4VP/ZUu/G/XJDUrwUbrK6dy/DPFhIdbwBHUxkfYSNBUsAzuYrEiAFrmbKDNqwGySp81UWq0+J+hiDafbJHfgPJTfEeFAcHyBbyrve2JfIAIKvigcud21PSd5oI8Vg4mLzyqOEloitGeLnCG2ySqoADGTAUSHraNO+Xsw5wps4Jr8hLGIf0KkSofLdtXQZPwIYOnfhKHwFXoAPTDYHXRI+v51AzlpTRpSGE0="
-
+  secure: "LBPuPqFb4PYq9n0d6vQ+TwFWwepAsl3X3ZoRyWU+4/kv3S50PRzre60B5xVP+Y3eyG5RbsWh1Z4unp2nVOGN9O3H4VjqgAXQYnyTMIzg+AceUnjVmlbzPL01A0tTY5MswbZP3ncQFphBNreRrIWgLZKV9btfiYjuOO85+ZC+biw3jNuyeGkHSdfibAsuKug0Mr11FkYccAry3zOUHwNzn2dMnfDVImPmjxucZxXOqIeqXaPQ9W8OVn+ZiYYoW51+s/G1ll00C290c6TKbnVnFVqK6cAR9VQnpI00IDLuRNGQJWiosHCxoYkr/p9nSZgN04nVRYvkLXo8CxSsthcYf23Z1R0H5NeFuCVfLSzAgFOff23VK2jOhINPgCfBtENMyR4jVdUSCv0XJ/VrjHHMJXzpILXSy/M38RnZzeN2brM6H7nbvk58Kdv+6Dn7A1E2ZLCslFtlP4m6qrP17bDViibfVgYNcRytDATnKXjbJURAJ3ja+ZUULLPMhAO5BDHuJDzIWXq2wzZWk4OMk49PIaVwkSvaJ8+KFg9x7mNXGhql5TAS+d+OArkJyzR1ODQnfZ0JA1rzvJ9T321lOT8YzWy8nEPfRcpAbrIuud1Rrj4r4luOaZ6iRmGvOtrnKCDjciQCY+J1ftJj5U+uDeZt0A9Bxo1DFy/tW96KX0QxvwI="
+  
 git:
   depth: 1
 
@@ -20,7 +20,7 @@ before_script:
 script:
   - ls -a
   - echo ${TRAVIS_PULL_REQUEST}
-  - echo "y" | travis login --github-token $TRAV_TOKEN
+  - echo "y" | travis login --pro --github-token $TRAV_TOKEN
   - if [ "${TRAVIS_PULL_REQUEST}" == "false"  ]; then make install;make test;ls -l $GOPATH/bin; else echo "y" | travis restart -r bluzelle/curium-test; fi
 
 
