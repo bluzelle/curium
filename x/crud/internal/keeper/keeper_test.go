@@ -1,13 +1,177 @@
+// Copyright (C) 2020 Bluzelle
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License, version 3,
+// as published by the Free Software Foundation.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
 package keeper
 
-import "testing"
+import (
+	"github.com/bluzelle/curium/x/crud/internal/types"
+	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/store/cachekv"
+	"github.com/cosmos/cosmos-sdk/store/dbadapter"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/assert"
+	dbm "github.com/tendermint/tm-db"
+	"reflect"
+	"testing"
+)
+
+func initKeeperTest(t *testing.T) (sdk.Context, sdk.KVStore, []byte, *codec.Codec) {
+	return sdk.Context{},
+		cachekv.NewStore(dbadapter.Store{dbm.NewMemDB()}),
+		[]byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"),
+		codec.New()
+}
 
 func Test_makeMetaKey(t *testing.T) {
 	uuid := "uuid"
 	key := "key"
 	accepted := "uuid\x00key"
 
-	if MakeMetaKey(uuid, key) != accepted {
-		t.Error("MakeMetaKey failed.")
+	assert.Equal(t, MakeMetaKey(uuid, key), accepted)
+}
+
+func TestKeeper_SetBLZValue(t *testing.T) {
+	ctx, testStore, owner, cdc := initKeeperTest(t)
+
+	keeper := NewKeeper(nil, nil, cdc)
+
+	acceptedValue := types.BLZValue{
+		Value: "value",
+		Owner: owner,
 	}
+
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key", acceptedValue)
+
+	result := testStore.Get([]byte(MakeMetaKey("uuid", "key")))
+
+	var value types.BLZValue
+	cdc.MustUnmarshalBinaryBare(result, &value)
+
+	assert.True(t, reflect.DeepEqual(acceptedValue, value))
+}
+
+func TestKeeper_GetBLZValue(t *testing.T) {
+	ctx, testStore, owner, cdc := initKeeperTest(t)
+	keeper := NewKeeper(nil, nil, cdc)
+
+	// test value not found
+	result := keeper.GetBLZValue(ctx, testStore, "uuid", "key")
+
+	assert.True(t, reflect.DeepEqual(types.NewBLZValue(), result))
+
+	acceptedValue := types.BLZValue{
+		Value: "value",
+		Owner: owner,
+	}
+
+	// set the value and test that it is found\
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key", acceptedValue)
+	result = keeper.GetBLZValue(ctx, testStore, "uuid", "key")
+
+	assert.True(t, reflect.DeepEqual(acceptedValue, result))
+}
+
+func TestKeeper_DeleteBLZValue(t *testing.T) {
+	ctx, testStore, owner, cdc := initKeeperTest(t)
+	keeper := NewKeeper(nil, nil, cdc)
+
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key", types.BLZValue{
+		Value: "value",
+		Owner: owner,
+	})
+	keeper.DeleteBLZValue(ctx, testStore, "uuid", "key")
+
+	result := keeper.GetBLZValue(ctx, testStore, "uuid", "key")
+
+	assert.True(t, reflect.DeepEqual(types.NewBLZValue(), result))
+}
+
+func TestKeeper_IsKeyPresent(t *testing.T) {
+	ctx, testStore, owner, cdc := initKeeperTest(t)
+	keeper := NewKeeper(nil, nil, cdc)
+
+	assert.False(t, keeper.IsKeyPresent(ctx, testStore, "uuid", "key"))
+
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key", types.BLZValue{
+		Value: "value",
+		Owner: owner,
+	})
+
+	assert.True(t, keeper.IsKeyPresent(ctx, testStore, "uuid", "key"))
+}
+
+func TestKeeper_GetValuesIterator(t *testing.T) {
+	ctx, testStore, owner, cdc := initKeeperTest(t)
+	keeper := NewKeeper(nil, nil, cdc)
+
+	result := keeper.GetValuesIterator(ctx, testStore)
+
+	assert.False(t, result.Valid())
+
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key", types.BLZValue{
+		Value: "value",
+		Owner: owner,
+	})
+
+	result = keeper.GetValuesIterator(ctx, testStore)
+
+	assert.True(t, result.Valid())
+
+	result.Next()
+
+	assert.False(t, result.Valid())
+}
+
+func TestKeeper_GetKeys(t *testing.T) {
+	ctx, testStore, owner, cdc := initKeeperTest(t)
+	keeper := NewKeeper(nil, nil, cdc)
+
+	keys := keeper.GetKeys(ctx, testStore, "uuid")
+
+	assert.Equal(t, "uuid", keys.UUID)
+	assert.Empty(t, keys.Keys)
+
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetBLZValue(ctx, testStore, "uuid0", "key0", types.BLZValue{Value: "value", Owner: owner})
+
+	keys = keeper.GetKeys(ctx, testStore, "uuid")
+
+	assert.Equal(t, "uuid", keys.UUID)
+	assert.Len(t, keys.Keys, 4)
+
+	assert.Equal(t, keys.Keys[0], "key0")
+	assert.Equal(t, keys.Keys[1], "key1")
+	assert.Equal(t, keys.Keys[2], "key2")
+	assert.Equal(t, keys.Keys[3], "key3")
+
+	keys = keeper.GetKeys(ctx, testStore, "uuid0")
+
+	assert.Equal(t, "uuid0", keys.UUID)
+	assert.Len(t, keys.Keys, 1)
+}
+
+func TestKeeper_GetOwner(t *testing.T) {
+	ctx, testStore, owner, cdc := initKeeperTest(t)
+	keeper := NewKeeper(nil, nil, cdc)
+
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
+
+	actual := keeper.GetOwner(ctx, testStore, "uuid", "key0")
+
+	assert.True(t, reflect.DeepEqual([]byte(actual), owner))
+	assert.Empty(t, keeper.GetOwner(ctx, testStore, "notauuid", "notakey"))
 }

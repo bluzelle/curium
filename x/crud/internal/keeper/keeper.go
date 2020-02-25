@@ -23,14 +23,14 @@ import (
 )
 
 type IKeeper interface {
-	SetBLZValue(ctx sdk.Context, UUID string, key string, value types.BLZValue)
-	GetBLZValue(ctx sdk.Context, UUID string, key string) types.BLZValue
-	DeleteBLZValue(ctx sdk.Context, UUID string, key string)
-	IsKeyPresent(ctx sdk.Context, UUID string, key string) bool
-	IsUUIDKeyPresent(ctx sdk.Context, key string) bool
-	GetValuesIterator(ctx sdk.Context) sdk.Iterator
-	GetKeys(ctx sdk.Context, UUID string) types.QueryResultKeys
-	GetOwner(ctx sdk.Context, UUID string, key string) sdk.AccAddress
+	SetBLZValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string, value types.BLZValue)
+	GetBLZValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string) types.BLZValue
+	DeleteBLZValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string)
+	IsKeyPresent(ctx sdk.Context, store sdk.KVStore, UUID string, key string) bool
+	GetValuesIterator(ctx sdk.Context, store sdk.KVStore) sdk.Iterator
+	GetKeys(ctx sdk.Context, store sdk.KVStore, UUID string) types.QueryResultKeys
+	GetOwner(ctx sdk.Context, store sdk.KVStore, UUID string, key string) sdk.AccAddress
+	GetKVStore(ctx sdk.Context) sdk.KVStore
 }
 
 type Keeper struct {
@@ -39,22 +39,33 @@ type Keeper struct {
 	cdc        *codec.Codec
 }
 
+// Note: MakeMetaKey is used in query.go and keeper.go
 func MakeMetaKey(UUID string, key string) string {
 	return UUID + "\x00" + key
 }
 
-func (k Keeper) SetBLZValue(ctx sdk.Context, UUID string, key string, value types.BLZValue) {
+func NewKeeper(coinKeeper bank.Keeper, storeKey sdk.StoreKey, cdc *codec.Codec) Keeper {
+	return Keeper{
+		CoinKeeper: coinKeeper,
+		storeKey:   storeKey,
+		cdc:        cdc,
+	}
+}
+
+func (k Keeper) GetKVStore(ctx sdk.Context) sdk.KVStore {
+	return ctx.KVStore(k.storeKey)
+}
+
+func (k Keeper) SetBLZValue(_ sdk.Context, store sdk.KVStore, UUID string, key string, value types.BLZValue) {
 	if len(value.Value) == 0 {
 		return
 	}
-	store := ctx.KVStore(k.storeKey)
 	store.Set([]byte(MakeMetaKey(UUID, key)), k.cdc.MustMarshalBinaryBare(value))
 }
 
-func (k Keeper) GetBLZValue(ctx sdk.Context, UUID string, key string) types.BLZValue {
+func (k Keeper) GetBLZValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string) types.BLZValue {
 	BLZKey := MakeMetaKey(UUID, key)
-	store := ctx.KVStore(k.storeKey)
-	if !k.IsUUIDKeyPresent(ctx, BLZKey) {
+	if !k.isUUIDKeyPresent(ctx, store, BLZKey) {
 		return types.NewBLZValue()
 	}
 
@@ -64,27 +75,23 @@ func (k Keeper) GetBLZValue(ctx sdk.Context, UUID string, key string) types.BLZV
 	return value
 }
 
-func (k Keeper) DeleteBLZValue(ctx sdk.Context, UUID string, key string) {
-	store := ctx.KVStore(k.storeKey)
+func (k Keeper) DeleteBLZValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string) {
 	store.Delete([]byte(MakeMetaKey(UUID, key)))
 }
 
-func (k Keeper) IsKeyPresent(ctx sdk.Context, UUID string, key string) bool {
-	return k.IsUUIDKeyPresent(ctx, MakeMetaKey(UUID, key))
+func (k Keeper) IsKeyPresent(ctx sdk.Context, store sdk.KVStore, UUID string, key string) bool {
+	return k.isUUIDKeyPresent(ctx, store, MakeMetaKey(UUID, key))
 }
 
-func (k Keeper) IsUUIDKeyPresent(ctx sdk.Context, key string) bool {
-	store := ctx.KVStore(k.storeKey)
+func (k Keeper) isUUIDKeyPresent(ctx sdk.Context, store sdk.KVStore, key string) bool {
 	return store.Has([]byte(key))
 }
 
-func (k Keeper) GetValuesIterator(ctx sdk.Context) sdk.Iterator {
-	store := ctx.KVStore(k.storeKey)
+func (k Keeper) GetValuesIterator(ctx sdk.Context, store sdk.KVStore) sdk.Iterator {
 	return sdk.KVStorePrefixIterator(store, []byte{})
 }
 
-func (k Keeper) GetKeys(ctx sdk.Context, UUID string) types.QueryResultKeys {
-	store := ctx.KVStore(k.storeKey)
+func (k Keeper) GetKeys(ctx sdk.Context, store sdk.KVStore, UUID string) types.QueryResultKeys {
 	prefix := UUID + "\x00"
 	iterator := sdk.KVStorePrefixIterator(store, []byte(prefix))
 	keys := types.QueryResultKeys{UUID: UUID, Keys: make([]string, 0)}
@@ -96,14 +103,6 @@ func (k Keeper) GetKeys(ctx sdk.Context, UUID string) types.QueryResultKeys {
 	return keys
 }
 
-func NewKeeper(coinKeeper bank.Keeper, storeKey sdk.StoreKey, cdc *codec.Codec) Keeper {
-	return Keeper{
-		CoinKeeper: coinKeeper,
-		storeKey:   storeKey,
-		cdc:        cdc,
-	}
-}
-
-func (k Keeper) GetOwner(ctx sdk.Context, UUID string, key string) sdk.AccAddress {
-	return k.GetBLZValue(ctx, UUID, key).Owner
+func (k Keeper) GetOwner(ctx sdk.Context, store sdk.KVStore, UUID string, key string) sdk.AccAddress {
+	return k.GetBLZValue(ctx, store, UUID, key).Owner
 }
