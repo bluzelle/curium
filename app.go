@@ -39,9 +39,9 @@ import (
 	dbm "github.com/tendermint/tm-db"
 
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
-)
 
-const appName = "CRUD"
+	bluzellechain "github.com/bluzelle/curium/types"
+)
 
 var (
 	// default home directories for the application CLI
@@ -112,7 +112,7 @@ func NewCRUDApp(
 	cdc := MakeCodec()
 
 	// BaseApp handles interactions with Tendermint through the ABCI protocol
-	bApp := bam.NewBaseApp(appName, logger, db, auth.DefaultTxDecoder(cdc), baseAppOptions...)
+	bApp := bam.NewBaseApp(bluzellechain.AppName, logger, db, auth.DefaultTxDecoder(cdc), baseAppOptions...)
 
 	bApp.SetAppVersion(version.Version)
 
