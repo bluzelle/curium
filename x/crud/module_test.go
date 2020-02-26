@@ -1,3 +1,17 @@
+// Copyright (C) 2020 Bluzelle
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License, version 3,
+// as published by the Free Software Foundation.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
 package crud
 
 import (
@@ -14,8 +28,6 @@ func TestAppModuleBasic_Name(t *testing.T) {
 	sut := AppModuleBasic{}
 	assert.Equal(t, sut.Name(), "crud")
 }
-
-// TODO: test RegisterCodec
 
 func TestAppModuleBasic_DefaultGenesis(t *testing.T) {
 	genesis := AppModuleBasic{}.DefaultGenesis()
@@ -39,8 +51,6 @@ func TestAppModuleBasic_ValidateGenesis(t *testing.T) {
 	err = AppModuleBasic.ValidateGenesis(AppModuleBasic{}, bz)
 	assert.Nil(t, err)
 }
-
-// TODO func TestAppModuleBasic_RegisterRESTRoutes(t *testing.T)
 
 func TestAppModuleBasic_GetQueryCmd(t *testing.T) {
 	cdc := codec.Codec{}
@@ -93,13 +103,10 @@ func TestAppModuleBasic_GetTxCmd(t *testing.T) {
 
 		commands := cmd.Commands()
 		assert.Len(t, commands, 6)
-
-		// TODO: test crud commands -> create, read, update ...
 	}
 }
 
 func TestNewAppModule(t *testing.T) {
-	// TODO: this test needs fleshing out
 	k := Keeper{}
 	var bankkeeper bank.Keeper
 	sut := NewAppModule(k, bankkeeper)
@@ -115,14 +122,10 @@ func TestAppModule_Name(t *testing.T) {
 	assert.Equal(t, "crud", sut.Name())
 }
 
-// TODO func TestAppModule_RegisterInvariants(t *testing.T)
-
 func TestAppModule_Route(t *testing.T) {
 	sut := AppModule{}
 	assert.Equal(t, "crud", sut.Route())
 }
-
-// TODO: func TestAppModule_NewHandler(t *testing.T) is a wrapper, implement this test in handler_test.go
 
 func TestAppModule_QuerierRoute(t *testing.T) {
 	sut := AppModule{}
@@ -133,14 +136,4 @@ func TestAppModule_NewQuerierHandler(t *testing.T) {
 	sut := AppModule{}
 	querier := sut.NewQuerierHandler()
 	assert.Equal(t, "func(types.Context, []string, types.RequestQuery) ([]uint8, types.Error)", reflect.TypeOf(querier).String())
-
-	// TODO: test the existence of a query?
 }
-
-// TODO AppModule BeginBlock method is empty
-
-// TODO AppModule EndBlock calls an abci method ValidatorUpdate, currently unsure of what to test in this case
-
-// TODO TestAppModule_InitGenesis(t *testing.T) Need to figure out how to mock objects in Cosmos-sdk
-
-// TODO func TestAppModule_ExportGenesis(t *testing.T) Need to figure out how to mock objects in Cosmos-sdk
