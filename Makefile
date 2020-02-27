@@ -12,7 +12,7 @@ build_tags := $(strip $(build_tags))
 whitespace :=
 whitespace += $(whitespace)
 comma := ,
-build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
+build_tags_comma_sep := $(patsubst $(whitespace),$(comma),$(build_tags))
 
 # process linker flags
 
