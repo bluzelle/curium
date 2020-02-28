@@ -13,6 +13,7 @@ whitespace :=
 whitespace += $(whitespace)
 comma := ,
 build_tags_comma_sep := $(patsubst $(whitespace),$(comma),$(build_tags))
+coverage := $(shell mktemp -u).coverage.out
 
 # process linker flags
 
@@ -37,3 +38,8 @@ go.sum: go.mod
 
 test:
 	@go test -mod=readonly $(PACKAGES)
+
+coverage:
+	@go test -v -coverprofile=$(coverage) ./x/...
+	@go tool cover -html=$(coverage)
+	@rm $(coverage)

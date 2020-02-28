@@ -1,3 +1,4 @@
+[![Coverage Status](https://coveralls.io/repos/github/bluzelle/curium/badge.svg?branch=devel)](https://coveralls.io/github/bluzelle/curium?branch=devel)
 # Curium Application
 
 https://github.com/cosmos/sdk-tutorials/tree/master/nameservice
