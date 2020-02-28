@@ -41,7 +41,7 @@ import (
 	"os"
 )
 
-const crud_module_entry = "bluzelle_crud"
+const crudModuleEntry = "bluzelle_crud"
 
 var (
 	// default home directories for the application CLI
@@ -70,8 +70,8 @@ func IsCrudEnabled(nodeHome string) bool {
 	viper.AddConfigPath(nodeHome + "/config/")
 
 	if viper.ReadInConfig() == nil {
-		if viper.IsSet(crud_module_entry) {
-			enabled = viper.GetBool(crud_module_entry)
+		if viper.IsSet(crudModuleEntry) {
+			enabled = viper.GetBool(crudModuleEntry)
 		}
 	}
 

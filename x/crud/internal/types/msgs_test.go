@@ -59,7 +59,8 @@ func TestMsgBLZCreate_ValidateBasic(t *testing.T) {
 
 func TestMsgBLZCreate_GetSignBytes(t *testing.T) {
 	sut := NewMsgBLZCreate("uuid", "key", "value", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
-	assert.Equal(t, string(sut.GetSignBytes()), "{\"type\":\"crud/create\",\"value\":{\"Key\":\"key\",\"Owner\":\"cosmos1vfk827n9d3kx2vt5xpuhwardwfj82mryvcmxsdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\",\"Value\":\"value\"}}")
+	assert.Equal(t, string(sut.GetSignBytes()), "{\"type\":\"crud/create\",\"value\":{\"Key\":\"key\",\"Owner\":\""+
+		"cosmos1vfk827n9d3kx2vt5xpuhwardwfj82mryvcmxsdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\",\"Value\":\"value\"}}")
 }
 
 func TestMsgBLZCreate_GetSigners(t *testing.T) {
@@ -105,7 +106,8 @@ func TestMsgBLZRead_ValidateBasic(t *testing.T) {
 
 func TestMsgBLZRead_GetSignBytes(t *testing.T) {
 	sut := NewMsgBLZRead("uuid", "key", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
-	assert.Equal(t, string(sut.GetSignBytes()), "{\"type\":\"crud/read\",\"value\":{\"Key\":\"key\",\"Owner\":\"cosmos1vfk827n9d3kx2vt5xpuhwardwfj82mryvcmxsdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\"}}")
+	assert.Equal(t, string(sut.GetSignBytes()), "{\"type\":\"crud/read\",\"value\":{\"Key\":\"key\",\"Owner\":\""+
+		"cosmos1vfk827n9d3kx2vt5xpuhwardwfj82mryvcmxsdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\"}}")
 }
 
 func TestMsgBLZRead_GetSigners(t *testing.T) {
@@ -152,7 +154,8 @@ func TestMsgBLZUpdate_ValidateBasic(t *testing.T) {
 
 func TestMsgBLZUpdate_GetSignBytes(t *testing.T) {
 	sut := NewMsgBLZUpdate("uuid", "key", "value", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
-	assert.Equal(t, "{\"type\":\"crud/update\",\"value\":{\"Key\":\"key\",\"Owner\":\"cosmos1vfk827n9d3kx2vt5xpuhwardwfj82mryvcmxsdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\",\"Value\":\"value\"}}", string(sut.GetSignBytes()))
+	assert.Equal(t, "{\"type\":\"crud/update\",\"value\":{\"Key\":\"key\",\"Owner\":\"cosmos1vfk827n9d3kx2vt5xp"+
+		"uhwardwfj82mryvcmxsdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\",\"Value\":\"value\"}}", string(sut.GetSignBytes()))
 }
 
 func TestMsgBLZUpdate_GetSigners(t *testing.T) {
@@ -198,7 +201,8 @@ func TestMsgBLZDelete_ValidateBasic(t *testing.T) {
 
 func TestMsgBLZDelete_GetSignBytes(t *testing.T) {
 	sut := NewMsgBLZDelete("uuid", "key", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
-	assert.Equal(t, string(sut.GetSignBytes()), "{\"type\":\"crud/delete\",\"value\":{\"Key\":\"key\",\"Owner\":\"cosmos1vfk827n9d3kx2vt5xpuhwardwfj82mryvcmxsdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\"}}")
+	assert.Equal(t, string(sut.GetSignBytes()), "{\"type\":\"crud/delete\",\"value\":{\"Key\":\"key\",\"Owner\":\""+
+		"cosmos1vfk827n9d3kx2vt5xpuhwardwfj82mryvcmxsdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\"}}")
 }
 
 func TestMsgBLZDelete_GetSigners(t *testing.T) {
@@ -239,7 +243,8 @@ func TestMsgBLZKeys_ValidateBasic(t *testing.T) {
 
 func TestMsgBLZKeys_GetSignBytes(t *testing.T) {
 	sut := NewMsgBLZKeys("uuid", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
-	assert.Equal(t, "{\"type\":\"crud/keys\",\"value\":{\"Owner\":\"cosmos1vfk827n9d3kx2vt5xpuhwardwfj82mryvcmxsdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\"}}", string(sut.GetSignBytes()))
+	assert.Equal(t, "{\"type\":\"crud/keys\",\"value\":{\"Owner\":\"cosmos1vfk827n9d3kx2vt5xpuhwardwfj82mryvcmx"+
+		"sdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\"}}", string(sut.GetSignBytes()))
 }
 
 func TestMsgBLZKeys_GetSigners(t *testing.T) {
@@ -285,7 +290,8 @@ func TestMsgBLZHas_ValidateBasic(t *testing.T) {
 
 func TestMsgBLZHas_GetSignBytes(t *testing.T) {
 	sut := NewMsgBLZHas("uuid", "key", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
-	assert.Equal(t, "{\"type\":\"crud/has\",\"value\":{\"Key\":\"key\",\"Owner\":\"cosmos1vfk827n9d3kx2vt5xpuhwardwfj82mryvcmxsdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\"}}", string(sut.GetSignBytes()))
+	assert.Equal(t, "{\"type\":\"crud/has\",\"value\":{\"Key\":\"key\",\"Owner\":\"cosmos1vfk827n9d3kx2vt5xpuhw"+
+		"ardwfj82mryvcmxsdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\"}}", string(sut.GetSignBytes()))
 }
 
 func TestMsgBLZHas_GetSigners(t *testing.T) {
