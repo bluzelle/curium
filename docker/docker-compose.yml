@@ -2,25 +2,35 @@ version: '3'
 
 services:
   swarm01:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: bluzelle-curium:latest
     ports:
       - "26656:26656"
       - "1317:1317"
     environment:
       NODE_NAME: "swarm01"
-    networks:
-      - swarmnet
+      LOCAL_IP: ${LOCAL_IP}
     expose:
       - "26656"
       - "1317"
-
-  swarm02:
-    image: bluzelle-curium:latest
-    environment:
-      NODE_NAME: "swarm02"
-      LOCAL_IP: ${LOCAL_IP}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "10"
+    restart: unless-stopped
     networks:
       - swarmnet
+
+  # swarm02:
+  #   image: bluzelle-curium:latest
+  #   environment:
+  #     NODE_NAME: "swarm02"
+  #     LOCAL_IP: ${LOCAL_IP}
+  #   networks:
+  #     - swarmnet
 
   #swarm03:
   #   image: bluzelle-curium:latest
