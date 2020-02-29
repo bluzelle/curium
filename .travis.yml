@@ -10,9 +10,14 @@ env:
 git:
   depth: 1
 
+before_install:
+  - go get github.com/mattn/goveralls
+  - go get -u github.com/rakyll/gotest
+
 install: true
 
 script:
   - make install
-  - go test -v ./...
+  - gotest -v -covermode=count -coverprofile=coverage.out ./x/...
+  - $GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis-ci
   - ls -l $GOPATH/bin
