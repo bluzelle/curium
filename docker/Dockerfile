@@ -4,6 +4,11 @@ MAINTAINER support@bluzelle.com
 # Set up dependencies
 ENV PACKAGES make git bash gcc
 
+ENV GO111MODULE=on \
+    CGO_ENABLED=0 \
+    GOOS=linux \
+    GOARCH=amd64
+
 # Set working directory for the build
 WORKDIR /go/src/github.com/bluzelle/
 
@@ -25,6 +30,9 @@ FROM alpine:edge
 RUN apk add --update ca-certificates
 
 WORKDIR /root
+
+EXPOSE 26656
+EXPOSE 1317
 
 # Copy over binaries from the build-env
 COPY --from=build-env /go/bin/blzd /usr/bin/blzd
