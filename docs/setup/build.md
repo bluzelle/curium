@@ -1,0 +1,101 @@
+[prev](./devenv.md) | [next](./deploy.md)
+***
+
+Build the Curium Project
+========================
+
+1.  cd to the project folder
+
+        cd ~/go/src/github.com/bluzelle/curium
+ 
+2.  Install blzd and blzcli
+
+        make install
+ 
+3.  Ensure blzcli and blzd work by executing the binaries, you should be able to execute the apps from your user folder:
+
+        ~ cd
+        ~ blzcli
+        Bluzelle CRUD Client
+        
+        Usage:
+          blzcli [command]
+
+        Available Commands:
+          status      Query remote node for status
+          config      Create or query an application CLI configuration file
+          query       Querying subcommands
+          tx          Transactions subcommands
+        
+          rest-server Start LCD (light-client daemon), a local REST server
+        
+          keys        Add or view local private keys
+        
+          version     Print the app version
+          help        Help about any command
+        
+        Flags:
+              --chain-id string   Chain ID of tendermint node
+          -e, --encoding string   Binary encoding (hex|b64|btc) (default "hex")
+          -h, --help              help for blzcli
+              --home string       directory for config and data (default "/Users/rnistuk/.blzcli")
+          -o, --output string     Output format (text|json) (default "text")
+              --trace             print out full stack trace on errors
+
+        Use "blzcli [command] --help" for more information about a command.
+
+    the daemon:
+
+        ~ cd
+        ~ blzd
+        Bluzelle CRUD Daemon (server)
+        
+        Usage:
+          blzd [command]
+        
+        Available Commands:
+          init                Initialize private validator, p2p, genesis, and application configuration files
+          collect-gentxs      Collect genesis txs and output a genesis.json file
+          gentx               Generate a genesis tx carrying a self delegation
+          validate-genesis    validates the genesis file at the default location or at the location passed as an arg
+          add-genesis-account Add genesis account to genesis.json
+          start               Run the full node
+          unsafe-reset-all    Resets the blockchain database, removes address book files, and resets priv_validator.json to the genesis state
+        
+          tendermint          Tendermint subcommands
+          export              Export state to JSON
+        
+          version             Print the app version
+          help                Help about any command
+        
+        Flags:
+          -h, --help               help for blzd
+              --home string        directory for config and data (default "/Users/rnistuk/.blzd")
+              --log_level string   Log level (default "main:info,state:info,*:error")
+              --trace              print out full stack trace on errors
+        
+        Use "blzd [command] --help" for more information about a command.
+ 
+4.  You can also verify the build versions with the following commands. They should match the git commit hash of the tip (git rev-parse HEAD) you cloned above.
+
+        ~ blzcli version --long
+        name: BluzelleService
+        server_name: blzd
+        client_name: blzcli
+        version: 0.0.0-1-gebfbde2
+        commit: ebfbde2ed1c017114153f8ad655e45b984f82d58
+        build_tags: ""
+        go: go version go1.13.4 darwin/amd64
+ 
+
+        ~ blzd version --long
+        name: BluzelleService
+        server_name: blzd
+        client_name: blzcli
+        version: 0.0.0-1-gebfbde2
+        commit: ebfbde2ed1c017114153f8ad655e45b984f82d58
+        build_tags: ""
+        go: go version go1.13.4 darwin/amd64
+ 
+ ***
+ [prev](./devenv.md) | [next](./deploy.md)
