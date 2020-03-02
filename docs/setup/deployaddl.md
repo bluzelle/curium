@@ -7,11 +7,11 @@ Deploy Additional Nodes
 
 2. Initialize the daemon config as before
 
-        blzd init <moniker> --chain-id <chain-id for the zone>  2>&1 | jq .node_id
+        $ blzd init <moniker> --chain-id <chain-id for the zone>  2>&1 | jq .node_id
 
     Use a new moniker string, but use the same chain-id as used in the initial node
 
-        blzd init curium01 --chain-id bluzelle  2>&1 | jq .node_id
+        $ blzd init curium01 --chain-id bluzelle  2>&1 | jq .node_id
         
     The JSON output will contain the node_id, note that value so that it can be used to identify this node to other nodes in the zone (in their respective “persistent_peers” value in config.toml). Keep in mind that for this document’s purposes, we are only really ever pointing all second and subsequent nodes to the first node’s id. We could point them to any other running node, in theory.
     
@@ -19,10 +19,10 @@ Deploy Additional Nodes
     
 3.  Set the client configuration
 
-        blzcli config chain-id bluzelle
-        blzcli config output json 
-        blzcli config indent true 
-        blzcli config trust-node true
+        $ blzcli config chain-id bluzelle
+        $ blzcli config output json 
+        $ blzcli config indent true 
+        $ blzcli config trust-node true
 
 4.  Edit .blzd/config/config/config.toml to add  the first node’s address to the comma separated list of persistent_peers:
 
@@ -42,11 +42,11 @@ Deploy Additional Nodes
     
 6.  Create the key that will be used to label the validator on this node
 
-        > blzcli keys add validator
+        $ blzcli keys add vuser
         Enter a passphrase to encrypt your key to disk:
         Repeat the passphrase:
         
-        - name: validator
+        - name: vuser
           type: local
           address: bluzelle1zgu6f3ezy0ay9eq82nla2mmlnedzypn9q86usr
           pubkey: bluzellepub1addwnpepqvz4h9kgd7xx4k04epr7z2msy82uh8ugdsdykmplzcu2sx80gttrz8x8fpr
@@ -63,12 +63,12 @@ Deploy Additional Nodes
 
 7.  Return to the first node server and distribute tokens from the genesis validator to the address of the validator on the new node
 
-        blzcli tx send <src delegator address> <dest delegator address> 1000000000bnt /
+        $ blzcli tx send <src delegator address> <dest delegator address> 1000000000bnt /
           --gas-prices 0.01bnt / 
           --from validator
     note that the the validator keys are the id’s that are prefixed with “bluzelle”, and can be obtained by running
     
-        blzcli keys show validator -a
+        $ blzcli keys show validator -a
         
     on each server.
     
@@ -76,22 +76,21 @@ Deploy Additional Nodes
 
 8.  Before the node can be started it must copy the genesis.json file from the first node. Return to the new node server and use the secure copy command scp, to copy the genesis file from the first node.
 
-        scp -i <pem> ubuntu@35.183.107.145:~/.blzd/config/genesis.json ~/.blzd/config/
-    where <pem> is the identity file for the current server.
+        $ scp ubuntu@<host>:~/.blzd/config/genesis.json ~/.blzd/config/
 
 9.  Start the Bluzelle daemon as a background task on the new node
 
-        blzd start
+        $ blzd start
         
     the node will start and catch up to the rest of the zone. Occasionally, this command will fail, in that case run the following command first
 
-        blzd unsafe-reset-all
+        $ blzd unsafe-reset-all
         
     and then retry the start command.
 
 10. When the new node catches up to the rest of the zone, the account that we have named validator will have 1B bnt tokens, and it can be turned into a validator node, allowed to participate in validating additions to the blockchain. 
 
-        blzcli tx staking create-validator \
+        $ blzcli tx staking create-validator \
           --amount=100000000bnt \
           --pubkey=$(blzd tendermint show-validator) \
           --moniker=curium01 \
@@ -107,7 +106,7 @@ Deploy Additional Nodes
 
 11. You can get the current validator set with the command
 
-        > blzcli q tendermint-validator-set
+        $ blzcli q tendermint-validator-set
         {
           "block_height": "758",
           "validators": [

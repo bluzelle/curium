@@ -7,14 +7,14 @@ The querying subcommands provide access to the unsigned functinality of the the 
 
 The CLI can provide usage help for the queries with the following command:
 
-    ~ blzcli q --help
+    $ blzcli q --help
 
 # Transactions
 Transactional commands can be crytographically signed and require gas to perform. Where a command has a return value users must employ the "tx" query to retrieve the response.
 
 The CLI can provide usage help for the queries with the following command:
 
-    ~ blzcli tx --help
+    $ blzcli tx --help
 
 ***
 [prev](../setup/deployaddl.md) | [next](../commands/useful.md)

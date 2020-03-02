@@ -6,16 +6,16 @@ Build the Curium Project
 
 1.  cd to the project folder
 
-        cd ~/go/src/github.com/bluzelle/curium
+        $ cd ~/go/src/github.com/bluzelle/curium
  
 2.  Install blzd and blzcli
 
-        make install
+        $ make install
  
 3.  Ensure blzcli and blzd work by executing the binaries, you should be able to execute the apps from your user folder:
 
-        ~ cd
-        ~ blzcli
+        $ cd
+        $ blzcli
         Bluzelle CRUD Client
         
         Usage:
@@ -46,8 +46,8 @@ Build the Curium Project
 
     the daemon:
 
-        ~ cd
-        ~ blzd
+        $ cd
+        $ blzd
         Bluzelle CRUD Daemon (server)
         
         Usage:
@@ -78,23 +78,22 @@ Build the Curium Project
  
 4.  You can also verify the build versions with the following commands. They should match the git commit hash of the tip (git rev-parse HEAD) you cloned above.
 
-        ~ blzcli version --long
+        $ blzcli version --long
         name: BluzelleService
         server_name: blzd
         client_name: blzcli
-        version: 0.0.0-1-gebfbde2
-        commit: ebfbde2ed1c017114153f8ad655e45b984f82d58
-        build_tags: ""
+        version: 0.0.0-24-g3253c8b
+        commit: 3253c8b6b4e40b125c0ccdfd6a81a06a02a5e018
+        build_tags: ledger,cosmos-sdk v0.37.4
         go: go version go1.13.4 darwin/amd64
- 
 
-        ~ blzd version --long
+        $ blzd version --long
         name: BluzelleService
         server_name: blzd
         client_name: blzcli
-        version: 0.0.0-1-gebfbde2
-        commit: ebfbde2ed1c017114153f8ad655e45b984f82d58
-        build_tags: ""
+        version: 0.0.0-24-g3253c8b
+        commit: 3253c8b6b4e40b125c0ccdfd6a81a06a02a5e018
+        build_tags: ledger,cosmos-sdk v0.37.4
         go: go version go1.13.4 darwin/amd64
  
  ***

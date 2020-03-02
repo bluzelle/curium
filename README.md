@@ -10,8 +10,6 @@ Bluzelle Curium Multi-Validator Zone Installation
 
 These are steps involved in setting up the OS, Dev Environment, building and deploying a multi-node Curium Zone.
 
-For the most up to date instructions go to [Starting a Multi-Validator Zone](https://bluzelle.atlassian.net/wiki/spaces/CUR/pages/781746219/Starting+a+Multi-Validator+Zone)
-
 1. [OS Setup for Curium](./docs/setup/os.md)
 2. [Development Environment Setup](./docs/setup/devenv.md)
 3. [Build the Curium Project](./docs/setup/build.md)

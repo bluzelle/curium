@@ -6,15 +6,15 @@ Deploy the Initial Node
 
 1.  Before initializing a node, remove the previous node config folders from your home folder, if they exist
 
-        rm -rf .blz*
+        $ rm -rf .blz*
  
 2.  Initialize the daemon
 
-        blzd init [moniker] [flags]
+        $ blzd init [moniker] [flags]
 
     where moniker is a human readable name for the current node, an appropriate flag would be a string for --chain-id, for example
 
-        blzd init curium00 --chain-id bluzelle 2>&1 | jq .node_id
+        $ blzd init curium00 --chain-id bluzelle 2>&1 | jq .node_id
     
     Use the jq command to parse the node_id from the json output. Note the “2>&1” argument, blzd init, in this case sends its output to stderr, so we need to redirect the output back to stdout. 
 
@@ -30,24 +30,24 @@ Deploy the Initial Node
 
 4.  Edit “.blzd/config/genesis.json” to change bond_denom from “stake” to “bnt”. This genesis.json file will be used to initialize the blockchain for this zone. This can be done from the command line with sed
 
-        sed -i -e 's/"bond_denom": "stake"/"bond_denom": "bnt"/g' \
+         $ sed -i -e 's/"bond_denom": "stake"/"bond_denom": "bnt"/g' \
             ~/.blzd/config/genesis.json
 
-5.  Edit .blzd/config/app.toml in a text editor and set the minimum-gas-prices to “0.01bnt”. Every node should have at least this minimum. This can also be done from the command line with sed:
+5.  Edit .blzd/config/app.toml in a text editor and set the minimum-gas-prices to “0.01bnt”. Every node should have at least this minimum. This can also be done from the command line with sed: 
 
-        sed -i -e 's/minimum-gas-prices = ""/minimum-gas-prices = "0.01bnt"/g' \
+        $ sed -i -e 's/minimum-gas-prices = ""/minimum-gas-prices = "0.01bnt"/g' \
         ~/.blzd/config/app.toml
 
 6.  Set the client configuration settings:
-        blzcli config chain-id bluzelle 
-        blzcli config output json 
-        blzcli config indent true 
-        blzcli config trust-node true
+        $ blzcli config chain-id bluzelle 
+        $ blzcli config output json 
+        $ blzcli config indent true 
+        $ blzcli config trust-node true
     where “bluzelle” is the zone’s chain-id.
 
 7. Derive a new key that will label the validator account for this node, call it “validator”:
 
-        > blzcli keys add validator
+        $ blzcli keys add validator
         Enter a passphrase to encrypt your key to disk:
         Repeat the passphrase:
         
@@ -69,13 +69,13 @@ Deploy the Initial Node
 
 8.  Add the first account to the blockchain using the validator key as the account identifier
 
-        blzd add-genesis-account $(blzcli keys show validator -a) 10000000000bnt
+        $ blzd add-genesis-account $(blzcli keys show validator -a) 10000000000bnt
         
     this command is an alias for “tx staking create-validator”. The amount given for the bnt tokens here will be the total amount of tokens available to the zone.
 
 9.  As this is the first node in the zone, it needs a transaction that will be the first transaction in the blockchain. 
 
-        > blzd gentx --name validator --amount 100000000bnt
+        $ blzd gentx --name vuser --amount 100000000bnt
         Password to sign with 'validator':
         Genesis transaction written to "/home/rich/.blzd/config/gentx/gentx-6ccdb7764f4b6762bca9ce254ee9db49a687cc9c.json"
         
@@ -83,18 +83,22 @@ Deploy the Initial Node
 
 10. Create the genesis file from the first transaction:
 
-        blzd collect-gentxs
+        $ blzd collect-gentxs
     the output of this command will also contain the validator_address, prefixed with bluzellevaloper. If you have not done so in the previous step, note the validator_address. 
     
-        This command creates the signed genesis.json (.blzd/config/genesis.json) that will be copied to the rest of the nodes in the zone.
+    This command creates the signed genesis.json (.blzd/config/genesis.json) that will be copied to the rest of the nodes in the zone.
 
 11. The node can be started with the Bluzelle daemon:
 
-        blzd start
+        $ blzd start
         
 12. On a second terminal the http server can be started with the Bluzelle client
 
-        blzcli rest-server --laddr tcp://0.0.0.0:1317
+        $ blzcli rest-server
+ 
+    If external access to the rest server is required add the _--laddr_ argument
+    
+        $ blzcli rest-server --laddr tcp://0.0.0.0:1317
  
 ***
 [prev](./build.md) | [next](./deployaddl.md)
