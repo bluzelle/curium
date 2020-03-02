@@ -15,23 +15,19 @@
 package types
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/magiconair/properties/assert"
+	"testing"
 )
 
-// DefaultCodespace is the Module Name
-const (
-	DefaultCodespace sdk.CodespaceType = ModuleName
-
-	CodeKeyDoesNotExist  sdk.CodeType = 101
-	CodeKeyAlreadyExists sdk.CodeType = 102
-)
-
-// ErrNameDoesNotExist is the error for name not existing
-func ErrKeyDoesNotExist(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeKeyDoesNotExist, "Key does not exist")
+func TestQueryResultRead_String(t *testing.T) {
+	assert.Equal(t, QueryResultRead{UUID: "uuid", Key: "key", Value: "value"}.String(), "value")
 }
 
-// ErrNameDoesNotExist is the error for name not existing
-func ErrKeyAlreadyExists(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeKeyAlreadyExists, "Key already exists")
+func TestQueryResultHas_String(t *testing.T) {
+	assert.Equal(t, QueryResultHas{UUID: "uuid", Key: "key", Has: false}.String(), "false")
+	assert.Equal(t, QueryResultHas{UUID: "uuid", Key: "key", Has: true}.String(), "true")
+}
+
+func TestQueryResultKeys_String(t *testing.T) {
+	assert.Equal(t, QueryResultKeys{UUID: "uuid", Keys: []string{"one", "two", "three"}}.String(), "one, two, three")
 }

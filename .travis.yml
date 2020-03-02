@@ -12,6 +12,10 @@ env:
 git:
   depth: 1
 
+before_install:
+  - go get github.com/mattn/goveralls
+  - go get -u github.com/rakyll/gotest
+
 install: true
 
 before_script:
@@ -21,7 +25,4 @@ script:
   - ls -a
   - echo ${TRAVIS_PULL_REQUEST}
   - echo "y" | travis login --pro --github-token $TRAV_TOKEN
-  - if [ "${TRAVIS_PULL_REQUEST}" == "false"  ]; then make install;make test;ls -l $GOPATH/bin; else echo "y" | travis restart -r bluzelle/curium-test; fi
-
-
-  
+  - if [ "${TRAVIS_PULL_REQUEST}" == "false"  ]; then make install;gotest -v -covermode=count -coverprofile=coverage.out ./x/...;$GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis-ci;ls -l $GOPATH/bin; else echo "y" | travis restart -r bluzelle/curium-test; fi

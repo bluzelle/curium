@@ -16,6 +16,7 @@ package crud
 
 import (
 	"fmt"
+	"github.com/bluzelle/curium/x/crud/internal/keeper"
 	"github.com/bluzelle/curium/x/crud/internal/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -44,21 +45,20 @@ func DefaultGenesisState() GenesisState {
 	}
 }
 
-// TODO: we need to revisit this method, how does the genesis file work?
-func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) []abci.ValidatorUpdate {
+func InitGenesis(ctx sdk.Context, keeper keeper.IKeeper, data GenesisState) []abci.ValidatorUpdate {
 	for _, record := range data.BlzValues {
-		keeper.SetBLZValue(ctx, "UUID-Genesis", "Key-Genesis", record)
+		keeper.SetBLZValue(ctx, keeper.GetKVStore(ctx), "UUID-Genesis", "Key-Genesis", record)
 	}
 	return []abci.ValidatorUpdate{}
 }
 
 // TODO - fix key value issues
-func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
+func ExportGenesis(ctx sdk.Context, k keeper.IKeeper) GenesisState {
 	var records []types.BLZValue
-	iterator := k.GetValuesIterator(ctx)
+	iterator := k.GetValuesIterator(ctx, k.GetKVStore(ctx))
 	for ; iterator.Valid(); iterator.Next() {
 		key := string(iterator.Key())
-		value := k.GetBLZValue(ctx, "UUID-Genesis", key)
+		value := k.GetBLZValue(ctx, k.GetKVStore(ctx), "UUID-Genesis", key)
 		records = append(records, value)
 	}
 	return GenesisState{records}

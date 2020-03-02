@@ -16,9 +16,9 @@ package app
 
 import (
 	"encoding/json"
-	"os"
-
+	bluzellechain "github.com/bluzelle/curium/types"
 	"github.com/bluzelle/curium/x/crud"
+	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
@@ -32,16 +32,16 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
+	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
-
-	bam "github.com/cosmos/cosmos-sdk/baseapp"
+	"os"
 )
 
-const appName = "CRUD"
+const crudModuleEntry = "bluzelle_crud"
 
 var (
 	// default home directories for the application CLI
@@ -51,19 +51,7 @@ var (
 	DefaultNodeHome = os.ExpandEnv("$HOME/.blzd")
 
 	// ModuleBasicManager is in charge of setting up basic module elements
-	ModuleBasics = module.NewBasicManager(
-		genaccounts.AppModuleBasic{},
-		genutil.AppModuleBasic{},
-		auth.AppModuleBasic{},
-		bank.AppModuleBasic{},
-		staking.AppModuleBasic{},
-		distr.AppModuleBasic{},
-		params.AppModuleBasic{},
-		slashing.AppModuleBasic{},
-		supply.AppModuleBasic{},
-
-		crud.AppModule{},
-	)
+	ModuleBasics = newBasicManager(DefaultNodeHome)
 
 	// account permissions
 	maccPerms = map[string][]string{
@@ -73,6 +61,51 @@ var (
 		staking.NotBondedPoolName: {supply.Burner, supply.Staking},
 	}
 )
+
+func IsCrudEnabled(nodeHome string) bool {
+	enabled := true
+
+	viper.SetConfigName("config")
+	viper.SetConfigType("toml")
+	viper.AddConfigPath(nodeHome + "/config/")
+
+	if viper.ReadInConfig() == nil {
+		if viper.IsSet(crudModuleEntry) {
+			enabled = viper.GetBool(crudModuleEntry)
+		}
+	}
+
+	return enabled
+}
+
+func newBasicManager(nodeHome string) module.BasicManager {
+	if IsCrudEnabled(nodeHome) {
+		return module.NewBasicManager(
+			genaccounts.AppModuleBasic{},
+			genutil.AppModuleBasic{},
+			auth.AppModuleBasic{},
+			bank.AppModuleBasic{},
+			staking.AppModuleBasic{},
+			distr.AppModuleBasic{},
+			params.AppModuleBasic{},
+			slashing.AppModuleBasic{},
+			supply.AppModuleBasic{},
+			crud.AppModule{},
+		)
+	} else {
+		return module.NewBasicManager(
+			genaccounts.AppModuleBasic{},
+			genutil.AppModuleBasic{},
+			auth.AppModuleBasic{},
+			bank.AppModuleBasic{},
+			staking.AppModuleBasic{},
+			distr.AppModuleBasic{},
+			params.AppModuleBasic{},
+			slashing.AppModuleBasic{},
+			supply.AppModuleBasic{},
+		)
+	}
+}
 
 func MakeCodec() *codec.Codec {
 	var cdc = codec.New()
@@ -112,7 +145,7 @@ func NewCRUDApp(
 	cdc := MakeCodec()
 
 	// BaseApp handles interactions with Tendermint through the ABCI protocol
-	bApp := bam.NewBaseApp(appName, logger, db, auth.DefaultTxDecoder(cdc), baseAppOptions...)
+	bApp := bam.NewBaseApp(bluzellechain.AppName, logger, db, auth.DefaultTxDecoder(cdc), baseAppOptions...)
 
 	bApp.SetAppVersion(version.Version)
 
@@ -239,7 +272,9 @@ func NewCRUDApp(
 	)
 
 	// register all module routes and module queriers
-	app.mm.RegisterRoutes(app.Router(), app.QueryRouter())
+	if IsCrudEnabled(DefaultNodeHome) {
+		app.mm.RegisterRoutes(app.Router(), app.QueryRouter())
+	}
 
 	// The initChainer handles translating the genesis.json file into initial state for the network
 	app.SetInitChainer(app.InitChainer)
