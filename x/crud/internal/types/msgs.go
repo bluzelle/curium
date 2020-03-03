@@ -20,6 +20,9 @@ import (
 
 const RouterKey = ModuleName
 
+const MaxKeySize = 4097 // one extra byte for null between uuid & key
+const MaxValueSize = 262144
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Create
 type MsgBLZCreate struct {
@@ -46,9 +49,19 @@ func (msg MsgBLZCreate) ValidateBasic() sdk.Error {
 	if msg.Owner.Empty() {
 		return sdk.ErrInvalidAddress(msg.Owner.String())
 	}
+
 	if len(msg.UUID) == 0 || len(msg.Key) == 0 {
 		return sdk.ErrInvalidPubKey("UUID or key Empty")
 	}
+
+	if len(msg.UUID)+len(msg.Key) > MaxKeySize {
+		return sdk.ErrInternal("UUID+Key too large")
+	}
+
+	if len(msg.Value) > MaxValueSize {
+		return sdk.ErrInternal("Value too large")
+	}
+
 	return nil
 }
 

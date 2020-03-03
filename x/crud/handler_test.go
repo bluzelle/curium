@@ -30,36 +30,51 @@ func initTest(t *testing.T) (*gomock.Controller, *mocks.MockIKeeper, sdk.Context
 	return mockCtrl, mocks.NewMockIKeeper(mockCtrl), sdk.Context{}, []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
 }
 
+type BadMsg struct {
+}
+
+func (msg BadMsg) Route() string                { return RouterKey }
+func (msg BadMsg) Type() string                 { return "badMsg" }
+func (msg BadMsg) ValidateBasic() sdk.Error     { return nil }
+func (msg BadMsg) GetSignBytes() []byte         { return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg)) }
+func (msg BadMsg) GetSigners() []sdk.AccAddress { return []sdk.AccAddress{} }
+
 func Test_handleMsgBLZCreate(t *testing.T) {
 	mockCtrl, mockKeeper, ctx, owner := initTest(t)
 	defer mockCtrl.Finish()
 
 	// Simple Unit
 	{
-		create_msg := types.MsgBLZCreate{
+		createMsg := types.MsgBLZCreate{
 			UUID:  "uuid",
 			Key:   "key",
 			Value: "value",
 			Owner: owner,
 		}
 
+		assert.Equal(t, createMsg.Type(), "create")
+
 		// always return nil for a store...
 		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
 
 		// testing key already exists
-		mockKeeper.EXPECT().GetBLZValue(ctx, nil, create_msg.UUID, create_msg.Key).Return(types.BLZValue{Value: create_msg.Value, Owner: owner})
+		mockKeeper.EXPECT().GetBLZValue(ctx, nil, createMsg.UUID, createMsg.Key).Return(types.BLZValue{Value: createMsg.Value, Owner: owner})
 
-		result := handleMsgBLZCreate(ctx, mockKeeper, create_msg)
+		result := NewHandler(mockKeeper)(ctx, createMsg)
 
 		assert.False(t, result.IsOK(), result.Log)
 
 		// test valid create message
-		mockKeeper.EXPECT().GetBLZValue(ctx, nil, create_msg.UUID, create_msg.Key)
-		mockKeeper.EXPECT().SetBLZValue(ctx, nil, create_msg.UUID, create_msg.Key, types.BLZValue{Value: create_msg.Value, Owner: create_msg.Owner})
+		mockKeeper.EXPECT().GetBLZValue(ctx, nil, createMsg.UUID, createMsg.Key)
+		mockKeeper.EXPECT().SetBLZValue(ctx, nil, createMsg.UUID, createMsg.Key, types.BLZValue{Value: createMsg.Value, Owner: createMsg.Owner})
 
-		result = handleMsgBLZCreate(ctx, mockKeeper, create_msg)
+		result = NewHandler(mockKeeper)(ctx, createMsg)
 
 		assert.True(t, result.IsOK())
+
+		// test bad message
+		result = NewHandler(mockKeeper)(ctx, BadMsg{})
+		assert.False(t, result.IsOK())
 	}
 
 	// Test for empty message parameters
@@ -81,18 +96,19 @@ func Test_handleMsgBLZRead(t *testing.T) {
 
 	// Key not found test
 	{
-		read_msg := types.MsgBLZRead{
+		readMsg := types.MsgBLZRead{
 			UUID:  "uuid",
 			Key:   "key",
 			Owner: owner,
 		}
+		assert.Equal(t, readMsg.Type(), "read")
 
 		// always return nil for a store...
 		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
 
-		mockKeeper.EXPECT().GetOwner(ctx, nil, read_msg.UUID, read_msg.Key)
+		mockKeeper.EXPECT().GetOwner(ctx, nil, readMsg.UUID, readMsg.Key)
 
-		result := handleMsgBLZRead(ctx, mockKeeper, read_msg)
+		result := NewHandler(mockKeeper)(ctx, readMsg)
 
 		assert.False(t, result.IsOK())
 	}
@@ -143,6 +159,7 @@ func Test_handleMsgBLZUpdate(t *testing.T) {
 			Value: "value",
 			Owner: owner,
 		}
+		assert.Equal(t, updateMsg.Type(), "update")
 
 		// always return nil for a store...
 		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
@@ -153,7 +170,7 @@ func Test_handleMsgBLZUpdate(t *testing.T) {
 			Owner: owner,
 		})
 
-		result := handleMsgBLZUpdate(ctx, mockKeeper, updateMsg)
+		result := NewHandler(mockKeeper)(ctx, updateMsg)
 		assert.True(t, result.IsOK())
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, updateMsg.UUID, updateMsg.Key)
@@ -187,12 +204,14 @@ func Test_handleMsgBLZDelete(t *testing.T) {
 	{
 		deleteMsg := types.MsgBLZDelete{UUID: "uuid", Key: "key", Owner: owner}
 
+		assert.Equal(t, deleteMsg.Type(), "delete")
+
 		// always return nil for a store...
 		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, deleteMsg.UUID, deleteMsg.Key)
 
-		result := handleMsgBLZDelete(ctx, mockKeeper, deleteMsg)
+		result := NewHandler(mockKeeper)(ctx, deleteMsg)
 		assert.False(t, result.IsOK())
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, deleteMsg.UUID, deleteMsg.Key).Return(
@@ -231,6 +250,7 @@ func Test_handleMsgBLZKeys(t *testing.T) {
 			UUID:  "uuid",
 			Owner: owner,
 		}
+		assert.Equal(t, keysMsg.Type(), "keys")
 
 		// always return nil for a store...
 		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
@@ -238,7 +258,7 @@ func Test_handleMsgBLZKeys(t *testing.T) {
 		acceptedKeys := []string{"one", "two", "three"}
 		mockKeeper.EXPECT().GetKeys(ctx, nil, keysMsg.UUID).Return(types.QueryResultKeys{UUID: "uuid", Keys: acceptedKeys})
 
-		result := handleMsgBLZKeys(ctx, mockKeeper, keysMsg)
+		result := NewHandler(mockKeeper)(ctx, keysMsg)
 		assert.True(t, result.IsOK())
 		assert.NotEmpty(t, result.Data)
 
@@ -269,12 +289,14 @@ func Test_handleMsgBLZHas(t *testing.T) {
 			Key:   "key",
 			Owner: owner,
 		}
+		assert.Equal(t, hasMsg.Type(), "has")
+
 		// always return nil for a store...
 		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, hasMsg.UUID, hasMsg.Key).Return(owner)
 
-		result := handleMsgBLZHas(ctx, mockKeeper, hasMsg)
+		result := NewHandler(mockKeeper)(ctx, hasMsg)
 		assert.True(t, result.IsOK())
 
 		json_result := types.QueryResultHas{}
