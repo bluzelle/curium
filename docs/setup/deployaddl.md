@@ -65,10 +65,10 @@ Deploy Additional Nodes
 
         $ blzcli tx send <src delegator address> <dest delegator address> 1000000000bnt /
           --gas-prices 0.01bnt / 
-          --from validator
+          --from vuser
     note that the the validator keys are the id’s that are prefixed with “bluzelle”, and can be obtained by running
     
-        $ blzcli keys show validator -a
+        $ blzcli keys show vuser -a
         
     on each server.
     
@@ -100,7 +100,7 @@ Deploy Additional Nodes
           --min-self-delegation=1 \
           --gas=auto --gas-adjustment=1.2 \
           --gas-prices=0.01bnt \
-          --from validator
+          --from vuser
 
     This will stake this node’s validator with the minimum amount of bnt tokens to become a validator with 100 voting power. The validator will participate in validating new operations sent to block chain and earn rewards and commision for doing so. Be sure to note the validator address in the output.
 

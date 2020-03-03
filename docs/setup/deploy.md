@@ -45,13 +45,13 @@ Deploy the Initial Node
         $ blzcli config trust-node true
     where “bluzelle” is the zone’s chain-id.
 
-7. Derive a new key that will label the validator account for this node, call it “validator”:
+7. Derive a new key that will label the validator account for this node, call it “vuser”:
 
-        $ blzcli keys add validator
+        $ blzcli keys add vuser
         Enter a passphrase to encrypt your key to disk:
         Repeat the passphrase:
         
-        - name: validator
+        - name: vuser
           type: local
           address: bluzelle1akcrplttpq2qvp90g8l7ttgj25q00rvj0e9d6k
           pubkey: bluzellepub1addwnpepqtzzdysc4mukmzzk7aexmfyjdq305ztgu2dkggytqazvvpxv3xma56r8c4n
@@ -67,16 +67,16 @@ Deploy the Initial Node
 
     Note the address, with the “bluzelle” prefix, and the mnemonic. The mnemonic will be used by the Bluzelle javascript client to send transactions to the node.
 
-8.  Add the first account to the blockchain using the validator key as the account identifier
+8.  Add the first account to the blockchain using the vuser key as the account identifier
 
-        $ blzd add-genesis-account $(blzcli keys show validator -a) 10000000000bnt
+        $ blzd add-genesis-account $(blzcli keys show vuser -a) 10000000000bnt
         
     this command is an alias for “tx staking create-validator”. The amount given for the bnt tokens here will be the total amount of tokens available to the zone.
 
 9.  As this is the first node in the zone, it needs a transaction that will be the first transaction in the blockchain. 
 
         $ blzd gentx --name vuser --amount 100000000bnt
-        Password to sign with 'validator':
+        Password to sign with 'vuser':
         Genesis transaction written to "/home/rich/.blzd/config/gentx/gentx-6ccdb7764f4b6762bca9ce254ee9db49a687cc9c.json"
         
     remember to specify the  amount of coins to bond using the --amount parameter so that bnt is used as stake, if this is neglected the bonding denomination will be stake. Open the genesis transaction JSON file and note the value for the validator_address, it will have the prefix “bluzellevaloper”,  this id will be used to get account info later.
