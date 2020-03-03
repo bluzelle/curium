@@ -55,6 +55,16 @@ func TestMsgBLZCreate_ValidateBasic(t *testing.T) {
 	sut.UUID = "uuid"
 	sut.Key = ""
 	assert.Equal(t, sut.ValidateBasic(), sdk.ErrInvalidPubKey("UUID or key Empty"))
+
+	// test max sizes...
+	sut.Key = string(make([]byte, MaxKeySize/2))
+	sut.UUID = string(make([]byte, MaxKeySize/2+2))
+	assert.Equal(t, sut.ValidateBasic(), sdk.ErrInternal("UUID+Key too large"))
+
+	sut.Key = "Key"
+	sut.UUID = "UUID"
+	sut.Value = string(make([]byte, MaxValueSize+1))
+	assert.Equal(t, sut.ValidateBasic(), sdk.ErrInternal("Value too large"))
 }
 
 func TestMsgBLZCreate_GetSignBytes(t *testing.T) {
