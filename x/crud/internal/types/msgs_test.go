@@ -313,3 +313,56 @@ func TestMsgBLZHas_GetSigners(t *testing.T) {
 	msg := NewMsgBLZHas("uuid", "key", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
 	assert.Equal(t, msg.GetSigners(), []sdk.AccAddress{msg.Owner})
 }
+
+/////////////////////////////////////////////////////////////////////////////////
+func TestNewMsgBLZRename(t *testing.T) {
+	owner := []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
+	accepted := MsgBLZRename{UUID: "uuid", Key: "key", NewKey: "newkey", Owner: owner}
+
+	sut := NewMsgBLZRename(accepted.UUID, accepted.Key, accepted.NewKey, owner)
+	assert.IsType(t, MsgBLZRename{}, sut)
+
+	assert.True(t, reflect.DeepEqual(accepted, sut))
+}
+
+func TestMsgBLZRename_Route(t *testing.T) {
+	assert.Equal(t, "crud", MsgBLZRename{}.Route())
+}
+
+func TestMsgBLZRename_Type(t *testing.T) {
+	assert.Equal(t, "rename", MsgBLZRename{}.Type())
+}
+
+func TestMsgBLZRename_ValidateBasic(t *testing.T) {
+	sut := NewMsgBLZRename("uuid", "key", "newkey", []byte(""))
+	assert.Equal(t, sdk.ErrInvalidAddress(sut.Owner.String()), sut.ValidateBasic())
+
+	sut.Owner = []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
+	assert.Nil(t, sut.ValidateBasic())
+
+	sut.UUID = ""
+	assert.Equal(t, sdk.ErrInvalidPubKey("UUID empty"), sut.ValidateBasic())
+
+	sut.UUID = "uuid"
+	sut.Key = ""
+	assert.Equal(t, sdk.ErrInvalidPubKey("key empty"), sut.ValidateBasic())
+
+	sut.Key = "key"
+	sut.NewKey = ""
+	assert.Equal(t, sdk.ErrInvalidPubKey("new key empty"), sut.ValidateBasic())
+
+	sut.Key = "Key"
+	sut.NewKey = string(make([]byte, MaxKeySize+1))
+	assert.Equal(t, sdk.ErrInternal("UUID+NewKey too large"), sut.ValidateBasic())
+}
+
+func TestMsgBLZRename_GetSignBytes(t *testing.T) {
+	sut := NewMsgBLZRename("uuid", "key", "newkey", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
+	exp := "{\"type\":\"crud/rename\",\"value\":{\"Key\":\"key\",\"NewKey\":\"newkey\",\"Owner\":\"cosmos1vfk827n9d3kx2vt5xpuhwardwfj82mryvcmxsdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\"}}"
+	assert.Equal(t, exp, string(sut.GetSignBytes()))
+}
+
+func TestMsgBLZRename_GetSigners(t *testing.T) {
+	msg := NewMsgBLZRename("uuid", "key", "newkey", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
+	assert.Equal(t, []sdk.AccAddress{msg.Owner}, msg.GetSigners())
+}

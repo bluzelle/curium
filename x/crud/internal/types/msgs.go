@@ -263,3 +263,50 @@ func (msg MsgBLZHas) GetSignBytes() []byte {
 func (msg MsgBLZHas) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner}
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Rename
+type MsgBLZRename struct {
+	UUID   string
+	Key    string
+	NewKey string
+	Owner  sdk.AccAddress
+}
+
+func NewMsgBLZRename(uuid string, key string, newKey string, owner sdk.AccAddress) MsgBLZRename {
+	return MsgBLZRename{UUID: uuid, Key: key, NewKey: newKey, Owner: owner}
+}
+
+func (msg MsgBLZRename) Route() string { return "crud" }
+
+func (msg MsgBLZRename) Type() string { return "rename" }
+
+func (msg MsgBLZRename) ValidateBasic() sdk.Error {
+	if msg.Owner.Empty() {
+		return sdk.ErrInvalidAddress(msg.Owner.String())
+	}
+
+	if len(msg.UUID) == 0 {
+		return sdk.ErrInvalidPubKey("UUID empty")
+	}
+
+	if len(msg.Key) == 0 {
+		return sdk.ErrInvalidPubKey("key empty")
+	}
+
+	if len(msg.NewKey) == 0 {
+		return sdk.ErrInvalidPubKey("new key empty")
+	}
+
+	if len(msg.UUID)+len(msg.NewKey) > MaxKeySize {
+		return sdk.ErrInternal("UUID+NewKey too large")
+	}
+
+	return nil
+}
+
+func (msg MsgBLZRename) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
+
+func (msg MsgBLZRename) GetSigners() []sdk.AccAddress { return []sdk.AccAddress{msg.Owner} }

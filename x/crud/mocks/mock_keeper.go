@@ -132,6 +132,20 @@ func (mr *MockIKeeperMockRecorder) IsKeyPresent(arg0, arg1, arg2, arg3 interface
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsKeyPresent", reflect.TypeOf((*MockIKeeper)(nil).IsKeyPresent), arg0, arg1, arg2, arg3)
 }
 
+// RenameBLZKey mocks base method
+func (m *MockIKeeper) RenameBLZKey(arg0 types1.Context, arg1 types0.KVStore, arg2, arg3, arg4 string) bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RenameBLZKey", arg0, arg1, arg2, arg3, arg4)
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// RenameBLZKey indicates an expected call of RenameBLZKey
+func (mr *MockIKeeperMockRecorder) RenameBLZKey(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RenameBLZKey", reflect.TypeOf((*MockIKeeper)(nil).RenameBLZKey), arg0, arg1, arg2, arg3, arg4)
+}
+
 // SetBLZValue mocks base method
 func (m *MockIKeeper) SetBLZValue(arg0 types1.Context, arg1 types0.KVStore, arg2, arg3 string, arg4 types.BLZValue) {
 	m.ctrl.T.Helper()

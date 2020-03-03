@@ -175,3 +175,23 @@ func TestKeeper_GetOwner(t *testing.T) {
 	assert.True(t, reflect.DeepEqual([]byte(actual), owner))
 	assert.Empty(t, keeper.GetOwner(ctx, testStore, "notauuid", "notakey"))
 }
+
+func TestKeeper_RenameBLZKey(t *testing.T) {
+	ctx, testStore, owner, cdc := initKeeperTest(t)
+
+	keeper := NewKeeper(nil, nil, cdc)
+
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key", types.BLZValue{
+		Value: "a value",
+		Owner: owner,
+	})
+
+	assert.False(t, keeper.RenameBLZKey(ctx, testStore, "uuid", "badkey", "newkey"))
+
+	assert.True(t, keeper.RenameBLZKey(ctx, testStore, "uuid", "key", "newkey"))
+
+	assert.True(t, reflect.DeepEqual(keeper.GetBLZValue(ctx,testStore, "uuid", "newkey"), types.BLZValue{
+		Value: "a value",
+		Owner: owner,
+	}))
+}

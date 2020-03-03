@@ -325,3 +325,62 @@ func Test_handleMsgBLZHas(t *testing.T) {
 		assert.False(t, result.IsOK())
 	}
 }
+
+func Test_handleMsgBLZRename(t *testing.T) {
+	// check for new key
+	// check for new key size
+	// ensure the owners match
+	//
+	mockCtrl, mockKeeper, ctx, owner := initTest(t)
+	defer mockCtrl.Finish()
+
+	// Simple Rename test
+	{
+		renameMsg := types.MsgBLZRename{
+			UUID:   "uuid",
+			Key:    "key",
+			NewKey: "newkey",
+			Owner:  owner,
+		}
+		assert.Equal(t, renameMsg.Type(), "rename")
+
+		// always return nil for a store...
+		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
+		mockKeeper.EXPECT().GetOwner(ctx, nil, renameMsg.UUID, renameMsg.Key).Return(owner)
+		mockKeeper.EXPECT().RenameBLZKey(ctx, gomock.Any(), renameMsg.UUID, renameMsg.Key, renameMsg.NewKey).Return(true)
+
+		result := NewHandler(mockKeeper)(ctx, renameMsg)
+		assert.True(t, result.IsOK())
+
+		mockKeeper.EXPECT().GetOwner(ctx, nil, renameMsg.UUID, renameMsg.Key).Return(owner)
+		renameMsg.Owner = []byte("bluzelle1nnpyp9wr6law2u5jwa23t0ywtmrduldf6h4wqr")
+		result = handleMsgBLZRename(ctx, mockKeeper, renameMsg)
+		assert.False(t, result.IsOK())
+
+		mockKeeper.EXPECT().GetOwner(ctx, nil, renameMsg.UUID, renameMsg.Key)
+		result = handleMsgBLZRename(ctx, mockKeeper, renameMsg)
+		assert.False(t, result.IsOK())
+
+		// Rename failed
+		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
+		mockKeeper.EXPECT().GetOwner(ctx, nil, renameMsg.UUID, renameMsg.Key).Return(renameMsg.Owner)
+		mockKeeper.EXPECT().RenameBLZKey(ctx, gomock.Any(), renameMsg.UUID, renameMsg.Key, renameMsg.NewKey).Return(false)
+
+		result = NewHandler(mockKeeper)(ctx, renameMsg)
+		assert.False(t, result.IsOK())
+		assert.Equal(t, "{\"codespace\":\"sdk\",\"code\":1,\"message\":\"Rename failed\"}", result.Log)
+	}
+
+	// Test for empty message parameters
+	{
+
+		result := handleMsgBLZRename(ctx, mockKeeper, types.MsgBLZRename{})
+		assert.False(t, result.IsOK())
+
+		result = handleMsgBLZRename(ctx, mockKeeper, types.MsgBLZRename{UUID: "uuid", Key: "key"})
+		assert.False(t, result.IsOK())
+
+		result = handleMsgBLZRename(ctx, mockKeeper, types.MsgBLZRename{UUID: "uuid", Key: "key", NewKey: "newkey"})
+		assert.False(t, result.IsOK())
+	}
+}
