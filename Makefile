@@ -26,11 +26,16 @@ ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=BluzelleService \
 
 BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
 
-all: install
+all:
+		go build $(BUILD_FLAGS) ./cmd/blzd
+		go build $(BUILD_FLAGS) ./cmd/blzcli
 
 install: go.sum
 		go install -mod=readonly $(BUILD_FLAGS) ./cmd/blzd
 		go install -mod=readonly $(BUILD_FLAGS) ./cmd/blzcli
+
+clean:
+		@rm -f blzd blzcli
 
 go.sum: go.mod
 		@echo "--> Ensure dependencies have not been modified"
