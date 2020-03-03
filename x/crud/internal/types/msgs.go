@@ -133,9 +133,15 @@ func (msg MsgBLZUpdate) ValidateBasic() sdk.Error {
 	if msg.Owner.Empty() {
 		return sdk.ErrInvalidAddress(msg.Owner.String())
 	}
+
 	if len(msg.UUID) == 0 || len(msg.Key) == 0 {
 		return sdk.ErrInvalidPubKey("UUID or key Empty")
 	}
+
+	if len(msg.Value) > MaxValueSize {
+		return sdk.ErrInternal("Value too large")
+	}
+
 	return nil
 }
 
