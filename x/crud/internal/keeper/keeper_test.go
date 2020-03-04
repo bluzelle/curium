@@ -16,18 +16,22 @@ package keeper
 
 import (
 	"github.com/bluzelle/curium/x/crud/internal/types"
+	"github.com/bluzelle/curium/x/crud/mocks"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store/cachekv"
 	"github.com/cosmos/cosmos-sdk/store/dbadapter"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	abci "github.com/tendermint/tendermint/abci/types"
 	dbm "github.com/tendermint/tm-db"
 	"reflect"
 	"testing"
 )
 
 func initKeeperTest(t *testing.T) (sdk.Context, sdk.KVStore, []byte, *codec.Codec) {
-	return sdk.Context{},
+
+	return sdk.NewContext(nil, abci.Header{}, false, nil),
 		cachekv.NewStore(dbadapter.Store{dbm.NewMemDB()}),
 		[]byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"),
 		codec.New()
@@ -44,7 +48,7 @@ func Test_makeMetaKey(t *testing.T) {
 func TestKeeper_SetBLZValue(t *testing.T) {
 	ctx, testStore, owner, cdc := initKeeperTest(t)
 
-	keeper := NewKeeper(nil, nil, cdc)
+	keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{})
 
 	acceptedValue := types.BLZValue{
 		Value: "value",
@@ -63,7 +67,7 @@ func TestKeeper_SetBLZValue(t *testing.T) {
 
 func TestKeeper_GetBLZValue(t *testing.T) {
 	ctx, testStore, owner, cdc := initKeeperTest(t)
-	keeper := NewKeeper(nil, nil, cdc)
+	keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{})
 
 	// test value not found
 	result := keeper.GetBLZValue(ctx, testStore, "uuid", "key")
@@ -84,7 +88,7 @@ func TestKeeper_GetBLZValue(t *testing.T) {
 
 func TestKeeper_DeleteBLZValue(t *testing.T) {
 	ctx, testStore, owner, cdc := initKeeperTest(t)
-	keeper := NewKeeper(nil, nil, cdc)
+	keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{})
 
 	keeper.SetBLZValue(ctx, testStore, "uuid", "key", types.BLZValue{
 		Value: "value",
@@ -99,7 +103,7 @@ func TestKeeper_DeleteBLZValue(t *testing.T) {
 
 func TestKeeper_IsKeyPresent(t *testing.T) {
 	ctx, testStore, owner, cdc := initKeeperTest(t)
-	keeper := NewKeeper(nil, nil, cdc)
+	keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{})
 
 	assert.False(t, keeper.IsKeyPresent(ctx, testStore, "uuid", "key"))
 
@@ -113,7 +117,7 @@ func TestKeeper_IsKeyPresent(t *testing.T) {
 
 func TestKeeper_GetValuesIterator(t *testing.T) {
 	ctx, testStore, owner, cdc := initKeeperTest(t)
-	keeper := NewKeeper(nil, nil, cdc)
+	keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{})
 
 	result := keeper.GetValuesIterator(ctx, testStore)
 
@@ -135,7 +139,7 @@ func TestKeeper_GetValuesIterator(t *testing.T) {
 
 func TestKeeper_GetKeys(t *testing.T) {
 	ctx, testStore, owner, cdc := initKeeperTest(t)
-	keeper := NewKeeper(nil, nil, cdc)
+	keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{MaxKeysSize: 1024})
 
 	keys := keeper.GetKeys(ctx, testStore, "uuid")
 
@@ -164,9 +168,37 @@ func TestKeeper_GetKeys(t *testing.T) {
 	assert.Len(t, keys.Keys, 1)
 }
 
+func TestKeeper_GetKeys_MaxSize(t *testing.T) {
+	ctx, testStore, owner, cdc := initKeeperTest(t)
+
+	// test max keys size
+	{
+		keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{MaxKeysSize: 9})
+		keeper.SetBLZValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
+		keeper.SetBLZValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value", Owner: owner})
+		keeper.SetBLZValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value", Owner: owner})
+		keeper.SetBLZValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value", Owner: owner})
+
+		keys := keeper.GetKeys(ctx, testStore, "uuid")
+
+		assert.Len(t, keys.Keys, 2)
+	}
+
+	// test out of gas
+	{
+		mockCtrl := gomock.NewController(t)
+		mockGasMeter := mocks.NewMockGasMeter(mockCtrl)
+		keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{MaxKeysSize: 1024})
+		mockGasMeter.EXPECT().IsPastLimit().Return(true)
+		keys := keeper.GetKeys(ctx.WithGasMeter(mockGasMeter), testStore, "uuid")
+
+		assert.Len(t, keys.Keys, 0)
+	}
+}
+
 func TestKeeper_GetOwner(t *testing.T) {
 	ctx, testStore, owner, cdc := initKeeperTest(t)
-	keeper := NewKeeper(nil, nil, cdc)
+	keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{})
 
 	keeper.SetBLZValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
 
@@ -179,7 +211,7 @@ func TestKeeper_GetOwner(t *testing.T) {
 func TestKeeper_RenameBLZKey(t *testing.T) {
 	ctx, testStore, owner, cdc := initKeeperTest(t)
 
-	keeper := NewKeeper(nil, nil, cdc)
+	keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{})
 
 	keeper.SetBLZValue(ctx, testStore, "uuid", "key", types.BLZValue{
 		Value: "a value",
@@ -190,7 +222,7 @@ func TestKeeper_RenameBLZKey(t *testing.T) {
 
 	assert.True(t, keeper.RenameBLZKey(ctx, testStore, "uuid", "key", "newkey"))
 
-	assert.True(t, reflect.DeepEqual(keeper.GetBLZValue(ctx,testStore, "uuid", "newkey"), types.BLZValue{
+	assert.True(t, reflect.DeepEqual(keeper.GetBLZValue(ctx, testStore, "uuid", "newkey"), types.BLZValue{
 		Value: "a value",
 		Owner: owner,
 	}))

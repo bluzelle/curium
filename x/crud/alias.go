@@ -34,6 +34,7 @@ var (
 
 type (
 	Keeper          = keeper.Keeper
+	MaxKeeperSizes  = keeper.MaxKeeperSizes
 	MsgBLZCreate    = types.MsgBLZCreate
 	MsgBLZRead      = types.MsgBLZRead
 	MsgBLZUpdate    = types.MsgBLZUpdate
