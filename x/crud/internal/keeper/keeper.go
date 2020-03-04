@@ -31,6 +31,7 @@ type IKeeper interface {
 	GetKeys(ctx sdk.Context, store sdk.KVStore, UUID string) types.QueryResultKeys
 	GetOwner(ctx sdk.Context, store sdk.KVStore, UUID string, key string) sdk.AccAddress
 	GetKVStore(ctx sdk.Context) sdk.KVStore
+	RenameBLZKey(ctx sdk.Context, store sdk.KVStore, UUID string, key string, newkey string) bool
 }
 
 type Keeper struct {
@@ -105,4 +106,22 @@ func (k Keeper) GetKeys(ctx sdk.Context, store sdk.KVStore, UUID string) types.Q
 
 func (k Keeper) GetOwner(ctx sdk.Context, store sdk.KVStore, UUID string, key string) sdk.AccAddress {
 	return k.GetBLZValue(ctx, store, UUID, key).Owner
+}
+
+func (k Keeper) RenameBLZKey(ctx sdk.Context, store sdk.KVStore, UUID string, key string, newKey string) bool {
+	BLZNewKey := MakeMetaKey(UUID, newKey)
+	if k.isUUIDKeyPresent(ctx, store, BLZNewKey) {
+		return false
+	}
+
+	value := k.GetBLZValue(ctx, store, UUID, key)
+
+	if value.Owner.Empty() {
+		return false
+	}
+
+	k.SetBLZValue(ctx, store, UUID, newKey, value)
+	k.DeleteBLZValue(ctx, store, UUID, key)
+
+	return true
 }

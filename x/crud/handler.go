@@ -37,6 +37,8 @@ func NewHandler(keeper keeper.IKeeper) sdk.Handler {
 			return handleMsgBLZKeys(ctx, keeper, msg)
 		case types.MsgBLZHas:
 			return handleMsgBLZHas(ctx, keeper, msg)
+		case types.MsgBLZRename:
+			return handleMsgBLZRename(ctx, keeper, msg)
 		default:
 			return sdk.ErrUnknownRequest(fmt.Sprintf("Unrecognized crud msg type: %v", msg.Type())).Result()
 		}
@@ -141,4 +143,25 @@ func handleMsgBLZHas(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZHas
 	}
 
 	return sdk.Result{Data: json_data}
+}
+
+func handleMsgBLZRename(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZRename) sdk.Result {
+	if len(msg.UUID) == 0 || len(msg.Key) == 0 || len(msg.NewKey) ==0 || msg.Owner.Empty() {
+		return sdk.ErrInternal("Invalid message").Result()
+	}
+
+	owner := keeper.GetOwner(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key)
+	if owner.Empty() {
+		return sdk.ErrInternal("Key does not exist").Result()
+	}
+
+	if !msg.Owner.Equals(owner) {
+		return sdk.ErrUnauthorized("Incorrect Owner").Result()
+	}
+
+	if !keeper.RenameBLZKey(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key, msg.NewKey) {
+		return sdk.ErrInternal("Rename failed").Result()
+	}
+
+	return sdk.Result{}
 }

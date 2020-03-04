@@ -40,6 +40,7 @@ func GetTxCmd(_ string, cdc *codec.Codec) *cobra.Command {
 		GetCmdBLZDelete(cdc),
 		GetCmdBLZKeys(cdc),
 		GetCmdBLZHas(cdc),
+		GetCmdBLZRename(cdc),
 	)...)
 
 	return crudTxCmd
@@ -154,6 +155,26 @@ func GetCmdBLZHas(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 			msg := types.NewMsgBLZHas(args[0], args[1], cliCtx.GetFromAddress())
+
+			err := msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+		},
+	}
+}
+
+func GetCmdBLZRename(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "rename [UUID] [key] [new key]",
+		Short: "rename an existing entry in the database",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+			msg := types.NewMsgBLZRename(args[0], args[1], args[2], cliCtx.GetFromAddress())
 
 			err := msg.ValidateBasic()
 			if err != nil {
