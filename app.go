@@ -26,7 +26,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
-	"github.com/cosmos/cosmos-sdk/x/genaccounts"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
@@ -34,8 +33,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
-	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/libs/log"
+	tmos "github.com/tendermint/tendermint/libs/os"
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 	"os"
@@ -82,7 +81,6 @@ func IsCrudEnabled(nodeHome string) bool {
 func newBasicManager(nodeHome string) module.BasicManager {
 	if IsCrudEnabled(nodeHome) {
 		return module.NewBasicManager(
-			genaccounts.AppModuleBasic{},
 			genutil.AppModuleBasic{},
 			auth.AppModuleBasic{},
 			bank.AppModuleBasic{},
@@ -95,7 +93,6 @@ func newBasicManager(nodeHome string) module.BasicManager {
 		)
 	} else {
 		return module.NewBasicManager(
-			genaccounts.AppModuleBasic{},
 			genutil.AppModuleBasic{},
 			auth.AppModuleBasic{},
 			bank.AppModuleBasic{},
@@ -164,7 +161,7 @@ func NewCRUDApp(
 	}
 
 	// The ParamsKeeper handles parameter storage for the application
-	app.paramsKeeper = params.NewKeeper(app.cdc, keys[params.StoreKey], tkeys[params.TStoreKey], params.DefaultCodespace)
+	app.paramsKeeper = params.NewKeeper(app.cdc, keys[params.StoreKey], tkeys[params.TStoreKey])
 	// Set specific supspaces
 	authSubspace := app.paramsKeeper.Subspace(auth.DefaultParamspace)
 	bankSubspace := app.paramsKeeper.Subspace(bank.DefaultParamspace)
@@ -184,7 +181,6 @@ func NewCRUDApp(
 	app.bankKeeper = bank.NewBaseKeeper(
 		app.accountKeeper,
 		bankSubspace,
-		bank.DefaultCodespace,
 		app.ModuleAccountAddrs(),
 	)
 
@@ -201,10 +197,8 @@ func NewCRUDApp(
 	stakingKeeper := staking.NewKeeper(
 		app.cdc,
 		keys[staking.StoreKey],
-		tkeys[staking.TStoreKey],
 		app.supplyKeeper,
 		stakingSubspace,
-		staking.DefaultCodespace,
 	)
 
 	app.distrKeeper = distr.NewKeeper(
@@ -213,7 +207,6 @@ func NewCRUDApp(
 		distrSubspace,
 		&stakingKeeper,
 		app.supplyKeeper,
-		distr.DefaultCodespace,
 		auth.FeeCollectorName,
 		app.ModuleAccountAddrs(),
 	)
@@ -223,7 +216,6 @@ func NewCRUDApp(
 		keys[slashing.StoreKey],
 		&stakingKeeper,
 		slashingSubspace,
-		slashing.DefaultCodespace,
 	)
 
 	// register the staking hooks
@@ -244,15 +236,14 @@ func NewCRUDApp(
 	)
 
 	app.mm = module.NewManager(
-		genaccounts.NewAppModule(app.accountKeeper),
 		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx),
 		auth.NewAppModule(app.accountKeeper),
 		bank.NewAppModule(app.bankKeeper, app.accountKeeper),
 		crud.NewAppModule(app.crudKeeper, app.bankKeeper),
 		supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
-		distr.NewAppModule(app.distrKeeper, app.supplyKeeper),
-		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
-		staking.NewAppModule(app.stakingKeeper, app.distrKeeper, app.accountKeeper, app.supplyKeeper),
+		distr.NewAppModule(app.distrKeeper, app.accountKeeper, app.supplyKeeper, app.stakingKeeper),
+		slashing.NewAppModule(app.slashingKeeper, app.accountKeeper, app.stakingKeeper),
+		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
 	)
 
 	app.mm.SetOrderBeginBlockers(distr.ModuleName, slashing.ModuleName)
@@ -262,7 +253,6 @@ func NewCRUDApp(
 	// NOTE: The genutils moodule must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
 	app.mm.SetOrderInitGenesis(
-		genaccounts.ModuleName,
 		distr.ModuleName,
 		staking.ModuleName,
 		auth.ModuleName,
@@ -298,7 +288,7 @@ func NewCRUDApp(
 
 	err := app.LoadLatestVersion(app.keys[bam.MainStoreKey])
 	if err != nil {
-		cmn.Exit(err.Error())
+		tmos.Exit(err.Error())
 	}
 
 	return app

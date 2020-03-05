@@ -135,5 +135,5 @@ func TestAppModule_QuerierRoute(t *testing.T) {
 func TestAppModule_NewQuerierHandler(t *testing.T) {
 	sut := AppModule{}
 	querier := sut.NewQuerierHandler()
-	assert.Equal(t, "func(types.Context, []string, types.RequestQuery) ([]uint8, types.Error)", reflect.TypeOf(querier).String())
+	assert.Equal(t, "func(types.Context, []string, types.RequestQuery) ([]uint8, error)", reflect.TypeOf(querier).String())
 }

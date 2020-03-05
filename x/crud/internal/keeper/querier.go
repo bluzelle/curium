@@ -18,6 +18,7 @@ import (
 	"github.com/bluzelle/curium/x/crud/internal/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
@@ -28,7 +29,7 @@ const (
 )
 
 func NewQuerier(keeper Keeper) sdk.Querier {
-	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err sdk.Error) {
+	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err error) {
 		switch path[0] {
 		case QueryRead:
 			return queryRead(ctx, path[1:], req, keeper, keeper.cdc)
@@ -37,16 +38,16 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 		case QueryKeys:
 			return queryKeys(ctx, path[1:], req, keeper, keeper.cdc)
 		default:
-			return nil, sdk.ErrUnknownRequest("unknown crud query endpoint")
+			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown crud query endpoint")
 		}
 	}
 }
 
-func queryRead(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, sdk.Error) {
+func queryRead(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, error) {
 	blzValue := keeper.GetBLZValue(ctx, keeper.GetKVStore(ctx), path[0], path[1])
 
 	if len(blzValue.Owner) == 0 {
-		return []byte{}, sdk.ErrUnknownRequest("key not found")
+		return []byte{}, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "key not found")
 	}
 
 	res, err := codec.MarshalJSONIndent(cdc, types.QueryResultRead{UUID: path[0], Key: path[1], Value: blzValue.Value})
@@ -57,7 +58,7 @@ func queryRead(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeep
 	return res, nil
 }
 
-func queryHas(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, sdk.Error) {
+func queryHas(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, error) {
 	has := keeper.IsKeyPresent(ctx, keeper.GetKVStore(ctx), path[0], path[1])
 
 	res, err := codec.MarshalJSONIndent(cdc, types.QueryResultHas{UUID: path[0], Key: path[1], Has: has})
@@ -68,7 +69,7 @@ func queryHas(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeepe
 	return res, nil
 }
 
-func queryKeys(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, sdk.Error) {
+func queryKeys(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, error) {
 	res, err := codec.MarshalJSONIndent(cdc, keeper.GetKeys(ctx, keeper.GetKVStore(ctx), path[0]))
 	if err != nil {
 		panic("could not marshal result to JSON")

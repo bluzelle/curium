@@ -19,6 +19,7 @@ import (
 	"github.com/bluzelle/curium/x/crud/internal/types"
 	"github.com/bluzelle/curium/x/crud/mocks"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"reflect"
@@ -35,7 +36,7 @@ type BadMsg struct {
 
 func (msg BadMsg) Route() string                { return RouterKey }
 func (msg BadMsg) Type() string                 { return "badMsg" }
-func (msg BadMsg) ValidateBasic() sdk.Error     { return nil }
+func (msg BadMsg) ValidateBasic() error         { return nil }
 func (msg BadMsg) GetSignBytes() []byte         { return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg)) }
 func (msg BadMsg) GetSigners() []sdk.AccAddress { return []sdk.AccAddress{} }
 
@@ -60,33 +61,31 @@ func Test_handleMsgBLZCreate(t *testing.T) {
 		// testing key already exists
 		mockKeeper.EXPECT().GetBLZValue(ctx, nil, createMsg.UUID, createMsg.Key).Return(types.BLZValue{Value: createMsg.Value, Owner: owner})
 
-		result := NewHandler(mockKeeper)(ctx, createMsg)
-
-		assert.False(t, result.IsOK(), result.Log)
+		_, err := NewHandler(mockKeeper)(ctx, createMsg)
+		assert.NotNil(t, err)
 
 		// test valid create message
 		mockKeeper.EXPECT().GetBLZValue(ctx, nil, createMsg.UUID, createMsg.Key)
 		mockKeeper.EXPECT().SetBLZValue(ctx, nil, createMsg.UUID, createMsg.Key, types.BLZValue{Value: createMsg.Value, Owner: createMsg.Owner})
 
-		result = NewHandler(mockKeeper)(ctx, createMsg)
-
-		assert.True(t, result.IsOK())
+		_, err = NewHandler(mockKeeper)(ctx, createMsg)
+		assert.Nil(t, err)
 
 		// test bad message
-		result = NewHandler(mockKeeper)(ctx, BadMsg{})
-		assert.False(t, result.IsOK())
+		_, err = NewHandler(mockKeeper)(ctx, BadMsg{})
+		assert.NotNil(t, err)
 	}
 
 	// Test for empty message parameters
 	{
-		result := handleMsgBLZCreate(ctx, mockKeeper, types.MsgBLZCreate{})
-		assert.False(t, result.IsOK())
+		_, err := handleMsgBLZCreate(ctx, mockKeeper, types.MsgBLZCreate{})
+		assert.NotNil(t, err)
 
-		result = handleMsgBLZCreate(ctx, mockKeeper, types.MsgBLZCreate{UUID: "uuid"})
-		assert.False(t, result.IsOK())
+		_, err = handleMsgBLZCreate(ctx, mockKeeper, types.MsgBLZCreate{UUID: "uuid"})
+		assert.NotNil(t, err)
 
-		result = handleMsgBLZCreate(ctx, mockKeeper, types.MsgBLZCreate{UUID: "uuid", Key: "key"})
-		assert.False(t, result.IsOK())
+		_, err = handleMsgBLZCreate(ctx, mockKeeper, types.MsgBLZCreate{UUID: "uuid", Key: "key"})
+		assert.NotNil(t, err)
 	}
 }
 
@@ -108,9 +107,9 @@ func Test_handleMsgBLZRead(t *testing.T) {
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, readMsg.UUID, readMsg.Key)
 
-		result := NewHandler(mockKeeper)(ctx, readMsg)
+		_, err := NewHandler(mockKeeper)(ctx, readMsg)
 
-		assert.False(t, result.IsOK())
+		assert.NotNil(t, err)
 	}
 
 	// key returned in result
@@ -123,9 +122,9 @@ func Test_handleMsgBLZRead(t *testing.T) {
 		mockKeeper.EXPECT().GetOwner(ctx, nil, read_msg.UUID, read_msg.Key).Return(owner)
 		mockKeeper.EXPECT().GetBLZValue(ctx, nil, read_msg.UUID, read_msg.Key).Return(types.BLZValue{Value: "utest", Owner: owner})
 
-		result := handleMsgBLZRead(ctx, mockKeeper, read_msg)
+		result, err := handleMsgBLZRead(ctx, mockKeeper, read_msg)
 
-		assert.True(t, result.IsOK())
+		assert.Nil(t, err)
 		assert.NotEmpty(t, result.Data)
 
 		json_result := types.BLZValue{}
@@ -136,14 +135,14 @@ func Test_handleMsgBLZRead(t *testing.T) {
 
 	// Test for empty message parameters
 	{
-		result := handleMsgBLZRead(ctx, mockKeeper, types.MsgBLZRead{})
-		assert.False(t, result.IsOK())
+		_, err := handleMsgBLZRead(ctx, mockKeeper, types.MsgBLZRead{})
+		assert.NotNil(t, err)
 
-		result = handleMsgBLZRead(ctx, mockKeeper, types.MsgBLZRead{UUID: "uuid"})
-		assert.False(t, result.IsOK())
+		_, err = handleMsgBLZRead(ctx, mockKeeper, types.MsgBLZRead{UUID: "uuid"})
+		assert.NotNil(t, err)
 
-		result = handleMsgBLZRead(ctx, mockKeeper, types.MsgBLZRead{UUID: "uuid", Key: "key"})
-		assert.False(t, result.IsOK())
+		_, err = handleMsgBLZRead(ctx, mockKeeper, types.MsgBLZRead{UUID: "uuid", Key: "key"})
+		assert.NotNil(t, err)
 	}
 }
 
@@ -170,29 +169,29 @@ func Test_handleMsgBLZUpdate(t *testing.T) {
 			Owner: owner,
 		})
 
-		result := NewHandler(mockKeeper)(ctx, updateMsg)
-		assert.True(t, result.IsOK())
+		_, err := NewHandler(mockKeeper)(ctx, updateMsg)
+		assert.Nil(t, err)
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, updateMsg.UUID, updateMsg.Key)
-		result = handleMsgBLZUpdate(ctx, mockKeeper, updateMsg)
-		assert.False(t, result.IsOK())
+		_, err = handleMsgBLZUpdate(ctx, mockKeeper, updateMsg)
+		assert.NotNil(t, err)
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, updateMsg.UUID, updateMsg.Key).Return(owner)
 		updateMsg.Owner = []byte("bluzelle1nnpyp9wr6law2u5jwa23t0ywtmrduldf6h4wqr")
-		result = handleMsgBLZUpdate(ctx, mockKeeper, updateMsg)
-		assert.False(t, result.IsOK())
+		_, err = handleMsgBLZUpdate(ctx, mockKeeper, updateMsg)
+		assert.NotNil(t, err)
 	}
 
 	// Test for empty message parameters
 	{
-		result := handleMsgBLZUpdate(ctx, mockKeeper, types.MsgBLZUpdate{})
-		assert.False(t, result.IsOK())
+		_, err := handleMsgBLZUpdate(ctx, mockKeeper, types.MsgBLZUpdate{})
+		assert.NotNil(t, err)
 
-		result = handleMsgBLZUpdate(ctx, mockKeeper, types.MsgBLZUpdate{UUID: "uuid"})
-		assert.False(t, result.IsOK())
+		_, err = handleMsgBLZUpdate(ctx, mockKeeper, types.MsgBLZUpdate{UUID: "uuid"})
+		assert.NotNil(t, err)
 
-		result = handleMsgBLZUpdate(ctx, mockKeeper, types.MsgBLZUpdate{UUID: "uuid", Key: "key"})
-		assert.False(t, result.IsOK())
+		_, err = handleMsgBLZUpdate(ctx, mockKeeper, types.MsgBLZUpdate{UUID: "uuid", Key: "key"})
+		assert.NotNil(t, err)
 	}
 }
 
@@ -211,32 +210,31 @@ func Test_handleMsgBLZDelete(t *testing.T) {
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, deleteMsg.UUID, deleteMsg.Key)
 
-		result := NewHandler(mockKeeper)(ctx, deleteMsg)
-		assert.False(t, result.IsOK())
+		_, err := NewHandler(mockKeeper)(ctx, deleteMsg)
+		assert.NotNil(t, err)
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, deleteMsg.UUID, deleteMsg.Key).Return(
 			[]byte("bluzelle1nnpyp9wr6law2u5jwa23t0ywtmrduldf6h4wqr"))
 
-		result = handleMsgBLZDelete(ctx, mockKeeper, deleteMsg)
-		assert.False(t, result.IsOK())
+		_, err = handleMsgBLZDelete(ctx, mockKeeper, deleteMsg)
+		assert.NotNil(t, err)
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, deleteMsg.UUID, deleteMsg.Key).Return(owner)
 		mockKeeper.EXPECT().DeleteBLZValue(ctx, nil, deleteMsg.UUID, deleteMsg.Key)
-		result = handleMsgBLZDelete(ctx, mockKeeper, deleteMsg)
-
-		assert.True(t, result.IsOK())
+		_, err = handleMsgBLZDelete(ctx, mockKeeper, deleteMsg)
+		assert.Nil(t, err)
 	}
 
 	// Test for empty message parameters
 	{
-		result := handleMsgBLZDelete(ctx, mockKeeper, types.MsgBLZDelete{})
-		assert.False(t, result.IsOK())
+		_, err := handleMsgBLZDelete(ctx, mockKeeper, types.MsgBLZDelete{})
+		assert.NotNil(t, err)
 
-		result = handleMsgBLZDelete(ctx, mockKeeper, types.MsgBLZDelete{UUID: "uuid"})
-		assert.False(t, result.IsOK())
+		_, err = handleMsgBLZDelete(ctx, mockKeeper, types.MsgBLZDelete{UUID: "uuid"})
+		assert.NotNil(t, err)
 
-		result = handleMsgBLZDelete(ctx, mockKeeper, types.MsgBLZDelete{UUID: "uuid", Key: "key"})
-		assert.False(t, result.IsOK())
+		_, err = handleMsgBLZDelete(ctx, mockKeeper, types.MsgBLZDelete{UUID: "uuid", Key: "key"})
+		assert.NotNil(t, err)
 	}
 }
 
@@ -258,8 +256,8 @@ func Test_handleMsgBLZKeys(t *testing.T) {
 		acceptedKeys := []string{"one", "two", "three"}
 		mockKeeper.EXPECT().GetKeys(ctx, nil, keysMsg.UUID).Return(types.QueryResultKeys{UUID: "uuid", Keys: acceptedKeys})
 
-		result := NewHandler(mockKeeper)(ctx, keysMsg)
-		assert.True(t, result.IsOK())
+		result, err := NewHandler(mockKeeper)(ctx, keysMsg)
+		assert.Nil(t, err)
 		assert.NotEmpty(t, result.Data)
 
 		json_result := types.QueryResultKeys{}
@@ -270,11 +268,11 @@ func Test_handleMsgBLZKeys(t *testing.T) {
 
 	// Test for empty message parameters
 	{
-		result := handleMsgBLZKeys(ctx, mockKeeper, types.MsgBLZKeys{})
-		assert.False(t, result.IsOK())
+		_, err := handleMsgBLZKeys(ctx, mockKeeper, types.MsgBLZKeys{})
+		assert.NotNil(t, err)
 
-		result = handleMsgBLZKeys(ctx, mockKeeper, types.MsgBLZKeys{UUID: "uuid"})
-		assert.False(t, result.IsOK())
+		_, err = handleMsgBLZKeys(ctx, mockKeeper, types.MsgBLZKeys{UUID: "uuid"})
+		assert.NotNil(t, err)
 	}
 }
 
@@ -296,8 +294,8 @@ func Test_handleMsgBLZHas(t *testing.T) {
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, hasMsg.UUID, hasMsg.Key).Return(owner)
 
-		result := NewHandler(mockKeeper)(ctx, hasMsg)
-		assert.True(t, result.IsOK())
+		result, err := NewHandler(mockKeeper)(ctx, hasMsg)
+		assert.Nil(t, err)
 
 		json_result := types.QueryResultHas{}
 		json.Unmarshal(result.Data, &json_result)
@@ -308,8 +306,8 @@ func Test_handleMsgBLZHas(t *testing.T) {
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, hasMsg.UUID, hasMsg.Key)
 
-		result = handleMsgBLZHas(ctx, mockKeeper, hasMsg)
-		assert.True(t, result.IsOK())
+		result, err = handleMsgBLZHas(ctx, mockKeeper, hasMsg)
+		assert.Nil(t, err)
 
 		json_result = types.QueryResultHas{}
 		json.Unmarshal(result.Data, &json_result)
@@ -318,11 +316,11 @@ func Test_handleMsgBLZHas(t *testing.T) {
 
 	// Test for empty message parameters
 	{
-		result := handleMsgBLZHas(ctx, mockKeeper, types.MsgBLZHas{})
-		assert.False(t, result.IsOK())
+		_, err := handleMsgBLZHas(ctx, mockKeeper, types.MsgBLZHas{})
+		assert.NotNil(t, err)
 
-		result = handleMsgBLZHas(ctx, mockKeeper, types.MsgBLZHas{UUID: "uuid"})
-		assert.False(t, result.IsOK())
+		_, err = handleMsgBLZHas(ctx, mockKeeper, types.MsgBLZHas{UUID: "uuid"})
+		assert.NotNil(t, err)
 	}
 }
 
@@ -349,38 +347,37 @@ func Test_handleMsgBLZRename(t *testing.T) {
 		mockKeeper.EXPECT().GetOwner(ctx, nil, renameMsg.UUID, renameMsg.Key).Return(owner)
 		mockKeeper.EXPECT().RenameBLZKey(ctx, gomock.Any(), renameMsg.UUID, renameMsg.Key, renameMsg.NewKey).Return(true)
 
-		result := NewHandler(mockKeeper)(ctx, renameMsg)
-		assert.True(t, result.IsOK())
+		_, err := NewHandler(mockKeeper)(ctx, renameMsg)
+		assert.Nil(t, err)
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, renameMsg.UUID, renameMsg.Key).Return(owner)
 		renameMsg.Owner = []byte("bluzelle1nnpyp9wr6law2u5jwa23t0ywtmrduldf6h4wqr")
-		result = handleMsgBLZRename(ctx, mockKeeper, renameMsg)
-		assert.False(t, result.IsOK())
+		_, err = handleMsgBLZRename(ctx, mockKeeper, renameMsg)
+		assert.NotNil(t, err)
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, renameMsg.UUID, renameMsg.Key)
-		result = handleMsgBLZRename(ctx, mockKeeper, renameMsg)
-		assert.False(t, result.IsOK())
+		_, err = handleMsgBLZRename(ctx, mockKeeper, renameMsg)
+		assert.NotNil(t, err)
 
 		// Rename failed
 		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
 		mockKeeper.EXPECT().GetOwner(ctx, nil, renameMsg.UUID, renameMsg.Key).Return(renameMsg.Owner)
 		mockKeeper.EXPECT().RenameBLZKey(ctx, gomock.Any(), renameMsg.UUID, renameMsg.Key, renameMsg.NewKey).Return(false)
 
-		result = NewHandler(mockKeeper)(ctx, renameMsg)
-		assert.False(t, result.IsOK())
-		assert.Equal(t, "{\"codespace\":\"sdk\",\"code\":1,\"message\":\"Rename failed\"}", result.Log)
+		_, err = NewHandler(mockKeeper)(ctx, renameMsg)
+		assert.NotNil(t, err)
+		assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Rename failed").Error(), err.Error())
 	}
 
 	// Test for empty message parameters
 	{
+		_, err := handleMsgBLZRename(ctx, mockKeeper, types.MsgBLZRename{})
+		assert.NotNil(t, err)
 
-		result := handleMsgBLZRename(ctx, mockKeeper, types.MsgBLZRename{})
-		assert.False(t, result.IsOK())
+		_, err = handleMsgBLZRename(ctx, mockKeeper, types.MsgBLZRename{UUID: "uuid", Key: "key"})
+		assert.NotNil(t, err)
 
-		result = handleMsgBLZRename(ctx, mockKeeper, types.MsgBLZRename{UUID: "uuid", Key: "key"})
-		assert.False(t, result.IsOK())
-
-		result = handleMsgBLZRename(ctx, mockKeeper, types.MsgBLZRename{UUID: "uuid", Key: "key", NewKey: "newkey"})
-		assert.False(t, result.IsOK())
+		_, err = handleMsgBLZRename(ctx, mockKeeper, types.MsgBLZRename{UUID: "uuid", Key: "key", NewKey: "newkey"})
+		assert.NotNil(t, err)
 	}
 }

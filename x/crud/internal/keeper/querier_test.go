@@ -54,7 +54,6 @@ func Test_queryRead(t *testing.T) {
 		})
 
 	result, err := queryRead(ctx, []string{"uuid", "key"}, abci.RequestQuery{}, mockKeeper, cdc)
-
 	assert.Nil(t, err)
 
 	json_result := types.BLZValue{}
