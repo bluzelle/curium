@@ -13,6 +13,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 //go:generate mockgen -destination=../../mocks/mock_keeper.go -package=mocks github.com/bluzelle/curium/x/crud/internal/keeper IKeeper
+//go:generate mockgen -destination=../../mocks/mock_gas.go -package=mocks github.com/cosmos/cosmos-sdk/store/types GasMeter
 package keeper
 
 import (
@@ -21,6 +22,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 )
+
+type MaxKeeperSizes struct {
+	MaxKeysSize uint64
+}
 
 type IKeeper interface {
 	SetBLZValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string, value types.BLZValue)
@@ -38,6 +43,7 @@ type Keeper struct {
 	CoinKeeper bank.Keeper
 	storeKey   sdk.StoreKey
 	cdc        *codec.Codec
+	mks        MaxKeeperSizes
 }
 
 // Note: MakeMetaKey is used in query.go and keeper.go
@@ -45,11 +51,12 @@ func MakeMetaKey(UUID string, key string) string {
 	return UUID + "\x00" + key
 }
 
-func NewKeeper(coinKeeper bank.Keeper, storeKey sdk.StoreKey, cdc *codec.Codec) Keeper {
+func NewKeeper(coinKeeper bank.Keeper, storeKey sdk.StoreKey, cdc *codec.Codec, mks MaxKeeperSizes) Keeper {
 	return Keeper{
 		CoinKeeper: coinKeeper,
 		storeKey:   storeKey,
 		cdc:        cdc,
+		mks:        mks,
 	}
 }
 
@@ -96,10 +103,21 @@ func (k Keeper) GetKeys(ctx sdk.Context, store sdk.KVStore, UUID string) types.Q
 	prefix := UUID + "\x00"
 	iterator := sdk.KVStorePrefixIterator(store, []byte(prefix))
 	keys := types.QueryResultKeys{UUID: UUID, Keys: make([]string, 0)}
-
 	defer iterator.Close()
+
+	keysSize := uint64(0)
 	for ; iterator.Valid(); iterator.Next() {
-		keys.Keys = append(keys.Keys, string(iterator.Key())[len(prefix):])
+		key := string(iterator.Key())[len(prefix):]
+		keysSize = uint64(len(key)) + keysSize
+		if ctx.GasMeter().IsPastLimit() {
+			return types.QueryResultKeys{UUID: UUID, Keys: make([]string, 0)}
+		}
+
+		if keysSize < k.mks.MaxKeysSize {
+			keys.Keys = append(keys.Keys, key)
+		} else {
+			return keys
+		}
 	}
 	return keys
 }
