@@ -16,6 +16,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const RouterKey = ModuleName
@@ -45,21 +46,21 @@ func (msg MsgBLZCreate) Route() string { return RouterKey }
 
 func (msg MsgBLZCreate) Type() string { return "create" }
 
-func (msg MsgBLZCreate) ValidateBasic() sdk.Error {
+func (msg MsgBLZCreate) ValidateBasic() error {
 	if msg.Owner.Empty() {
-		return sdk.ErrInvalidAddress(msg.Owner.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
 	}
 
 	if len(msg.UUID) == 0 || len(msg.Key) == 0 {
-		return sdk.ErrInvalidPubKey("UUID or key Empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID or key Empty")
 	}
 
 	if len(msg.UUID)+len(msg.Key) > MaxKeySize {
-		return sdk.ErrInternal("UUID+Key too large")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID+Key too large")
 	}
 
 	if len(msg.Value) > MaxValueSize {
-		return sdk.ErrInternal("Value too large")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Value too large")
 	}
 
 	return nil
@@ -89,12 +90,12 @@ func (msg MsgBLZRead) Route() string { return RouterKey }
 
 func (msg MsgBLZRead) Type() string { return "read" }
 
-func (msg MsgBLZRead) ValidateBasic() sdk.Error {
+func (msg MsgBLZRead) ValidateBasic() error {
 	if msg.Owner.Empty() {
-		return sdk.ErrInvalidAddress(msg.Owner.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
 	}
 	if len(msg.UUID) == 0 || len(msg.Key) == 0 {
-		return sdk.ErrInvalidPubKey("UUID or key Empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID or key Empty")
 	}
 	return nil
 }
@@ -129,17 +130,17 @@ func (msg MsgBLZUpdate) Route() string { return RouterKey }
 
 func (msg MsgBLZUpdate) Type() string { return "update" }
 
-func (msg MsgBLZUpdate) ValidateBasic() sdk.Error {
+func (msg MsgBLZUpdate) ValidateBasic() error {
 	if msg.Owner.Empty() {
-		return sdk.ErrInvalidAddress(msg.Owner.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
 	}
 
 	if len(msg.UUID) == 0 || len(msg.Key) == 0 {
-		return sdk.ErrInvalidPubKey("UUID or key Empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID or key Empty")
 	}
 
 	if len(msg.Value) > MaxValueSize {
-		return sdk.ErrInternal("Value too large")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Value too large")
 	}
 
 	return nil
@@ -173,12 +174,12 @@ func (msg MsgBLZDelete) Route() string { return RouterKey }
 
 func (msg MsgBLZDelete) Type() string { return "delete" }
 
-func (msg MsgBLZDelete) ValidateBasic() sdk.Error {
+func (msg MsgBLZDelete) ValidateBasic() error {
 	if msg.Owner.Empty() {
-		return sdk.ErrInvalidAddress(msg.Owner.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
 	}
 	if len(msg.UUID) == 0 || len(msg.Key) == 0 {
-		return sdk.ErrInvalidPubKey("UUID or key Empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID or key Empty")
 	}
 	return nil
 }
@@ -206,13 +207,13 @@ func (msg MsgBLZKeys) Route() string { return RouterKey }
 
 func (msg MsgBLZKeys) Type() string { return "keys" }
 
-func (msg MsgBLZKeys) ValidateBasic() sdk.Error {
+func (msg MsgBLZKeys) ValidateBasic() error {
 	if msg.Owner.Empty() {
-		return sdk.ErrInvalidAddress(msg.Owner.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
 	}
 
 	if len(msg.UUID) == 0 {
-		return sdk.ErrInvalidPubKey("UUID empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID empty")
 	}
 	return nil
 }
@@ -241,17 +242,17 @@ func (msg MsgBLZHas) Route() string { return RouterKey }
 
 func (msg MsgBLZHas) Type() string { return "has" }
 
-func (msg MsgBLZHas) ValidateBasic() sdk.Error {
+func (msg MsgBLZHas) ValidateBasic() error {
 	if msg.Owner.Empty() {
-		return sdk.ErrInvalidAddress(msg.Owner.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
 	}
 
 	if len(msg.UUID) == 0 {
-		return sdk.ErrInvalidPubKey("UUID empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID empty")
 	}
 
 	if len(msg.Key) == 0 {
-		return sdk.ErrInvalidPubKey("key empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "key empty")
 	}
 	return nil
 }
@@ -281,25 +282,25 @@ func (msg MsgBLZRename) Route() string { return "crud" }
 
 func (msg MsgBLZRename) Type() string { return "rename" }
 
-func (msg MsgBLZRename) ValidateBasic() sdk.Error {
+func (msg MsgBLZRename) ValidateBasic() error {
 	if msg.Owner.Empty() {
-		return sdk.ErrInvalidAddress(msg.Owner.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
 	}
 
 	if len(msg.UUID) == 0 {
-		return sdk.ErrInvalidPubKey("UUID empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID empty")
 	}
 
 	if len(msg.Key) == 0 {
-		return sdk.ErrInvalidPubKey("key empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "key empty")
 	}
 
 	if len(msg.NewKey) == 0 {
-		return sdk.ErrInvalidPubKey("new key empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "new key empty")
 	}
 
 	if len(msg.UUID)+len(msg.NewKey) > MaxKeySize {
-		return sdk.ErrInternal("UUID+NewKey too large")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID+NewKey too large")
 	}
 
 	return nil

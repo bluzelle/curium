@@ -19,6 +19,7 @@ import (
 	"github.com/bluzelle/curium/x/crud/internal/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/spf13/cobra"
 )
@@ -32,9 +33,11 @@ func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	crudQueryCmd.AddCommand(client.GetCommands(GetCmdBLZQRead(storeKey, cdc))...)
-	crudQueryCmd.AddCommand(client.GetCommands(GetCmdBLZQHas(storeKey, cdc))...)
-	crudQueryCmd.AddCommand(client.GetCommands(GetCmdBLZQKeys(storeKey, cdc))...)
+	crudQueryCmd.AddCommand(flags.GetCommands(
+		GetCmdBLZQRead(storeKey, cdc),
+		GetCmdBLZQHas(storeKey, cdc),
+		GetCmdBLZQKeys(storeKey, cdc),
+	)...)
 
 	return crudQueryCmd
 }

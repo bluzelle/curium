@@ -16,6 +16,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
@@ -44,27 +45,27 @@ func TestMsgBLZCreate_Type(t *testing.T) {
 
 func TestMsgBLZCreate_ValidateBasic(t *testing.T) {
 	sut := NewMsgBLZCreate("uuid", "key", "value", nil)
-	assert.Equal(t, sut.ValidateBasic(), sdk.ErrInvalidAddress(sut.Owner.String()))
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, sut.Owner.String()).Error(), sut.ValidateBasic().Error())
 
 	sut.Owner = []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
 	assert.Nil(t, sut.ValidateBasic())
 
 	sut.UUID = ""
-	assert.Equal(t, sut.ValidateBasic(), sdk.ErrInvalidPubKey("UUID or key Empty"))
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID or key Empty").Error(), sut.ValidateBasic().Error())
 
 	sut.UUID = "uuid"
 	sut.Key = ""
-	assert.Equal(t, sut.ValidateBasic(), sdk.ErrInvalidPubKey("UUID or key Empty"))
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID or key Empty").Error(), sut.ValidateBasic().Error())
 
 	// test max sizes...
 	sut.Key = string(make([]byte, MaxKeySize/2))
 	sut.UUID = string(make([]byte, MaxKeySize/2+2))
-	assert.Equal(t, sut.ValidateBasic(), sdk.ErrInternal("UUID+Key too large"))
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID+Key too large").Error(), sut.ValidateBasic().Error())
 
 	sut.Key = "Key"
 	sut.UUID = "UUID"
 	sut.Value = string(make([]byte, MaxValueSize+1))
-	assert.Equal(t, sdk.ErrInternal("Value too large"), sut.ValidateBasic())
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Value too large").Error(), sut.ValidateBasic().Error())
 }
 
 func TestMsgBLZCreate_GetSignBytes(t *testing.T) {
@@ -101,17 +102,17 @@ func TestMsgBLZRead_Type(t *testing.T) {
 
 func TestMsgBLZRead_ValidateBasic(t *testing.T) {
 	sut := NewMsgBLZRead("uuid", "key", nil)
-	assert.Equal(t, sut.ValidateBasic(), sdk.ErrInvalidAddress(sut.Owner.String()))
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, sut.Owner.String()).Error(), sut.ValidateBasic().Error())
 
 	sut.Owner = []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
 	assert.Nil(t, sut.ValidateBasic())
 
 	sut.UUID = ""
-	assert.Equal(t, sut.ValidateBasic(), sdk.ErrInvalidPubKey("UUID or key Empty"))
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID or key Empty").Error(), sut.ValidateBasic().Error())
 
 	sut.UUID = "uuid"
 	sut.Key = ""
-	assert.Equal(t, sut.ValidateBasic(), sdk.ErrInvalidPubKey("UUID or key Empty"))
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID or key Empty").Error(), sut.ValidateBasic().Error())
 }
 
 func TestMsgBLZRead_GetSignBytes(t *testing.T) {
@@ -149,22 +150,22 @@ func TestMsgBLZUpdate_Type(t *testing.T) {
 
 func TestMsgBLZUpdate_ValidateBasic(t *testing.T) {
 	sut := NewMsgBLZUpdate("uuid", "key", "new", nil)
-	assert.Equal(t, sut.ValidateBasic(), sdk.ErrInvalidAddress(sut.Owner.String()))
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, sut.Owner.String()).Error(), sut.ValidateBasic().Error())
 
 	sut.Owner = []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
 	assert.Nil(t, sut.ValidateBasic())
 
 	sut.UUID = ""
-	assert.Equal(t, sut.ValidateBasic(), sdk.ErrInvalidPubKey("UUID or key Empty"))
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID or key Empty").Error(), sut.ValidateBasic().Error())
 
 	sut.UUID = "uuid"
 	sut.Key = ""
-	assert.Equal(t, sut.ValidateBasic(), sdk.ErrInvalidPubKey("UUID or key Empty"))
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID or key Empty").Error(), sut.ValidateBasic().Error())
 
 	sut.Key = "Key"
 	sut.UUID = "UUID"
 	sut.Value = string(make([]byte, MaxValueSize+1))
-	assert.Equal(t, sdk.ErrInternal("Value too large"), sut.ValidateBasic())
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Value too large").Error(), sut.ValidateBasic().Error())
 }
 
 func TestMsgBLZUpdate_GetSignBytes(t *testing.T) {
@@ -201,17 +202,17 @@ func TestMsgBLZDelete_Type(t *testing.T) {
 
 func TestMsgBLZDelete_ValidateBasic(t *testing.T) {
 	sut := NewMsgBLZDelete("uuid", "key", nil)
-	assert.Equal(t, sut.ValidateBasic(), sdk.ErrInvalidAddress(sut.Owner.String()))
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, sut.Owner.String()).Error(), sut.ValidateBasic().Error())
 
 	sut.Owner = []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
 	assert.Nil(t, sut.ValidateBasic())
 
 	sut.UUID = ""
-	assert.Equal(t, sut.ValidateBasic(), sdk.ErrInvalidPubKey("UUID or key Empty"))
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID or key Empty").Error(), sut.ValidateBasic().Error())
 
 	sut.UUID = "uuid"
 	sut.Key = ""
-	assert.Equal(t, sut.ValidateBasic(), sdk.ErrInvalidPubKey("UUID or key Empty"))
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID or key Empty").Error(), sut.ValidateBasic().Error())
 }
 
 func TestMsgBLZDelete_GetSignBytes(t *testing.T) {
@@ -247,13 +248,13 @@ func TestMsgBLZKeys_Type(t *testing.T) {
 
 func TestMsgBLZKeys_ValidateBasic(t *testing.T) {
 	sut := NewMsgBLZKeys("uuid", nil)
-	assert.Equal(t, sut.ValidateBasic(), sdk.ErrInvalidAddress(sut.Owner.String()))
+	assert.Equal(t, sut.ValidateBasic().Error(), sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, sut.Owner.String()).Error())
 
 	sut.Owner = []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
 	assert.Nil(t, sut.ValidateBasic())
 
 	sut.UUID = ""
-	assert.Equal(t, sut.ValidateBasic(), sdk.ErrInvalidPubKey("UUID empty"))
+	assert.Equal(t, sut.ValidateBasic().Error(), sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID empty").Error())
 }
 
 func TestMsgBLZKeys_GetSignBytes(t *testing.T) {
@@ -290,17 +291,17 @@ func TestMsgBLZHas_Type(t *testing.T) {
 
 func TestMsgBLZHas_ValidateBasic(t *testing.T) {
 	sut := NewMsgBLZHas("uuid", "key", nil)
-	assert.Equal(t, sut.ValidateBasic(), sdk.ErrInvalidAddress(sut.Owner.String()))
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, sut.Owner.String()).Error(), sut.ValidateBasic().Error())
 
 	sut.Owner = []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
 	assert.Nil(t, sut.ValidateBasic())
 
 	sut.UUID = ""
-	assert.Equal(t, sut.ValidateBasic(), sdk.ErrInvalidPubKey("UUID empty"))
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID empty").Error(), sut.ValidateBasic().Error())
 
 	sut.UUID = "uuid"
 	sut.Key = ""
-	assert.Equal(t, sut.ValidateBasic(), sdk.ErrInvalidPubKey("key empty"))
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "key empty").Error(), sut.ValidateBasic().Error())
 }
 
 func TestMsgBLZHas_GetSignBytes(t *testing.T) {
@@ -335,25 +336,25 @@ func TestMsgBLZRename_Type(t *testing.T) {
 
 func TestMsgBLZRename_ValidateBasic(t *testing.T) {
 	sut := NewMsgBLZRename("uuid", "key", "newkey", []byte(""))
-	assert.Equal(t, sdk.ErrInvalidAddress(sut.Owner.String()), sut.ValidateBasic())
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, sut.Owner.String()).Error(), sut.ValidateBasic().Error())
 
 	sut.Owner = []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
 	assert.Nil(t, sut.ValidateBasic())
 
 	sut.UUID = ""
-	assert.Equal(t, sdk.ErrInvalidPubKey("UUID empty"), sut.ValidateBasic())
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID empty").Error(), sut.ValidateBasic().Error())
 
 	sut.UUID = "uuid"
 	sut.Key = ""
-	assert.Equal(t, sdk.ErrInvalidPubKey("key empty"), sut.ValidateBasic())
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "key empty").Error(), sut.ValidateBasic().Error())
 
 	sut.Key = "key"
 	sut.NewKey = ""
-	assert.Equal(t, sdk.ErrInvalidPubKey("new key empty"), sut.ValidateBasic())
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "new key empty").Error(), sut.ValidateBasic().Error())
 
 	sut.Key = "Key"
 	sut.NewKey = string(make([]byte, MaxKeySize+1))
-	assert.Equal(t, sdk.ErrInternal("UUID+NewKey too large"), sut.ValidateBasic())
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID+NewKey too large").Error(), sut.ValidateBasic().Error())
 }
 
 func TestMsgBLZRename_GetSignBytes(t *testing.T) {
