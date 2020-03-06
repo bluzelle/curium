@@ -16,6 +16,7 @@ package app
 
 import (
 	"encoding/json"
+	"time"
 	bluzellechain "github.com/bluzelle/curium/types"
 	"github.com/bluzelle/curium/x/crud"
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
@@ -31,6 +32,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
+	"github.com/cosmos/modules/incubator/faucet"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
@@ -60,6 +62,7 @@ var (
 		distr.ModuleName:          nil,
 		staking.BondedPoolName:    {supply.Burner, supply.Staking},
 		staking.NotBondedPoolName: {supply.Burner, supply.Staking},
+		faucet.ModuleName:         {supply.Minter}, // add permissions for faucet
 	}
 )
 
@@ -91,6 +94,7 @@ func newBasicManager(nodeHome string) module.BasicManager {
 			slashing.AppModuleBasic{},
 			supply.AppModuleBasic{},
 			crud.AppModule{},
+			faucet.AppModule{},
 		)
 	} else {
 		return module.NewBasicManager(
@@ -102,6 +106,7 @@ func newBasicManager(nodeHome string) module.BasicManager {
 			params.AppModuleBasic{},
 			slashing.AppModuleBasic{},
 			supply.AppModuleBasic{},
+			faucet.AppModule{},
 		)
 	}
 }
@@ -131,6 +136,7 @@ type CRUDApp struct {
 	supplyKeeper   supply.Keeper
 	paramsKeeper   params.Keeper
 	crudKeeper     crud.Keeper
+	faucetKeeper   faucet.Keeper	
 
 	// Module Manager
 	mm *module.Manager
@@ -149,7 +155,7 @@ func NewCRUDApp(
 	bApp.SetAppVersion(version.Version)
 
 	keys := sdk.NewKVStoreKeys(bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
-		supply.StoreKey, distr.StoreKey, slashing.StoreKey, params.StoreKey, crud.StoreKey)
+		supply.StoreKey, distr.StoreKey, slashing.StoreKey, params.StoreKey, crud.StoreKey, faucet.StoreKey)
 
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -236,11 +242,24 @@ func NewCRUDApp(
 		crud.MaxKeeperSizes{MaxKeysSize: maxKeysSize, MaxKeyValuesSize: maxKeyValuesSize},
 	)
 
+	// Example use of the faucet:
+	//
+	// blzcli tx faucet mintfor $(blzcli keys show neeraj -a) --from vuser --gas-prices 0.01bnt
+
+	app.faucetKeeper = faucet.NewKeeper(
+		app.supplyKeeper,
+		app.stakingKeeper,
+		2000000000, // How many tokens to mint out for every successful request
+		5*time.Minute, // Time you have to wait before you can use the faucet again for a given beneficiary address
+		keys[faucet.StoreKey],
+		app.cdc) 
+
 	app.mm = module.NewManager(
 		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx),
 		auth.NewAppModule(app.accountKeeper),
 		bank.NewAppModule(app.bankKeeper, app.accountKeeper),
 		crud.NewAppModule(app.crudKeeper, app.bankKeeper),
+		faucet.NewAppModule(app.faucetKeeper), // faucet module
 		supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
 		distr.NewAppModule(app.distrKeeper, app.accountKeeper, app.supplyKeeper, app.stakingKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.accountKeeper, app.stakingKeeper),
