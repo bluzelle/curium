@@ -40,9 +40,13 @@ Deploy the Initial Node
 
 6.  Set the client configuration settings:
         blzcli config chain-id bluzelle 
+        
         blzcli config output json 
+        
         blzcli config indent true 
+        
         blzcli config trust-node true
+    
     where “bluzelle” is the zone’s chain-id.
 
 7. Derive a new key that will label the validator account for this node, call it “vuser”:
