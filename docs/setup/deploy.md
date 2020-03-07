@@ -39,6 +39,7 @@ Deploy the Initial Node
         ~/.blzd/config/app.toml
 
 6.  Set the client configuration settings:
+
         blzcli config chain-id bluzelle 
         
         blzcli config output json 
