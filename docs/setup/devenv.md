@@ -15,23 +15,23 @@ Development Environment Setup
 
         export GOPATH=$HOME/go
         export GOBIN=${GOPATH}/bin
-        export PATH=$PATH:$GOBIN:/usr/local/go/bin`
+        export PATH=$PATH:$GOBIN:/usr/local/go/bin
 
     GOPATH is where the golang project source files, packages and binaries are kept. Make sure that the Golang compiler is in the PATH
 
 3.  Make the Golang working folders, if they have not already been created by the Golang compiler
 
-        $ mkdir -p ~/go/src/github.com/bluzelle
-        $ mkdir ~/go/bin
-        $ mkdir ~/go/pkg
+        mkdir -p ~/go/src/github.com/bluzelle
+        mkdir ~/go/bin
+        mkdir ~/go/pkg
 
 4.  Go to the bluzelle folder
 
-        $ cd ~/go/src/github.com/bluzelle
+        cd ~/go/src/github.com/bluzelle
 
 5.  Clone the curium project
 
-        $ git clone https://github.com/bluzelle/curium.git
+        git clone https://github.com/bluzelle/curium.git
  
 ***
 [prev](./os.md) | [next](./build.md)
