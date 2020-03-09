@@ -43,6 +43,7 @@ func GetTxCmd(_ string, cdc *codec.Codec) *cobra.Command {
 		GetCmdBLZKeys(cdc),
 		GetCmdBLZHas(cdc),
 		GetCmdBLZRename(cdc),
+		GetCmdBLZKeyValues(cdc),
 	)...)
 
 	return crudTxCmd
@@ -143,6 +144,27 @@ func GetCmdBLZKeys(cdc *codec.Codec) *cobra.Command {
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
 			msg := types.NewMsgBLZKeys(args[0], cliCtx.GetFromAddress())
+
+			err := msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+		},
+	}
+}
+
+func GetCmdBLZKeyValues(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "keyvalues [UUID]",
+		Short: "list keys/values for a UUID in the database",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
+			msg := types.NewMsgBLZKeyValues(args[0], cliCtx.GetFromAddress())
 
 			err := msg.ValidateBasic()
 			if err != nil {

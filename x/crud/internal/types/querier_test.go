@@ -27,7 +27,3 @@ func TestQueryResultHas_String(t *testing.T) {
 	assert.Equal(t, QueryResultHas{UUID: "uuid", Key: "key", Has: false}.String(), "false")
 	assert.Equal(t, QueryResultHas{UUID: "uuid", Key: "key", Has: true}.String(), "true")
 }
-
-func TestQueryResultKeys_String(t *testing.T) {
-	assert.Equal(t, QueryResultKeys{UUID: "uuid", Keys: []string{"one", "two", "three"}}.String(), "one, two, three")
-}

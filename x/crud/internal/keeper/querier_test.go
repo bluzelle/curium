@@ -46,14 +46,14 @@ func Test_queryRead(t *testing.T) {
 
 	// always return nil for a store...
 	mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
-
 	mockKeeper.EXPECT().GetBLZValue(ctx, nil, "uuid", "key").
 		Return(types.BLZValue{
 			Value: expectedValue,
 			Owner: expectedOwner,
 		})
+	mockKeeper.EXPECT().GetCdc().Return(cdc)
 
-	result, err := queryRead(ctx, []string{"uuid", "key"}, abci.RequestQuery{}, mockKeeper, cdc)
+	result, err := NewQuerier(mockKeeper)(ctx, []string{"read", "uuid", "key"}, abci.RequestQuery{})
 	assert.Nil(t, err)
 
 	json_result := types.BLZValue{}
@@ -66,6 +66,10 @@ func Test_queryRead(t *testing.T) {
 	result, err = queryRead(ctx, []string{"uuid", "key"}, abci.RequestQuery{}, mockKeeper, cdc)
 
 	assert.NotNil(t, err)
+
+	// nonexistent path test
+	_, err = NewQuerier(mockKeeper)(ctx, []string{"badpath", "uuid", "key"}, abci.RequestQuery{})
+	assert.NotNil(t, err)
 }
 
 func Test_queryHas(t *testing.T) {
@@ -73,10 +77,10 @@ func Test_queryHas(t *testing.T) {
 
 	// always return nil for a store...
 	mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
-
 	mockKeeper.EXPECT().IsKeyPresent(ctx, nil, "uuid", "key").Return(true)
+	mockKeeper.EXPECT().GetCdc().Return(cdc)
 
-	result, err := queryHas(ctx, []string{"uuid", "key"}, abci.RequestQuery{}, mockKeeper, cdc)
+	result, err := NewQuerier(mockKeeper)(ctx, []string{"has", "uuid", "key"}, abci.RequestQuery{})
 
 	if err != nil {
 		t.Error("Expected nil error")
@@ -94,13 +98,13 @@ func Test_queryKeys(t *testing.T) {
 
 	// always return nil for a store...
 	mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
-
-	mockKeeper.EXPECT().GetKeys(ctx, nil, "uuid").Return(types.QueryResultKeys{
+	mockKeeper.EXPECT().GetKeys(ctx, nil, "uuid", nil).Return(types.QueryResultKeys{
 		UUID: "uuid",
 		Keys: acceptedKeys,
 	})
+	mockKeeper.EXPECT().GetCdc().Return(cdc)
 
-	result, err := queryKeys(ctx, []string{"uuid", "key"}, abci.RequestQuery{}, mockKeeper, cdc)
+	result, err := NewQuerier(mockKeeper)(ctx, []string{"keys", "uuid"}, abci.RequestQuery{})
 
 	assert.Nil(t, err)
 
@@ -108,4 +112,27 @@ func Test_queryKeys(t *testing.T) {
 	json.Unmarshal(result, &json_result)
 
 	assert.True(t, reflect.DeepEqual(acceptedKeys, json_result.Keys))
+}
+
+func Test_queryKeyValues(t *testing.T) {
+	ctx, cdc, mockKeeper := initTest(t)
+
+	keyValues := []types.KeyValue{}
+	keyValues = append(keyValues, types.KeyValue{Key: "key0", Value: "value0"})
+	keyValues = append(keyValues, types.KeyValue{Key: "key1", Value: "value1"})
+
+	acceptedKeyValues := types.QueryResultKeyValues{UUID: "uuid", KeyValues: keyValues}
+
+	// always return nil for a store...
+	mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
+	mockKeeper.EXPECT().GetKeyValues(ctx, nil, "uuid", gomock.Any()).Return(acceptedKeyValues)
+	mockKeeper.EXPECT().GetCdc().Return(cdc)
+
+	result, err := NewQuerier(mockKeeper)(ctx, []string{"keyvalues", "uuid"}, abci.RequestQuery{})
+	assert.Nil(t, err)
+
+	json_result := types.QueryResultKeyValues{}
+	json.Unmarshal(result, &json_result)
+
+	assert.True(t, reflect.DeepEqual(acceptedKeyValues, json_result))
 }

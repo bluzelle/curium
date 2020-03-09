@@ -9,6 +9,7 @@ import (
 	types0 "github.com/cosmos/cosmos-sdk/store/types"
 	types1 "github.com/cosmos/cosmos-sdk/types"
 	gomock "github.com/golang/mock/gomock"
+	amino "github.com/tendermint/go-amino"
 	db "github.com/tendermint/tm-db"
 	reflect "reflect"
 )
@@ -62,6 +63,20 @@ func (mr *MockIKeeperMockRecorder) GetBLZValue(arg0, arg1, arg2, arg3 interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBLZValue", reflect.TypeOf((*MockIKeeper)(nil).GetBLZValue), arg0, arg1, arg2, arg3)
 }
 
+// GetCdc mocks base method
+func (m *MockIKeeper) GetCdc() *amino.Codec {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCdc")
+	ret0, _ := ret[0].(*amino.Codec)
+	return ret0
+}
+
+// GetCdc indicates an expected call of GetCdc
+func (mr *MockIKeeperMockRecorder) GetCdc() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCdc", reflect.TypeOf((*MockIKeeper)(nil).GetCdc))
+}
+
 // GetKVStore mocks base method
 func (m *MockIKeeper) GetKVStore(arg0 types1.Context) types0.KVStore {
 	m.ctrl.T.Helper()
@@ -76,18 +91,32 @@ func (mr *MockIKeeperMockRecorder) GetKVStore(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKVStore", reflect.TypeOf((*MockIKeeper)(nil).GetKVStore), arg0)
 }
 
-// GetKeys mocks base method
-func (m *MockIKeeper) GetKeys(arg0 types1.Context, arg1 types0.KVStore, arg2 string) types.QueryResultKeys {
+// GetKeyValues mocks base method
+func (m *MockIKeeper) GetKeyValues(arg0 types1.Context, arg1 types0.KVStore, arg2 string, arg3 types1.AccAddress) types.QueryResultKeyValues {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetKeys", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "GetKeyValues", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(types.QueryResultKeyValues)
+	return ret0
+}
+
+// GetKeyValues indicates an expected call of GetKeyValues
+func (mr *MockIKeeperMockRecorder) GetKeyValues(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKeyValues", reflect.TypeOf((*MockIKeeper)(nil).GetKeyValues), arg0, arg1, arg2, arg3)
+}
+
+// GetKeys mocks base method
+func (m *MockIKeeper) GetKeys(arg0 types1.Context, arg1 types0.KVStore, arg2 string, arg3 types1.AccAddress) types.QueryResultKeys {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetKeys", arg0, arg1, arg2, arg3)
 	ret0, _ := ret[0].(types.QueryResultKeys)
 	return ret0
 }
 
 // GetKeys indicates an expected call of GetKeys
-func (mr *MockIKeeperMockRecorder) GetKeys(arg0, arg1, arg2 interface{}) *gomock.Call {
+func (mr *MockIKeeperMockRecorder) GetKeys(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKeys", reflect.TypeOf((*MockIKeeper)(nil).GetKeys), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKeys", reflect.TypeOf((*MockIKeeper)(nil).GetKeys), arg0, arg1, arg2, arg3)
 }
 
 // GetOwner mocks base method

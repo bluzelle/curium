@@ -127,11 +127,23 @@ func txCmd(cdc *amino.Codec) *cobra.Command {
 		flags.LineBreak,
 		authcmd.GetBroadcastCommand(cdc),
 		authcmd.GetEncodeCommand(cdc),
+		authcmd.GetDecodeCommand(cdc),
 		flags.LineBreak,
 	)
 
 	// add modules' tx commands
 	app.ModuleBasics.AddTxCommands(txCmd, cdc)
+
+	// remove auth and bank commands as they're mounted under the root tx command
+	//var cmdsToRemove []*cobra.Command
+	//
+	//for _, cmd := range txCmd.Commands() {
+	//	if cmd.Use == auth.ModuleName || cmd.Use == bank.ModuleName {
+	//		cmdsToRemove = append(cmdsToRemove, cmd)
+	//	}
+	//}
+	//
+	//txCmd.RemoveCommand(cmdsToRemove...)
 
 	return txCmd
 }

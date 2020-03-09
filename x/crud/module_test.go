@@ -75,12 +75,12 @@ func TestAppModuleBasic_GetQueryCmd_CrudQueries(t *testing.T) {
 	command := AppModuleBasic{}.GetQueryCmd(&cdc)
 
 	commands := command.Commands()
-	assert.Len(t, command.Commands(), 3)
+	assert.Len(t, command.Commands(), 4)
 
-	expectedUses := [...]string{"has [UUID] [key]", "keys [UUID]", "read [UUID] [key]"}
-	expectedNames := [...]string{"has", "keys", "read"}
+	expectedUses := [...]string{"has [UUID] [key]", "keys [UUID]", "keyvalues [UUID]", "read [UUID] [key]"}
+	expectedNames := [...]string{"has", "keys", "keyvalues", "read"}
 
-	for i := 0; i < 3; i++ {
+	for i := 0; i < len(command.Commands()); i++ {
 		expectedUse := expectedUses[i]
 		expectedName := expectedNames[i]
 		cmd := commands[i]
@@ -102,7 +102,7 @@ func TestAppModuleBasic_GetTxCmd(t *testing.T) {
 		assert.Equal(t, 2, cmd.SuggestionsMinimumDistance)
 
 		commands := cmd.Commands()
-		assert.Len(t, commands, 7)
+		assert.Len(t, commands, 8)
 	}
 }
 

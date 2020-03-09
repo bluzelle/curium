@@ -311,3 +311,36 @@ func (msg MsgBLZRename) GetSignBytes() []byte {
 }
 
 func (msg MsgBLZRename) GetSigners() []sdk.AccAddress { return []sdk.AccAddress{msg.Owner} }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// KeyValue
+type MsgBLZKeyValues struct {
+	UUID  string
+	Owner sdk.AccAddress
+}
+
+func NewMsgBLZKeyValues(uuid string, owner sdk.AccAddress) MsgBLZKeyValues {
+	return MsgBLZKeyValues{UUID: uuid, Owner: owner}
+}
+
+func (msg MsgBLZKeyValues) Route() string { return "crud" }
+
+func (msg MsgBLZKeyValues) Type() string { return "keyvalues" }
+
+func (msg MsgBLZKeyValues) ValidateBasic() error {
+	if msg.Owner.Empty() {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
+	}
+
+	if len(msg.UUID) == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID empty")
+	}
+
+	return nil
+}
+
+func (msg MsgBLZKeyValues) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
+
+func (msg MsgBLZKeyValues) GetSigners() []sdk.AccAddress { return []sdk.AccAddress{msg.Owner} }

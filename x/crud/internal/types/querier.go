@@ -14,8 +14,6 @@
 
 package types
 
-import "strings"
-
 type QueryResultRead struct {
 	UUID  string `json:"uuid"`
 	Key   string `json:"key"`
@@ -47,7 +45,12 @@ type QueryResultKeys struct {
 	Keys []string `json:"keys"`
 }
 
-// for fmt.Stringer
-func (r QueryResultKeys) String() string {
-	return strings.Join(r.Keys, ", ")
+type KeyValue struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+type QueryResultKeyValues struct {
+	UUID      string     `json:"uuid"`
+	KeyValues []KeyValue `json:"keyvalues"`
 }
