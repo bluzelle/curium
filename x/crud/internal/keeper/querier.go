@@ -23,20 +23,23 @@ import (
 )
 
 const (
-	QueryRead = "read"
-	QueryHas  = "has"
-	QueryKeys = "keys"
+	QueryRead      = "read"
+	QueryHas       = "has"
+	QueryKeys      = "keys"
+	QueryKeyValues = "keyvalues"
 )
 
-func NewQuerier(keeper Keeper) sdk.Querier {
+func NewQuerier(keeper IKeeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err error) {
 		switch path[0] {
 		case QueryRead:
-			return queryRead(ctx, path[1:], req, keeper, keeper.cdc)
+			return queryRead(ctx, path[1:], req, keeper, keeper.GetCdc())
 		case QueryHas:
-			return queryHas(ctx, path[1:], req, keeper, keeper.cdc)
+			return queryHas(ctx, path[1:], req, keeper, keeper.GetCdc())
 		case QueryKeys:
-			return queryKeys(ctx, path[1:], req, keeper, keeper.cdc)
+			return queryKeys(ctx, path[1:], req, keeper, keeper.GetCdc())
+		case QueryKeyValues:
+			return queryKeyValues(ctx, path[1:], req, keeper, keeper.GetCdc())
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown crud query endpoint")
 		}
@@ -70,7 +73,16 @@ func queryHas(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeepe
 }
 
 func queryKeys(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, error) {
-	res, err := codec.MarshalJSONIndent(cdc, keeper.GetKeys(ctx, keeper.GetKVStore(ctx), path[0]))
+	res, err := codec.MarshalJSONIndent(cdc, keeper.GetKeys(ctx, keeper.GetKVStore(ctx), path[0], nil))
+	if err != nil {
+		panic("could not marshal result to JSON")
+	}
+
+	return res, nil
+}
+
+func queryKeyValues(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, error) {
+	res, err := codec.MarshalJSONIndent(cdc, keeper.GetKeyValues(ctx, keeper.GetKVStore(ctx), path[0], nil))
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}

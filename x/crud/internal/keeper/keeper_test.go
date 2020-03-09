@@ -30,7 +30,6 @@ import (
 )
 
 func initKeeperTest(t *testing.T) (sdk.Context, sdk.KVStore, []byte, *codec.Codec) {
-
 	return sdk.NewContext(nil, abci.Header{}, false, nil),
 		cachekv.NewStore(dbadapter.Store{dbm.NewMemDB()}),
 		[]byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"),
@@ -138,10 +137,11 @@ func TestKeeper_GetValuesIterator(t *testing.T) {
 }
 
 func TestKeeper_GetKeys(t *testing.T) {
+	// TODO: ensure that we only get keys associated with the owner
 	ctx, testStore, owner, cdc := initKeeperTest(t)
 	keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{MaxKeysSize: 1024})
 
-	keys := keeper.GetKeys(ctx, testStore, "uuid")
+	keys := keeper.GetKeys(ctx, testStore, "uuid", nil)
 
 	assert.Equal(t, "uuid", keys.UUID)
 	assert.Empty(t, keys.Keys)
@@ -152,7 +152,7 @@ func TestKeeper_GetKeys(t *testing.T) {
 	keeper.SetBLZValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value", Owner: owner})
 	keeper.SetBLZValue(ctx, testStore, "uuid0", "key0", types.BLZValue{Value: "value", Owner: owner})
 
-	keys = keeper.GetKeys(ctx, testStore, "uuid")
+	keys = keeper.GetKeys(ctx, testStore, "uuid", nil)
 
 	assert.Equal(t, "uuid", keys.UUID)
 	assert.Len(t, keys.Keys, 4)
@@ -162,7 +162,39 @@ func TestKeeper_GetKeys(t *testing.T) {
 	assert.Equal(t, keys.Keys[2], "key2")
 	assert.Equal(t, keys.Keys[3], "key3")
 
-	keys = keeper.GetKeys(ctx, testStore, "uuid0")
+	keys = keeper.GetKeys(ctx, testStore, "uuid0", nil)
+
+	assert.Equal(t, "uuid0", keys.UUID)
+	assert.Len(t, keys.Keys, 1)
+}
+
+func TestKeeper_GetKeys_no_owner_for_query_usage(t *testing.T) {
+	// TODO: ensure that we only get keys associated with the owner
+	ctx, testStore, owner, cdc := initKeeperTest(t)
+	keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{MaxKeysSize: 1024})
+
+	keys := keeper.GetKeys(ctx, testStore, "uuid", nil)
+
+	assert.Equal(t, "uuid", keys.UUID)
+	assert.Empty(t, keys.Keys)
+
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetBLZValue(ctx, testStore, "uuid0", "key0", types.BLZValue{Value: "value", Owner: owner})
+
+	keys = keeper.GetKeys(ctx, testStore, "uuid", nil)
+
+	assert.Equal(t, "uuid", keys.UUID)
+	assert.Len(t, keys.Keys, 4)
+
+	assert.Equal(t, keys.Keys[0], "key0")
+	assert.Equal(t, keys.Keys[1], "key1")
+	assert.Equal(t, keys.Keys[2], "key2")
+	assert.Equal(t, keys.Keys[3], "key3")
+
+	keys = keeper.GetKeys(ctx, testStore, "uuid0", nil)
 
 	assert.Equal(t, "uuid0", keys.UUID)
 	assert.Len(t, keys.Keys, 1)
@@ -179,7 +211,7 @@ func TestKeeper_GetKeys_MaxSize(t *testing.T) {
 		keeper.SetBLZValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value", Owner: owner})
 		keeper.SetBLZValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value", Owner: owner})
 
-		keys := keeper.GetKeys(ctx, testStore, "uuid")
+		keys := keeper.GetKeys(ctx, testStore, "uuid", nil)
 
 		assert.Len(t, keys.Keys, 2)
 	}
@@ -190,7 +222,7 @@ func TestKeeper_GetKeys_MaxSize(t *testing.T) {
 		mockGasMeter := mocks.NewMockGasMeter(mockCtrl)
 		keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{MaxKeysSize: 1024})
 		mockGasMeter.EXPECT().IsPastLimit().Return(true)
-		keys := keeper.GetKeys(ctx.WithGasMeter(mockGasMeter), testStore, "uuid")
+		keys := keeper.GetKeys(ctx.WithGasMeter(mockGasMeter), testStore, "uuid", nil)
 
 		assert.Len(t, keys.Keys, 0)
 	}
@@ -226,4 +258,81 @@ func TestKeeper_RenameBLZKey(t *testing.T) {
 		Value: "a value",
 		Owner: owner,
 	}))
+}
+
+func TestKeeper_GetKeyValues(t *testing.T) {
+	ctx, testStore, owner, cdc := initKeeperTest(t)
+	keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{MaxKeyValuesSize: 1024})
+
+	kvs := keeper.GetKeyValues(ctx, testStore, "uuid", owner)
+
+	assert.Equal(t, "uuid", kvs.UUID)
+	assert.Empty(t, kvs.KeyValues)
+
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value0", Owner: owner})
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value1", Owner: owner})
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value2", Owner: owner})
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value3"})
+
+	kvs = keeper.GetKeyValues(ctx, testStore, "uuid", nil)
+	assert.Equal(t, "uuid", kvs.UUID)
+	assert.Len(t, kvs.KeyValues, 4)
+
+	assert.Equal(t, kvs.KeyValues[0], types.KeyValue{Key: "key0", Value: "value0"})
+	assert.Equal(t, kvs.KeyValues[1], types.KeyValue{Key: "key1", Value: "value1"})
+	assert.Equal(t, kvs.KeyValues[2], types.KeyValue{Key: "key2", Value: "value2"})
+	assert.Equal(t, kvs.KeyValues[3], types.KeyValue{Key: "key3", Value: "value3"})
+}
+
+func TestKeeper_GetKeyValues_no_owner_for_query_usage(t *testing.T) {
+	ctx, testStore, owner, cdc := initKeeperTest(t)
+	keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{MaxKeyValuesSize: 1024})
+
+	kvs := keeper.GetKeyValues(ctx, testStore, "uuid", owner)
+
+	assert.Equal(t, "uuid", kvs.UUID)
+	assert.Empty(t, kvs.KeyValues)
+
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value0", Owner: owner})
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value1", Owner: owner})
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value2", Owner: owner})
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value3",
+		Owner: []byte("bluzelle1rnnpyp9wr6law2u5jwa23t0ywtmrduldf6h4wq")})
+
+	kvs = keeper.GetKeyValues(ctx, testStore, "uuid", nil)
+	assert.Equal(t, "uuid", kvs.UUID)
+	assert.Len(t, kvs.KeyValues, 4)
+
+	assert.Equal(t, kvs.KeyValues[0], types.KeyValue{Key: "key0", Value: "value0"})
+	assert.Equal(t, kvs.KeyValues[1], types.KeyValue{Key: "key1", Value: "value1"})
+	assert.Equal(t, kvs.KeyValues[2], types.KeyValue{Key: "key2", Value: "value2"})
+	assert.Equal(t, kvs.KeyValues[3], types.KeyValue{Key: "key3", Value: "value3"})
+}
+
+func TestKeeper_GetKeyValues_MaxSize(t *testing.T) {
+	ctx, testStore, owner, cdc := initKeeperTest(t)
+
+	// test max keys size
+	{
+		keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{MaxKeyValuesSize: 19})
+		keeper.SetBLZValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
+		keeper.SetBLZValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value", Owner: owner})
+		keeper.SetBLZValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value", Owner: owner})
+		keeper.SetBLZValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value", Owner: owner})
+
+		keyValues := keeper.GetKeyValues(ctx, testStore, "uuid", owner)
+
+		assert.Len(t, keyValues.KeyValues, 2)
+	}
+
+	// test out of gas
+	{
+		mockCtrl := gomock.NewController(t)
+		mockGasMeter := mocks.NewMockGasMeter(mockCtrl)
+		keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{MaxKeyValuesSize: 1024})
+		mockGasMeter.EXPECT().IsPastLimit().Return(true)
+		keyValues := keeper.GetKeyValues(ctx.WithGasMeter(mockGasMeter), testStore, "uuid", owner)
+
+		assert.Len(t, keyValues.KeyValues, 0)
+	}
 }

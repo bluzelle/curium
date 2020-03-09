@@ -42,6 +42,7 @@ import (
 
 const crudModuleEntry = "bluzelle_crud"
 const maxKeysSize = uint64(102400)
+const maxKeyValuesSize = uint64(102400)
 
 var (
 	// default home directories for the application CLI
@@ -232,7 +233,7 @@ func NewCRUDApp(
 		app.bankKeeper,
 		keys[crud.StoreKey],
 		app.cdc,
-		crud.MaxKeeperSizes{MaxKeysSize: maxKeysSize},
+		crud.MaxKeeperSizes{MaxKeysSize: maxKeysSize, MaxKeyValuesSize: maxKeyValuesSize},
 	)
 
 	app.mm = module.NewManager(

@@ -40,6 +40,8 @@ func NewHandler(keeper keeper.IKeeper) sdk.Handler {
 			return handleMsgBLZHas(ctx, keeper, msg)
 		case types.MsgBLZRename:
 			return handleMsgBLZRename(ctx, keeper, msg)
+		case types.MsgBLZKeyValues:
+			return handleMsgBLZKeyValues(ctx, keeper, msg)
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, fmt.Sprintf("Unrecognized crud msg type: %v", msg.Type()))
 		}
@@ -52,7 +54,7 @@ func handleMsgBLZCreate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZ
 	}
 
 	if !keeper.GetBLZValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key).Owner.Empty() {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "Key already exists")
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Key already exists")
 	}
 
 	keeper.SetBLZValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key, types.BLZValue{
@@ -123,7 +125,7 @@ func handleMsgBLZKeys(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZKe
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
 	}
 
-	json_data, err := json.Marshal(keeper.GetKeys(ctx, keeper.GetKVStore(ctx), msg.UUID))
+	json_data, err := json.Marshal(keeper.GetKeys(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Owner))
 	if err != nil {
 		fmt.Println(err)
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "could not marshal result to JSON")
@@ -165,4 +167,18 @@ func handleMsgBLZRename(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZ
 	}
 
 	return &sdk.Result{}, nil
+}
+
+func handleMsgBLZKeyValues(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZKeyValues) (*sdk.Result, error) {
+	if len(msg.UUID) == 0 || msg.Owner.Empty() {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
+	}
+
+	json_data, err := json.Marshal(keeper.GetKeyValues(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Owner))
+	if err != nil {
+		fmt.Println(err)
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "could not marshal result to JSON")
+	}
+
+	return &sdk.Result{Data: json_data}, nil
 }

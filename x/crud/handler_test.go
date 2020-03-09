@@ -254,7 +254,7 @@ func Test_handleMsgBLZKeys(t *testing.T) {
 		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
 
 		acceptedKeys := []string{"one", "two", "three"}
-		mockKeeper.EXPECT().GetKeys(ctx, nil, keysMsg.UUID).Return(types.QueryResultKeys{UUID: "uuid", Keys: acceptedKeys})
+		mockKeeper.EXPECT().GetKeys(ctx, nil, keysMsg.UUID, gomock.Any()).Return(types.QueryResultKeys{UUID: "uuid", Keys: acceptedKeys})
 
 		result, err := NewHandler(mockKeeper)(ctx, keysMsg)
 		assert.Nil(t, err)
@@ -378,6 +378,49 @@ func Test_handleMsgBLZRename(t *testing.T) {
 		assert.NotNil(t, err)
 
 		_, err = handleMsgBLZRename(ctx, mockKeeper, types.MsgBLZRename{UUID: "uuid", Key: "key", NewKey: "newkey"})
+		assert.NotNil(t, err)
+	}
+}
+
+func Test_handleMsgBLZKeyValues(t *testing.T) {
+	mockCtrl, mockKeeper, ctx, owner := initTest(t)
+	defer mockCtrl.Finish()
+
+	// Simple keys test key does not exist
+	{
+		keyValuesMsg := types.MsgBLZKeyValues{
+			UUID:  "uuid",
+			Owner: owner,
+		}
+		assert.Equal(t, keyValuesMsg.Type(), "keyvalues")
+
+		// always return nil for a store...
+		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
+
+		keyValues := []types.KeyValue{}
+		keyValues = append(keyValues, types.KeyValue{Key: "key0", Value: "value0"})
+		keyValues = append(keyValues, types.KeyValue{Key: "key1", Value: "value1"})
+
+		acceptedKeyValues := types.QueryResultKeyValues{UUID: "uuid", KeyValues: keyValues}
+
+		mockKeeper.EXPECT().GetKeyValues(ctx, nil, keyValuesMsg.UUID, gomock.Any()).Return(acceptedKeyValues)
+
+		result, err := NewHandler(mockKeeper)(ctx, keyValuesMsg)
+		assert.Nil(t, err)
+		assert.NotEmpty(t, result.Data)
+
+		json_result := types.QueryResultKeyValues{}
+		json.Unmarshal(result.Data, &json_result)
+
+		assert.True(t, reflect.DeepEqual(json_result, acceptedKeyValues))
+	}
+
+	// Test for empty message parameters
+	{
+		_, err := handleMsgBLZKeyValues(ctx, mockKeeper, types.MsgBLZKeyValues{})
+		assert.NotNil(t, err)
+
+		_, err = handleMsgBLZKeyValues(ctx, mockKeeper, types.MsgBLZKeyValues{UUID: "uuid"})
 		assert.NotNil(t, err)
 	}
 }
