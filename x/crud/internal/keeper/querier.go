@@ -27,6 +27,7 @@ const (
 	QueryHas       = "has"
 	QueryKeys      = "keys"
 	QueryKeyValues = "keyvalues"
+	QueryCount     = "count"
 )
 
 func NewQuerier(keeper IKeeper) sdk.Querier {
@@ -40,6 +41,8 @@ func NewQuerier(keeper IKeeper) sdk.Querier {
 			return queryKeys(ctx, path[1:], req, keeper, keeper.GetCdc())
 		case QueryKeyValues:
 			return queryKeyValues(ctx, path[1:], req, keeper, keeper.GetCdc())
+		case QueryCount:
+			return queryCount(ctx, path[1:], req, keeper, keeper.GetCdc())
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown crud query endpoint")
 		}
@@ -83,6 +86,15 @@ func queryKeys(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeep
 
 func queryKeyValues(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, error) {
 	res, err := codec.MarshalJSONIndent(cdc, keeper.GetKeyValues(ctx, keeper.GetKVStore(ctx), path[0], nil))
+	if err != nil {
+		panic("could not marshal result to JSON")
+	}
+
+	return res, nil
+}
+
+func queryCount(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, error) {
+	res, err := codec.MarshalJSONIndent(cdc, keeper.GetCount(ctx, keeper.GetKVStore(ctx), path[0], nil))
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}

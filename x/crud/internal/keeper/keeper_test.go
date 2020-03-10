@@ -274,14 +274,13 @@ func TestKeeper_GetKeyValues(t *testing.T) {
 	keeper.SetBLZValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value2", Owner: owner})
 	keeper.SetBLZValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value3"})
 
-	kvs = keeper.GetKeyValues(ctx, testStore, "uuid", nil)
+	kvs = keeper.GetKeyValues(ctx, testStore, "uuid", owner)
 	assert.Equal(t, "uuid", kvs.UUID)
-	assert.Len(t, kvs.KeyValues, 4)
+	assert.Len(t, kvs.KeyValues, 3)
 
-	assert.Equal(t, kvs.KeyValues[0], types.KeyValue{Key: "key0", Value: "value0"})
-	assert.Equal(t, kvs.KeyValues[1], types.KeyValue{Key: "key1", Value: "value1"})
-	assert.Equal(t, kvs.KeyValues[2], types.KeyValue{Key: "key2", Value: "value2"})
-	assert.Equal(t, kvs.KeyValues[3], types.KeyValue{Key: "key3", Value: "value3"})
+	assert.Equal(t, types.KeyValue{Key: "key0", Value: "value0"}, kvs.KeyValues[0])
+	assert.Equal(t, types.KeyValue{Key: "key1", Value: "value1"}, kvs.KeyValues[1])
+	assert.Equal(t, types.KeyValue{Key: "key2", Value: "value2"}, kvs.KeyValues[2])
 }
 
 func TestKeeper_GetKeyValues_no_owner_for_query_usage(t *testing.T) {
@@ -335,4 +334,50 @@ func TestKeeper_GetKeyValues_MaxSize(t *testing.T) {
 
 		assert.Len(t, keyValues.KeyValues, 0)
 	}
+}
+
+func TestKeeper_GetCount(t *testing.T) {
+	ctx, testStore, owner, cdc := initKeeperTest(t)
+	keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{})
+
+	count := keeper.GetCount(ctx, testStore, "uuid", nil)
+
+	assert.Equal(t, "uuid", count.UUID)
+	assert.Equal(t, uint64(0), count.Count)
+
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetBLZValue(ctx, testStore, "uuid0", "key0", types.BLZValue{Value: "value", Owner: owner})
+
+	count = keeper.GetCount(ctx, testStore, "uuid", nil)
+
+	assert.Equal(t, "uuid", count.UUID)
+	assert.Equal(t, uint64(4), count.Count)
+
+	count = keeper.GetCount(ctx, testStore, "uuid0", owner)
+
+	assert.Equal(t, "uuid0", count.UUID)
+	assert.Equal(t, uint64(1), count.Count)
+}
+
+func TestKeeper_GetCount_no_owner_for_query_usage(t *testing.T) {
+	ctx, testStore, owner, cdc := initKeeperTest(t)
+	keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{})
+
+	count := keeper.GetCount(ctx, testStore, "uuid", nil)
+	assert.Equal(t, "uuid", count.UUID)
+	assert.Equal(t, uint64(0), count.Count)
+
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value",
+		Owner: []byte("bluzelle1rnnpyp9wr6law2u5jwa23t0ywtmrduldf6h4wq")})
+
+	count = keeper.GetCount(ctx, testStore, "uuid", nil)
+
+	assert.Equal(t, "uuid", count.UUID)
+	assert.Equal(t, uint64(4), count.Count)
 }

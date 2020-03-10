@@ -41,6 +41,7 @@ type IKeeper interface {
 	RenameBLZKey(ctx sdk.Context, store sdk.KVStore, UUID string, key string, newkey string) bool
 	GetCdc() *codec.Codec
 	GetKeyValues(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultKeyValues
+	GetCount(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultCount
 }
 
 type Keeper struct {
@@ -111,11 +112,12 @@ func (k Keeper) GetKeys(ctx sdk.Context, store sdk.KVStore, UUID string, owner s
 
 	keysSize := uint64(0)
 	for ; iterator.Valid(); iterator.Next() {
-		var bz = store.Get([]byte(iterator.Key()))
-		var value types.BLZValue
-		k.cdc.MustUnmarshalBinaryBare(bz, &value)
-
-		if owner == nil || reflect.DeepEqual(value.Owner, owner) {
+		if (owner == nil) || func() bool {
+			var bz = store.Get([]byte(iterator.Key()))
+			var value types.BLZValue
+			k.cdc.MustUnmarshalBinaryBare(bz, &value)
+			return reflect.DeepEqual(value.Owner, owner)
+		}() {
 			key := string(iterator.Key())[len(prefix):]
 			keysSize = uint64(len(key)) + keysSize
 			if ctx.GasMeter().IsPastLimit() {
@@ -190,4 +192,23 @@ func (k Keeper) GetKeyValues(ctx sdk.Context, store sdk.KVStore, UUID string, ow
 		}
 	}
 	return keyValues
+}
+
+func (k Keeper) GetCount(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultCount {
+	prefix := UUID + "\x00"
+	iterator := sdk.KVStorePrefixIterator(store, []byte(prefix))
+	defer iterator.Close()
+	count := types.QueryResultCount{UUID: UUID}
+
+	for ; iterator.Valid(); iterator.Next() {
+		if (owner == nil) || func() bool {
+			var bz = store.Get([]byte(iterator.Key()))
+			var value types.BLZValue
+			k.cdc.MustUnmarshalBinaryBare(bz, &value)
+			return reflect.DeepEqual(value.Owner, owner)
+		}() {
+			count.Count += 1
+		}
+	}
+	return count
 }

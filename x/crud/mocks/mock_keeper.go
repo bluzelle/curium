@@ -77,6 +77,20 @@ func (mr *MockIKeeperMockRecorder) GetCdc() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCdc", reflect.TypeOf((*MockIKeeper)(nil).GetCdc))
 }
 
+// GetCount mocks base method
+func (m *MockIKeeper) GetCount(arg0 types1.Context, arg1 types0.KVStore, arg2 string, arg3 types1.AccAddress) types.QueryResultCount {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCount", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(types.QueryResultCount)
+	return ret0
+}
+
+// GetCount indicates an expected call of GetCount
+func (mr *MockIKeeperMockRecorder) GetCount(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCount", reflect.TypeOf((*MockIKeeper)(nil).GetCount), arg0, arg1, arg2, arg3)
+}
+
 // GetKVStore mocks base method
 func (m *MockIKeeper) GetKVStore(arg0 types1.Context) types0.KVStore {
 	m.ctrl.T.Helper()

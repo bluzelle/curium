@@ -38,6 +38,7 @@ func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 		GetCmdBLZQHas(storeKey, cdc),
 		GetCmdBLZQKeys(storeKey, cdc),
 		GetCmdBLZQKeyValues(storeKey, cdc),
+		GetCmdBLZQCount(storeKey, cdc),
 	)...)
 
 	return crudQueryCmd
@@ -123,6 +124,24 @@ func GetCmdBLZQKeyValues(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			if out.KeyValues == nil {
 				out.KeyValues = make([]types.KeyValue, 0)
 			}
+
+			return cliCtx.PrintOutput(out)
+		},
+	}
+}
+
+func GetCmdBLZQCount(queryRoute string, cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "count [UUID]",
+		Short: "count UUID",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			UUID := args[0]
+			res, _, _ := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/count/%s", queryRoute, UUID), nil)
+
+			var out types.QueryResultCount
+			cdc.MustUnmarshalJSON(res, &out)
 
 			return cliCtx.PrintOutput(out)
 		},

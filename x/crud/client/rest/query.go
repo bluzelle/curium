@@ -88,3 +88,13 @@ func BlzQKeyValuesHandler(cliCtx context.CLIContext, storeName string) http.Hand
 		rest.PostProcessResponse(w, cliCtx, res)
 	}
 }
+
+func BlzQCountHandler(cliCtx context.CLIContext, storeName string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+
+		res, _, _ := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/count/%s", storeName, vars["UUID"]), nil)
+
+		rest.PostProcessResponse(w, cliCtx, res)
+	}
+}

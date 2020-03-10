@@ -136,3 +136,24 @@ func Test_queryKeyValues(t *testing.T) {
 
 	assert.True(t, reflect.DeepEqual(acceptedKeyValues, json_result))
 }
+
+func Test_queryCount(t *testing.T) {
+	ctx, cdc, mockKeeper := initTest(t)
+
+	// always return nil for a store...
+	mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
+	mockKeeper.EXPECT().GetCount(ctx, nil, "uuid", nil).Return(types.QueryResultCount{
+		UUID:  "uuid",
+		Count: 2,
+	})
+	mockKeeper.EXPECT().GetCdc().Return(cdc)
+
+	result, err := NewQuerier(mockKeeper)(ctx, []string{"count", "uuid"}, abci.RequestQuery{})
+	assert.Nil(t, err)
+
+	json_result := types.QueryResultCount{}
+	json.Unmarshal(result, &json_result)
+
+	assert.Equal(t, "uuid", json_result.UUID)
+	assert.Equal(t, uint64(2), json_result.Count)
+}
