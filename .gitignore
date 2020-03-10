@@ -16,3 +16,6 @@
 .idea/
 blzcli
 blzd
+
+# Garbage OS files
+.DS_Store
