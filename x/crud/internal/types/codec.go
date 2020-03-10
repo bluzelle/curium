@@ -34,4 +34,5 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgBLZHas{}, "crud/has", nil)
 	cdc.RegisterConcrete(MsgBLZRename{}, "crud/rename", nil)
 	cdc.RegisterConcrete(MsgCount{}, "crud/count", nil)
+	cdc.RegisterConcrete(MsgDeleteAll{}, "crud/deleteall", nil)
 }

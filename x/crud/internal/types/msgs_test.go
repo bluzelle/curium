@@ -51,11 +51,11 @@ func TestMsgBLZCreate_ValidateBasic(t *testing.T) {
 	assert.Nil(t, sut.ValidateBasic())
 
 	sut.UUID = ""
-	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID or key Empty").Error(), sut.ValidateBasic().Error())
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID or key Empty").Error(), sut.ValidateBasic().Error())
 
 	sut.UUID = "uuid"
 	sut.Key = ""
-	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID or key Empty").Error(), sut.ValidateBasic().Error())
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID or key Empty").Error(), sut.ValidateBasic().Error())
 
 	// test max sizes...
 	sut.Key = string(make([]byte, MaxKeySize/2))
@@ -108,11 +108,11 @@ func TestMsgBLZRead_ValidateBasic(t *testing.T) {
 	assert.Nil(t, sut.ValidateBasic())
 
 	sut.UUID = ""
-	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID or key Empty").Error(), sut.ValidateBasic().Error())
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID or key Empty").Error(), sut.ValidateBasic().Error())
 
 	sut.UUID = "uuid"
 	sut.Key = ""
-	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID or key Empty").Error(), sut.ValidateBasic().Error())
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID or key Empty").Error(), sut.ValidateBasic().Error())
 }
 
 func TestMsgBLZRead_GetSignBytes(t *testing.T) {
@@ -156,11 +156,11 @@ func TestMsgBLZUpdate_ValidateBasic(t *testing.T) {
 	assert.Nil(t, sut.ValidateBasic())
 
 	sut.UUID = ""
-	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID or key Empty").Error(), sut.ValidateBasic().Error())
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID or key Empty").Error(), sut.ValidateBasic().Error())
 
 	sut.UUID = "uuid"
 	sut.Key = ""
-	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID or key Empty").Error(), sut.ValidateBasic().Error())
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID or key Empty").Error(), sut.ValidateBasic().Error())
 
 	sut.Key = "Key"
 	sut.UUID = "UUID"
@@ -208,11 +208,11 @@ func TestMsgBLZDelete_ValidateBasic(t *testing.T) {
 	assert.Nil(t, sut.ValidateBasic())
 
 	sut.UUID = ""
-	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID or key Empty").Error(), sut.ValidateBasic().Error())
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID or key Empty").Error(), sut.ValidateBasic().Error())
 
 	sut.UUID = "uuid"
 	sut.Key = ""
-	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID or key Empty").Error(), sut.ValidateBasic().Error())
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID or key Empty").Error(), sut.ValidateBasic().Error())
 }
 
 func TestMsgBLZDelete_GetSignBytes(t *testing.T) {
@@ -254,7 +254,7 @@ func TestMsgBLZKeys_ValidateBasic(t *testing.T) {
 	assert.Nil(t, sut.ValidateBasic())
 
 	sut.UUID = ""
-	assert.Equal(t, sut.ValidateBasic().Error(), sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID empty").Error())
+	assert.Equal(t, sut.ValidateBasic().Error(), sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID empty").Error())
 }
 
 func TestMsgBLZKeys_GetSignBytes(t *testing.T) {
@@ -297,11 +297,11 @@ func TestMsgBLZHas_ValidateBasic(t *testing.T) {
 	assert.Nil(t, sut.ValidateBasic())
 
 	sut.UUID = ""
-	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID empty").Error(), sut.ValidateBasic().Error())
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID empty").Error(), sut.ValidateBasic().Error())
 
 	sut.UUID = "uuid"
 	sut.Key = ""
-	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "key empty").Error(), sut.ValidateBasic().Error())
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "key empty").Error(), sut.ValidateBasic().Error())
 }
 
 func TestMsgBLZHas_GetSignBytes(t *testing.T) {
@@ -342,15 +342,15 @@ func TestMsgBLZRename_ValidateBasic(t *testing.T) {
 	assert.Nil(t, sut.ValidateBasic())
 
 	sut.UUID = ""
-	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID empty").Error(), sut.ValidateBasic().Error())
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID empty").Error(), sut.ValidateBasic().Error())
 
 	sut.UUID = "uuid"
 	sut.Key = ""
-	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "key empty").Error(), sut.ValidateBasic().Error())
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "key empty").Error(), sut.ValidateBasic().Error())
 
 	sut.Key = "key"
 	sut.NewKey = ""
-	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "new key empty").Error(), sut.ValidateBasic().Error())
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "new key empty").Error(), sut.ValidateBasic().Error())
 
 	sut.Key = "Key"
 	sut.NewKey = string(make([]byte, MaxKeySize+1))
@@ -395,7 +395,7 @@ func TestMsgBLZKeyValues_ValidateBasic(t *testing.T) {
 	assert.Nil(t, sut.ValidateBasic())
 
 	sut.UUID = ""
-	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID empty").Error(), sut.ValidateBasic().Error())
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID empty").Error(), sut.ValidateBasic().Error())
 }
 
 func TestMsgBLZKeyValues_GetSignBytes(t *testing.T) {
@@ -437,7 +437,7 @@ func TestMsgCount_ValidateBasic(t *testing.T) {
 	assert.Nil(t, sut.ValidateBasic())
 
 	sut.UUID = ""
-	assert.Equal(t, sut.ValidateBasic().Error(), sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID empty").Error())
+	assert.Equal(t, sut.ValidateBasic().Error(), sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID empty").Error())
 }
 
 func TestMsgCount_GetSignBytes(t *testing.T) {
@@ -447,5 +447,46 @@ func TestMsgCount_GetSignBytes(t *testing.T) {
 
 func TestMsgCount_GetSigners(t *testing.T) {
 	msg := NewMsgCount("uuid", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
+	assert.Equal(t, msg.GetSigners(), []sdk.AccAddress{msg.Owner})
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+func TestNewMsgDeleteAll(t *testing.T) {
+	owner := []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
+	sut := NewMsgDeleteAll("uuid", owner)
+
+	assert.IsType(t, MsgDeleteAll{}, sut)
+	assert.True(t, reflect.DeepEqual(sut, MsgDeleteAll{
+		UUID:  "uuid",
+		Owner: owner,
+	}))
+}
+
+func TestMsgDeleteAll_Route(t *testing.T) {
+	assert.Equal(t, "crud", MsgDeleteAll{}.Route())
+}
+
+func TestMsgDeleteAll_Type(t *testing.T) {
+	assert.Equal(t, "deleteall", MsgDeleteAll{}.Type())
+}
+
+func TestMsgDeleteAll_ValidateBasic(t *testing.T) {
+	sut := NewMsgDeleteAll("uuid", nil)
+	assert.Equal(t, sut.ValidateBasic().Error(), sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, sut.Owner.String()).Error())
+
+	sut.Owner = []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
+	assert.Nil(t, sut.ValidateBasic())
+
+	sut.UUID = ""
+	assert.Equal(t, sut.ValidateBasic().Error(), sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID empty").Error())
+}
+
+func TestMsgDeleteAll_GetSignBytes(t *testing.T) {
+	sut := NewMsgDeleteAll("uuid", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
+	assert.Equal(t, "{\"type\":\"crud/deleteall\",\"value\":{\"Owner\":\"cosmos1vfk827n9d3kx2vt5xpuhwardwfj82mryvcmxsdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\"}}", string(sut.GetSignBytes()))
+}
+
+func TestMsgDeleteAll_GetSigners(t *testing.T) {
+	msg := NewMsgDeleteAll("uuid", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
 	assert.Equal(t, msg.GetSigners(), []sdk.AccAddress{msg.Owner})
 }

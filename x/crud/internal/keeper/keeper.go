@@ -42,6 +42,7 @@ type IKeeper interface {
 	GetCdc() *codec.Codec
 	GetKeyValues(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultKeyValues
 	GetCount(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultCount
+	DeleteAll(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress)
 }
 
 type Keeper struct {
@@ -211,4 +212,21 @@ func (k Keeper) GetCount(ctx sdk.Context, store sdk.KVStore, UUID string, owner 
 		}
 	}
 	return count
+}
+
+func (k Keeper) DeleteAll(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) {
+	prefix := UUID + "\x00"
+	iterator := sdk.KVStorePrefixIterator(store, []byte(prefix))
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		if func() bool {
+			var bz = store.Get([]byte(iterator.Key()))
+			var value types.BLZValue
+			k.cdc.MustUnmarshalBinaryBare(bz, &value)
+			return reflect.DeepEqual(value.Owner, owner)
+		}() {
+			store.Delete(iterator.Key())
+		}
+	}
 }
