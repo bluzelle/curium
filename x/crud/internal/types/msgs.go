@@ -52,7 +52,7 @@ func (msg MsgBLZCreate) ValidateBasic() error {
 	}
 
 	if len(msg.UUID) == 0 || len(msg.Key) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID or key Empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID or key Empty")
 	}
 
 	if len(msg.UUID)+len(msg.Key) > MaxKeySize {
@@ -95,7 +95,7 @@ func (msg MsgBLZRead) ValidateBasic() error {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
 	}
 	if len(msg.UUID) == 0 || len(msg.Key) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID or key Empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID or key Empty")
 	}
 	return nil
 }
@@ -136,7 +136,7 @@ func (msg MsgBLZUpdate) ValidateBasic() error {
 	}
 
 	if len(msg.UUID) == 0 || len(msg.Key) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID or key Empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID or key Empty")
 	}
 
 	if len(msg.Value) > MaxValueSize {
@@ -179,7 +179,7 @@ func (msg MsgBLZDelete) ValidateBasic() error {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
 	}
 	if len(msg.UUID) == 0 || len(msg.Key) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID or key Empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID or key Empty")
 	}
 	return nil
 }
@@ -213,7 +213,7 @@ func (msg MsgBLZKeys) ValidateBasic() error {
 	}
 
 	if len(msg.UUID) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID empty")
 	}
 	return nil
 }
@@ -248,11 +248,11 @@ func (msg MsgBLZHas) ValidateBasic() error {
 	}
 
 	if len(msg.UUID) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID empty")
 	}
 
 	if len(msg.Key) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "key empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "key empty")
 	}
 	return nil
 }
@@ -288,15 +288,15 @@ func (msg MsgBLZRename) ValidateBasic() error {
 	}
 
 	if len(msg.UUID) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID empty")
 	}
 
 	if len(msg.Key) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "key empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "key empty")
 	}
 
 	if len(msg.NewKey) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "new key empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "new key empty")
 	}
 
 	if len(msg.UUID)+len(msg.NewKey) > MaxKeySize {
@@ -333,7 +333,7 @@ func (msg MsgBLZKeyValues) ValidateBasic() error {
 	}
 
 	if len(msg.UUID) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID empty")
 	}
 
 	return nil
@@ -366,7 +366,7 @@ func (msg MsgCount) ValidateBasic() error {
 	}
 
 	if len(msg.UUID) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID empty")
 	}
 	return nil
 }
@@ -376,5 +376,39 @@ func (msg MsgCount) GetSignBytes() []byte {
 }
 
 func (msg MsgCount) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Owner}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// DeleteAll
+type MsgDeleteAll struct {
+	UUID  string
+	Owner sdk.AccAddress
+}
+
+func NewMsgDeleteAll(UUID string, owner sdk.AccAddress) MsgDeleteAll {
+	return MsgDeleteAll{UUID: UUID, Owner: owner}
+}
+
+func (msg MsgDeleteAll) Route() string { return RouterKey }
+
+func (msg MsgDeleteAll) Type() string { return "deleteall" }
+
+func (msg MsgDeleteAll) ValidateBasic() error {
+	if msg.Owner.Empty() {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
+	}
+
+	if len(msg.UUID) == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID empty")
+	}
+	return nil
+}
+
+func (msg MsgDeleteAll) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
+
+func (msg MsgDeleteAll) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner}
 }

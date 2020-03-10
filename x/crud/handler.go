@@ -44,6 +44,8 @@ func NewHandler(keeper keeper.IKeeper) sdk.Handler {
 			return handleMsgBLZKeyValues(ctx, keeper, msg)
 		case types.MsgCount:
 			return handleMsgCount(ctx, keeper, msg)
+		case types.MsgDeleteAll:
+			return handleMsgDeleteAll(ctx, keeper, msg)
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, fmt.Sprintf("Unrecognized crud msg type: %v", msg.Type()))
 		}
@@ -197,4 +199,14 @@ func handleMsgCount(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgCount) 
 	}
 
 	return &sdk.Result{Data: json_data}, nil
+}
+
+func handleMsgDeleteAll(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgDeleteAll) (*sdk.Result, error) {
+	if len(msg.UUID) == 0 || msg.Owner.Empty() {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
+	}
+
+	keeper.DeleteAll(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Owner)
+
+	return &sdk.Result{}, nil
 }

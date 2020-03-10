@@ -152,7 +152,7 @@ func TestKeeper_GetKeys(t *testing.T) {
 	keeper.SetBLZValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value", Owner: owner})
 	keeper.SetBLZValue(ctx, testStore, "uuid0", "key0", types.BLZValue{Value: "value", Owner: owner})
 
-	keys = keeper.GetKeys(ctx, testStore, "uuid", nil)
+	keys = keeper.GetKeys(ctx, testStore, "uuid", owner)
 
 	assert.Equal(t, "uuid", keys.UUID)
 	assert.Len(t, keys.Keys, 4)
@@ -380,4 +380,25 @@ func TestKeeper_GetCount_no_owner_for_query_usage(t *testing.T) {
 
 	assert.Equal(t, "uuid", count.UUID)
 	assert.Equal(t, uint64(4), count.Count)
+}
+
+func TestKeeper_DeleteAll(t *testing.T) {
+	ctx, testStore, owner, cdc := initKeeperTest(t)
+	keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{})
+
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetBLZValue(ctx, testStore, "uuid", "key", types.BLZValue{Value: "value", Owner: []byte("bluzelle1nnpyp9wr6law2u5jwa23t0ywtmrduldf6h4wqr")})
+
+	keeper.DeleteAll(ctx, testStore, "uuid", owner)
+
+	count := keeper.GetCount(ctx, testStore, "uuid", owner)
+	assert.Equal(t, "uuid", count.UUID)
+	assert.Equal(t, uint64(0), count.Count)
+
+	count = keeper.GetCount(ctx, testStore, "uuid", []byte("bluzelle1nnpyp9wr6law2u5jwa23t0ywtmrduldf6h4wqr"))
+	assert.Equal(t, "uuid", count.UUID)
+	assert.Equal(t, uint64(1), count.Count)
 }

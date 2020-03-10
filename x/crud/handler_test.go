@@ -459,3 +459,31 @@ func Test_handleMsgCount(t *testing.T) {
 		assert.NotNil(t, err)
 	}
 }
+
+func Test_handleMsgBLZDeleteAll(t *testing.T) {
+	mockCtrl, mockKeeper, ctx, owner := initTest(t)
+	defer mockCtrl.Finish()
+
+	// Simple delete test key does not exist
+	{
+		deleteAllMsg := types.MsgDeleteAll{UUID: "uuid", Owner: owner}
+
+		assert.Equal(t, "deleteall", deleteAllMsg.Type())
+
+		// always return nil for a store...
+		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
+		mockKeeper.EXPECT().DeleteAll(ctx, nil, deleteAllMsg.UUID, gomock.Any())
+
+		_, err := NewHandler(mockKeeper)(ctx, deleteAllMsg)
+		assert.Nil(t, err)
+	}
+
+	// Test for empty message parameters
+	{
+		_, err := handleMsgDeleteAll(ctx, mockKeeper, types.MsgDeleteAll{})
+		assert.NotNil(t, err)
+
+		_, err = handleMsgDeleteAll(ctx, mockKeeper, types.MsgDeleteAll{UUID: "uuid"})
+		assert.NotNil(t, err)
+	}
+}

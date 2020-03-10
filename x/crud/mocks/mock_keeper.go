@@ -37,6 +37,18 @@ func (m *MockIKeeper) EXPECT() *MockIKeeperMockRecorder {
 	return m.recorder
 }
 
+// DeleteAll mocks base method
+func (m *MockIKeeper) DeleteAll(arg0 types1.Context, arg1 types0.KVStore, arg2 string, arg3 types1.AccAddress) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "DeleteAll", arg0, arg1, arg2, arg3)
+}
+
+// DeleteAll indicates an expected call of DeleteAll
+func (mr *MockIKeeperMockRecorder) DeleteAll(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAll", reflect.TypeOf((*MockIKeeper)(nil).DeleteAll), arg0, arg1, arg2, arg3)
+}
+
 // DeleteBLZValue mocks base method
 func (m *MockIKeeper) DeleteBLZValue(arg0 types1.Context, arg1 types0.KVStore, arg2, arg3 string) {
 	m.ctrl.T.Helper()
