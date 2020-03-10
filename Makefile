@@ -22,7 +22,7 @@ ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=BluzelleService \
 	-X github.com/cosmos/cosmos-sdk/version.ClientName=blzcli \
 	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
-	-X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep),cosmos-sdk $(COSMOS_SDK)"
+	-X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep),faucet,cosmos-sdk $(COSMOS_SDK)"
 
 BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)' -tags faucet
 
