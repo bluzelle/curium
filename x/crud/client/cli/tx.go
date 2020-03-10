@@ -44,6 +44,7 @@ func GetTxCmd(_ string, cdc *codec.Codec) *cobra.Command {
 		GetCmdBLZHas(cdc),
 		GetCmdBLZRename(cdc),
 		GetCmdBLZKeyValues(cdc),
+		GetCmdBLZCount(cdc),
 	)...)
 
 	return crudTxCmd
@@ -207,6 +208,27 @@ func GetCmdBLZRename(cdc *codec.Codec) *cobra.Command {
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
 			msg := types.NewMsgBLZRename(args[0], args[1], args[2], cliCtx.GetFromAddress())
+
+			err := msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+		},
+	}
+}
+
+func GetCmdBLZCount(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "count [UUID]",
+		Short: "count of existing entries in the database",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
+			msg := types.NewMsgCount(args[0], cliCtx.GetFromAddress())
 
 			err := msg.ValidateBasic()
 			if err != nil {

@@ -424,3 +424,38 @@ func Test_handleMsgBLZKeyValues(t *testing.T) {
 		assert.NotNil(t, err)
 	}
 }
+
+func Test_handleMsgCount(t *testing.T) {
+	mockCtrl, mockKeeper, ctx, owner := initTest(t)
+	defer mockCtrl.Finish()
+
+	// Simple keys test key does not exist
+	{
+		countMsg := types.MsgCount{
+			UUID:  "uuid",
+			Owner: owner,
+		}
+		assert.Equal(t, countMsg.Type(), "count")
+
+		// always return nil for a store...
+		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
+		mockKeeper.EXPECT().GetCount(ctx, nil, "uuid", gomock.Any()).Return(types.QueryResultCount{UUID: "uuid", Count: uint64(123)})
+		result, err := NewHandler(mockKeeper)(ctx, countMsg)
+		assert.Nil(t, err)
+
+		json_result := types.QueryResultCount{}
+		json.Unmarshal(result.Data, &json_result)
+
+		assert.Equal(t, countMsg.UUID, json_result.UUID)
+		assert.Equal(t, uint64(123), json_result.Count)
+	}
+
+	// Test for empty message parameters
+	{
+		_, err := handleMsgCount(ctx, mockKeeper, types.MsgCount{})
+		assert.NotNil(t, err)
+
+		_, err = handleMsgCount(ctx, mockKeeper, types.MsgCount{UUID: "uuid"})
+		assert.NotNil(t, err)
+	}
+}

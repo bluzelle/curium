@@ -35,4 +35,6 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, storeName string) 
 	r.HandleFunc(fmt.Sprintf("/%s/keys", storeName), BlzKeysHandler(cliCtx)).Methods("POST")
 	r.HandleFunc(fmt.Sprintf("/%s/keyvalues", storeName), BlzKeyValuesHandler(cliCtx)).Methods("POST")
 	r.HandleFunc(fmt.Sprintf("/%s/rename", storeName), BlzRenameHandler(cliCtx)).Methods("POST")
+	r.HandleFunc(fmt.Sprintf("/%s/count", storeName), BlzCountHandler(cliCtx)).Methods("POST")
+	r.HandleFunc(fmt.Sprintf("/%s/count/{UUID}", storeName), BlzQCountHandler(cliCtx, storeName)).Methods("GET")
 }

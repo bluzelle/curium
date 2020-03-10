@@ -344,3 +344,37 @@ func (msg MsgBLZKeyValues) GetSignBytes() []byte {
 }
 
 func (msg MsgBLZKeyValues) GetSigners() []sdk.AccAddress { return []sdk.AccAddress{msg.Owner} }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Count
+type MsgCount struct {
+	UUID  string
+	Owner sdk.AccAddress
+}
+
+func NewMsgCount(UUID string, owner sdk.AccAddress) MsgCount {
+	return MsgCount{UUID: UUID, Owner: owner}
+}
+
+func (msg MsgCount) Route() string { return RouterKey }
+
+func (msg MsgCount) Type() string { return "count" }
+
+func (msg MsgCount) ValidateBasic() error {
+	if msg.Owner.Empty() {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
+	}
+
+	if len(msg.UUID) == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "UUID empty")
+	}
+	return nil
+}
+
+func (msg MsgCount) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
+
+func (msg MsgCount) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Owner}
+}
