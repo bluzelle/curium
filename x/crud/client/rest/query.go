@@ -98,3 +98,11 @@ func BlzQCountHandler(cliCtx context.CLIContext, storeName string) http.HandlerF
 		rest.PostProcessResponse(w, cliCtx, res)
 	}
 }
+
+func BlzQVersionHandler(cliCtx context.CLIContext, storeName string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		res, _, _ := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/version", storeName), nil)
+
+		rest.PostProcessResponse(w, cliCtx, res)
+	}
+}
