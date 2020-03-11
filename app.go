@@ -16,7 +16,6 @@ package app
 
 import (
 	"encoding/json"
-	"time"
 	bluzellechain "github.com/bluzelle/curium/types"
 	"github.com/bluzelle/curium/x/crud"
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
@@ -40,6 +39,7 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 	"os"
+	"time"
 )
 
 const crudModuleEntry = "bluzelle_crud"
@@ -54,7 +54,18 @@ var (
 	DefaultNodeHome = os.ExpandEnv("$HOME/.blzd")
 
 	// ModuleBasicManager is in charge of setting up basic module elements
-	ModuleBasics = newBasicManager(DefaultNodeHome)
+	ModuleBasics = module.NewBasicManager(
+		genutil.AppModuleBasic{},
+		auth.AppModuleBasic{},
+		bank.AppModuleBasic{},
+		staking.AppModuleBasic{},
+		distr.AppModuleBasic{},
+		params.AppModuleBasic{},
+		slashing.AppModuleBasic{},
+		supply.AppModuleBasic{},
+		crud.AppModule{},
+		faucet.AppModule{},
+	)
 
 	// account permissions
 	maccPerms = map[string][]string{
@@ -69,7 +80,7 @@ var (
 func IsCrudEnabled(nodeHome string) bool {
 	enabled := true
 
-	viper.SetConfigName("config")
+	viper.SetConfigName("app")
 	viper.SetConfigType("toml")
 	viper.AddConfigPath(nodeHome + "/config/")
 
@@ -78,37 +89,7 @@ func IsCrudEnabled(nodeHome string) bool {
 			enabled = viper.GetBool(crudModuleEntry)
 		}
 	}
-
 	return enabled
-}
-
-func newBasicManager(nodeHome string) module.BasicManager {
-	if IsCrudEnabled(nodeHome) {
-		return module.NewBasicManager(
-			genutil.AppModuleBasic{},
-			auth.AppModuleBasic{},
-			bank.AppModuleBasic{},
-			staking.AppModuleBasic{},
-			distr.AppModuleBasic{},
-			params.AppModuleBasic{},
-			slashing.AppModuleBasic{},
-			supply.AppModuleBasic{},
-			crud.AppModule{},
-			faucet.AppModule{},
-		)
-	} else {
-		return module.NewBasicManager(
-			genutil.AppModuleBasic{},
-			auth.AppModuleBasic{},
-			bank.AppModuleBasic{},
-			staking.AppModuleBasic{},
-			distr.AppModuleBasic{},
-			params.AppModuleBasic{},
-			slashing.AppModuleBasic{},
-			supply.AppModuleBasic{},
-			faucet.AppModule{},
-		)
-	}
 }
 
 func MakeCodec() *codec.Codec {
@@ -136,7 +117,7 @@ type CRUDApp struct {
 	supplyKeeper   supply.Keeper
 	paramsKeeper   params.Keeper
 	crudKeeper     crud.Keeper
-	faucetKeeper   faucet.Keeper	
+	faucetKeeper   faucet.Keeper
 
 	// Module Manager
 	mm *module.Manager
@@ -249,16 +230,20 @@ func NewCRUDApp(
 	app.faucetKeeper = faucet.NewKeeper(
 		app.supplyKeeper,
 		app.stakingKeeper,
-		2000000000, // How many tokens to mint out for every successful request
+		2000000000,    // How many tokens to mint out for every successful request
 		5*time.Minute, // Time you have to wait before you can use the faucet again for a given beneficiary address
 		keys[faucet.StoreKey],
-		app.cdc) 
+		app.cdc)
+
+	// check flags...
+	bluzelleCrud := IsCrudEnabled(DefaultNodeHome)
+	logger.Info("Module setup", crudModuleEntry, bluzelleCrud)
 
 	app.mm = module.NewManager(
 		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx),
 		auth.NewAppModule(app.accountKeeper),
 		bank.NewAppModule(app.bankKeeper, app.accountKeeper),
-		crud.NewAppModule(app.crudKeeper, app.bankKeeper),
+		crud.NewAppModule(!bluzelleCrud, app.crudKeeper, app.bankKeeper),
 		faucet.NewAppModule(app.faucetKeeper), // faucet module
 		supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
 		distr.NewAppModule(app.distrKeeper, app.accountKeeper, app.supplyKeeper, app.stakingKeeper),
@@ -284,9 +269,7 @@ func NewCRUDApp(
 	)
 
 	// register all module routes and module queriers
-	if IsCrudEnabled(DefaultNodeHome) {
-		app.mm.RegisterRoutes(app.Router(), app.QueryRouter())
-	}
+	app.mm.RegisterRoutes(app.Router(), app.QueryRouter())
 
 	// The initChainer handles translating the genesis.json file into initial state for the network
 	app.SetInitChainer(app.InitChainer)
