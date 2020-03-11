@@ -72,15 +72,18 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 
 type AppModule struct {
 	AppModuleBasic
-	keeper     Keeper
-	coinKeeper bank.Keeper
+	keeper       Keeper
+	coinKeeper   bank.Keeper
+	crudDisabled bool // called disabled as default construction will set it false
 }
 
-func NewAppModule(k Keeper, bankkeeper bank.Keeper) AppModule {
+func NewAppModule(crudDisabled bool, k Keeper, bankkeeper bank.Keeper) AppModule {
+
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
 		keeper:         k,
 		coinKeeper:     bankkeeper,
+		crudDisabled:   crudDisabled,
 	}
 }
 
@@ -91,7 +94,11 @@ func (AppModule) Name() string {
 func (am AppModule) RegisterInvariants(_ sdk.InvariantRegistry) {}
 
 func (am AppModule) Route() string {
-	return RouterKey
+	if !am.crudDisabled {
+		return RouterKey
+	} else {
+		return ""
+	}
 }
 
 func (am AppModule) NewHandler() sdk.Handler {
@@ -99,7 +106,11 @@ func (am AppModule) NewHandler() sdk.Handler {
 }
 
 func (am AppModule) QuerierRoute() string {
-	return ModuleName
+	if !am.crudDisabled {
+		return ModuleName
+	} else {
+		return ""
+	}
 }
 
 func (am AppModule) NewQuerierHandler() sdk.Querier {

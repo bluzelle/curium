@@ -109,7 +109,7 @@ func TestAppModuleBasic_GetTxCmd(t *testing.T) {
 func TestNewAppModule(t *testing.T) {
 	k := Keeper{}
 	var bankkeeper bank.Keeper
-	sut := NewAppModule(k, bankkeeper)
+	sut := NewAppModule(false, k, bankkeeper)
 
 	assert.Equal(t, "crud", sut.Route())
 }
@@ -117,7 +117,7 @@ func TestNewAppModule(t *testing.T) {
 func TestAppModule_Name(t *testing.T) {
 	k := Keeper{}
 	var bankkeeper bank.Keeper
-	sut := NewAppModule(k, bankkeeper)
+	sut := NewAppModule(false, k, bankkeeper)
 
 	assert.Equal(t, "crud", sut.Name())
 }
@@ -125,11 +125,27 @@ func TestAppModule_Name(t *testing.T) {
 func TestAppModule_Route(t *testing.T) {
 	sut := AppModule{}
 	assert.Equal(t, "crud", sut.Route())
+
+	// When crud disabled, no route is returned
+	{
+		k := Keeper{}
+		var bankkeeper bank.Keeper
+		sut := NewAppModule(true, k, bankkeeper)
+		assert.Equal(t, "", sut.Route())
+	}
 }
 
 func TestAppModule_QuerierRoute(t *testing.T) {
 	sut := AppModule{}
 	assert.Equal(t, "crud", sut.QuerierRoute())
+
+	// When crud disabled, no route is returned
+	{
+		k := Keeper{}
+		var bankkeeper bank.Keeper
+		sut := NewAppModule(true, k, bankkeeper)
+		assert.Equal(t, "", sut.QuerierRoute())
+	}
 }
 
 func TestAppModule_NewQuerierHandler(t *testing.T) {
