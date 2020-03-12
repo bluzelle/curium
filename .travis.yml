@@ -21,3 +21,4 @@ script:
   - gotest -v -covermode=count -coverprofile=coverage.out ./x/...
   - $GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis-ci
   - ls -l $GOPATH/bin
+
