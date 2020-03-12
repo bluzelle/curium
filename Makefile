@@ -31,14 +31,12 @@ all:
 		go build $(BUILD_FLAGS) -ldflags '$(LDFLAGS) $(LDFLAGS_NO_FAUCET)' ./cmd/blzd
 		go build $(BUILD_FLAGS) -ldflags '$(LDFLAGS) $(LDFLAGS_NO_FAUCET)' ./cmd/blzcli
 
-install: go.sum
-		go install -mod=readonly $(BUILD_FLAGS) -ldflags '$(LDFLAGS) $(LDFLAGS_NO_FAUCET)' ./cmd/blzd
-		go install -mod=readonly $(BUILD_FLAGS) -ldflags '$(LDFLAGS) $(LDFLAGS_NO_FAUCET)' ./cmd/blzcli
-
 clean:
 		@rm -f blzd blzcli
 
-mainnet: install
+mainnet: go.sum
+		go install -mod=readonly $(BUILD_FLAGS) -ldflags '$(LDFLAGS) $(LDFLAGS_NO_FAUCET)' ./cmd/blzd
+		go install -mod=readonly $(BUILD_FLAGS) -ldflags '$(LDFLAGS) $(LDFLAGS_NO_FAUCET)' ./cmd/blzcli
 
 testnet:
 		# only testnet has the faucet enabled...
