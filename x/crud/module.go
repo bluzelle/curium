@@ -102,7 +102,11 @@ func (am AppModule) Route() string {
 }
 
 func (am AppModule) NewHandler() sdk.Handler {
-	return NewHandler(am.keeper)
+	if !am.crudDisabled {
+		return NewHandler(am.keeper)
+	} else {
+		return nil
+	}
 }
 
 func (am AppModule) QuerierRoute() string {
