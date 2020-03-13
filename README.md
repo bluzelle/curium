@@ -3,12 +3,14 @@
 The Bluzelle Curium Application
 ===============================
 
-**TODO: Marketing description of the product here**
+The decentralized database for Web 3.0. Bluzelle uses blockchain and 
+EdgeComputing for greater performance and security.
 
 Bluzelle Curium Multi-Validator Zone Installation
 -------------------------------------------------
 
-These are steps involved in setting up the OS, Dev Environment, building and deploying a multi-node Curium Zone.
+These are steps involved in setting up the OS, Dev Environment, building and 
+deploying a multi-node Curium Zone.
 
 1. [OS Setup for Curium](./docs/setup/os.md)
 2. [Development Environment Setup](./docs/setup/devenv.md)

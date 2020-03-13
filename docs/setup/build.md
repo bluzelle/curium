@@ -4,18 +4,22 @@
 Build the Curium Project
 ========================
 
-1.  cd to the project folder
+1.  In a terminal, change to the curium working directory
 
-        $ cd ~/go/src/github.com/bluzelle/curium
+        cd ~/go/src/github.com/bluzelle/curium
  
-2.  Install blzd and blzcli
+2.  Use make to build and install the blzd and blzcli executables
 
-        $ make install
+        make install
  
-3.  Ensure blzcli and blzd work by executing the binaries, you should be able to execute the apps from your user folder:
+3.  Ensure Bluzelle CLI and daemon work by executing the binaries, you should 
+    be able to execute the apps from your users directory:
 
-        $ cd
-        $ blzcli
+        cd
+        blzcli
+        
+    The output of the Bluzelle CLI will be:
+
         Bluzelle CRUD Client
         
         Usage:
@@ -44,10 +48,13 @@ Build the Curium Project
 
         Use "blzcli [command] --help" for more information about a command.
 
-    the daemon:
+    similarly for the Bluzelle daemon:
 
-        $ cd
-        $ blzd
+        cd
+        blzd
+        
+    Which will produce the following output:
+        
         Bluzelle CRUD Daemon (server)
         
         Usage:
@@ -76,9 +83,12 @@ Build the Curium Project
         
         Use "blzd [command] --help" for more information about a command.
  
-4.  You can also verify the build versions with the following commands. They should match the git commit hash of the tip (git rev-parse HEAD) you cloned above.
+4.  Verify the build Bluzelle CLI build version
 
-        $ blzcli version --long
+        blzcli version --long
+        
+    which provides the output
+        
         name: BluzelleService
         server_name: blzd
         client_name: blzcli
@@ -86,8 +96,13 @@ Build the Curium Project
         commit: 3253c8b6b4e40b125c0ccdfd6a81a06a02a5e018
         build_tags: ledger,cosmos-sdk v0.37.4
         go: go version go1.13.4 darwin/amd64
-
-        $ blzd version --long
+        
+    Similarly, verify the Bluzelle daemon
+    
+        blzd version --long
+        
+    which has the output
+        
         name: BluzelleService
         server_name: blzd
         client_name: blzcli
