@@ -26,4 +26,5 @@ script:
   - ls -a
   - echo ${TRAVIS_PULL_REQUEST}
   - echo "y" | travis login --pro --github-token $TRAV_TOKEN
-  - if [ "${TRAVIS_PULL_REQUEST}" == "false"  ]; then make install;gotest -v -covermode=count -coverprofile=coverage.out ./x/...;$GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis-ci;ls -l $GOPATH/bin; else echo "y" | travis restart -r bluzelle/curium-test; travis-status --pro --token "{$TRAV_API_TOKEN}" --repo bluzelle/curium-test --branch task/milagan/cm-89 --fail-pending || echo 'Not yet passing'; fi
+  - echo ${TRAV_API_TOKEN}
+  - if [ "${TRAVIS_PULL_REQUEST}" == "false"  ]; then make install;gotest -v -covermode=count -coverprofile=coverage.out ./x/...;$GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis-ci;ls -l $GOPATH/bin; else echo "y" | travis restart -r bluzelle/curium-test; travis-status --pro --token $TRAV_API_TOKEN --repo bluzelle/curium-test --branch task/milagan/cm-89 --fail-pending || echo 'Not yet passing'; fi
