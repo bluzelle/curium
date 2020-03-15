@@ -18,6 +18,9 @@ const { exec } = require("child_process");
 
 function runTravisCommand(comm, cb){
     exec(comm, (error, stdout, stderr) => {
+        console.log("Current Status of Integration Tests: " + stdout)
+    });
+    exec(comm, (error, stdout, stderr) => {
         if (error) {
             console.log(`error: ${error.message}`);
             return -1;
@@ -57,7 +60,7 @@ function runIntegrationTest(){
             console.log("status: " + resp)
             console.log("INTEGRATION TESTS STILL RUNNING...")
             runIntegrationTest()
-        }, 5000, result)  
+        }, 10000, result)  
 
     } );
 }
