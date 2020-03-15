@@ -18,7 +18,7 @@ const { exec } = require("child_process");
 
 function runTravisCommand(comm, cb){
     exec(comm, (error, stdout, stderr) => {
-        console.log("Current Status of Integration Tests: " + stdout)
+        console.log(`${stdout}`)
     });
     exec(comm, (error, stdout, stderr) => {
         if (error) {
@@ -48,20 +48,22 @@ function runIntegrationTest(){
     runTravisCommand("node node_modules/travis-status --pro --token " + travisArgs[0] + " --repo bluzelle/curium-test --branch task/milagan/cm-89"
     , function (result) { 
 
-        setTimeout(function(resp){
-            if(resp == "passed"){
-                console.log("INTEGRATION TESTS PASSED")
-                process.exit(0)
-            }
-            else if(resp == "failed"){
-                console.log("INTEGRATION TESTS FAILED")
-                process.exit(1)
-            }
-            console.log("status: " + resp)
-            console.log("INTEGRATION TESTS STILL RUNNING...")
-            runIntegrationTest()
-        }, 10000, result)  
-
+        
+        if(result == "passed"){
+            console.log("INTEGRATION TESTS PASSED")
+            process.exit(0)
+        }
+        else if(result == "failed"){
+            console.log("INTEGRATION TESTS FAILED")
+            process.exit(1)
+        }
+        else{
+            setTimeout(function(resp){
+                console.log("status: " + resp)
+                console.log("INTEGRATION TESTS STILL RUNNING...")
+                runIntegrationTest()
+            }, 10000, result)  
+        }
     } );
 }
 
