@@ -27,4 +27,4 @@ script:
   - echo ${TRAVIS_PULL_REQUEST}
   - echo "y" | travis login --pro --github-token $TRAV_TOKEN
   - echo ${TRAV_API_TOKEN}
-  - if [ "${TRAVIS_PULL_REQUEST}" == "false"  ]; then make install;gotest -v -covermode=count -coverprofile=coverage.out ./x/...;$GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis-ci;ls -l $GOPATH/bin; else echo "y" | travis restart -r bluzelle/curium-test; npm install -g travis-status; node travisStatus.js $TRAV_API_TOKEN; fi
+  - if [ "${TRAVIS_PULL_REQUEST}" == "false"  ]; then make install;gotest -v -covermode=count -coverprofile=coverage.out ./x/...;$GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis-ci;ls -l $GOPATH/bin; else echo "y" | travis restart -r bluzelle/curium-test; npm install travis-status; node travisStatus.js $TRAV_API_TOKEN; fi

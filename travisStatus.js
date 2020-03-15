@@ -42,7 +42,7 @@ function runTravisCommand(comm, cb){
 }
 
 function runIntegrationTest(){
-    runTravisCommand("travis-status --pro --token " + travisArgs[0] + " --repo bluzelle/curium-test --branch task/milagan/cm-89 --fail-pending"
+    runTravisCommand("node travis-status --pro --token " + travisArgs[0] + " --repo bluzelle/curium-test --branch task/milagan/cm-89 --fail-pending"
     , function (result) { 
         while(true){
             if(result == "passed"){
