@@ -21,6 +21,7 @@ install: true
 
 before_script:
   - sudo apt-get install ruby-dev && sudo gem install travis
+  - npm install -g travis-status
   - npm install -g child_process
 script:
   - ls -a
