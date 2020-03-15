@@ -17,9 +17,6 @@ var travisArgs = process.argv.slice(2);
 const { exec } = require("child_process");
 
 function runTravisCommand(comm, cb){
-    exec("ls -a", (error, stdout, stderr) => {
-        console.log(stdout)
-    });
     exec(comm, (error, stdout, stderr) => {
         if (error) {
             console.log(`error: ${error.message}`);
@@ -45,21 +42,24 @@ function runTravisCommand(comm, cb){
 }
 
 function runIntegrationTest(){
-    runTravisCommand("node node_modules/travis-status --pro --token " + travisArgs[0] + " --repo bluzelle/curium-test --branch task/milagan/cm-89 --fail-pending"
+    runTravisCommand("node node_modules/travis-status --pro --token " + travisArgs[0] + " --repo bluzelle/curium-test --branch task/milagan/cm-89"
     , function (result) { 
-        while(true){
-            if(result == "passed"){
+
+        setTimeout(function(resp){
+            if(resp == "passed"){
                 console.log("INTEGRATION TESTS PASSED")
                 process.exit(0)
             }
-            else if(result == "failed"){
+            else if(resp == "failed"){
                 console.log("INTEGRATION TESTS FAILED")
                 process.exit(1)
             }
             else{
+                console.log("INTEGRATION TESTS STILL RUNNING...")
                 runIntegrationTest()
             }
-        }
+        }, 5000, result)  
+
     } );
 }
 
