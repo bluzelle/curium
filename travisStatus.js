@@ -54,10 +54,9 @@ function runIntegrationTest(){
                 console.log("INTEGRATION TESTS FAILED")
                 process.exit(1)
             }
-            else{
-                console.log("INTEGRATION TESTS STILL RUNNING...")
-                runIntegrationTest()
-            }
+            console.log("status: " + resp)
+            console.log("INTEGRATION TESTS STILL RUNNING...")
+            runIntegrationTest()
         }, 5000, result)  
 
     } );
