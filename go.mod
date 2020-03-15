@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	github.com/cosmos/cosmos-sdk v0.38.1
-	github.com/cosmos/modules/incubator/faucet v0.0.0-20200305101902-47c39933dbb5
+	github.com/cosmos/modules/incubator/faucet v0.0.0-20200315124306-c86f71ae76a0
 	github.com/golang/mock v1.4.0
 	github.com/gorilla/mux v1.7.4
 	github.com/magiconair/properties v1.8.1
