@@ -8,7 +8,8 @@ env:
   global:
   - GO111MODULE=on
   secure: "LBPuPqFb4PYq9n0d6vQ+TwFWwepAsl3X3ZoRyWU+4/kv3S50PRzre60B5xVP+Y3eyG5RbsWh1Z4unp2nVOGN9O3H4VjqgAXQYnyTMIzg+AceUnjVmlbzPL01A0tTY5MswbZP3ncQFphBNreRrIWgLZKV9btfiYjuOO85+ZC+biw3jNuyeGkHSdfibAsuKug0Mr11FkYccAry3zOUHwNzn2dMnfDVImPmjxucZxXOqIeqXaPQ9W8OVn+ZiYYoW51+s/G1ll00C290c6TKbnVnFVqK6cAR9VQnpI00IDLuRNGQJWiosHCxoYkr/p9nSZgN04nVRYvkLXo8CxSsthcYf23Z1R0H5NeFuCVfLSzAgFOff23VK2jOhINPgCfBtENMyR4jVdUSCv0XJ/VrjHHMJXzpILXSy/M38RnZzeN2brM6H7nbvk58Kdv+6Dn7A1E2ZLCslFtlP4m6qrP17bDViibfVgYNcRytDATnKXjbJURAJ3ja+ZUULLPMhAO5BDHuJDzIWXq2wzZWk4OMk49PIaVwkSvaJ8+KFg9x7mNXGhql5TAS+d+OArkJyzR1ODQnfZ0JA1rzvJ9T321lOT8YzWy8nEPfRcpAbrIuud1Rrj4r4luOaZ6iRmGvOtrnKCDjciQCY+J1ftJj5U+uDeZt0A9Bxo1DFy/tW96KX0QxvwI="
-  
+  secure: "KuI9j2Xn1YKQCEwcYl5B9rbpb8W13oyAZVgVjRNSB4b1geXhFgMMkHhoDcBnWLvh9arsgBIEVpflSJCmn9tvN21xdQRFTEW2urxm0c/XAaNHZ6GIeOP7IPfFPJMRGKQ/SQzNwW/Y1z4pCs+Y+y3yzmsj79Ivb3I6P3HZk4ckracoP33QBBLn31svUyKcxoA5GcMN00TF+dlVRjyk8J1VGz7urH0Bo2P6ixZiKbprNlP7zVO9+Ez/PpVqtZJwgR73yQii6XuwMfeogntt/c84VGKnjGpp+d0sFY1MYGeOpwlkXo1xTdUJVWs5L+56+D/ezoqqZR+56xofceD4QYSrB/M6CYNOXQu9don/eoRvdfDZZLNgmJgTCYbmMZFzPlm/SZBlzZZxmtO251PlgU8bW5Pxf5aW3uBR/rWPsG0EtSa3CvNtkQOmgNxSm8K3lKP0KkJ5k23n4bDNdy3L+eEN6yl4RxZbmJnmixvhdAB7jcH3sQZ/4/RUBtK9RMJohx/WRfXmNi7mUF4nM4TxtikuZ/oTJA26w2Xc7gMmwQLbwIIiXV291h8Qn2YJXIyqh/1dEDCB5rNeuKI9dujgz0DnszBU85YSzNyNGadfm30HB4VaGPWBEPmapbEj1lYwzx7B2LIbFANuOKb99eoBHPgDYiI/2SyJcTUJ6qS6hSDIARE="
+
 git:
   depth: 1
 
@@ -25,4 +26,4 @@ script:
   - ls -a
   - echo ${TRAVIS_PULL_REQUEST}
   - echo "y" | travis login --pro --github-token $TRAV_TOKEN
-  - if [ "${TRAVIS_PULL_REQUEST}" == "false"  ]; then make install;gotest -v -covermode=count -coverprofile=coverage.out ./x/...;$GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis-ci;ls -l $GOPATH/bin; else echo "y" | travis restart -r bluzelle/curium-test; travis-status --pro --token $TRAV_TOKEN --repo bluzelle/curium-test --branch task/milagan/cm-89 --fail-pending || echo 'Not yet passing'; fi
+  - if [ "${TRAVIS_PULL_REQUEST}" == "false"  ]; then make install;gotest -v -covermode=count -coverprofile=coverage.out ./x/...;$GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis-ci;ls -l $GOPATH/bin; else echo "y" | travis restart -r bluzelle/curium-test; travis-status --pro --token $TRAV_API_TOKEN --repo bluzelle/curium-test --branch task/milagan/cm-89 --fail-pending || echo 'Not yet passing'; fi
