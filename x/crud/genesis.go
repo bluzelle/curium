@@ -47,7 +47,7 @@ func DefaultGenesisState() GenesisState {
 
 func InitGenesis(ctx sdk.Context, keeper keeper.IKeeper, data GenesisState) []abci.ValidatorUpdate {
 	for _, record := range data.BlzValues {
-		keeper.SetBLZValue(ctx, keeper.GetKVStore(ctx), "UUID-Genesis", "Key-Genesis", record)
+		keeper.SetValue(ctx, keeper.GetKVStore(ctx), "UUID-Genesis", "Key-Genesis", record)
 	}
 	return []abci.ValidatorUpdate{}
 }
@@ -58,7 +58,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.IKeeper) GenesisState {
 	iterator := k.GetValuesIterator(ctx, k.GetKVStore(ctx))
 	for ; iterator.Valid(); iterator.Next() {
 		key := string(iterator.Key())
-		value := k.GetBLZValue(ctx, k.GetKVStore(ctx), "UUID-Genesis", key)
+		value := k.GetValue(ctx, k.GetKVStore(ctx), "UUID-Genesis", key)
 		records = append(records, value)
 	}
 	return GenesisState{records}

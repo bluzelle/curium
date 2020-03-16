@@ -118,7 +118,7 @@ func Test_queryKeys(t *testing.T) {
 func Test_queryKeyValues(t *testing.T) {
 	ctx, cdc, mockKeeper := initTest(t)
 
-	keyValues := []types.KeyValue{}
+	var keyValues []types.KeyValue
 	keyValues = append(keyValues, types.KeyValue{Key: "key0", Value: "value0"})
 	keyValues = append(keyValues, types.KeyValue{Key: "key1", Value: "value1"})
 

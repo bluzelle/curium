@@ -40,13 +40,13 @@ func (msg BadMsg) ValidateBasic() error         { return nil }
 func (msg BadMsg) GetSignBytes() []byte         { return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg)) }
 func (msg BadMsg) GetSigners() []sdk.AccAddress { return []sdk.AccAddress{} }
 
-func Test_handleMsgBLZCreate(t *testing.T) {
+func Test_handleMsgCreate(t *testing.T) {
 	mockCtrl, mockKeeper, ctx, owner := initTest(t)
 	defer mockCtrl.Finish()
 
 	// Simple Unit
 	{
-		createMsg := types.MsgBLZCreate{
+		createMsg := types.MsgCreate{
 			UUID:  "uuid",
 			Key:   "key",
 			Value: "value",
@@ -78,24 +78,24 @@ func Test_handleMsgBLZCreate(t *testing.T) {
 
 	// Test for empty message parameters
 	{
-		_, err := handleMsgBLZCreate(ctx, mockKeeper, types.MsgBLZCreate{})
+		_, err := handleMsgCreate(ctx, mockKeeper, types.MsgCreate{})
 		assert.NotNil(t, err)
 
-		_, err = handleMsgBLZCreate(ctx, mockKeeper, types.MsgBLZCreate{UUID: "uuid"})
+		_, err = handleMsgCreate(ctx, mockKeeper, types.MsgCreate{UUID: "uuid"})
 		assert.NotNil(t, err)
 
-		_, err = handleMsgBLZCreate(ctx, mockKeeper, types.MsgBLZCreate{UUID: "uuid", Key: "key"})
+		_, err = handleMsgCreate(ctx, mockKeeper, types.MsgCreate{UUID: "uuid", Key: "key"})
 		assert.NotNil(t, err)
 	}
 }
 
-func Test_handleMsgBLZRead(t *testing.T) {
+func Test_handleMsgRead(t *testing.T) {
 	mockCtrl, mockKeeper, ctx, owner := initTest(t)
 	defer mockCtrl.Finish()
 
 	// Key not found test
 	{
-		readMsg := types.MsgBLZRead{
+		readMsg := types.MsgRead{
 			UUID:  "uuid",
 			Key:   "key",
 			Owner: owner,
@@ -114,7 +114,7 @@ func Test_handleMsgBLZRead(t *testing.T) {
 
 	// key returned in result
 	{
-		read_msg := types.MsgBLZRead{
+		read_msg := types.MsgRead{
 			UUID:  "uuid",
 			Key:   "key",
 			Owner: owner,
@@ -122,7 +122,7 @@ func Test_handleMsgBLZRead(t *testing.T) {
 		mockKeeper.EXPECT().GetOwner(ctx, nil, read_msg.UUID, read_msg.Key).Return(owner)
 		mockKeeper.EXPECT().GetBLZValue(ctx, nil, read_msg.UUID, read_msg.Key).Return(types.BLZValue{Value: "utest", Owner: owner})
 
-		result, err := handleMsgBLZRead(ctx, mockKeeper, read_msg)
+		result, err := handleMsgRead(ctx, mockKeeper, read_msg)
 
 		assert.Nil(t, err)
 		assert.NotEmpty(t, result.Data)
@@ -135,24 +135,24 @@ func Test_handleMsgBLZRead(t *testing.T) {
 
 	// Test for empty message parameters
 	{
-		_, err := handleMsgBLZRead(ctx, mockKeeper, types.MsgBLZRead{})
+		_, err := handleMsgRead(ctx, mockKeeper, types.MsgRead{})
 		assert.NotNil(t, err)
 
-		_, err = handleMsgBLZRead(ctx, mockKeeper, types.MsgBLZRead{UUID: "uuid"})
+		_, err = handleMsgRead(ctx, mockKeeper, types.MsgRead{UUID: "uuid"})
 		assert.NotNil(t, err)
 
-		_, err = handleMsgBLZRead(ctx, mockKeeper, types.MsgBLZRead{UUID: "uuid", Key: "key"})
+		_, err = handleMsgRead(ctx, mockKeeper, types.MsgRead{UUID: "uuid", Key: "key"})
 		assert.NotNil(t, err)
 	}
 }
 
-func Test_handleMsgBLZUpdate(t *testing.T) {
+func Test_handleMsgUpdate(t *testing.T) {
 	mockCtrl, mockKeeper, ctx, owner := initTest(t)
 	defer mockCtrl.Finish()
 
 	// Simple Update test
 	{
-		updateMsg := types.MsgBLZUpdate{
+		updateMsg := types.MsgUpdate{
 			UUID:  "uuid",
 			Key:   "key",
 			Value: "value",
@@ -173,35 +173,35 @@ func Test_handleMsgBLZUpdate(t *testing.T) {
 		assert.Nil(t, err)
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, updateMsg.UUID, updateMsg.Key)
-		_, err = handleMsgBLZUpdate(ctx, mockKeeper, updateMsg)
+		_, err = handleMsgUpdate(ctx, mockKeeper, updateMsg)
 		assert.NotNil(t, err)
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, updateMsg.UUID, updateMsg.Key).Return(owner)
 		updateMsg.Owner = []byte("bluzelle1nnpyp9wr6law2u5jwa23t0ywtmrduldf6h4wqr")
-		_, err = handleMsgBLZUpdate(ctx, mockKeeper, updateMsg)
+		_, err = handleMsgUpdate(ctx, mockKeeper, updateMsg)
 		assert.NotNil(t, err)
 	}
 
 	// Test for empty message parameters
 	{
-		_, err := handleMsgBLZUpdate(ctx, mockKeeper, types.MsgBLZUpdate{})
+		_, err := handleMsgUpdate(ctx, mockKeeper, types.MsgUpdate{})
 		assert.NotNil(t, err)
 
-		_, err = handleMsgBLZUpdate(ctx, mockKeeper, types.MsgBLZUpdate{UUID: "uuid"})
+		_, err = handleMsgUpdate(ctx, mockKeeper, types.MsgUpdate{UUID: "uuid"})
 		assert.NotNil(t, err)
 
-		_, err = handleMsgBLZUpdate(ctx, mockKeeper, types.MsgBLZUpdate{UUID: "uuid", Key: "key"})
+		_, err = handleMsgUpdate(ctx, mockKeeper, types.MsgUpdate{UUID: "uuid", Key: "key"})
 		assert.NotNil(t, err)
 	}
 }
 
-func Test_handleMsgBLZDelete(t *testing.T) {
+func Test_handleMsgDelete(t *testing.T) {
 	mockCtrl, mockKeeper, ctx, owner := initTest(t)
 	defer mockCtrl.Finish()
 
 	// Simple delete test key does not exist
 	{
-		deleteMsg := types.MsgBLZDelete{UUID: "uuid", Key: "key", Owner: owner}
+		deleteMsg := types.MsgDelete{UUID: "uuid", Key: "key", Owner: owner}
 
 		assert.Equal(t, deleteMsg.Type(), "delete")
 
@@ -216,35 +216,35 @@ func Test_handleMsgBLZDelete(t *testing.T) {
 		mockKeeper.EXPECT().GetOwner(ctx, nil, deleteMsg.UUID, deleteMsg.Key).Return(
 			[]byte("bluzelle1nnpyp9wr6law2u5jwa23t0ywtmrduldf6h4wqr"))
 
-		_, err = handleMsgBLZDelete(ctx, mockKeeper, deleteMsg)
+		_, err = handleMsgDelete(ctx, mockKeeper, deleteMsg)
 		assert.NotNil(t, err)
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, deleteMsg.UUID, deleteMsg.Key).Return(owner)
 		mockKeeper.EXPECT().DeleteBLZValue(ctx, nil, deleteMsg.UUID, deleteMsg.Key)
-		_, err = handleMsgBLZDelete(ctx, mockKeeper, deleteMsg)
+		_, err = handleMsgDelete(ctx, mockKeeper, deleteMsg)
 		assert.Nil(t, err)
 	}
 
 	// Test for empty message parameters
 	{
-		_, err := handleMsgBLZDelete(ctx, mockKeeper, types.MsgBLZDelete{})
+		_, err := handleMsgDelete(ctx, mockKeeper, types.MsgDelete{})
 		assert.NotNil(t, err)
 
-		_, err = handleMsgBLZDelete(ctx, mockKeeper, types.MsgBLZDelete{UUID: "uuid"})
+		_, err = handleMsgDelete(ctx, mockKeeper, types.MsgDelete{UUID: "uuid"})
 		assert.NotNil(t, err)
 
-		_, err = handleMsgBLZDelete(ctx, mockKeeper, types.MsgBLZDelete{UUID: "uuid", Key: "key"})
+		_, err = handleMsgDelete(ctx, mockKeeper, types.MsgDelete{UUID: "uuid", Key: "key"})
 		assert.NotNil(t, err)
 	}
 }
 
-func Test_handleMsgBLZKeys(t *testing.T) {
+func Test_handleMsgKeys(t *testing.T) {
 	mockCtrl, mockKeeper, ctx, owner := initTest(t)
 	defer mockCtrl.Finish()
 
 	// Simple keys test key does not exist
 	{
-		keysMsg := types.MsgBLZKeys{
+		keysMsg := types.MsgKeys{
 			UUID:  "uuid",
 			Owner: owner,
 		}
@@ -268,21 +268,21 @@ func Test_handleMsgBLZKeys(t *testing.T) {
 
 	// Test for empty message parameters
 	{
-		_, err := handleMsgBLZKeys(ctx, mockKeeper, types.MsgBLZKeys{})
+		_, err := handleMsgKeys(ctx, mockKeeper, types.MsgKeys{})
 		assert.NotNil(t, err)
 
-		_, err = handleMsgBLZKeys(ctx, mockKeeper, types.MsgBLZKeys{UUID: "uuid"})
+		_, err = handleMsgKeys(ctx, mockKeeper, types.MsgKeys{UUID: "uuid"})
 		assert.NotNil(t, err)
 	}
 }
 
-func Test_handleMsgBLZHas(t *testing.T) {
+func Test_handleMsgHas(t *testing.T) {
 	mockCtrl, mockKeeper, ctx, owner := initTest(t)
 	defer mockCtrl.Finish()
 
 	// Simple keys test key does not exist
 	{
-		hasMsg := types.MsgBLZHas{
+		hasMsg := types.MsgHas{
 			UUID:  "uuid",
 			Key:   "key",
 			Owner: owner,
@@ -306,7 +306,7 @@ func Test_handleMsgBLZHas(t *testing.T) {
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, hasMsg.UUID, hasMsg.Key)
 
-		result, err = handleMsgBLZHas(ctx, mockKeeper, hasMsg)
+		result, err = handleMsgHas(ctx, mockKeeper, hasMsg)
 		assert.Nil(t, err)
 
 		json_result = types.QueryResultHas{}
@@ -316,15 +316,15 @@ func Test_handleMsgBLZHas(t *testing.T) {
 
 	// Test for empty message parameters
 	{
-		_, err := handleMsgBLZHas(ctx, mockKeeper, types.MsgBLZHas{})
+		_, err := handleMsgHas(ctx, mockKeeper, types.MsgHas{})
 		assert.NotNil(t, err)
 
-		_, err = handleMsgBLZHas(ctx, mockKeeper, types.MsgBLZHas{UUID: "uuid"})
+		_, err = handleMsgHas(ctx, mockKeeper, types.MsgHas{UUID: "uuid"})
 		assert.NotNil(t, err)
 	}
 }
 
-func Test_handleMsgBLZRename(t *testing.T) {
+func Test_handleMsgRename(t *testing.T) {
 	// check for new key
 	// check for new key size
 	// ensure the owners match
@@ -334,7 +334,7 @@ func Test_handleMsgBLZRename(t *testing.T) {
 
 	// Simple Rename test
 	{
-		renameMsg := types.MsgBLZRename{
+		renameMsg := types.MsgRename{
 			UUID:   "uuid",
 			Key:    "key",
 			NewKey: "newkey",
@@ -352,11 +352,11 @@ func Test_handleMsgBLZRename(t *testing.T) {
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, renameMsg.UUID, renameMsg.Key).Return(owner)
 		renameMsg.Owner = []byte("bluzelle1nnpyp9wr6law2u5jwa23t0ywtmrduldf6h4wqr")
-		_, err = handleMsgBLZRename(ctx, mockKeeper, renameMsg)
+		_, err = handleMsgRename(ctx, mockKeeper, renameMsg)
 		assert.NotNil(t, err)
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, renameMsg.UUID, renameMsg.Key)
-		_, err = handleMsgBLZRename(ctx, mockKeeper, renameMsg)
+		_, err = handleMsgRename(ctx, mockKeeper, renameMsg)
 		assert.NotNil(t, err)
 
 		// Rename failed
@@ -371,24 +371,24 @@ func Test_handleMsgBLZRename(t *testing.T) {
 
 	// Test for empty message parameters
 	{
-		_, err := handleMsgBLZRename(ctx, mockKeeper, types.MsgBLZRename{})
+		_, err := handleMsgRename(ctx, mockKeeper, types.MsgRename{})
 		assert.NotNil(t, err)
 
-		_, err = handleMsgBLZRename(ctx, mockKeeper, types.MsgBLZRename{UUID: "uuid", Key: "key"})
+		_, err = handleMsgRename(ctx, mockKeeper, types.MsgRename{UUID: "uuid", Key: "key"})
 		assert.NotNil(t, err)
 
-		_, err = handleMsgBLZRename(ctx, mockKeeper, types.MsgBLZRename{UUID: "uuid", Key: "key", NewKey: "newkey"})
+		_, err = handleMsgRename(ctx, mockKeeper, types.MsgRename{UUID: "uuid", Key: "key", NewKey: "newkey"})
 		assert.NotNil(t, err)
 	}
 }
 
-func Test_handleMsgBLZKeyValues(t *testing.T) {
+func Test_handleMsgKeyValues(t *testing.T) {
 	mockCtrl, mockKeeper, ctx, owner := initTest(t)
 	defer mockCtrl.Finish()
 
 	// Simple keys test key does not exist
 	{
-		keyValuesMsg := types.MsgBLZKeyValues{
+		keyValuesMsg := types.MsgKeyValues{
 			UUID:  "uuid",
 			Owner: owner,
 		}
@@ -417,10 +417,10 @@ func Test_handleMsgBLZKeyValues(t *testing.T) {
 
 	// Test for empty message parameters
 	{
-		_, err := handleMsgBLZKeyValues(ctx, mockKeeper, types.MsgBLZKeyValues{})
+		_, err := handleMsgKeyValues(ctx, mockKeeper, types.MsgKeyValues{})
 		assert.NotNil(t, err)
 
-		_, err = handleMsgBLZKeyValues(ctx, mockKeeper, types.MsgBLZKeyValues{UUID: "uuid"})
+		_, err = handleMsgKeyValues(ctx, mockKeeper, types.MsgKeyValues{UUID: "uuid"})
 		assert.NotNil(t, err)
 	}
 }
@@ -460,7 +460,7 @@ func Test_handleMsgCount(t *testing.T) {
 	}
 }
 
-func Test_handleMsgBLZDeleteAll(t *testing.T) {
+func Test_handleMsgDeleteAll(t *testing.T) {
 	mockCtrl, mockKeeper, ctx, owner := initTest(t)
 	defer mockCtrl.Finish()
 
@@ -484,6 +484,77 @@ func Test_handleMsgBLZDeleteAll(t *testing.T) {
 		assert.NotNil(t, err)
 
 		_, err = handleMsgDeleteAll(ctx, mockKeeper, types.MsgDeleteAll{UUID: "uuid"})
+		assert.NotNil(t, err)
+	}
+}
+
+func Test_handleMsgMultiUpdate(t *testing.T) {
+	mockCtrl, mockKeeper, ctx, owner := initTest(t)
+	defer mockCtrl.Finish()
+
+	// Update multiple key/values
+	{
+		multiUpdateMsg := types.MsgMultiUpdate{UUID: "uuid", Owner: owner}
+		multiUpdateMsg.KeyValues = append(multiUpdateMsg.KeyValues, types.KeyValue{Key: "key0", Value: "value1"})
+		multiUpdateMsg.KeyValues = append(multiUpdateMsg.KeyValues, types.KeyValue{Key: "key1", Value: "value1"})
+
+		assert.Equal(t, "multiupdate", multiUpdateMsg.Type())
+
+		// always return nil for a store...
+		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
+		mockKeeper.EXPECT().GetOwner(ctx, nil, multiUpdateMsg.UUID, multiUpdateMsg.KeyValues[0].Key).Return(owner)
+		mockKeeper.EXPECT().GetOwner(ctx, nil, multiUpdateMsg.UUID, multiUpdateMsg.KeyValues[1].Key).Return(owner)
+
+		mockKeeper.EXPECT().SetBLZValue(ctx, nil, multiUpdateMsg.UUID, multiUpdateMsg.KeyValues[0].Key,
+			types.BLZValue{Value: multiUpdateMsg.KeyValues[0].Value, Owner: owner})
+		mockKeeper.EXPECT().SetBLZValue(ctx, nil, multiUpdateMsg.UUID, multiUpdateMsg.KeyValues[1].Key,
+			types.BLZValue{Value: multiUpdateMsg.KeyValues[1].Value, Owner: owner})
+
+		_, err := NewHandler(mockKeeper)(ctx, multiUpdateMsg)
+		assert.Nil(t, err)
+	}
+
+	// Attempt to update key/values, but one does not exist
+	{
+		multiUpdateMsg := types.MsgMultiUpdate{UUID: "uuid", Owner: owner}
+		multiUpdateMsg.KeyValues = append(multiUpdateMsg.KeyValues, types.KeyValue{Key: "key0", Value: "value1"})
+		multiUpdateMsg.KeyValues = append(multiUpdateMsg.KeyValues, types.KeyValue{Key: "key1", Value: "value1"})
+
+		// always return nil for a store...
+		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
+		mockKeeper.EXPECT().GetOwner(ctx, nil, multiUpdateMsg.UUID, multiUpdateMsg.KeyValues[0].Key).Return(owner)
+		mockKeeper.EXPECT().GetOwner(ctx, nil, multiUpdateMsg.UUID, multiUpdateMsg.KeyValues[1].Key)
+
+		_, err := NewHandler(mockKeeper)(ctx, multiUpdateMsg)
+		assert.NotNil(t, err)
+		assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Key does not exist [1]").Error(), err.Error())
+	}
+
+	// Attempt to update key/values, but one has a different owner
+	{
+		multiUpdateMsg := types.MsgMultiUpdate{UUID: "uuid", Owner: owner}
+		multiUpdateMsg.KeyValues = append(multiUpdateMsg.KeyValues, types.KeyValue{Key: "key0", Value: "value1"})
+		multiUpdateMsg.KeyValues = append(multiUpdateMsg.KeyValues, types.KeyValue{Key: "key1", Value: "value1"})
+
+		// always return nil for a store...
+		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
+		mockKeeper.EXPECT().GetOwner(ctx, nil, multiUpdateMsg.UUID, multiUpdateMsg.KeyValues[0].Key).Return(owner)
+		mockKeeper.EXPECT().GetOwner(ctx, nil, multiUpdateMsg.UUID, multiUpdateMsg.KeyValues[1].Key).Return([]byte("bluzelle4wqrnnpyp9wr6law2u5jwa231t0ywtmrduldf6h"))
+
+		_, err := NewHandler(mockKeeper)(ctx, multiUpdateMsg)
+		assert.NotNil(t, err)
+		assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Incorrect Owner [1]").Error(), err.Error())
+	}
+
+	// Test for empty message parameters
+	{
+		_, err := handleMsgMultiUpdate(ctx, mockKeeper, types.MsgMultiUpdate{})
+		assert.NotNil(t, err)
+
+		_, err = handleMsgMultiUpdate(ctx, mockKeeper, types.MsgMultiUpdate{UUID: "uuid"})
+		assert.NotNil(t, err)
+
+		_, err = handleMsgMultiUpdate(ctx, mockKeeper, types.MsgMultiUpdate{UUID: "uuid", KeyValues: []types.KeyValue{{Key: "key0", Value: "value1"}}})
 		assert.NotNil(t, err)
 	}
 }

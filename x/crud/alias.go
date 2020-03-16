@@ -35,10 +35,10 @@ var (
 type (
 	Keeper          = keeper.Keeper
 	MaxKeeperSizes  = keeper.MaxKeeperSizes
-	MsgBLZCreate    = types.MsgBLZCreate
-	MsgBLZRead      = types.MsgBLZRead
-	MsgBLZUpdate    = types.MsgBLZUpdate
-	MsgBLZDelete    = types.MsgBLZDelete
+	MsgCreate       = types.MsgCreate
+	MsgRead         = types.MsgRead
+	MsgUpdate       = types.MsgUpdate
+	MsgDelete       = types.MsgDelete
 	QueryResultRead = types.QueryResultRead
 	QueryResultHas  = types.QueryResultHas
 )

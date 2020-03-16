@@ -26,49 +26,51 @@ import (
 func NewHandler(keeper keeper.IKeeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		switch msg := msg.(type) {
-		case types.MsgBLZCreate:
-			return handleMsgBLZCreate(ctx, keeper, msg)
-		case types.MsgBLZRead:
-			return handleMsgBLZRead(ctx, keeper, msg)
-		case types.MsgBLZUpdate:
-			return handleMsgBLZUpdate(ctx, keeper, msg)
-		case types.MsgBLZDelete:
-			return handleMsgBLZDelete(ctx, keeper, msg)
-		case types.MsgBLZKeys:
-			return handleMsgBLZKeys(ctx, keeper, msg)
-		case types.MsgBLZHas:
-			return handleMsgBLZHas(ctx, keeper, msg)
-		case types.MsgBLZRename:
-			return handleMsgBLZRename(ctx, keeper, msg)
-		case types.MsgBLZKeyValues:
-			return handleMsgBLZKeyValues(ctx, keeper, msg)
+		case types.MsgCreate:
+			return handleMsgCreate(ctx, keeper, msg)
+		case types.MsgRead:
+			return handleMsgRead(ctx, keeper, msg)
+		case types.MsgUpdate:
+			return handleMsgUpdate(ctx, keeper, msg)
+		case types.MsgDelete:
+			return handleMsgDelete(ctx, keeper, msg)
+		case types.MsgKeys:
+			return handleMsgKeys(ctx, keeper, msg)
+		case types.MsgHas:
+			return handleMsgHas(ctx, keeper, msg)
+		case types.MsgRename:
+			return handleMsgRename(ctx, keeper, msg)
+		case types.MsgKeyValues:
+			return handleMsgKeyValues(ctx, keeper, msg)
 		case types.MsgCount:
 			return handleMsgCount(ctx, keeper, msg)
 		case types.MsgDeleteAll:
 			return handleMsgDeleteAll(ctx, keeper, msg)
+		case types.MsgMultiUpdate:
+			return handleMsgMultiUpdate(ctx, keeper, msg)
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, fmt.Sprintf("Unrecognized crud msg type: %v", msg.Type()))
 		}
 	}
 }
 
-func handleMsgBLZCreate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZCreate) (*sdk.Result, error) {
+func handleMsgCreate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgCreate) (*sdk.Result, error) {
 	if len(msg.UUID) == 0 || len(msg.Key) == 0 || msg.Owner.Empty() {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
 	}
 
-	if !keeper.GetBLZValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key).Owner.Empty() {
+	if !keeper.GetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key).Owner.Empty() {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Key already exists")
 	}
 
-	keeper.SetBLZValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key, types.BLZValue{
+	keeper.SetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key, types.BLZValue{
 		Value: msg.Value,
 		Owner: msg.Owner,
 	})
 	return &sdk.Result{}, nil
 }
 
-func handleMsgBLZRead(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZRead) (*sdk.Result, error) {
+func handleMsgRead(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgRead) (*sdk.Result, error) {
 	if len(msg.UUID) == 0 || len(msg.Key) == 0 || msg.Owner.Empty() {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
 	}
@@ -78,7 +80,7 @@ func handleMsgBLZRead(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZRe
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Key does not exist")
 	}
 
-	json_data, err := json.Marshal(types.QueryResultRead{msg.UUID, msg.Key, keeper.GetBLZValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key).Value})
+	json_data, err := json.Marshal(types.QueryResultRead{msg.UUID, msg.Key, keeper.GetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key).Value})
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "could not marshal result to JSON")
 	}
@@ -86,7 +88,7 @@ func handleMsgBLZRead(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZRe
 	return &sdk.Result{Data: json_data}, nil
 }
 
-func handleMsgBLZUpdate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZUpdate) (*sdk.Result, error) {
+func handleMsgUpdate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgUpdate) (*sdk.Result, error) {
 	if len(msg.UUID) == 0 || len(msg.Key) == 0 || msg.Owner.Empty() {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
 	}
@@ -100,12 +102,12 @@ func handleMsgBLZUpdate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZ
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Incorrect Owner")
 	}
 
-	keeper.SetBLZValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key, types.BLZValue{Value: msg.Value, Owner: msg.Owner})
+	keeper.SetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key, types.BLZValue{Value: msg.Value, Owner: msg.Owner})
 
 	return &sdk.Result{}, nil
 }
 
-func handleMsgBLZDelete(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZDelete) (*sdk.Result, error) {
+func handleMsgDelete(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgDelete) (*sdk.Result, error) {
 	if len(msg.UUID) == 0 || len(msg.Key) == 0 || msg.Owner.Empty() {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
 	}
@@ -119,12 +121,12 @@ func handleMsgBLZDelete(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZ
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Incorrect Owner")
 	}
 
-	keeper.DeleteBLZValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key)
+	keeper.DeleteValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key)
 
 	return &sdk.Result{}, nil
 }
 
-func handleMsgBLZKeys(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZKeys) (*sdk.Result, error) {
+func handleMsgKeys(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgKeys) (*sdk.Result, error) {
 	if len(msg.UUID) == 0 || msg.Owner.Empty() {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
 	}
@@ -138,7 +140,7 @@ func handleMsgBLZKeys(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZKe
 	return &sdk.Result{Data: json_data}, nil
 }
 
-func handleMsgBLZHas(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZHas) (*sdk.Result, error) {
+func handleMsgHas(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgHas) (*sdk.Result, error) {
 	if len(msg.UUID) == 0 || len(msg.Key) == 0 || msg.Owner.Empty() {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
 	}
@@ -152,7 +154,7 @@ func handleMsgBLZHas(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZHas
 	return &sdk.Result{Data: json_data}, nil
 }
 
-func handleMsgBLZRename(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZRename) (*sdk.Result, error) {
+func handleMsgRename(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgRename) (*sdk.Result, error) {
 	if len(msg.UUID) == 0 || len(msg.Key) == 0 || len(msg.NewKey) == 0 || msg.Owner.Empty() {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
 	}
@@ -166,14 +168,14 @@ func handleMsgBLZRename(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZ
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "Incorrect Owner")
 	}
 
-	if !keeper.RenameBLZKey(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key, msg.NewKey) {
+	if !keeper.RenameKey(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key, msg.NewKey) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Rename failed")
 	}
 
 	return &sdk.Result{}, nil
 }
 
-func handleMsgBLZKeyValues(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgBLZKeyValues) (*sdk.Result, error) {
+func handleMsgKeyValues(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgKeyValues) (*sdk.Result, error) {
 	if len(msg.UUID) == 0 || msg.Owner.Empty() {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
 	}
@@ -207,6 +209,32 @@ func handleMsgDeleteAll(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgDel
 	}
 
 	keeper.DeleteAll(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Owner)
+
+	return &sdk.Result{}, nil
+}
+
+func handleMsgMultiUpdate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgMultiUpdate) (*sdk.Result, error) {
+	if len(msg.UUID) == 0 || len(msg.KeyValues) == 0 || msg.Owner.Empty() {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
+	}
+
+	// we're past basic validation, now scan owners & if the keys exist...
+	for i := range msg.KeyValues[:] {
+		owner := keeper.GetOwner(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.KeyValues[i].Key)
+
+		if owner.Empty() {
+			return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("Key does not exist [%d]", i))
+		}
+
+		if !owner.Equals(msg.Owner) {
+			return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("Incorrect Owner [%d]", i))
+		}
+	}
+
+	// update the values...
+	for i := range msg.KeyValues[:] {
+		keeper.SetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.KeyValues[i].Key, types.BLZValue{Value: msg.KeyValues[i].Value, Owner: msg.Owner})
+	}
 
 	return &sdk.Result{}, nil
 }

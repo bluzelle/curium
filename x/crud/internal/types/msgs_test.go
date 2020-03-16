@@ -24,10 +24,10 @@ import (
 
 func TestNewMsgBLZCreate(t *testing.T) {
 	owner := []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
-	sut := NewMsgBLZCreate("uuid", "key", "value", owner)
+	sut := NewMsgCreate("uuid", "key", "value", owner)
 
-	assert.IsType(t, sut, MsgBLZCreate{})
-	assert.True(t, reflect.DeepEqual(sut, MsgBLZCreate{
+	assert.IsType(t, sut, MsgCreate{})
+	assert.True(t, reflect.DeepEqual(sut, MsgCreate{
 		UUID:  "uuid",
 		Key:   "key",
 		Value: "value",
@@ -36,15 +36,15 @@ func TestNewMsgBLZCreate(t *testing.T) {
 }
 
 func TestMsgBLZCreate_Route(t *testing.T) {
-	assert.Equal(t, MsgBLZCreate{}.Route(), "crud")
+	assert.Equal(t, MsgCreate{}.Route(), "crud")
 }
 
 func TestMsgBLZCreate_Type(t *testing.T) {
-	assert.Equal(t, "create", MsgBLZCreate{}.Type())
+	assert.Equal(t, "create", MsgCreate{}.Type())
 }
 
 func TestMsgBLZCreate_ValidateBasic(t *testing.T) {
-	sut := NewMsgBLZCreate("uuid", "key", "value", nil)
+	sut := NewMsgCreate("uuid", "key", "value", nil)
 	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, sut.Owner.String()).Error(), sut.ValidateBasic().Error())
 
 	sut.Owner = []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
@@ -69,23 +69,23 @@ func TestMsgBLZCreate_ValidateBasic(t *testing.T) {
 }
 
 func TestMsgBLZCreate_GetSignBytes(t *testing.T) {
-	sut := NewMsgBLZCreate("uuid", "key", "value", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
+	sut := NewMsgCreate("uuid", "key", "value", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
 	assert.Equal(t, string(sut.GetSignBytes()), "{\"type\":\"crud/create\",\"value\":{\"Key\":\"key\",\"Owner\":\""+
 		"cosmos1vfk827n9d3kx2vt5xpuhwardwfj82mryvcmxsdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\",\"Value\":\"value\"}}")
 }
 
 func TestMsgBLZCreate_GetSigners(t *testing.T) {
-	msg := NewMsgBLZCreate("uuid", "key", "value", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
+	msg := NewMsgCreate("uuid", "key", "value", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
 	assert.Equal(t, msg.GetSigners(), []sdk.AccAddress{msg.Owner})
 }
 
 /////////////////////////////////////////////////////////////////////////////////
 func TestNewMsgBLZRead(t *testing.T) {
 	owner := []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
-	sut := NewMsgBLZRead("uuid", "key", owner)
+	sut := NewMsgRead("uuid", "key", owner)
 
-	assert.IsType(t, sut, MsgBLZRead{})
-	assert.True(t, reflect.DeepEqual(sut, MsgBLZRead{
+	assert.IsType(t, sut, MsgRead{})
+	assert.True(t, reflect.DeepEqual(sut, MsgRead{
 		UUID:  "uuid",
 		Key:   "key",
 		Owner: owner,
@@ -93,15 +93,15 @@ func TestNewMsgBLZRead(t *testing.T) {
 }
 
 func TestMsgBLZRead_Route(t *testing.T) {
-	assert.Equal(t, MsgBLZRead{}.Route(), "crud")
+	assert.Equal(t, MsgRead{}.Route(), "crud")
 }
 
 func TestMsgBLZRead_Type(t *testing.T) {
-	assert.Equal(t, "read", MsgBLZRead{}.Type())
+	assert.Equal(t, "read", MsgRead{}.Type())
 }
 
 func TestMsgBLZRead_ValidateBasic(t *testing.T) {
-	sut := NewMsgBLZRead("uuid", "key", nil)
+	sut := NewMsgRead("uuid", "key", nil)
 	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, sut.Owner.String()).Error(), sut.ValidateBasic().Error())
 
 	sut.Owner = []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
@@ -116,23 +116,23 @@ func TestMsgBLZRead_ValidateBasic(t *testing.T) {
 }
 
 func TestMsgBLZRead_GetSignBytes(t *testing.T) {
-	sut := NewMsgBLZRead("uuid", "key", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
+	sut := NewMsgRead("uuid", "key", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
 	assert.Equal(t, string(sut.GetSignBytes()), "{\"type\":\"crud/read\",\"value\":{\"Key\":\"key\",\"Owner\":\""+
 		"cosmos1vfk827n9d3kx2vt5xpuhwardwfj82mryvcmxsdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\"}}")
 }
 
 func TestMsgBLZRead_GetSigners(t *testing.T) {
-	msg := NewMsgBLZRead("uuid", "key", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
+	msg := NewMsgRead("uuid", "key", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
 	assert.Equal(t, msg.GetSigners(), []sdk.AccAddress{msg.Owner})
 }
 
 /////////////////////////////////////////////////////////////////////////////////
 func TestNewMsgBLZUpdate(t *testing.T) {
 	owner := []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
-	sut := NewMsgBLZUpdate("uuid", "key", "value", owner)
+	sut := NewMsgUpdate("uuid", "key", "value", owner)
 
-	assert.IsType(t, sut, MsgBLZUpdate{})
-	assert.True(t, reflect.DeepEqual(sut, MsgBLZUpdate{
+	assert.IsType(t, sut, MsgUpdate{})
+	assert.True(t, reflect.DeepEqual(sut, MsgUpdate{
 		UUID:  "uuid",
 		Key:   "key",
 		Value: "value",
@@ -141,15 +141,15 @@ func TestNewMsgBLZUpdate(t *testing.T) {
 }
 
 func TestMsgBLZUpdate_Route(t *testing.T) {
-	assert.Equal(t, MsgBLZUpdate{}.Route(), "crud")
+	assert.Equal(t, MsgUpdate{}.Route(), "crud")
 }
 
 func TestMsgBLZUpdate_Type(t *testing.T) {
-	assert.Equal(t, "update", MsgBLZUpdate{}.Type())
+	assert.Equal(t, "update", MsgUpdate{}.Type())
 }
 
 func TestMsgBLZUpdate_ValidateBasic(t *testing.T) {
-	sut := NewMsgBLZUpdate("uuid", "key", "new", nil)
+	sut := NewMsgUpdate("uuid", "key", "new", nil)
 	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, sut.Owner.String()).Error(), sut.ValidateBasic().Error())
 
 	sut.Owner = []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
@@ -169,23 +169,23 @@ func TestMsgBLZUpdate_ValidateBasic(t *testing.T) {
 }
 
 func TestMsgBLZUpdate_GetSignBytes(t *testing.T) {
-	sut := NewMsgBLZUpdate("uuid", "key", "value", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
+	sut := NewMsgUpdate("uuid", "key", "value", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
 	assert.Equal(t, "{\"type\":\"crud/update\",\"value\":{\"Key\":\"key\",\"Owner\":\"cosmos1vfk827n9d3kx2vt5xp"+
 		"uhwardwfj82mryvcmxsdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\",\"Value\":\"value\"}}", string(sut.GetSignBytes()))
 }
 
 func TestMsgBLZUpdate_GetSigners(t *testing.T) {
-	msg := NewMsgBLZUpdate("uuid", "key", "value", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
+	msg := NewMsgUpdate("uuid", "key", "value", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
 	assert.Equal(t, msg.GetSigners(), []sdk.AccAddress{msg.Owner})
 }
 
 /////////////////////////////////////////////////////////////////////////////////
 func TestNewMsgBLZDelete(t *testing.T) {
 	owner := []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
-	sut := NewMsgBLZDelete("uuid", "key", owner)
+	sut := NewMsgDelete("uuid", "key", owner)
 
-	assert.IsType(t, sut, MsgBLZDelete{})
-	assert.True(t, reflect.DeepEqual(sut, MsgBLZDelete{
+	assert.IsType(t, sut, MsgDelete{})
+	assert.True(t, reflect.DeepEqual(sut, MsgDelete{
 		UUID:  "uuid",
 		Key:   "key",
 		Owner: owner,
@@ -193,15 +193,15 @@ func TestNewMsgBLZDelete(t *testing.T) {
 }
 
 func TestMsgBLZDelete_Route(t *testing.T) {
-	assert.Equal(t, MsgBLZDelete{}.Route(), "crud")
+	assert.Equal(t, MsgDelete{}.Route(), "crud")
 }
 
 func TestMsgBLZDelete_Type(t *testing.T) {
-	assert.Equal(t, "delete", MsgBLZDelete{}.Type())
+	assert.Equal(t, "delete", MsgDelete{}.Type())
 }
 
 func TestMsgBLZDelete_ValidateBasic(t *testing.T) {
-	sut := NewMsgBLZDelete("uuid", "key", nil)
+	sut := NewMsgDelete("uuid", "key", nil)
 	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, sut.Owner.String()).Error(), sut.ValidateBasic().Error())
 
 	sut.Owner = []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
@@ -216,38 +216,38 @@ func TestMsgBLZDelete_ValidateBasic(t *testing.T) {
 }
 
 func TestMsgBLZDelete_GetSignBytes(t *testing.T) {
-	sut := NewMsgBLZDelete("uuid", "key", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
+	sut := NewMsgDelete("uuid", "key", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
 	assert.Equal(t, string(sut.GetSignBytes()), "{\"type\":\"crud/delete\",\"value\":{\"Key\":\"key\",\"Owner\":\""+
 		"cosmos1vfk827n9d3kx2vt5xpuhwardwfj82mryvcmxsdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\"}}")
 }
 
 func TestMsgBLZDelete_GetSigners(t *testing.T) {
-	msg := NewMsgBLZDelete("uuid", "key", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
+	msg := NewMsgDelete("uuid", "key", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
 	assert.Equal(t, msg.GetSigners(), []sdk.AccAddress{msg.Owner})
 }
 
 /////////////////////////////////////////////////////////////////////////////////
 func TestNewMsgBLZKeys(t *testing.T) {
 	owner := []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
-	sut := NewMsgBLZKeys("uuid", owner)
+	sut := NewMsgKeys("uuid", owner)
 
-	assert.IsType(t, sut, MsgBLZKeys{})
-	assert.True(t, reflect.DeepEqual(sut, MsgBLZKeys{
+	assert.IsType(t, sut, MsgKeys{})
+	assert.True(t, reflect.DeepEqual(sut, MsgKeys{
 		UUID:  "uuid",
 		Owner: owner,
 	}))
 }
 
 func TestMsgBLZKeys_Route(t *testing.T) {
-	assert.Equal(t, MsgBLZKeys{}.Route(), "crud")
+	assert.Equal(t, MsgKeys{}.Route(), "crud")
 }
 
 func TestMsgBLZKeys_Type(t *testing.T) {
-	assert.Equal(t, "keys", MsgBLZKeys{}.Type())
+	assert.Equal(t, "keys", MsgKeys{}.Type())
 }
 
 func TestMsgBLZKeys_ValidateBasic(t *testing.T) {
-	sut := NewMsgBLZKeys("uuid", nil)
+	sut := NewMsgKeys("uuid", nil)
 	assert.Equal(t, sut.ValidateBasic().Error(), sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, sut.Owner.String()).Error())
 
 	sut.Owner = []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
@@ -258,23 +258,23 @@ func TestMsgBLZKeys_ValidateBasic(t *testing.T) {
 }
 
 func TestMsgBLZKeys_GetSignBytes(t *testing.T) {
-	sut := NewMsgBLZKeys("uuid", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
+	sut := NewMsgKeys("uuid", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
 	assert.Equal(t, "{\"type\":\"crud/keys\",\"value\":{\"Owner\":\"cosmos1vfk827n9d3kx2vt5xpuhwardwfj82mryvcmx"+
 		"sdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\"}}", string(sut.GetSignBytes()))
 }
 
 func TestMsgBLZKeys_GetSigners(t *testing.T) {
-	msg := NewMsgBLZKeys("uuid", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
+	msg := NewMsgKeys("uuid", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
 	assert.Equal(t, msg.GetSigners(), []sdk.AccAddress{msg.Owner})
 }
 
 /////////////////////////////////////////////////////////////////////////////////
 func TestNewMsgBLZHas(t *testing.T) {
 	owner := []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
-	sut := NewMsgBLZHas("uuid", "key", owner)
+	sut := NewMsgHas("uuid", "key", owner)
 
-	assert.IsType(t, sut, MsgBLZHas{})
-	assert.True(t, reflect.DeepEqual(sut, MsgBLZHas{
+	assert.IsType(t, sut, MsgHas{})
+	assert.True(t, reflect.DeepEqual(sut, MsgHas{
 		UUID:  "uuid",
 		Key:   "key",
 		Owner: owner,
@@ -282,15 +282,15 @@ func TestNewMsgBLZHas(t *testing.T) {
 }
 
 func TestMsgBLZHas_Route(t *testing.T) {
-	assert.Equal(t, MsgBLZHas{}.Route(), "crud")
+	assert.Equal(t, MsgHas{}.Route(), "crud")
 }
 
 func TestMsgBLZHas_Type(t *testing.T) {
-	assert.Equal(t, "has", MsgBLZHas{}.Type())
+	assert.Equal(t, "has", MsgHas{}.Type())
 }
 
 func TestMsgBLZHas_ValidateBasic(t *testing.T) {
-	sut := NewMsgBLZHas("uuid", "key", nil)
+	sut := NewMsgHas("uuid", "key", nil)
 	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, sut.Owner.String()).Error(), sut.ValidateBasic().Error())
 
 	sut.Owner = []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
@@ -305,37 +305,37 @@ func TestMsgBLZHas_ValidateBasic(t *testing.T) {
 }
 
 func TestMsgBLZHas_GetSignBytes(t *testing.T) {
-	sut := NewMsgBLZHas("uuid", "key", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
+	sut := NewMsgHas("uuid", "key", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
 	assert.Equal(t, "{\"type\":\"crud/has\",\"value\":{\"Key\":\"key\",\"Owner\":\"cosmos1vfk827n9d3kx2vt5xpuhw"+
 		"ardwfj82mryvcmxsdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\"}}", string(sut.GetSignBytes()))
 }
 
 func TestMsgBLZHas_GetSigners(t *testing.T) {
-	msg := NewMsgBLZHas("uuid", "key", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
+	msg := NewMsgHas("uuid", "key", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
 	assert.Equal(t, msg.GetSigners(), []sdk.AccAddress{msg.Owner})
 }
 
 /////////////////////////////////////////////////////////////////////////////////
 func TestNewMsgBLZRename(t *testing.T) {
 	owner := []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
-	accepted := MsgBLZRename{UUID: "uuid", Key: "key", NewKey: "newkey", Owner: owner}
+	accepted := MsgRename{UUID: "uuid", Key: "key", NewKey: "newkey", Owner: owner}
 
-	sut := NewMsgBLZRename(accepted.UUID, accepted.Key, accepted.NewKey, owner)
-	assert.IsType(t, MsgBLZRename{}, sut)
+	sut := NewMsgRename(accepted.UUID, accepted.Key, accepted.NewKey, owner)
+	assert.IsType(t, MsgRename{}, sut)
 
 	assert.True(t, reflect.DeepEqual(accepted, sut))
 }
 
 func TestMsgBLZRename_Route(t *testing.T) {
-	assert.Equal(t, "crud", MsgBLZRename{}.Route())
+	assert.Equal(t, "crud", MsgRename{}.Route())
 }
 
 func TestMsgBLZRename_Type(t *testing.T) {
-	assert.Equal(t, "rename", MsgBLZRename{}.Type())
+	assert.Equal(t, "rename", MsgRename{}.Type())
 }
 
 func TestMsgBLZRename_ValidateBasic(t *testing.T) {
-	sut := NewMsgBLZRename("uuid", "key", "newkey", []byte(""))
+	sut := NewMsgRename("uuid", "key", "newkey", []byte(""))
 	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, sut.Owner.String()).Error(), sut.ValidateBasic().Error())
 
 	sut.Owner = []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
@@ -358,37 +358,37 @@ func TestMsgBLZRename_ValidateBasic(t *testing.T) {
 }
 
 func TestMsgBLZRename_GetSignBytes(t *testing.T) {
-	sut := NewMsgBLZRename("uuid", "key", "newkey", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
+	sut := NewMsgRename("uuid", "key", "newkey", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
 	exp := "{\"type\":\"crud/rename\",\"value\":{\"Key\":\"key\",\"NewKey\":\"newkey\",\"Owner\":\"cosmos1vfk827n9d3kx2vt5xpuhwardwfj82mryvcmxsdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\"}}"
 	assert.Equal(t, exp, string(sut.GetSignBytes()))
 }
 
 func TestMsgBLZRename_GetSigners(t *testing.T) {
-	msg := NewMsgBLZRename("uuid", "key", "newkey", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
+	msg := NewMsgRename("uuid", "key", "newkey", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
 	assert.Equal(t, []sdk.AccAddress{msg.Owner}, msg.GetSigners())
 }
 
 /////////////////////////////////////////////////////////////////////////////////
 func TestNewMsgBLZKeyValues(t *testing.T) {
 	owner := []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
-	accepted := MsgBLZKeyValues{UUID: "uuid", Owner: owner}
+	accepted := MsgKeyValues{UUID: "uuid", Owner: owner}
 
-	sut := NewMsgBLZKeyValues(accepted.UUID, owner)
-	assert.IsType(t, MsgBLZKeyValues{}, sut)
+	sut := NewMsgKeyValues(accepted.UUID, owner)
+	assert.IsType(t, MsgKeyValues{}, sut)
 
 	assert.True(t, reflect.DeepEqual(accepted, sut))
 }
 
 func TestMsgBLZKeyValues_Route(t *testing.T) {
-	assert.Equal(t, "crud", MsgBLZKeyValues{}.Route())
+	assert.Equal(t, "crud", MsgKeyValues{}.Route())
 }
 
 func TestMsgBLZKeyValues_Type(t *testing.T) {
-	assert.Equal(t, "keyvalues", MsgBLZKeyValues{}.Type())
+	assert.Equal(t, "keyvalues", MsgKeyValues{}.Type())
 }
 
 func TestMsgBLZKeyValues_ValidateBasic(t *testing.T) {
-	sut := NewMsgBLZKeyValues("uuid", []byte(""))
+	sut := NewMsgKeyValues("uuid", []byte(""))
 	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, sut.Owner.String()).Error(), sut.ValidateBasic().Error())
 
 	sut.Owner = []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
@@ -399,13 +399,13 @@ func TestMsgBLZKeyValues_ValidateBasic(t *testing.T) {
 }
 
 func TestMsgBLZKeyValues_GetSignBytes(t *testing.T) {
-	sut := NewMsgBLZKeyValues("uuid", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
+	sut := NewMsgKeyValues("uuid", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
 	exp := "{\"type\":\"crud/keyvalues\",\"value\":{\"Owner\":\"cosmos1vfk827n9d3kx2vt5xpuhwardwfj82mryvcmxsdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\"}}"
 	assert.Equal(t, exp, string(sut.GetSignBytes()))
 }
 
 func TestMsgBLZKeyValues_GetSigners(t *testing.T) {
-	msg := NewMsgBLZKeyValues("uuid", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
+	msg := NewMsgKeyValues("uuid", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
 	assert.Equal(t, []sdk.AccAddress{msg.Owner}, msg.GetSigners())
 }
 
@@ -488,5 +488,66 @@ func TestMsgDeleteAll_GetSignBytes(t *testing.T) {
 
 func TestMsgDeleteAll_GetSigners(t *testing.T) {
 	msg := NewMsgDeleteAll("uuid", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"))
+	assert.Equal(t, msg.GetSigners(), []sdk.AccAddress{msg.Owner})
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+func TestNewMsgMultiUpdate(t *testing.T) {
+	owner := []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
+	keyValues := []KeyValue{}
+	keyValues = append(keyValues, KeyValue{Key: "key0", Value: "value0"})
+	keyValues = append(keyValues, KeyValue{Key: "key1", Value: "value1"})
+
+	sut := NewMsgMultiUpdate("uuid", owner, keyValues)
+
+	assert.IsType(t, MsgMultiUpdate{}, sut)
+	assert.True(t, reflect.DeepEqual(sut, MsgMultiUpdate{
+		UUID:      "uuid",
+		Owner:     owner,
+		KeyValues: keyValues,
+	}))
+}
+
+func TestMsgMultiUpdate_Route(t *testing.T) {
+	assert.Equal(t, "crud", MsgMultiUpdate{}.Route())
+}
+
+func TestMsgMultiUpdate_Type(t *testing.T) {
+	assert.Equal(t, "multiupdate", MsgMultiUpdate{}.Type())
+}
+
+func TestMsgMultiUpdate_ValidateBasic(t *testing.T) {
+	sut := NewMsgMultiUpdate("uuid", nil, []KeyValue{KeyValue{"key", "value"}})
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, sut.Owner.String()).Error(), sut.ValidateBasic().Error())
+
+	sut.Owner = []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
+	assert.Nil(t, sut.ValidateBasic())
+
+	sut.UUID = ""
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID empty").Error(), sut.ValidateBasic().Error())
+
+	sut.UUID = "uuid"
+	sut.KeyValues = nil
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "KeyValues empty").Error(), sut.ValidateBasic().Error())
+
+	// test max key sizes...
+	sut.KeyValues = append(sut.KeyValues, KeyValue{Key: "key", Value: "value"})
+	sut.KeyValues = append(sut.KeyValues, KeyValue{Key: string(make([]byte, MaxKeySize)), Value: "value"})
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID+Key too large [1]").Error(), sut.ValidateBasic().Error())
+
+	// test max value sizes...
+	sut.KeyValues = nil
+	sut.KeyValues = append(sut.KeyValues, KeyValue{Key: "key1", Value: "value"})
+	sut.KeyValues = append(sut.KeyValues, KeyValue{Key: "key2", Value: string(make([]byte, MaxValueSize+1))})
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Value too large [1]").Error(), sut.ValidateBasic().Error())
+}
+
+func TestMsgMultiUpdate_GetSignBytes(t *testing.T) {
+	sut := NewMsgMultiUpdate("uuid", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"), nil)
+	assert.Equal(t, "{\"type\":\"crud/multiupdate\",\"value\":{\"KeyValues\":null,\"Owner\":\"cosmos1vfk827n9d3kx2vt5xpuhwardwfj82mryvcmxsdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\"}}", string(sut.GetSignBytes()))
+}
+
+func TestMsgMultiUpdate_GetSigners(t *testing.T) {
+	msg := NewMsgMultiUpdate("uuid", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"), nil)
 	assert.Equal(t, msg.GetSigners(), []sdk.AccAddress{msg.Owner})
 }

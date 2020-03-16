@@ -45,11 +45,6 @@ type QueryResultKeys struct {
 	Keys []string `json:"keys"`
 }
 
-type KeyValue struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
-}
-
 type QueryResultKeyValues struct {
 	UUID      string     `json:"uuid"`
 	KeyValues []KeyValue `json:"keyvalues"`

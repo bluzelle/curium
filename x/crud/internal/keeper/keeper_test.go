@@ -54,7 +54,7 @@ func TestKeeper_SetBLZValue(t *testing.T) {
 		Owner: owner,
 	}
 
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key", acceptedValue)
+	keeper.SetValue(ctx, testStore, "uuid", "key", acceptedValue)
 
 	result := testStore.Get([]byte(MakeMetaKey("uuid", "key")))
 
@@ -69,7 +69,7 @@ func TestKeeper_GetBLZValue(t *testing.T) {
 	keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{})
 
 	// test value not found
-	result := keeper.GetBLZValue(ctx, testStore, "uuid", "key")
+	result := keeper.GetValue(ctx, testStore, "uuid", "key")
 
 	assert.True(t, reflect.DeepEqual(types.NewBLZValue(), result))
 
@@ -79,8 +79,8 @@ func TestKeeper_GetBLZValue(t *testing.T) {
 	}
 
 	// set the value and test that it is found\
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key", acceptedValue)
-	result = keeper.GetBLZValue(ctx, testStore, "uuid", "key")
+	keeper.SetValue(ctx, testStore, "uuid", "key", acceptedValue)
+	result = keeper.GetValue(ctx, testStore, "uuid", "key")
 
 	assert.True(t, reflect.DeepEqual(acceptedValue, result))
 }
@@ -89,13 +89,13 @@ func TestKeeper_DeleteBLZValue(t *testing.T) {
 	ctx, testStore, owner, cdc := initKeeperTest(t)
 	keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{})
 
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key", types.BLZValue{
+	keeper.SetValue(ctx, testStore, "uuid", "key", types.BLZValue{
 		Value: "value",
 		Owner: owner,
 	})
-	keeper.DeleteBLZValue(ctx, testStore, "uuid", "key")
+	keeper.DeleteValue(ctx, testStore, "uuid", "key")
 
-	result := keeper.GetBLZValue(ctx, testStore, "uuid", "key")
+	result := keeper.GetValue(ctx, testStore, "uuid", "key")
 
 	assert.True(t, reflect.DeepEqual(types.NewBLZValue(), result))
 }
@@ -106,7 +106,7 @@ func TestKeeper_IsKeyPresent(t *testing.T) {
 
 	assert.False(t, keeper.IsKeyPresent(ctx, testStore, "uuid", "key"))
 
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key", types.BLZValue{
+	keeper.SetValue(ctx, testStore, "uuid", "key", types.BLZValue{
 		Value: "value",
 		Owner: owner,
 	})
@@ -122,7 +122,7 @@ func TestKeeper_GetValuesIterator(t *testing.T) {
 
 	assert.False(t, result.Valid())
 
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key", types.BLZValue{
+	keeper.SetValue(ctx, testStore, "uuid", "key", types.BLZValue{
 		Value: "value",
 		Owner: owner,
 	})
@@ -146,11 +146,11 @@ func TestKeeper_GetKeys(t *testing.T) {
 	assert.Equal(t, "uuid", keys.UUID)
 	assert.Empty(t, keys.Keys)
 
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value", Owner: owner})
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value", Owner: owner})
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value", Owner: owner})
-	keeper.SetBLZValue(ctx, testStore, "uuid0", "key0", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid0", "key0", types.BLZValue{Value: "value", Owner: owner})
 
 	keys = keeper.GetKeys(ctx, testStore, "uuid", owner)
 
@@ -178,11 +178,11 @@ func TestKeeper_GetKeys_no_owner_for_query_usage(t *testing.T) {
 	assert.Equal(t, "uuid", keys.UUID)
 	assert.Empty(t, keys.Keys)
 
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value", Owner: owner})
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value", Owner: owner})
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value", Owner: owner})
-	keeper.SetBLZValue(ctx, testStore, "uuid0", "key0", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid0", "key0", types.BLZValue{Value: "value", Owner: owner})
 
 	keys = keeper.GetKeys(ctx, testStore, "uuid", nil)
 
@@ -206,10 +206,10 @@ func TestKeeper_GetKeys_MaxSize(t *testing.T) {
 	// test max keys size
 	{
 		keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{MaxKeysSize: 9})
-		keeper.SetBLZValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
-		keeper.SetBLZValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value", Owner: owner})
-		keeper.SetBLZValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value", Owner: owner})
-		keeper.SetBLZValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value", Owner: owner})
+		keeper.SetValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
+		keeper.SetValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value", Owner: owner})
+		keeper.SetValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value", Owner: owner})
+		keeper.SetValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value", Owner: owner})
 
 		keys := keeper.GetKeys(ctx, testStore, "uuid", nil)
 
@@ -232,7 +232,7 @@ func TestKeeper_GetOwner(t *testing.T) {
 	ctx, testStore, owner, cdc := initKeeperTest(t)
 	keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{})
 
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
 
 	actual := keeper.GetOwner(ctx, testStore, "uuid", "key0")
 
@@ -245,16 +245,16 @@ func TestKeeper_RenameBLZKey(t *testing.T) {
 
 	keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{})
 
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key", types.BLZValue{
+	keeper.SetValue(ctx, testStore, "uuid", "key", types.BLZValue{
 		Value: "a value",
 		Owner: owner,
 	})
 
-	assert.False(t, keeper.RenameBLZKey(ctx, testStore, "uuid", "badkey", "newkey"))
+	assert.False(t, keeper.RenameKey(ctx, testStore, "uuid", "badkey", "newkey"))
 
-	assert.True(t, keeper.RenameBLZKey(ctx, testStore, "uuid", "key", "newkey"))
+	assert.True(t, keeper.RenameKey(ctx, testStore, "uuid", "key", "newkey"))
 
-	assert.True(t, reflect.DeepEqual(keeper.GetBLZValue(ctx, testStore, "uuid", "newkey"), types.BLZValue{
+	assert.True(t, reflect.DeepEqual(keeper.GetValue(ctx, testStore, "uuid", "newkey"), types.BLZValue{
 		Value: "a value",
 		Owner: owner,
 	}))
@@ -269,10 +269,10 @@ func TestKeeper_GetKeyValues(t *testing.T) {
 	assert.Equal(t, "uuid", kvs.UUID)
 	assert.Empty(t, kvs.KeyValues)
 
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value0", Owner: owner})
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value1", Owner: owner})
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value2", Owner: owner})
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value3"})
+	keeper.SetValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value0", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value1", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value2", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value3"})
 
 	kvs = keeper.GetKeyValues(ctx, testStore, "uuid", owner)
 	assert.Equal(t, "uuid", kvs.UUID)
@@ -292,10 +292,10 @@ func TestKeeper_GetKeyValues_no_owner_for_query_usage(t *testing.T) {
 	assert.Equal(t, "uuid", kvs.UUID)
 	assert.Empty(t, kvs.KeyValues)
 
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value0", Owner: owner})
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value1", Owner: owner})
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value2", Owner: owner})
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value3",
+	keeper.SetValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value0", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value1", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value2", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value3",
 		Owner: []byte("bluzelle1rnnpyp9wr6law2u5jwa23t0ywtmrduldf6h4wq")})
 
 	kvs = keeper.GetKeyValues(ctx, testStore, "uuid", nil)
@@ -314,10 +314,10 @@ func TestKeeper_GetKeyValues_MaxSize(t *testing.T) {
 	// test max keys size
 	{
 		keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{MaxKeyValuesSize: 19})
-		keeper.SetBLZValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
-		keeper.SetBLZValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value", Owner: owner})
-		keeper.SetBLZValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value", Owner: owner})
-		keeper.SetBLZValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value", Owner: owner})
+		keeper.SetValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
+		keeper.SetValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value", Owner: owner})
+		keeper.SetValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value", Owner: owner})
+		keeper.SetValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value", Owner: owner})
 
 		keyValues := keeper.GetKeyValues(ctx, testStore, "uuid", owner)
 
@@ -345,11 +345,11 @@ func TestKeeper_GetCount(t *testing.T) {
 	assert.Equal(t, "uuid", count.UUID)
 	assert.Equal(t, uint64(0), count.Count)
 
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value", Owner: owner})
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value", Owner: owner})
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value", Owner: owner})
-	keeper.SetBLZValue(ctx, testStore, "uuid0", "key0", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid0", "key0", types.BLZValue{Value: "value", Owner: owner})
 
 	count = keeper.GetCount(ctx, testStore, "uuid", nil)
 
@@ -370,10 +370,10 @@ func TestKeeper_GetCount_no_owner_for_query_usage(t *testing.T) {
 	assert.Equal(t, "uuid", count.UUID)
 	assert.Equal(t, uint64(0), count.Count)
 
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value", Owner: owner})
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value", Owner: owner})
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value",
+	keeper.SetValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value",
 		Owner: []byte("bluzelle1rnnpyp9wr6law2u5jwa23t0ywtmrduldf6h4wq")})
 
 	count = keeper.GetCount(ctx, testStore, "uuid", nil)
@@ -386,11 +386,11 @@ func TestKeeper_DeleteAll(t *testing.T) {
 	ctx, testStore, owner, cdc := initKeeperTest(t)
 	keeper := NewKeeper(nil, nil, cdc, MaxKeeperSizes{})
 
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value", Owner: owner})
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value", Owner: owner})
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value", Owner: owner})
-	keeper.SetBLZValue(ctx, testStore, "uuid", "key", types.BLZValue{Value: "value", Owner: []byte("bluzelle1nnpyp9wr6law2u5jwa23t0ywtmrduldf6h4wqr")})
+	keeper.SetValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid", "key1", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid", "key2", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value", Owner: owner})
+	keeper.SetValue(ctx, testStore, "uuid", "key", types.BLZValue{Value: "value", Owner: []byte("bluzelle1nnpyp9wr6law2u5jwa23t0ywtmrduldf6h4wqr")})
 
 	keeper.DeleteAll(ctx, testStore, "uuid", owner)
 
