@@ -55,7 +55,7 @@ func NewQuerier(keeper IKeeper) sdk.Querier {
 }
 
 func queryRead(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, error) {
-	blzValue := keeper.GetBLZValue(ctx, keeper.GetKVStore(ctx), path[0], path[1])
+	blzValue := keeper.GetValue(ctx, keeper.GetKVStore(ctx), path[0], path[1])
 
 	if len(blzValue.Owner) == 0 {
 		return []byte{}, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "key not found")

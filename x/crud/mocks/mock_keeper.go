@@ -49,30 +49,30 @@ func (mr *MockIKeeperMockRecorder) DeleteAll(arg0, arg1, arg2, arg3 interface{})
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAll", reflect.TypeOf((*MockIKeeper)(nil).DeleteAll), arg0, arg1, arg2, arg3)
 }
 
-// DeleteBLZValue mocks base method
-func (m *MockIKeeper) DeleteBLZValue(arg0 types1.Context, arg1 types0.KVStore, arg2, arg3 string) {
+// DeleteValue mocks base method
+func (m *MockIKeeper) DeleteValue(arg0 types1.Context, arg1 types0.KVStore, arg2, arg3 string) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "DeleteBLZValue", arg0, arg1, arg2, arg3)
+	m.ctrl.Call(m, "DeleteValue", arg0, arg1, arg2, arg3)
 }
 
-// DeleteBLZValue indicates an expected call of DeleteBLZValue
+// DeleteValue indicates an expected call of DeleteValue
 func (mr *MockIKeeperMockRecorder) DeleteBLZValue(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteBLZValue", reflect.TypeOf((*MockIKeeper)(nil).DeleteBLZValue), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteValue", reflect.TypeOf((*MockIKeeper)(nil).DeleteValue), arg0, arg1, arg2, arg3)
 }
 
-// GetBLZValue mocks base method
-func (m *MockIKeeper) GetBLZValue(arg0 types1.Context, arg1 types0.KVStore, arg2, arg3 string) types.BLZValue {
+// GetValue mocks base method
+func (m *MockIKeeper) GetValue(arg0 types1.Context, arg1 types0.KVStore, arg2, arg3 string) types.BLZValue {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetBLZValue", arg0, arg1, arg2, arg3)
+	ret := m.ctrl.Call(m, "GetValue", arg0, arg1, arg2, arg3)
 	ret0, _ := ret[0].(types.BLZValue)
 	return ret0
 }
 
-// GetBLZValue indicates an expected call of GetBLZValue
+// GetValue indicates an expected call of GetValue
 func (mr *MockIKeeperMockRecorder) GetBLZValue(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBLZValue", reflect.TypeOf((*MockIKeeper)(nil).GetBLZValue), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetValue", reflect.TypeOf((*MockIKeeper)(nil).GetValue), arg0, arg1, arg2, arg3)
 }
 
 // GetCdc mocks base method
@@ -187,28 +187,28 @@ func (mr *MockIKeeperMockRecorder) IsKeyPresent(arg0, arg1, arg2, arg3 interface
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsKeyPresent", reflect.TypeOf((*MockIKeeper)(nil).IsKeyPresent), arg0, arg1, arg2, arg3)
 }
 
-// RenameBLZKey mocks base method
-func (m *MockIKeeper) RenameBLZKey(arg0 types1.Context, arg1 types0.KVStore, arg2, arg3, arg4 string) bool {
+// RenameKey mocks base method
+func (m *MockIKeeper) RenameKey(arg0 types1.Context, arg1 types0.KVStore, arg2, arg3, arg4 string) bool {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RenameBLZKey", arg0, arg1, arg2, arg3, arg4)
+	ret := m.ctrl.Call(m, "RenameKey", arg0, arg1, arg2, arg3, arg4)
 	ret0, _ := ret[0].(bool)
 	return ret0
 }
 
-// RenameBLZKey indicates an expected call of RenameBLZKey
+// RenameKey indicates an expected call of RenameKey
 func (mr *MockIKeeperMockRecorder) RenameBLZKey(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RenameBLZKey", reflect.TypeOf((*MockIKeeper)(nil).RenameBLZKey), arg0, arg1, arg2, arg3, arg4)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RenameKey", reflect.TypeOf((*MockIKeeper)(nil).RenameKey), arg0, arg1, arg2, arg3, arg4)
 }
 
-// SetBLZValue mocks base method
-func (m *MockIKeeper) SetBLZValue(arg0 types1.Context, arg1 types0.KVStore, arg2, arg3 string, arg4 types.BLZValue) {
+// SetValue mocks base method
+func (m *MockIKeeper) SetValue(arg0 types1.Context, arg1 types0.KVStore, arg2, arg3 string, arg4 types.BLZValue) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "SetBLZValue", arg0, arg1, arg2, arg3, arg4)
+	m.ctrl.Call(m, "SetValue", arg0, arg1, arg2, arg3, arg4)
 }
 
-// SetBLZValue indicates an expected call of SetBLZValue
+// SetValue indicates an expected call of SetValue
 func (mr *MockIKeeperMockRecorder) SetBLZValue(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetBLZValue", reflect.TypeOf((*MockIKeeper)(nil).SetBLZValue), arg0, arg1, arg2, arg3, arg4)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetValue", reflect.TypeOf((*MockIKeeper)(nil).SetValue), arg0, arg1, arg2, arg3, arg4)
 }

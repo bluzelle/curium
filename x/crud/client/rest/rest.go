@@ -39,4 +39,5 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, storeName string) 
 	r.HandleFunc(fmt.Sprintf("/%s/count/{UUID}", storeName), BlzQCountHandler(cliCtx, storeName)).Methods("GET")
 	r.HandleFunc(fmt.Sprintf("/%s/deleteall", storeName), BlzDeleteAllHandler(cliCtx)).Methods("POST")
 	r.HandleFunc(fmt.Sprintf("/%s/version", storeName), BlzQVersionHandler(cliCtx, storeName)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/multiupdate", storeName), BlzMultiUpdateHandler(cliCtx)).Methods("POST")
 }

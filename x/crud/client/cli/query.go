@@ -34,17 +34,17 @@ func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 	}
 
 	crudQueryCmd.AddCommand(flags.GetCommands(
-		GetCmdBLZQRead(storeKey, cdc),
-		GetCmdBLZQHas(storeKey, cdc),
-		GetCmdBLZQKeys(storeKey, cdc),
-		GetCmdBLZQKeyValues(storeKey, cdc),
-		GetCmdBLZQCount(storeKey, cdc),
+		GetCmdQRead(storeKey, cdc),
+		GetCmdQHas(storeKey, cdc),
+		GetCmdQKeys(storeKey, cdc),
+		GetCmdQKeyValues(storeKey, cdc),
+		GetCmdQCount(storeKey, cdc),
 	)...)
 
 	return crudQueryCmd
 }
 
-func GetCmdBLZQRead(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQRead(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "read [UUID] [key]",
 		Short: "read UUID key",
@@ -66,7 +66,7 @@ func GetCmdBLZQRead(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetCmdBLZQHas(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQHas(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "has [UUID] [key]",
 		Short: "has UUID key",
@@ -84,7 +84,7 @@ func GetCmdBLZQHas(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetCmdBLZQKeys(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQKeys(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "keys [UUID]",
 		Short: "keys UUID",
@@ -107,7 +107,7 @@ func GetCmdBLZQKeys(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetCmdBLZQKeyValues(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQKeyValues(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "keyvalues [UUID]",
 		Short: "keyvalues UUID",
@@ -130,7 +130,7 @@ func GetCmdBLZQKeyValues(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetCmdBLZQCount(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQCount(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "count [UUID]",
 		Short: "count UUID",

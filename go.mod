@@ -1,6 +1,6 @@
 module github.com/bluzelle/curium
 
-go 1.13
+go 1.14
 
 require (
 	github.com/cosmos/cosmos-sdk v0.38.1

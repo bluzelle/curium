@@ -30,15 +30,15 @@ type MaxKeeperSizes struct {
 }
 
 type IKeeper interface {
-	SetBLZValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string, value types.BLZValue)
-	GetBLZValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string) types.BLZValue
-	DeleteBLZValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string)
+	SetValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string, value types.BLZValue)
+	GetValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string) types.BLZValue
+	DeleteValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string)
 	IsKeyPresent(ctx sdk.Context, store sdk.KVStore, UUID string, key string) bool
 	GetValuesIterator(ctx sdk.Context, store sdk.KVStore) sdk.Iterator
 	GetKeys(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultKeys
 	GetOwner(ctx sdk.Context, store sdk.KVStore, UUID string, key string) sdk.AccAddress
 	GetKVStore(ctx sdk.Context) sdk.KVStore
-	RenameBLZKey(ctx sdk.Context, store sdk.KVStore, UUID string, key string, newkey string) bool
+	RenameKey(ctx sdk.Context, store sdk.KVStore, UUID string, key string, newkey string) bool
 	GetCdc() *codec.Codec
 	GetKeyValues(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultKeyValues
 	GetCount(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultCount
@@ -70,14 +70,14 @@ func (k Keeper) GetKVStore(ctx sdk.Context) sdk.KVStore {
 	return ctx.KVStore(k.storeKey)
 }
 
-func (k Keeper) SetBLZValue(_ sdk.Context, store sdk.KVStore, UUID string, key string, value types.BLZValue) {
+func (k Keeper) SetValue(_ sdk.Context, store sdk.KVStore, UUID string, key string, value types.BLZValue) {
 	if len(value.Value) == 0 {
 		return
 	}
 	store.Set([]byte(MakeMetaKey(UUID, key)), k.cdc.MustMarshalBinaryBare(value))
 }
 
-func (k Keeper) GetBLZValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string) types.BLZValue {
+func (k Keeper) GetValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string) types.BLZValue {
 	BLZKey := MakeMetaKey(UUID, key)
 	if !k.isUUIDKeyPresent(ctx, store, BLZKey) {
 		return types.NewBLZValue()
@@ -89,7 +89,7 @@ func (k Keeper) GetBLZValue(ctx sdk.Context, store sdk.KVStore, UUID string, key
 	return value
 }
 
-func (k Keeper) DeleteBLZValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string) {
+func (k Keeper) DeleteValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string) {
 	store.Delete([]byte(MakeMetaKey(UUID, key)))
 }
 
@@ -136,23 +136,23 @@ func (k Keeper) GetKeys(ctx sdk.Context, store sdk.KVStore, UUID string, owner s
 }
 
 func (k Keeper) GetOwner(ctx sdk.Context, store sdk.KVStore, UUID string, key string) sdk.AccAddress {
-	return k.GetBLZValue(ctx, store, UUID, key).Owner
+	return k.GetValue(ctx, store, UUID, key).Owner
 }
 
-func (k Keeper) RenameBLZKey(ctx sdk.Context, store sdk.KVStore, UUID string, key string, newKey string) bool {
+func (k Keeper) RenameKey(ctx sdk.Context, store sdk.KVStore, UUID string, key string, newKey string) bool {
 	BLZNewKey := MakeMetaKey(UUID, newKey)
 	if k.isUUIDKeyPresent(ctx, store, BLZNewKey) {
 		return false
 	}
 
-	value := k.GetBLZValue(ctx, store, UUID, key)
+	value := k.GetValue(ctx, store, UUID, key)
 
 	if value.Owner.Empty() {
 		return false
 	}
 
-	k.SetBLZValue(ctx, store, UUID, newKey, value)
-	k.DeleteBLZValue(ctx, store, UUID, key)
+	k.SetValue(ctx, store, UUID, newKey, value)
+	k.DeleteValue(ctx, store, UUID, key)
 
 	return true
 }

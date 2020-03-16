@@ -53,7 +53,7 @@ func BlzCreateHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgBLZCreate(req.UUID, req.Key, req.Value, addr)
+		msg := types.NewMsgCreate(req.UUID, req.Key, req.Value, addr)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -94,7 +94,7 @@ func BlzReadHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// create the message
-		msg := types.NewMsgBLZRead(req.UUID, req.Key, addr)
+		msg := types.NewMsgRead(req.UUID, req.Key, addr)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -135,7 +135,7 @@ func BlzUpdateHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgBLZUpdate(req.UUID, req.Key, req.Value, addr)
+		msg := types.NewMsgUpdate(req.UUID, req.Key, req.Value, addr)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -175,7 +175,7 @@ func BlzDeleteHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgBLZDelete(req.UUID, req.Key, addr)
+		msg := types.NewMsgDelete(req.UUID, req.Key, addr)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -215,7 +215,7 @@ func BlzHasHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgBLZHas(req.UUID, req.Key, addr)
+		msg := types.NewMsgHas(req.UUID, req.Key, addr)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -254,7 +254,7 @@ func BlzKeysHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgBLZKeys(req.UUID, addr)
+		msg := types.NewMsgKeys(req.UUID, addr)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -285,7 +285,7 @@ func BlzKeyValuesHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgBLZKeyValues(req.UUID, addr)
+		msg := types.NewMsgKeyValues(req.UUID, addr)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -326,7 +326,7 @@ func BlzRenameHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgBLZRename(req.UUID, req.Key, req.NewKey, addr)
+		msg := types.NewMsgRename(req.UUID, req.Key, req.NewKey, addr)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -405,6 +405,46 @@ func BlzDeleteAllHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		msg := types.NewMsgDeleteAll(req.UUID, addr)
+		err = msg.ValidateBasic()
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		utils.WriteGenerateStdTxResponse(w, cliCtx, baseReq, []sdk.Msg{msg})
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// MultiUpdate
+type MultiUpdateReq struct {
+	BaseReq   rest.BaseReq
+	UUID      string
+	Owner     string
+	KeyValues []types.KeyValue
+}
+
+func BlzMultiUpdateHandler(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req MultiUpdateReq
+
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
+			return
+		}
+
+		baseReq := req.BaseReq.Sanitize()
+		if !baseReq.ValidateBasic(w) {
+			return
+		}
+
+		addr, err := sdk.AccAddressFromBech32(req.Owner)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		msg := types.NewMsgMultiUpdate(req.UUID, addr, req.KeyValues)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

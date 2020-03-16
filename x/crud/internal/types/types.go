@@ -46,3 +46,8 @@ func (kv BLZValue) String() string {
 	}
 	return strings.TrimSpace(fmt.Sprintf("Value: %s Owner: %s", kv.Value, kv.Owner.String()))
 }
+
+type KeyValue struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}

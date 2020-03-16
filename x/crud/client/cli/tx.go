@@ -22,6 +22,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/spf13/cobra"
@@ -36,22 +37,23 @@ func GetTxCmd(_ string, cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 	crudTxCmd.AddCommand(flags.PostCommands(
-		GetCmdBLZCreate(cdc),
-		GetCmdBLZRead(cdc),
-		GetCmdBLZUpdate(cdc),
-		GetCmdBLZDelete(cdc),
-		GetCmdBLZKeys(cdc),
-		GetCmdBLZHas(cdc),
-		GetCmdBLZRename(cdc),
-		GetCmdBLZKeyValues(cdc),
-		GetCmdBLZCount(cdc),
+		GetCmdCreate(cdc),
+		GetCmdRead(cdc),
+		GetCmdUpdate(cdc),
+		GetCmdDelete(cdc),
+		GetCmdKeys(cdc),
+		GetCmdHas(cdc),
+		GetCmdRename(cdc),
+		GetCmdKeyValues(cdc),
+		GetCmdCount(cdc),
 		GetCmdDeleteAll(cdc),
+		GetCmdMultiUpdate(cdc),
 	)...)
 
 	return crudTxCmd
 }
 
-func GetCmdBLZCreate(cdc *codec.Codec) *cobra.Command {
+func GetCmdCreate(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "create [UUID] [key] [value]",
 		Short: "create a new entry in the database",
@@ -61,7 +63,7 @@ func GetCmdBLZCreate(cdc *codec.Codec) *cobra.Command {
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
 
-			msg := types.NewMsgBLZCreate(args[0], args[1], args[2], cliCtx.GetFromAddress())
+			msg := types.NewMsgCreate(args[0], args[1], args[2], cliCtx.GetFromAddress())
 
 			err := msg.ValidateBasic()
 			if err != nil {
@@ -73,7 +75,7 @@ func GetCmdBLZCreate(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetCmdBLZRead(cdc *codec.Codec) *cobra.Command {
+func GetCmdRead(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "read [UUID] [key]",
 		Short: "read an existing entry in the database",
@@ -82,7 +84,7 @@ func GetCmdBLZRead(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			msg := types.NewMsgBLZRead(args[0], args[1], cliCtx.GetFromAddress())
+			msg := types.NewMsgRead(args[0], args[1], cliCtx.GetFromAddress())
 
 			err := msg.ValidateBasic()
 			if err != nil {
@@ -94,7 +96,7 @@ func GetCmdBLZRead(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetCmdBLZUpdate(cdc *codec.Codec) *cobra.Command {
+func GetCmdUpdate(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "update [UUID] [key] [value]",
 		Short: "update an existing entry in the database",
@@ -103,7 +105,7 @@ func GetCmdBLZUpdate(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			msg := types.NewMsgBLZUpdate(args[0], args[1], args[2], cliCtx.GetFromAddress())
+			msg := types.NewMsgUpdate(args[0], args[1], args[2], cliCtx.GetFromAddress())
 
 			err := msg.ValidateBasic()
 			if err != nil {
@@ -115,7 +117,7 @@ func GetCmdBLZUpdate(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetCmdBLZDelete(cdc *codec.Codec) *cobra.Command {
+func GetCmdDelete(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "delete [UUID] [key]",
 		Short: "delete an existing entry in the database",
@@ -124,7 +126,7 @@ func GetCmdBLZDelete(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			msg := types.NewMsgBLZDelete(args[0], args[1], cliCtx.GetFromAddress())
+			msg := types.NewMsgDelete(args[0], args[1], cliCtx.GetFromAddress())
 
 			err := msg.ValidateBasic()
 			if err != nil {
@@ -136,7 +138,7 @@ func GetCmdBLZDelete(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetCmdBLZKeys(cdc *codec.Codec) *cobra.Command {
+func GetCmdKeys(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "keys [UUID]",
 		Short: "list keys for a UUID in the database",
@@ -145,7 +147,7 @@ func GetCmdBLZKeys(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			msg := types.NewMsgBLZKeys(args[0], cliCtx.GetFromAddress())
+			msg := types.NewMsgKeys(args[0], cliCtx.GetFromAddress())
 
 			err := msg.ValidateBasic()
 			if err != nil {
@@ -157,7 +159,7 @@ func GetCmdBLZKeys(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetCmdBLZKeyValues(cdc *codec.Codec) *cobra.Command {
+func GetCmdKeyValues(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "keyvalues [UUID]",
 		Short: "list keys/values for a UUID in the database",
@@ -166,7 +168,7 @@ func GetCmdBLZKeyValues(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			msg := types.NewMsgBLZKeyValues(args[0], cliCtx.GetFromAddress())
+			msg := types.NewMsgKeyValues(args[0], cliCtx.GetFromAddress())
 
 			err := msg.ValidateBasic()
 			if err != nil {
@@ -178,7 +180,7 @@ func GetCmdBLZKeyValues(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetCmdBLZHas(cdc *codec.Codec) *cobra.Command {
+func GetCmdHas(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "has [UUID] [key]",
 		Short: "returns true if the key value pair exists",
@@ -187,7 +189,7 @@ func GetCmdBLZHas(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			msg := types.NewMsgBLZHas(args[0], args[1], cliCtx.GetFromAddress())
+			msg := types.NewMsgHas(args[0], args[1], cliCtx.GetFromAddress())
 
 			err := msg.ValidateBasic()
 			if err != nil {
@@ -199,7 +201,7 @@ func GetCmdBLZHas(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetCmdBLZRename(cdc *codec.Codec) *cobra.Command {
+func GetCmdRename(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "rename [UUID] [key] [new key]",
 		Short: "rename an existing entry in the database",
@@ -208,7 +210,7 @@ func GetCmdBLZRename(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			msg := types.NewMsgBLZRename(args[0], args[1], args[2], cliCtx.GetFromAddress())
+			msg := types.NewMsgRename(args[0], args[1], args[2], cliCtx.GetFromAddress())
 
 			err := msg.ValidateBasic()
 			if err != nil {
@@ -220,7 +222,7 @@ func GetCmdBLZRename(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetCmdBLZCount(cdc *codec.Codec) *cobra.Command {
+func GetCmdCount(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "count [UUID]",
 		Short: "count of existing entries in the database",
@@ -258,6 +260,39 @@ func GetCmdDeleteAll(cdc *codec.Codec) *cobra.Command {
 			}
 
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+		},
+	}
+}
+
+func GetCmdMultiUpdate(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "multiupdate [UUID] [key] [value] <key> <value> ...",
+		Short: "update existing entries in the database",
+		Args:  cobra.MinimumNArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
+
+			// after uuid there should be an even number of k/v pairs...
+			argsLen := len(args) - 1
+
+			if (argsLen % 2) == 0 {
+				msg := types.NewMsgMultiUpdate(args[0], cliCtx.GetFromAddress(), nil)
+
+				for i := 1; i < argsLen; i += 2 {
+					msg.KeyValues = append(msg.KeyValues, types.KeyValue{Key: args[i], Value: args[i+1]})
+				}
+
+				err := msg.ValidateBasic()
+				if err != nil {
+					return err
+				}
+
+				return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+			}
+
+			return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "incorrect number of k/v arguments")
 		},
 	}
 }
