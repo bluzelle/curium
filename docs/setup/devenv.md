@@ -18,8 +18,9 @@ Development Environment Setup
         export PATH=$PATH:$GOBIN:/usr/local/go/bin
 
     GOPATH is where the golang project source files, packages and binaries 
-    are kept. Make sure that the Golang compiler is in the PATH
-
+    are kept. Make sure that the Golang compiler folder *and* the GOBIN are
+    in the PATH.
+  
 3.  Make the Golang working folders with the following commands in a terminal
 
         mkdir -p ~/go/src/github.com/bluzelle
