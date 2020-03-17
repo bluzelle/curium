@@ -16,8 +16,8 @@ Deploy Additional Nodes
 
         blzd init <moniker> --chain-id <chain-id for the zone>  2>&1 | jq .node_id
 
-    Use a new moniker string, but use the same chain-id as used in the initial 
-    node
+    use a new moniker string, but use the chain-id used by the existing nodes to 
+    identify the zone that this node will connect to
 
         blzd init curium01 --chain-id bluzelle  2>&1 | jq .node_id
         
@@ -30,17 +30,21 @@ Deploy Additional Nodes
     
     There is no need to edit the genesis file, ".blzd/config/genesis.json", as
     it will be replaced with the genesis file created for the initial node in 
-    this zone.
+    this zone. If this node will be joining an existing zone, you will need to 
+    obtain the genesis file from a node that is already participaing in the
+    zone (see below). 
     
-4.  Set the client configuration
+4.  Set the client configuration, remember to use the chain id of the zone that
+    this node will be joining
 
-        blzcli config chain-id bluzelle
+        blzcli config chain-id <zone chain-id>
         blzcli config output json 
         blzcli config indent true 
         blzcli config trust-node true
 
-5.  Edit ".blzd/config/config/config.toml" to add  the first node’s address to 
-    the comma separated list of persistent_peers:
+5.  Edit ".blzd/config/config/config.toml" to add the address of a node that is
+    already a member of the zone that this node will be joining to the comma 
+    separated list of persistent_peers:
 
         # Comma separated list of nodes to keep persistent connections to
         persistent_peers = "6ccd<..>cc9c@<nodeip>:26656"
@@ -61,7 +65,8 @@ Deploy Additional Nodes
     Remember that *every* node should have *at least* this minimum. Feel free 
     to set it higher if you wish.
     
-7.  Create the key that will be used to label the validator on this node
+7.  *Optional - Validating Nodes Only*   
+    Create the key that will be used to label the validator on this node
 
         blzcli keys add vuser
 
@@ -85,7 +90,10 @@ Deploy Additional Nodes
 
     note the address and mnemonic phrase values.
 
-8.  Return to the first node server and distribute tokens from the genesis 
+8.  *Optional - Validating Nodes Only*   
+    If this node is joining an existing zone, obtain tokens from an existing
+    node.   
+    Or, return to the first node server and distribute tokens from the genesis 
     validator to the address of the validator on the new node
 
         blzcli tx send <src delegator address> <dest delegator address> \
@@ -104,13 +112,17 @@ Deploy Additional Nodes
     tokens from the validator on the first node the the validator on the second
     node on the blockchain. 
 
-9.  Before the node can be started it must copy the genesis.json file from the 
-    first node. Return to the new node server and use the secure copy command 
-    scp, to copy the genesis file from the first node.
+9.  Before the node can be started its' blockchain must be seeded with a 
+    genesis.json file from a node already participating in the zone. If the
+    node is joining an existing zone, request the the genesis.json file from 
+    the owner of the zone and copy it to  the "~/.blzd/config/" directory.
+    
+    If you are the owner of the zone, use the secure copy command "scp", to 
+    copy the genesis file from the first node.
 
-        scp ubuntu@<host>:~/.blzd/config/genesis.json ~/.blzd/config/
+        scp <user>@<host>:~/.blzd/config/genesis.json ~/.blzd/config/
 
-10. Start the Bluzelle daemon as a background task on the new node
+10. Start the Bluzelle daemon 
 
         blzd start
         
@@ -121,10 +133,11 @@ Deploy Additional Nodes
         
     and then retry the start command.
 
-11. When the new node catches up to the rest of the zone, the account that we 
-    have named vuser will have 10E15 ubnt tokens, and it can be turned into a 
-    validator node, allowed to participate in validating additions to the 
-    blockchain. 
+11. Optional - Validating Nodes Only   
+    When the new node catches up to the rest of the zone, the account that we 
+    have named vuser will have ubnt tokens given to it by another node in the
+    zone, and it can be turned into a validator node, allowed to participate 
+    in validating additions to the blockchain. 
 
         blzcli tx staking create-validator \
           --amount=1000000000ubnt \

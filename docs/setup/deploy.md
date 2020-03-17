@@ -4,6 +4,11 @@
 Deploy the Initial Node
 =======================
 
+>NOTE: If you wish to simply deploy a node, validating or non-validating, to an
+*existing* zone please skip ahead to the [Deploy Additional Nodes](./deployaddl.md)
+document.
+***
+
 1.  Before initializing a node, remove the previous node config folders from 
     your home folder, if they exist
 
