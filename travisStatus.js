@@ -27,7 +27,7 @@ function runTravisCommand(comm, cb){
 }
 
 function runIntegrationTest(){
-    runTravisCommand("travis-status --pro --token " + travisArgs[0] + " --repo bluzelle/curium-test --branch task/milagan/CM-89"
+    runTravisCommand("travis-status --pro --token " + travisArgs[0] + " --repo bluzelle/curium-test --branch devel"
     , function (result) { 
         if(result == "passed"){
             console.log("INTEGRATION TESTS PASSED")
