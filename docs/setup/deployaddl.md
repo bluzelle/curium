@@ -127,7 +127,7 @@ Deploy Additional Nodes
     blockchain. 
 
         blzcli tx staking create-validator \
-          --amount=100000000000000ubnt \
+          --amount=1000000000ubnt \
           --pubkey=$(blzd tendermint show-validator) \
           --moniker=curium01 \
           --commission-rate=0.1 \
