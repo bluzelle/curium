@@ -1,3 +1,6 @@
+services:
+  - docker
+  
 dist: bionic
 
 language: go
@@ -7,8 +10,6 @@ go: stable
 env:
   global:
     - GO111MODULE=on
-    - secure: "dnbjXj7c3iE4MLEevOUUqGDxr9tKDX/3qnFnM38RaObCgVsaxgQ3kFQGGLpw0uBllL7qh4lWwTzV2druEpoolE5Ecb4M2Xq2uHGXuD4Ulow9zR66x1qNpRKCNyCHglJj2oPU5mx0O4lGOY4f0GL5O1mGe2fOdOA3WD7+rquwdPH8J/hgfFQE3lvu3Fa9ZCDxbk69pgKz0qpeAvg2m0bv/iWKctpXxAufdq8GmiCKFSh6eey28qOfCU55VrqTq19pw6Q1nrl2QaApoqorDRXPvziznO4UgQyf1p6cl2MjAHm78KFnH9tdWOpmtZbUlgY4tEqbzZbhosyKNmPSTp7xRvzpeIulnvCJ6kKmrOi2KOdlH9kcoY29QZAkNUcKQvMnYASUbtinWA0Cn5t4Lr7psXUJw9f9+b8nOkycij0ogOucetipzRWiyXLR3Ii/GEMoioUbQHp6VsQTLTI1JV/K8/Bh8Uz4QQS+xbxhFuwO8Npo3bGxlo2O0aYsEdakyMvg1MIETteawkAJCTTznKza9lycKilUH+wR2rnGPtzJHlcKL3oLe7gDZGaLXxqhQcYo7ScW0WvA79FqUf6hJr/ETyw3jJ5LrW6ngi+z4hcNuJwau6fN9iaMbmjUVEsGgOZDaDuqYSRfK0sb8V+5n/gamV+Uqm2gSzAbHHmtmxkhOf8="
-    - secure: "DlG/Pk+e8fXi8JMjxk2TTpY8KOUnAs2RIZ92Lli9DK6GIbzPmfE8tQ4HeDVoiLoC1lP52WON0vdegDWGoRC/Mi3oVMxURI9AfM5qqrz8YmrrrVJGEGsKQgfBYmX7vv9PkElUbD8ZuF30TTC6BRIEloZvW90GI5Lr71oUxP7WUTSQXD5eObN0qfTMG6aUdFkRerAeadfGDt/fl3tjPj2OwfY/UXE8npBRiS5Qs6kirz5L1bjmwFqHUeFjXp4N3pGm4zdIVBx8hK4Pf2+Lj7cZZ6ocWLV/LDpvE7RcxRuRdjykdjiMps1N1zzXFjoN9a8T6AbS+ZsHTzNF9rXvZZ5yIMa5xfdmwEig+pZjFP+PNV2UkJeVpyRsGRm2WgMPPIfayPWaIoHPBcMcVGxvqKs8RBeRsAAx6woX0Yig0X1Nk6Pc9WYNmTyDocSDjT7vpj1TngO5XICt+fzsBTtEJzGjakyPrm3mn+mVTlMz/V7LeqLHH3hhO7la903wBOEd38zLFZWkC14g9NLbmV2hlPSTUoV5mrrjTXpQeFbp69TBrhqzMlAWyz1PBz+x3o0FcJUqvMo5umD807h/msPwvv4wtfJJnxpcGWj+gyAvUN2fcWh2wr5qhHiDJOtsNo4v/0/3uqJ+yav1Cyx8EEdoxOY67Wg3Ou3M80yI5dn/DBusMok="
 git:
   depth: 1
 
@@ -20,23 +21,24 @@ install: true
 
 script:
   - |
-    ls -a
-    echo ${TRAVIS_PULL_REQUEST}
-    echo ${TRAV_API_TOKEN}
     if [ "${TRAVIS_PULL_REQUEST}" == "false"  ]; then 
       make install; 
       gotest -v -covermode=count -coverprofile=coverage.out ./x/...; 
       $GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis-ci;
       ls -l $GOPATH/bin;
     else
-      echo ${TRAVIS_PULL_REQUEST_BRANCH}
-      sudo apt-get install ruby-dev && sudo gem install travis
-      npm install -g travis-status
-      npm install -g child_process 
-      travis login --pro --github-token $GIT_API_TOKEN;
-      travis restart -r bluzelle/curium-test; 
-      npm install travis-status; 
-      node travisStatus.js $TRAV_API_TOKEN; 
+      echo ">>INSTALLING DEPENDENCIES<<"
+      curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+      echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+      sudo apt update
+      sudo apt install yarn
+      sudo apt-get install g++
+      sudo apt-get install make
+      export TARGET_BRANCH=${TRAVIS_PULL_REQUEST_BRANCH}
+      git clone git@github.com:bluzelle/curium-test.git#devel
+      yarn test-install
+      echo ">>RUNNING INTEGRATION TESTS<<"
+      yarn test
     fi
 
     
