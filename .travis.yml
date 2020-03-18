@@ -7,9 +7,7 @@ go: stable
 env:
   global:
     - GO111MODULE=on
-    - secure: "LBPuPqFb4PYq9n0d6vQ+TwFWwepAsl3X3ZoRyWU+4/kv3S50PRzre60B5xVP+Y3eyG5RbsWh1Z4unp2nVOGN9O3H4VjqgAXQYnyTMIzg+AceUnjVmlbzPL01A0tTY5MswbZP3ncQFphBNreRrIWgLZKV9btfiYjuOO85+ZC+biw3jNuyeGkHSdfibAsuKug0Mr11FkYccAry3zOUHwNzn2dMnfDVImPmjxucZxXOqIeqXaPQ9W8OVn+ZiYYoW51+s/G1ll00C290c6TKbnVnFVqK6cAR9VQnpI00IDLuRNGQJWiosHCxoYkr/p9nSZgN04nVRYvkLXo8CxSsthcYf23Z1R0H5NeFuCVfLSzAgFOff23VK2jOhINPgCfBtENMyR4jVdUSCv0XJ/VrjHHMJXzpILXSy/M38RnZzeN2brM6H7nbvk58Kdv+6Dn7A1E2ZLCslFtlP4m6qrP17bDViibfVgYNcRytDATnKXjbJURAJ3ja+ZUULLPMhAO5BDHuJDzIWXq2wzZWk4OMk49PIaVwkSvaJ8+KFg9x7mNXGhql5TAS+d+OArkJyzR1ODQnfZ0JA1rzvJ9T321lOT8YzWy8nEPfRcpAbrIuud1Rrj4r4luOaZ6iRmGvOtrnKCDjciQCY+J1ftJj5U+uDeZt0A9Bxo1DFy/tW96KX0QxvwI="
-    - secure: "LmvYG98cHXvtysWaHKHb8fLt1y2UHIVZ7g0w9AUkCnyR7BsbiLvyCIV5Xhg0SPGpcIPIEyTnCgAzEV0Q489Phr+W4eBq7wKfP63SIojgM3Ne4z/utoY/FOjvo3ZlOjwYrup3QIuU8JpDKy/0a+silGDl9q0Q/JdL0qStvgz9eSEmk5R6Ov0iNcQu7z3lZSgHaw7Y/TjJ7G8AbibZ6L0/Z4ncof6GORjZzo0mZwlPEmbjJnfUkqNKCcwI3IrPLP5I9qXTChuiV5wRfdibjD0Y0Lmddz/VAxNw6rcvEJEzM+GB42TXQZwl6ekXVqi0b1hC95Mz4dFt5idsN2Xf46EJeyUjNNZh5Bk3vfOAmyhnhc0/HEe97YxhZCTLUaVsNntNH3djFus6hE/yEE7hqbUo7eZmnhXGmg/tOd9rwUDCarT+K3oCdiJBg48htTe3vXn/Vm+ffI1QCY/RttitCkXLGg8G88d7cAD7RAM8F9nxyObkDEenj0n290DzRLwVE+i0N1ROLNerEdTWtCbuoWEgEl6SFRpw49elcgehHMq7X/Bg8gL9xrhzDs8psxN62dSjiSz/OXhDW6E7vvVJNKmMS+8/MLD0bCbrbsjhASpgeF8YGRchFVEw8/33Hmybnpo97+R5FObS8pVGu0yzcTNQzAe5eM0GZtihftxo3ApwEaA="
-
+    - secure: "SkWjSxPuBapff1YDviaRRJf8dEkjre15y2kGqVOpiHSAfuFMFCidEsaMOSrI9A1K+tV9IacqTUdwX+64SPF/9H3pWkqOqPaPxkz2dIAZjhpB2AtXkGh/cCgmAkVkIyifJwOTJlfSWqenu/uN78geeT+nqWSEgNzhwo3zys2sWGehtb9B2oiibP4glkxtzQu4TlPvQrMistEgSNerAmMADHxd05vto1ZGPHuAw7VRGPtly9KNh8STISkKrk22g5qSAt9p9uPzxkW9HEmnUqG/BhjwUm/fcFwGdq/9qjk9QAFM2Ft/NqTQR6tSctD09EkII/tM7sok0M31eRCjd4SCYlWv/aDzayEjxy4++W41JxzCIIgxGS8Pu60GXwdS6gEC8YCxQ2LCTAB2NMN1e4GjsEd05V/+fYAkYVzmw1WxlL6iSwA9cFp20aw/RPy9wK1vbRFbXuxSI45GjwVpr5XKQ5DtOMh1Svy1f6b4nIaEVjbXzftgT3Te04SnmaXd85VnLQUKowMiAO1Z9KG8CBWM/F8m8NV03ppt0ba8ml0YjbKZD16FUONzpB7okpo9CPeGgznrHOAaY21XOlb2tzJ7K75OWbRHxerrG442RXC/3OYqBzljxN0alVbUd33xpUrC6NUUHN4v7hdvd6WW8gLjOAnZ1LDee9hDTP599uHRvFs="
 git:
   depth: 1
 
@@ -34,7 +32,7 @@ script:
       $GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis-ci;
       ls -l $GOPATH/bin;
     else 
-      travis login --pro --github-token $TRAV_API_TOKEN
+      travis login --pro --github-token $TRAV_API_TOKEN;
       echo "y" | travis restart -r bluzelle/curium-test; 
       npm install travis-status; 
       node travisStatus.js $TRAV_API_TOKEN; 
