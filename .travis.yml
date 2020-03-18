@@ -28,8 +28,8 @@ script:
       ls -l $GOPATH/bin;
     else
       eval "$(ssh-agent -s)"
-      openssl aes-256-cbc -K $encrypted_ec3fb7be3793_key -iv $encrypted_ec3fb7be3793_iv -in curium-test.enc -out ./curium-test -d
-      openssl aes-256-cbc -K $encrypted_f82ec7d11b7a_key -iv $encrypted_f82ec7d11b7a_iv -in curium-control.enc -out ./curium-control -d
+      openssl aes-256-cbc -K $encrypted_ec3fb7be3793_key -iv $encrypted_ec3fb7be3793_iv -in curium-test.enc -out curium-test -d
+      openssl aes-256-cbc -K $encrypted_6b3ef2705469_key -iv $encrypted_6b3ef2705469_iv -in curium-control.enc -out curium-control -d
       chmod 600 ./curium-test
       chmod 600 ./curium-control
       ssh-add ./curium-test
