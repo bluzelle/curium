@@ -44,6 +44,10 @@ script:
       export TARGET_BRANCH=${TRAVIS_PULL_REQUEST_BRANCH}
       git clone -b devel git@github.com:bluzelle/curium-test.git
       cd curium-test/integration
+      yarn
+      cd node_modules
+      git clone -b devel git@github.com:bluzelle/curium-control.git
+      cd ..
       yarn test-install
       echo ">>RUNNING INTEGRATION TESTS<<"
       yarn test
