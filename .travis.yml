@@ -39,3 +39,4 @@ script:
       npm install travis-status; 
       node travisStatus.js $TRAV_API_TOKEN; 
     fi
+

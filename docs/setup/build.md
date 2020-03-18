@@ -10,10 +10,10 @@ Build the Curium Project
  
 2.  Use make to build and install the blzd and blzcli executables
 
-        make testnet
+        make mainnet
  
 3.  Ensure Bluzelle CLI and daemon work by executing the binaries, you should 
-    be able to execute the apps from your users directory:
+    be able to execute the apps from your home directory:
 
         cd
         blzcli

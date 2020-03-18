@@ -4,6 +4,11 @@
 Deploy the Initial Node
 =======================
 
+>NOTE: If you wish to simply deploy a node, validating or non-validating, to an
+*existing* zone please skip ahead to the [Deploy Additional Nodes](./deployaddl.md)
+document.
+***
+
 1.  Before initializing a node, remove the previous node config folders from 
     your home folder, if they exist
 
@@ -42,14 +47,14 @@ Deploy the Initial Node
     “ubnt”. This genesis.json file will be used to initialize the blockchain 
     for this zone. This can be done from the command line with sed
 
-         sed -i -e 's/"bond_denom": "stake"/"bond_denom": "bnt"/g' \
+         sed -i -e 's/"bond_denom": "stake"/"bond_denom": "ubnt"/g' \
             ~/.blzd/config/genesis.json
 
 5.  Edit .blzd/config/app.toml in a text editor and set the minimum-gas-prices 
     to “10.0ubnt”. Every node should have at least this minimum. This can also 
     be done from the command line with sed: 
 
-        sed -i -e 's/minimum-gas-prices = ""/minimum-gas-prices = "0.01ubnt"/g' \
+        sed -i -e 's/minimum-gas-prices = ""/minimum-gas-prices = "10.0ubnt"/g' \
             ~/.blzd/config/app.toml
 
 6.  Set the client configuration settings:
@@ -95,7 +100,7 @@ Deploy the Initial Node
         blzd add-genesis-account $(blzcli keys show vuser -a) 500000000000000ubnt
         
     this command is an alias for “tx staking create-validator”. The amount 
-    given for the bnt tokens here will be the total amount of tokens available 
+    given for the ubnt tokens here will be the total amount of tokens available 
     to the zone.
 
 9.  As this is the first node in the zone, it needs an initial transaction for 
@@ -122,7 +127,7 @@ Deploy the Initial Node
     
     Which will produce the output
     
-        "bluzellevaloper10g9je9j<...>"
+        "bluzellevaloper1<...>"
     
 10. Create the genesis file from the first transaction:
 
