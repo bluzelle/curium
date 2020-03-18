@@ -10,6 +10,7 @@ go: stable
 env:
   global:
     - GO111MODULE=on
+    - secure: "C9pRzWz5yX6BBbNm8UYB+ggDmVSvoDc+DZ85v5ZdbxsZUkx3DUWHbJIUhAlgvl3hkmnPK2VbD5iICGUf/idzvZKKHSkEIzNBW+nB1SIk6jXoiClM6GP3Ej5CaFRb1Y0fTe8wMJj/SDSCgxI89GVzuIib/h9HIVB0/PnIR0enfp3sAVYLXiJT6Z3LXsKRUDpRbFIZhqxJiYJ0PQWOCIG8Nmsm+PhbDxXL2YAjKAxIGWRUTgMSM27P+cvF+iW+dxK/rdDmgU0gCeBiRau/SJPSe0CwH3FUT2GoeSWbLhqurLsQM9eWqAJvyqu5HpAyoU1OUH5WNrT9IEpRbg3a4oDMTecM7/5f6ASy/GkK5dsoQUiwQO+7A9GTSt5Nte70VsnwtOb0xp66Kef2sr0w1Du6SSoZ1ceJ+q25FdF3zZJ9JGfWdnqRbSs2I/6OmqTDixh//aCpR91lTGPSiP5My3+/Zk4pe6+ksigjKn2ek9PQL0w+n75RuWTGQJzJ5XYW7Jxjc9m0COYkQ8Z/wvFgWHonMC1lt6ZHQDB4ml9bQ6knGSkLxlmBl+YchyuF4PURxPryEPwlp4DE82Isy7cmEFbwyMg69j2itXJNOoVcwDdzUYszgzxsPC1HWD+QwP/xLcM7yxJIKbTXRwHaPBKrAIbKsn+mNWpjNKnXALYoJvz9xvY="
 git:
   depth: 1
 
@@ -46,7 +47,7 @@ script:
       cd curium-test/integration
       yarn
       cd node_modules
-      git clone -b devel git@github.com:bluzelle/curium-control.git
+      git clone https://${CLONE_TOKEN}:x-oauth-basic@github.com/bluzelle/curium-control.git
       cd ..
       yarn test-install
       echo ">>RUNNING INTEGRATION TESTS<<"
