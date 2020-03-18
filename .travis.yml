@@ -44,7 +44,7 @@ script:
       cd curium-test/integration
       yarn
       cd node_modules
-      git clone https://${CLONE_TOKEN}:x-oauth-basic@github.com/bluzelle/curium-control.git
+      git clone -b devel https://${CLONE_TOKEN}:x-oauth-basic@github.com/bluzelle/curium-control.git
       cd ..
       yarn test-install
       echo ">>RUNNING INTEGRATION TESTS<<"
