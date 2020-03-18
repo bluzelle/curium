@@ -42,7 +42,7 @@ script:
       sudo apt-get install g++
       sudo apt-get install make
       export TARGET_BRANCH=${TRAVIS_PULL_REQUEST_BRANCH}
-      git clone git@github.com:bluzelle/curium-test.git#devel
+      git clone git://github.com/bluzelle/curium-test.git#devel
       cd curium-test/integration
       yarn test-install
       echo ">>RUNNING INTEGRATION TESTS<<"
