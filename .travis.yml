@@ -17,10 +17,6 @@ before_install:
 
 install: true
 
-before_script:
-  - sudo apt-get install ruby-dev && sudo gem install travis
-  - npm install -g travis-status
-  - npm install -g child_process
 script:
   - |
     ls -a
@@ -31,9 +27,12 @@ script:
       gotest -v -covermode=count -coverprofile=coverage.out ./x/...; 
       $GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis-ci;
       ls -l $GOPATH/bin;
-    else 
+    else
+      sudo apt-get install ruby-dev && sudo gem install travis
+      npm install -g travis-status
+      npm install -g child_process 
       travis login --pro --github-token $TRAV_API_TOKEN;
-      echo "y" | travis restart -r bluzelle/curium-test; 
+      travis restart -r bluzelle/curium-test; 
       npm install travis-status; 
       node travisStatus.js $TRAV_API_TOKEN; 
     fi
