@@ -27,6 +27,13 @@ script:
       $GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis-ci;
       ls -l $GOPATH/bin;
     else
+      eval "$(ssh-agent -s)"
+      openssl aes-256-cbc -K $encrypted_ec3fb7be3793_key -iv $encrypted_ec3fb7be3793_iv -in curium-test.enc -out ./curium-test -d
+      openssl aes-256-cbc -K $encrypted_f82ec7d11b7a_key -iv $encrypted_f82ec7d11b7a_iv -in curium-control.enc -out ./curium-control -d
+      chmod 600 ./curium-test
+      chmod 600 ./curium-control
+      ssh-add ./curium-test
+      ssh-add ./curium-control
       echo ">>INSTALLING DEPENDENCIES<<"
       curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
       echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
