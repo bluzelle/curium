@@ -1,3 +1,6 @@
+services:
+  - docker
+
 dist: bionic
 
 language: go
@@ -7,9 +10,7 @@ go: stable
 env:
   global:
     - GO111MODULE=on
-    - secure: "LBPuPqFb4PYq9n0d6vQ+TwFWwepAsl3X3ZoRyWU+4/kv3S50PRzre60B5xVP+Y3eyG5RbsWh1Z4unp2nVOGN9O3H4VjqgAXQYnyTMIzg+AceUnjVmlbzPL01A0tTY5MswbZP3ncQFphBNreRrIWgLZKV9btfiYjuOO85+ZC+biw3jNuyeGkHSdfibAsuKug0Mr11FkYccAry3zOUHwNzn2dMnfDVImPmjxucZxXOqIeqXaPQ9W8OVn+ZiYYoW51+s/G1ll00C290c6TKbnVnFVqK6cAR9VQnpI00IDLuRNGQJWiosHCxoYkr/p9nSZgN04nVRYvkLXo8CxSsthcYf23Z1R0H5NeFuCVfLSzAgFOff23VK2jOhINPgCfBtENMyR4jVdUSCv0XJ/VrjHHMJXzpILXSy/M38RnZzeN2brM6H7nbvk58Kdv+6Dn7A1E2ZLCslFtlP4m6qrP17bDViibfVgYNcRytDATnKXjbJURAJ3ja+ZUULLPMhAO5BDHuJDzIWXq2wzZWk4OMk49PIaVwkSvaJ8+KFg9x7mNXGhql5TAS+d+OArkJyzR1ODQnfZ0JA1rzvJ9T321lOT8YzWy8nEPfRcpAbrIuud1Rrj4r4luOaZ6iRmGvOtrnKCDjciQCY+J1ftJj5U+uDeZt0A9Bxo1DFy/tW96KX0QxvwI="
-    - secure: "LmvYG98cHXvtysWaHKHb8fLt1y2UHIVZ7g0w9AUkCnyR7BsbiLvyCIV5Xhg0SPGpcIPIEyTnCgAzEV0Q489Phr+W4eBq7wKfP63SIojgM3Ne4z/utoY/FOjvo3ZlOjwYrup3QIuU8JpDKy/0a+silGDl9q0Q/JdL0qStvgz9eSEmk5R6Ov0iNcQu7z3lZSgHaw7Y/TjJ7G8AbibZ6L0/Z4ncof6GORjZzo0mZwlPEmbjJnfUkqNKCcwI3IrPLP5I9qXTChuiV5wRfdibjD0Y0Lmddz/VAxNw6rcvEJEzM+GB42TXQZwl6ekXVqi0b1hC95Mz4dFt5idsN2Xf46EJeyUjNNZh5Bk3vfOAmyhnhc0/HEe97YxhZCTLUaVsNntNH3djFus6hE/yEE7hqbUo7eZmnhXGmg/tOd9rwUDCarT+K3oCdiJBg48htTe3vXn/Vm+ffI1QCY/RttitCkXLGg8G88d7cAD7RAM8F9nxyObkDEenj0n290DzRLwVE+i0N1ROLNerEdTWtCbuoWEgEl6SFRpw49elcgehHMq7X/Bg8gL9xrhzDs8psxN62dSjiSz/OXhDW6E7vvVJNKmMS+8/MLD0bCbrbsjhASpgeF8YGRchFVEw8/33Hmybnpo97+R5FObS8pVGu0yzcTNQzAe5eM0GZtihftxo3ApwEaA="
-
+    - secure: "C9pRzWz5yX6BBbNm8UYB+ggDmVSvoDc+DZ85v5ZdbxsZUkx3DUWHbJIUhAlgvl3hkmnPK2VbD5iICGUf/idzvZKKHSkEIzNBW+nB1SIk6jXoiClM6GP3Ej5CaFRb1Y0fTe8wMJj/SDSCgxI89GVzuIib/h9HIVB0/PnIR0enfp3sAVYLXiJT6Z3LXsKRUDpRbFIZhqxJiYJ0PQWOCIG8Nmsm+PhbDxXL2YAjKAxIGWRUTgMSM27P+cvF+iW+dxK/rdDmgU0gCeBiRau/SJPSe0CwH3FUT2GoeSWbLhqurLsQM9eWqAJvyqu5HpAyoU1OUH5WNrT9IEpRbg3a4oDMTecM7/5f6ASy/GkK5dsoQUiwQO+7A9GTSt5Nte70VsnwtOb0xp66Kef2sr0w1Du6SSoZ1ceJ+q25FdF3zZJ9JGfWdnqRbSs2I/6OmqTDixh//aCpR91lTGPSiP5My3+/Zk4pe6+ksigjKn2ek9PQL0w+n75RuWTGQJzJ5XYW7Jxjc9m0COYkQ8Z/wvFgWHonMC1lt6ZHQDB4ml9bQ6knGSkLxlmBl+YchyuF4PURxPryEPwlp4DE82Isy7cmEFbwyMg69j2itXJNOoVcwDdzUYszgzxsPC1HWD+QwP/xLcM7yxJIKbTXRwHaPBKrAIbKsn+mNWpjNKnXALYoJvz9xvY="
 git:
   depth: 1
 
@@ -19,22 +20,33 @@ before_install:
 
 install: true
 
-before_script:
-  - sudo apt-get install ruby-dev && sudo gem install travis
-  - npm install -g travis-status
-  - npm install -g child_process
 script:
   - |
-    ls -a
-    echo ${TRAVIS_PULL_REQUEST}
-    echo ${TRAV_API_TOKEN}
     if [ "${TRAVIS_PULL_REQUEST}" == "false"  ]; then 
       make install; 
       gotest -v -covermode=count -coverprofile=coverage.out ./x/...; 
       $GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis-ci;
       ls -l $GOPATH/bin;
-    else 
-      echo "y" | travis restart -r bluzelle/curium-test; 
-      npm install travis-status; 
-      node travisStatus.js $TRAV_API_TOKEN; 
+    else
+      eval "$(ssh-agent -s)"
+      openssl aes-256-cbc -K $encrypted_ec3fb7be3793_key -iv $encrypted_ec3fb7be3793_iv -in curium-test.enc -out curium-test-key -d
+      chmod 600 ./curium-test-key
+      ssh-add ./curium-test-key
+      echo ">>INSTALLING DEPENDENCIES<<"
+      curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+      echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+      sudo apt update
+      sudo apt install yarn
+      sudo apt-get install g++
+      sudo apt-get install make
+      export CURIUM_TARGET_BRANCH=${TRAVIS_PULL_REQUEST_BRANCH}
+      git clone -b devel git@github.com:bluzelle/curium-test.git
+      cd curium-test/integration
+      yarn
+      cd node_modules
+      git clone -b devel https://${CLONE_TOKEN}:x-oauth-basic@github.com/bluzelle/curium-control.git
+      cd ..
+      yarn test-install
+      echo ">>RUNNING INTEGRATION TESTS<<"
+      yarn test
     fi
