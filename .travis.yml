@@ -29,6 +29,7 @@ script:
       $GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis-ci;
       ls -l $GOPATH/bin;
     else
+      echo ${TRAVIS_BRANCH}
       sudo apt-get install ruby-dev && sudo gem install travis
       npm install -g travis-status
       npm install -g child_process 
