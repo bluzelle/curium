@@ -43,6 +43,8 @@ script:
       sudo apt-get install make
       export TARGET_BRANCH=${TRAVIS_PULL_REQUEST_BRANCH}
       git clone -b devel git://github.com/bluzelle/curium-test.git
+      pwd
+      ls
       cd /home/travis/gopath/src/github.com/bluzelle/curium/curium-test/integration
       yarn test-install
       echo ">>RUNNING INTEGRATION TESTS<<"
