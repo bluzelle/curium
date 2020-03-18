@@ -7,7 +7,7 @@ go: stable
 env:
   global:
     - GO111MODULE=on
-    - secure: "SkWjSxPuBapff1YDviaRRJf8dEkjre15y2kGqVOpiHSAfuFMFCidEsaMOSrI9A1K+tV9IacqTUdwX+64SPF/9H3pWkqOqPaPxkz2dIAZjhpB2AtXkGh/cCgmAkVkIyifJwOTJlfSWqenu/uN78geeT+nqWSEgNzhwo3zys2sWGehtb9B2oiibP4glkxtzQu4TlPvQrMistEgSNerAmMADHxd05vto1ZGPHuAw7VRGPtly9KNh8STISkKrk22g5qSAt9p9uPzxkW9HEmnUqG/BhjwUm/fcFwGdq/9qjk9QAFM2Ft/NqTQR6tSctD09EkII/tM7sok0M31eRCjd4SCYlWv/aDzayEjxy4++W41JxzCIIgxGS8Pu60GXwdS6gEC8YCxQ2LCTAB2NMN1e4GjsEd05V/+fYAkYVzmw1WxlL6iSwA9cFp20aw/RPy9wK1vbRFbXuxSI45GjwVpr5XKQ5DtOMh1Svy1f6b4nIaEVjbXzftgT3Te04SnmaXd85VnLQUKowMiAO1Z9KG8CBWM/F8m8NV03ppt0ba8ml0YjbKZD16FUONzpB7okpo9CPeGgznrHOAaY21XOlb2tzJ7K75OWbRHxerrG442RXC/3OYqBzljxN0alVbUd33xpUrC6NUUHN4v7hdvd6WW8gLjOAnZ1LDee9hDTP599uHRvFs="
+    - secure: "psWVljWA0cQht7k3cONy//XbHfBt2FcSbwIG/OxEzadYcTcnDuGeU895x9iOsFDA7u3LxLEd00qUjpE7x6oQOgfm3ygVTfJCzG/3ySwdfeQ5T3jES7VL47YVs3wIRv5KXLHzsazHTaWqF/B/YCHRVnQy2C4dMYsn+b6PVXcpF+ZEV9WDk3c3z7CkD5Vfo35CeYIxKuMAS3eo5hkkqefB58h/Ye2i5cFMMq8ckzXd4ZwU8e9X0ljDYlrW1DzdSUyh+1KpVxXN9xj4oO60RRUqEr9e3overrnYMlEu6H7wKru+ZvcEOIWrs7OU25ZEeCOmr4Rmjr2P3Z5tXPw18qDnjblY6BZ0sSlqPG7zvKvKHK4x7zpnGlrtMiixM5FWuaGlUPNsMlWmGLsy9mWXyhEvJgKSXEaoMRXR0zDIJ81x6id7TCnZBMlX1I/zTG5ZrJgoQRF2hXo26rBXgkzjExzzvqUM0yQ/cTB8FCUwOlk/dwCoTokn+jj8Gs+5N69sgRpvcDYnNA+zI9xSyAaxBJikMNw8JUshWDpQldfBnWm0vL3NFGVWaHr2jd7tT6XPO44cL1O1AD76AzNfdY4RmxT3d2DueucfLJQwjEh7O/p0VhgwfZYaqQ3W2y8uqddy4N+EEnwDuJiUJGnt3dJyr/r8Avkv3Qm+qqFXguuJSEmXKZo="
 git:
   depth: 1
 
@@ -32,9 +32,10 @@ script:
       $GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis-ci;
       ls -l $GOPATH/bin;
     else 
-      sudo travis login --pro --github-token $TRAV_API_TOKEN;
+      travis login --pro --github-token $TRAV_API_TOKEN;
       echo "y" | travis restart -r bluzelle/curium-test; 
       npm install travis-status; 
       node travisStatus.js $TRAV_API_TOKEN; 
     fi
 
+    
