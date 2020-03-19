@@ -8,7 +8,7 @@ Useful Commands
 on the command line.
 
 ***
-# node status info
+## node status info
 >Query remote node for status
 
     blzcli status [flags]
@@ -53,7 +53,7 @@ on the command line.
 
 
 ***
-# keys show 
+## keys show 
 >Given the name of a key this command returns the type, address and public key 
 for that key. Using the "-a" will return only the address info, this is useful
 for other commands, see below:
@@ -73,7 +73,7 @@ for other commands, see below:
     
    
 ***
-# query account
+## query account
 >Given and validator address, show account info for a validator
 
     blzcli query account [address] [flags]
@@ -102,7 +102,7 @@ for other commands, see below:
     blzcli q account (blzcli keys show [key name] -a)
 
 ***
-# query tendermint-validator-set
+## query tendermint-validator-set
 >Get the full Tendermint validator set for the zone at given height
 
     blzcli query tendermint-validator-set [height] [flags]
@@ -131,7 +131,7 @@ for other commands, see below:
       ]
     }
 ***
-# query tx
+## query tx
 >Query for a transaction by hash in a committed block
 
     blzcli query tx [hash] [flags]
@@ -163,7 +163,7 @@ request transaction
     {"uuid":"<uuid>","count":"1"}
 
 ***
-# query auth account
+## query auth account
 >Query account balance
 
     blzcli query auth account [address] [flags]
@@ -189,7 +189,7 @@ request transaction
     }
 
 ***
-# query distribution validator-outstanding-rewards
+## query distribution validator-outstanding-rewards
 >Query distribution outstanding (un-withdrawn) rewards for a validator and all their delegations
 
     blzcli query distribution validator-outstanding-rewards [validator] [flags]
@@ -204,7 +204,7 @@ request transaction
       }
     
 ***
-# query distribution commission
+## query distribution commission
 >Query validator commission rewards from delegators to that validator.
 
     blzcli query distribution commission [validator] [flags]
@@ -220,7 +220,7 @@ request transaction
     ]
 
 ***
-# query distribution rewards
+## query distribution rewards
 >Query all rewards earned by a delegator, optionally restrict to rewards from a single validator.
 
     blzcli query distribution rewards [delegator-addr] [<validator-addr>] [flags]
@@ -247,18 +247,6 @@ request transaction
           "amount": "21168000.000000000000000000"
         }
       ]
-***
-# multiupdate
-> Update existing entries in the database
-
-    blzcli tx crud multiupdate [UUID] [key] [value] <key> <value> ... [flags]
-
-> Example:
-
-    $ blzcli tx crud multiupdate uuid \
-        key00 "better value" key01 "new value" \
-        key02 "good value" key04 "new value"  \
-        --gas-prices 10.0ubnt --from vuser
 
 ***
 [prev](./qAndTX.md) 
