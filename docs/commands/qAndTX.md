@@ -144,6 +144,20 @@ the result, for example, a "tx crud read" command will return
     
     blzcli tx crud deleteall <uuid> /
         --gas-prices 10.0ubnt --from <user id>
+        
+***
+## multiupdate
+> Update existing entries in the database
+
+    blzcli tx crud multiupdate [UUID] [key] [value] <key> <value> ... [flags]
+
+> Example:
+
+    $ blzcli tx crud multiupdate uuid \
+        key00 "better value" key01 "new value" \
+        key02 "good value" key04 "new value"  \
+        --gas-prices 10.0ubnt --from vuser
+
 
 ***
 [prev](../setup/deployaddl.md) | [next](../commands/useful.md)
