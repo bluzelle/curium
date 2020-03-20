@@ -64,7 +64,7 @@ func handleMsgCreate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgCreate
 	}
 
 	keeper.SetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key, types.BLZValue{
-		Value: msg.Value,
+		Value: "foo",
 		Owner: msg.Owner,
 	})
 	return &sdk.Result{}, nil
