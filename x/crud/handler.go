@@ -58,7 +58,7 @@ func handleMsgCreate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgCreate
 	if len(msg.UUID) == 0 || len(msg.Key) == 0 || msg.Owner.Empty() {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
 	}
-
+//test
 	if !keeper.GetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key).Owner.Empty() {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Key already exists")
 	}
