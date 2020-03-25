@@ -56,7 +56,7 @@ func GetCmdQRead(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/read/%s/%s", queryRoute, UUID, key), nil)
 
 			if err != nil {
-				fmt.Printf("could not read key - %s : %s", UUID, key)
+				fmt.Printf("could not read key - %s : %s\n", UUID, key)
 				return nil
 			}
 			var out types.QueryResultRead

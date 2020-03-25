@@ -26,6 +26,8 @@ import (
 	"testing"
 )
 
+const DefaultLeaseBlockHeight = int64(10 * 86400 / 5) // (10 days of blocks * seconds/day) / 5
+
 func initTest(t *testing.T) (*gomock.Controller, *mocks.MockIKeeper, sdk.Context, []byte) {
 	mockCtrl := gomock.NewController(t)
 	return mockCtrl, mocks.NewMockIKeeper(mockCtrl), sdk.Context{}, []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
@@ -44,12 +46,15 @@ func Test_handleMsgCreate(t *testing.T) {
 	mockCtrl, mockKeeper, ctx, owner := initTest(t)
 	defer mockCtrl.Finish()
 
+	mockKeeper.EXPECT().GetDefaultLeaseBlocks().AnyTimes().Return(DefaultLeaseBlockHeight)
+
 	// Simple Unit
 	{
 		createMsg := types.MsgCreate{
 			UUID:  "uuid",
 			Key:   "key",
 			Value: "value",
+			Lease: 0,
 			Owner: owner,
 		}
 
@@ -58,15 +63,18 @@ func Test_handleMsgCreate(t *testing.T) {
 		// always return nil for a store...
 		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
 
+		mockKeeper.EXPECT().GetLeaseStore(gomock.Any()).AnyTimes().Return(nil)
+
 		// testing key already exists
-		mockKeeper.EXPECT().GetBLZValue(ctx, nil, createMsg.UUID, createMsg.Key).Return(types.BLZValue{Value: createMsg.Value, Owner: owner})
+		mockKeeper.EXPECT().GetValue(ctx, nil, createMsg.UUID, createMsg.Key).Return(types.BLZValue{Value: createMsg.Value, Owner: owner})
 
 		_, err := NewHandler(mockKeeper)(ctx, createMsg)
 		assert.NotNil(t, err)
 
 		// test valid create message
-		mockKeeper.EXPECT().GetBLZValue(ctx, nil, createMsg.UUID, createMsg.Key)
-		mockKeeper.EXPECT().SetBLZValue(ctx, nil, createMsg.UUID, createMsg.Key, types.BLZValue{Value: createMsg.Value, Owner: createMsg.Owner})
+		mockKeeper.EXPECT().GetValue(ctx, nil, createMsg.UUID, createMsg.Key)
+		mockKeeper.EXPECT().SetValue(ctx, nil, createMsg.UUID, createMsg.Key, types.BLZValue{Value: createMsg.Value, Owner: createMsg.Owner, Lease: DefaultLeaseBlockHeight})
+		mockKeeper.EXPECT().SetLease(nil, createMsg.UUID, createMsg.Key, int64(0), DefaultLeaseBlockHeight)
 
 		_, err = NewHandler(mockKeeper)(ctx, createMsg)
 		assert.Nil(t, err)
@@ -120,7 +128,7 @@ func Test_handleMsgRead(t *testing.T) {
 			Owner: owner,
 		}
 		mockKeeper.EXPECT().GetOwner(ctx, nil, read_msg.UUID, read_msg.Key).Return(owner)
-		mockKeeper.EXPECT().GetBLZValue(ctx, nil, read_msg.UUID, read_msg.Key).Return(types.BLZValue{Value: "utest", Owner: owner})
+		mockKeeper.EXPECT().GetValue(ctx, nil, read_msg.UUID, read_msg.Key).Return(types.BLZValue{Value: "utest", Owner: owner})
 
 		result, err := handleMsgRead(ctx, mockKeeper, read_msg)
 
@@ -150,11 +158,14 @@ func Test_handleMsgUpdate(t *testing.T) {
 	mockCtrl, mockKeeper, ctx, owner := initTest(t)
 	defer mockCtrl.Finish()
 
-	// Simple Update test
+	mockKeeper.EXPECT().GetDefaultLeaseBlocks().AnyTimes().Return(DefaultLeaseBlockHeight)
+
+	// zero new lease must fail
 	{
 		updateMsg := types.MsgUpdate{
 			UUID:  "uuid",
 			Key:   "key",
+			Lease: -100,
 			Value: "value",
 			Owner: owner,
 		}
@@ -164,10 +175,153 @@ func Test_handleMsgUpdate(t *testing.T) {
 		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, updateMsg.UUID, updateMsg.Key).Return(owner)
-		mockKeeper.EXPECT().SetBLZValue(ctx, nil, updateMsg.UUID, updateMsg.Key, types.BLZValue{
+		mockKeeper.EXPECT().GetValue(ctx, nil, updateMsg.UUID, updateMsg.Key).Return(types.BLZValue{
 			Value: "value",
+			Lease: 100,
 			Owner: owner,
 		})
+
+		_, err := NewHandler(mockKeeper)(ctx, updateMsg)
+		assert.NotNil(t, err)
+
+		mockKeeper.EXPECT().GetOwner(ctx, nil, updateMsg.UUID, updateMsg.Key)
+		_, err = handleMsgUpdate(ctx, mockKeeper, updateMsg)
+		assert.NotNil(t, err)
+
+		mockKeeper.EXPECT().GetOwner(ctx, nil, updateMsg.UUID, updateMsg.Key).Return(owner)
+		updateMsg.Owner = []byte("bluzelle1nnpyp9wr6law2u5jwa23t0ywtmrduldf6h4wqr")
+		_, err = handleMsgUpdate(ctx, mockKeeper, updateMsg)
+		assert.NotNil(t, err)
+	}
+
+	// Negative new lease must fail
+	{
+		updateMsg := types.MsgUpdate{
+			UUID:  "uuid",
+			Key:   "key",
+			Lease: -100,
+			Value: "value",
+			Owner: owner,
+		}
+		assert.Equal(t, updateMsg.Type(), "update")
+
+		// always return nil for a store...
+		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
+
+		mockKeeper.EXPECT().GetOwner(ctx, nil, updateMsg.UUID, updateMsg.Key).Return(owner)
+		mockKeeper.EXPECT().GetValue(ctx, nil, updateMsg.UUID, updateMsg.Key).Return(types.BLZValue{
+			Value: "value",
+			Lease: 0,
+			Owner: owner,
+		})
+
+		_, err := NewHandler(mockKeeper)(ctx, updateMsg)
+		assert.NotNil(t, err)
+
+		mockKeeper.EXPECT().GetOwner(ctx, nil, updateMsg.UUID, updateMsg.Key)
+		_, err = handleMsgUpdate(ctx, mockKeeper, updateMsg)
+		assert.NotNil(t, err)
+
+		mockKeeper.EXPECT().GetOwner(ctx, nil, updateMsg.UUID, updateMsg.Key).Return(owner)
+		updateMsg.Owner = []byte("bluzelle1nnpyp9wr6law2u5jwa23t0ywtmrduldf6h4wqr")
+		_, err = handleMsgUpdate(ctx, mockKeeper, updateMsg)
+		assert.NotNil(t, err)
+	}
+
+	// reducing lease should not take us below current height
+	{
+		updateMsg := types.MsgUpdate{
+			UUID:  "uuid",
+			Key:   "key",
+			Lease: -16,
+			Value: "value",
+			Owner: owner,
+		}
+		assert.Equal(t, updateMsg.Type(), "update")
+
+		// always return nil for a store...
+		mockKeeper.EXPECT().GetKVStore(gomock.Any()).AnyTimes().Return(nil)
+		mockKeeper.EXPECT().GetOwner(gomock.Any(), nil, updateMsg.UUID, updateMsg.Key).Return(owner)
+		mockKeeper.EXPECT().GetValue(gomock.Any(), nil, updateMsg.UUID, updateMsg.Key).Return(types.BLZValue{
+			Value:  "value",
+			Lease:  20,
+			Owner:  owner,
+			Height: 110,
+		})
+
+		newCtx := ctx.WithBlockHeight(115)
+		_, err := NewHandler(mockKeeper)(newCtx, updateMsg)
+		assert.NotNil(t, err)
+	}
+
+	// Simple Update test
+	{
+		updateMsg := types.MsgUpdate{
+			UUID:  "uuid",
+			Key:   "key",
+			Lease: 0,
+			Value: "value",
+			Owner: owner,
+		}
+		assert.Equal(t, updateMsg.Type(), "update")
+
+		// always return nil for a store...
+		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
+
+		mockKeeper.EXPECT().GetOwner(ctx, nil, updateMsg.UUID, updateMsg.Key).Return(owner)
+		mockKeeper.EXPECT().GetValue(ctx, nil, updateMsg.UUID, updateMsg.Key).Return(types.BLZValue{
+			Value: "value",
+			Lease: 0,
+			Owner: owner,
+		})
+		mockKeeper.EXPECT().SetValue(ctx, nil, updateMsg.UUID, updateMsg.Key, types.BLZValue{
+			Value: "value",
+			Lease: 0,
+			Owner: owner,
+		})
+
+		_, err := NewHandler(mockKeeper)(ctx, updateMsg)
+		assert.Nil(t, err)
+
+		mockKeeper.EXPECT().GetOwner(ctx, nil, updateMsg.UUID, updateMsg.Key)
+		_, err = handleMsgUpdate(ctx, mockKeeper, updateMsg)
+		assert.NotNil(t, err)
+
+		mockKeeper.EXPECT().GetOwner(ctx, nil, updateMsg.UUID, updateMsg.Key).Return(owner)
+		updateMsg.Owner = []byte("bluzelle1nnpyp9wr6law2u5jwa23t0ywtmrduldf6h4wqr")
+		_, err = handleMsgUpdate(ctx, mockKeeper, updateMsg)
+		assert.NotNil(t, err)
+	}
+
+	{
+		updateMsg := types.MsgUpdate{
+			UUID:  "uuid",
+			Key:   "key",
+			Lease: 2000,
+			Value: "value",
+			Owner: owner,
+		}
+		assert.Equal(t, updateMsg.Type(), "update")
+
+		// always return nil for a store...
+		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
+
+		mockKeeper.EXPECT().GetLeaseStore(gomock.Any()).AnyTimes().Return(nil)
+
+		mockKeeper.EXPECT().GetOwner(ctx, nil, updateMsg.UUID, updateMsg.Key).Return(owner)
+		mockKeeper.EXPECT().GetValue(ctx, nil, updateMsg.UUID, updateMsg.Key).Return(types.BLZValue{
+			Value: "value",
+			Lease: 4000,
+			Owner: owner,
+		})
+		mockKeeper.EXPECT().SetValue(ctx, nil, updateMsg.UUID, updateMsg.Key, types.BLZValue{
+			Value: "value",
+			Lease: 6000,
+			Owner: owner,
+		})
+
+		mockKeeper.EXPECT().DeleteLease(nil, updateMsg.UUID, updateMsg.Key, int64(0), int64(4000))
+		mockKeeper.EXPECT().SetLease(nil, updateMsg.UUID, updateMsg.Key, int64(0), int64(6000))
 
 		_, err := NewHandler(mockKeeper)(ctx, updateMsg)
 		assert.Nil(t, err)
@@ -208,6 +362,8 @@ func Test_handleMsgDelete(t *testing.T) {
 		// always return nil for a store...
 		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
 
+		mockKeeper.EXPECT().GetLeaseStore(gomock.Any()).AnyTimes().Return(nil)
+
 		mockKeeper.EXPECT().GetOwner(ctx, nil, deleteMsg.UUID, deleteMsg.Key)
 
 		_, err := NewHandler(mockKeeper)(ctx, deleteMsg)
@@ -220,7 +376,7 @@ func Test_handleMsgDelete(t *testing.T) {
 		assert.NotNil(t, err)
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, deleteMsg.UUID, deleteMsg.Key).Return(owner)
-		mockKeeper.EXPECT().DeleteBLZValue(ctx, nil, deleteMsg.UUID, deleteMsg.Key)
+		mockKeeper.EXPECT().DeleteValue(ctx, nil, nil, deleteMsg.UUID, deleteMsg.Key)
 		_, err = handleMsgDelete(ctx, mockKeeper, deleteMsg)
 		assert.Nil(t, err)
 	}
@@ -345,7 +501,7 @@ func Test_handleMsgRename(t *testing.T) {
 		// always return nil for a store...
 		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
 		mockKeeper.EXPECT().GetOwner(ctx, nil, renameMsg.UUID, renameMsg.Key).Return(owner)
-		mockKeeper.EXPECT().RenameBLZKey(ctx, gomock.Any(), renameMsg.UUID, renameMsg.Key, renameMsg.NewKey).Return(true)
+		mockKeeper.EXPECT().RenameKey(ctx, gomock.Any(), renameMsg.UUID, renameMsg.Key, renameMsg.NewKey).Return(true)
 
 		_, err := NewHandler(mockKeeper)(ctx, renameMsg)
 		assert.Nil(t, err)
@@ -362,7 +518,7 @@ func Test_handleMsgRename(t *testing.T) {
 		// Rename failed
 		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
 		mockKeeper.EXPECT().GetOwner(ctx, nil, renameMsg.UUID, renameMsg.Key).Return(renameMsg.Owner)
-		mockKeeper.EXPECT().RenameBLZKey(ctx, gomock.Any(), renameMsg.UUID, renameMsg.Key, renameMsg.NewKey).Return(false)
+		mockKeeper.EXPECT().RenameKey(ctx, gomock.Any(), renameMsg.UUID, renameMsg.Key, renameMsg.NewKey).Return(false)
 
 		_, err = NewHandler(mockKeeper)(ctx, renameMsg)
 		assert.NotNil(t, err)
@@ -505,9 +661,9 @@ func Test_handleMsgMultiUpdate(t *testing.T) {
 		mockKeeper.EXPECT().GetOwner(ctx, nil, multiUpdateMsg.UUID, multiUpdateMsg.KeyValues[0].Key).Return(owner)
 		mockKeeper.EXPECT().GetOwner(ctx, nil, multiUpdateMsg.UUID, multiUpdateMsg.KeyValues[1].Key).Return(owner)
 
-		mockKeeper.EXPECT().SetBLZValue(ctx, nil, multiUpdateMsg.UUID, multiUpdateMsg.KeyValues[0].Key,
+		mockKeeper.EXPECT().SetValue(ctx, nil, multiUpdateMsg.UUID, multiUpdateMsg.KeyValues[0].Key,
 			types.BLZValue{Value: multiUpdateMsg.KeyValues[0].Value, Owner: owner})
-		mockKeeper.EXPECT().SetBLZValue(ctx, nil, multiUpdateMsg.UUID, multiUpdateMsg.KeyValues[1].Key,
+		mockKeeper.EXPECT().SetValue(ctx, nil, multiUpdateMsg.UUID, multiUpdateMsg.KeyValues[1].Key,
 			types.BLZValue{Value: multiUpdateMsg.KeyValues[1].Value, Owner: owner})
 
 		_, err := NewHandler(mockKeeper)(ctx, multiUpdateMsg)

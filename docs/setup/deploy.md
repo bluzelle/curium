@@ -41,7 +41,7 @@ document.
     this can be done from the command line with
     
         sed -i -e '/^##### advanced configuration options #####/a \
-            output = "json"' ~/.blzd/config/config.toml
+                    output = "json"' ~/.blzd/config/config.toml
 
 4.  Edit “.blzd/config/genesis.json” to change bond_denom from “stake” to 
     “ubnt”. This genesis.json file will be used to initialize the blockchain 

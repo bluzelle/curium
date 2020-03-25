@@ -20,10 +20,11 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-const RouterKey = ModuleName
-
-const MaxKeySize = 4097 // one extra byte for null between uuid & key
-const MaxValueSize = 262144
+const (
+	RouterKey    = ModuleName
+	MaxKeySize   = 4097 // one extra byte for null between uuid & key
+	MaxValueSize = 262144
+)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Create
@@ -31,14 +32,17 @@ type MsgCreate struct {
 	UUID  string
 	Key   string
 	Value string
+	Lease int64
 	Owner sdk.AccAddress
 }
 
-func NewMsgCreate(UUID string, key string, value string, owner sdk.AccAddress) MsgCreate {
+func NewMsgCreate(UUID string, key string, value string, lease int64, owner sdk.AccAddress) MsgCreate {
+
 	return MsgCreate{
 		UUID:  UUID,
 		Key:   key,
 		Value: value,
+		Lease: lease,
 		Owner: owner,
 	}
 }
@@ -62,6 +66,10 @@ func (msg MsgCreate) ValidateBasic() error {
 
 	if len(msg.Value) > MaxValueSize {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Value too large")
+	}
+
+	if msg.Lease < 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Lease negative")
 	}
 
 	return nil
@@ -115,16 +123,8 @@ type MsgUpdate struct {
 	UUID  string
 	Key   string
 	Value string
+	Lease int64
 	Owner sdk.AccAddress
-}
-
-func NewMsgUpdate(UUID string, key string, value string, owner sdk.AccAddress) MsgUpdate {
-	return MsgUpdate{
-		UUID:  UUID,
-		Key:   key,
-		Value: value,
-		Owner: owner,
-	}
 }
 
 func (msg MsgUpdate) Route() string { return RouterKey }
