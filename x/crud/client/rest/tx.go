@@ -30,6 +30,7 @@ type createReq struct {
 	UUID    string
 	Key     string
 	Value   string
+	Lease   int64
 	Owner   string
 }
 
@@ -53,7 +54,7 @@ func BlzCreateHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgCreate(req.UUID, req.Key, req.Value, addr)
+		msg := types.NewMsgCreate(req.UUID, req.Key, req.Value, req.Lease, addr)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -112,6 +113,7 @@ type updateReq struct {
 	UUID    string
 	Key     string
 	Value   string
+	Lease   int64
 	Owner   string
 }
 
@@ -135,7 +137,7 @@ func BlzUpdateHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgUpdate(req.UUID, req.Key, req.Value, addr)
+		msg := types.MsgUpdate{req.UUID, req.Key, req.Value, req.Lease, addr}
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

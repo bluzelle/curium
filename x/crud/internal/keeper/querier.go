@@ -61,7 +61,7 @@ func queryRead(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeep
 		return []byte{}, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "key not found")
 	}
 
-	res, err := codec.MarshalJSONIndent(cdc, types.QueryResultRead{UUID: path[0], Key: path[1], Value: blzValue.Value})
+	res, err := codec.MarshalJSONIndent(cdc, types.QueryResultRead{UUID: path[0], Key: path[1], Value: blzValue.Value, Height: blzValue.Height, Lease: blzValue.Lease})
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}

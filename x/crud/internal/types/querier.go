@@ -15,9 +15,11 @@
 package types
 
 type QueryResultRead struct {
-	UUID  string `json:"uuid"`
-	Key   string `json:"key"`
-	Value string `json:"value"`
+	UUID   string `json:"uuid"`
+	Key    string `json:"key"`
+	Value  string `json:"value"`
+	Height int64  `json:"height,string"` // TODO: remove?
+	Lease  int64  `json:"lease,string"`
 }
 
 // for fmt.Stringer

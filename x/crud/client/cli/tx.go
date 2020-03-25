@@ -28,6 +28,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var leaseValue int64
+
 func GetTxCmd(_ string, cdc *codec.Codec) *cobra.Command {
 	crudTxCmd := &cobra.Command{
 		Use:                        types.ModuleName,
@@ -54,7 +56,7 @@ func GetTxCmd(_ string, cdc *codec.Codec) *cobra.Command {
 }
 
 func GetCmdCreate(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+	cc := cobra.Command{
 		Use:   "create [UUID] [key] [value]",
 		Short: "create a new entry in the database",
 		Args:  cobra.ExactArgs(3),
@@ -63,16 +65,17 @@ func GetCmdCreate(cdc *codec.Codec) *cobra.Command {
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
 
-			msg := types.NewMsgCreate(args[0], args[1], args[2], cliCtx.GetFromAddress())
+			msg := types.NewMsgCreate(args[0], args[1], args[2], leaseValue, cliCtx.GetFromAddress())
 
 			err := msg.ValidateBasic()
 			if err != nil {
 				return err
 			}
-
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
+	cc.PersistentFlags().Int64Var(&leaseValue, "lease", 0, "lease in blocks (default 172800 (10 days))")
+	return &cc
 }
 
 func GetCmdRead(cdc *codec.Codec) *cobra.Command {
@@ -97,7 +100,7 @@ func GetCmdRead(cdc *codec.Codec) *cobra.Command {
 }
 
 func GetCmdUpdate(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+	cc := cobra.Command{
 		Use:   "update [UUID] [key] [value]",
 		Short: "update an existing entry in the database",
 		Args:  cobra.ExactArgs(3),
@@ -105,7 +108,7 @@ func GetCmdUpdate(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			msg := types.NewMsgUpdate(args[0], args[1], args[2], cliCtx.GetFromAddress())
+			msg := types.MsgUpdate{UUID: args[0], Key: args[1], Value: args[2], Lease: leaseValue, Owner: cliCtx.GetFromAddress()}
 
 			err := msg.ValidateBasic()
 			if err != nil {
@@ -115,6 +118,9 @@ func GetCmdUpdate(cdc *codec.Codec) *cobra.Command {
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
+
+	cc.PersistentFlags().Int64Var(&leaseValue, "lease", 0, "lease in blocks (default 0 (no change))")
+	return &cc
 }
 
 func GetCmdDelete(cdc *codec.Codec) *cobra.Command {

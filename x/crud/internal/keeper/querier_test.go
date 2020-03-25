@@ -47,7 +47,7 @@ func Test_queryRead(t *testing.T) {
 
 	// always return nil for a store...
 	mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
-	mockKeeper.EXPECT().GetBLZValue(ctx, nil, "uuid", "key").
+	mockKeeper.EXPECT().GetValue(ctx, nil, "uuid", "key").
 		Return(types.BLZValue{
 			Value: expectedValue,
 			Owner: expectedOwner,
@@ -63,7 +63,7 @@ func Test_queryRead(t *testing.T) {
 	assert.Equal(t, json_result.Value, expectedValue)
 
 	// item does not exist.
-	mockKeeper.EXPECT().GetBLZValue(ctx, nil, "uuid", "key")
+	mockKeeper.EXPECT().GetValue(ctx, nil, "uuid", "key")
 	result, err = queryRead(ctx, []string{"uuid", "key"}, abci.RequestQuery{}, mockKeeper, cdc)
 
 	assert.NotNil(t, err)

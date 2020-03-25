@@ -63,10 +63,21 @@ func handleMsgCreate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgCreate
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Key already exists")
 	}
 
+	// default lease...
+	if msg.Lease == 0 {
+		msg.Lease = keeper.GetDefaultLeaseBlocks()
+	}
+
 	keeper.SetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key, types.BLZValue{
-		Value: msg.Value,
-		Owner: msg.Owner,
+		Value:  msg.Value,
+		Owner:  msg.Owner,
+		Lease:  msg.Lease,
+		Height: ctx.BlockHeight(),
 	})
+
+	leaseCtx := ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
+	keeper.SetLease(keeper.GetLeaseStore(leaseCtx), msg.UUID, msg.Key, ctx.BlockHeight(), msg.Lease)
+
 	return &sdk.Result{}, nil
 }
 
@@ -80,7 +91,8 @@ func handleMsgRead(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgRead) (*
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Key does not exist")
 	}
 
-	json_data, err := json.Marshal(types.QueryResultRead{msg.UUID, msg.Key, keeper.GetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key).Value})
+	blzValue := keeper.GetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key)
+	json_data, err := json.Marshal(types.QueryResultRead{msg.UUID, msg.Key, blzValue.Value, blzValue.Height, blzValue.Lease})
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "could not marshal result to JSON")
 	}
@@ -102,8 +114,27 @@ func handleMsgUpdate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgUpdate
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Incorrect Owner")
 	}
 
-	keeper.SetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key, types.BLZValue{Value: msg.Value, Owner: msg.Owner})
+	oldBlzValue := keeper.GetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key)
 
+	if msg.Lease != 0 { // 0 means no change to lease
+		newLease := oldBlzValue.Lease + msg.Lease
+		if newLease <= 0 {
+			return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid lease")
+		}
+
+		if (oldBlzValue.Height + newLease) <= ctx.BlockHeight() {
+			return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid lease")
+		}
+
+		keeper.SetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key, types.BLZValue{Value: msg.Value, Lease: newLease, Height: oldBlzValue.Height, Owner: msg.Owner})
+
+		leaseCtx := ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
+		keeper.DeleteLease(keeper.GetLeaseStore(leaseCtx), msg.UUID, msg.Key, oldBlzValue.Height, oldBlzValue.Lease)
+		keeper.SetLease(keeper.GetLeaseStore(leaseCtx), msg.UUID, msg.Key, oldBlzValue.Height, newLease)
+	} else {
+		keeper.SetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key, types.BLZValue{Value: msg.Value, Lease: oldBlzValue.Lease,
+			Owner: msg.Owner, Height: oldBlzValue.Height})
+	}
 	return &sdk.Result{}, nil
 }
 
@@ -121,7 +152,8 @@ func handleMsgDelete(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgDelete
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Incorrect Owner")
 	}
 
-	keeper.DeleteValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key)
+	newCtx := ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
+	keeper.DeleteValue(ctx, keeper.GetKVStore(ctx), keeper.GetLeaseStore(newCtx), msg.UUID, msg.Key)
 
 	return &sdk.Result{}, nil
 }

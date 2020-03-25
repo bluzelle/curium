@@ -22,15 +22,10 @@ import (
 )
 
 type BLZValue struct {
-	Value string         `json:"value"`
-	Owner sdk.AccAddress `json:"owner"`
-}
-
-func NewBLZValue() BLZValue {
-	return BLZValue{
-		Value: "",
-		Owner: nil,
-	}
+	Value  string         `json:"value"`
+	Lease  int64          `json:"lease"`
+	Height int64          `json:"height"`
+	Owner  sdk.AccAddress `json:"owner"`
 }
 
 func (kv BLZValue) Unmarshal(b []byte) BLZValue {

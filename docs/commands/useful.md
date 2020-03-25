@@ -189,8 +189,9 @@ request transaction
     }
 
 ***
-## query distribution validator-outstanding-rewards
->Query distribution outstanding (un-withdrawn) rewards for a validator and all their delegations
+# query distribution validator-outstanding-rewards
+>Query distribution outstanding (un-withdrawn) rewards for a validator and all 
+ their delegations
 
     blzcli query distribution validator-outstanding-rewards [validator] [flags]
 
