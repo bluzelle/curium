@@ -49,30 +49,28 @@ func (mr *MockIKeeperMockRecorder) DeleteAll(arg0, arg1, arg2, arg3 interface{})
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAll", reflect.TypeOf((*MockIKeeper)(nil).DeleteAll), arg0, arg1, arg2, arg3)
 }
 
-// DeleteValue mocks base method
-func (m *MockIKeeper) DeleteValue(arg0 types1.Context, arg1 types0.KVStore, arg2, arg3 string) {
+// DeleteLease mocks base method
+func (m *MockIKeeper) DeleteLease(arg0 types0.KVStore, arg1, arg2 string, arg3, arg4 int64) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "DeleteValue", arg0, arg1, arg2, arg3)
+	m.ctrl.Call(m, "DeleteLease", arg0, arg1, arg2, arg3, arg4)
+}
+
+// DeleteLease indicates an expected call of DeleteLease
+func (mr *MockIKeeperMockRecorder) DeleteLease(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteLease", reflect.TypeOf((*MockIKeeper)(nil).DeleteLease), arg0, arg1, arg2, arg3, arg4)
+}
+
+// DeleteValue mocks base method
+func (m *MockIKeeper) DeleteValue(arg0 types1.Context, arg1, arg2 types0.KVStore, arg3, arg4 string) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "DeleteValue", arg0, arg1, arg2, arg3, arg4)
 }
 
 // DeleteValue indicates an expected call of DeleteValue
-func (mr *MockIKeeperMockRecorder) DeleteBLZValue(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+func (mr *MockIKeeperMockRecorder) DeleteValue(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteValue", reflect.TypeOf((*MockIKeeper)(nil).DeleteValue), arg0, arg1, arg2, arg3)
-}
-
-// GetValue mocks base method
-func (m *MockIKeeper) GetValue(arg0 types1.Context, arg1 types0.KVStore, arg2, arg3 string) types.BLZValue {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetValue", arg0, arg1, arg2, arg3)
-	ret0, _ := ret[0].(types.BLZValue)
-	return ret0
-}
-
-// GetValue indicates an expected call of GetValue
-func (mr *MockIKeeperMockRecorder) GetBLZValue(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetValue", reflect.TypeOf((*MockIKeeper)(nil).GetValue), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteValue", reflect.TypeOf((*MockIKeeper)(nil).DeleteValue), arg0, arg1, arg2, arg3, arg4)
 }
 
 // GetCdc mocks base method
@@ -101,6 +99,20 @@ func (m *MockIKeeper) GetCount(arg0 types1.Context, arg1 types0.KVStore, arg2 st
 func (mr *MockIKeeperMockRecorder) GetCount(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCount", reflect.TypeOf((*MockIKeeper)(nil).GetCount), arg0, arg1, arg2, arg3)
+}
+
+// GetDefaultLeaseBlocks mocks base method
+func (m *MockIKeeper) GetDefaultLeaseBlocks() int64 {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDefaultLeaseBlocks")
+	ret0, _ := ret[0].(int64)
+	return ret0
+}
+
+// GetDefaultLeaseBlocks indicates an expected call of GetDefaultLeaseBlocks
+func (mr *MockIKeeperMockRecorder) GetDefaultLeaseBlocks() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultLeaseBlocks", reflect.TypeOf((*MockIKeeper)(nil).GetDefaultLeaseBlocks))
 }
 
 // GetKVStore mocks base method
@@ -145,6 +157,20 @@ func (mr *MockIKeeperMockRecorder) GetKeys(arg0, arg1, arg2, arg3 interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKeys", reflect.TypeOf((*MockIKeeper)(nil).GetKeys), arg0, arg1, arg2, arg3)
 }
 
+// GetLeaseStore mocks base method
+func (m *MockIKeeper) GetLeaseStore(arg0 types1.Context) types0.KVStore {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetLeaseStore", arg0)
+	ret0, _ := ret[0].(types0.KVStore)
+	return ret0
+}
+
+// GetLeaseStore indicates an expected call of GetLeaseStore
+func (mr *MockIKeeperMockRecorder) GetLeaseStore(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLeaseStore", reflect.TypeOf((*MockIKeeper)(nil).GetLeaseStore), arg0)
+}
+
 // GetOwner mocks base method
 func (m *MockIKeeper) GetOwner(arg0 types1.Context, arg1 types0.KVStore, arg2, arg3 string) types1.AccAddress {
 	m.ctrl.T.Helper()
@@ -157,6 +183,20 @@ func (m *MockIKeeper) GetOwner(arg0 types1.Context, arg1 types0.KVStore, arg2, a
 func (mr *MockIKeeperMockRecorder) GetOwner(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOwner", reflect.TypeOf((*MockIKeeper)(nil).GetOwner), arg0, arg1, arg2, arg3)
+}
+
+// GetValue mocks base method
+func (m *MockIKeeper) GetValue(arg0 types1.Context, arg1 types0.KVStore, arg2, arg3 string) types.BLZValue {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetValue", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(types.BLZValue)
+	return ret0
+}
+
+// GetValue indicates an expected call of GetValue
+func (mr *MockIKeeperMockRecorder) GetValue(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetValue", reflect.TypeOf((*MockIKeeper)(nil).GetValue), arg0, arg1, arg2, arg3)
 }
 
 // GetValuesIterator mocks base method
@@ -187,6 +227,18 @@ func (mr *MockIKeeperMockRecorder) IsKeyPresent(arg0, arg1, arg2, arg3 interface
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsKeyPresent", reflect.TypeOf((*MockIKeeper)(nil).IsKeyPresent), arg0, arg1, arg2, arg3)
 }
 
+// ProcessLeasesAtBlockHeight mocks base method
+func (m *MockIKeeper) ProcessLeasesAtBlockHeight(arg0 types1.Context, arg1, arg2 types0.KVStore, arg3 int64) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "ProcessLeasesAtBlockHeight", arg0, arg1, arg2, arg3)
+}
+
+// ProcessLeasesAtBlockHeight indicates an expected call of ProcessLeasesAtBlockHeight
+func (mr *MockIKeeperMockRecorder) ProcessLeasesAtBlockHeight(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessLeasesAtBlockHeight", reflect.TypeOf((*MockIKeeper)(nil).ProcessLeasesAtBlockHeight), arg0, arg1, arg2, arg3)
+}
+
 // RenameKey mocks base method
 func (m *MockIKeeper) RenameKey(arg0 types1.Context, arg1 types0.KVStore, arg2, arg3, arg4 string) bool {
 	m.ctrl.T.Helper()
@@ -196,9 +248,21 @@ func (m *MockIKeeper) RenameKey(arg0 types1.Context, arg1 types0.KVStore, arg2, 
 }
 
 // RenameKey indicates an expected call of RenameKey
-func (mr *MockIKeeperMockRecorder) RenameBLZKey(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
+func (mr *MockIKeeperMockRecorder) RenameKey(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RenameKey", reflect.TypeOf((*MockIKeeper)(nil).RenameKey), arg0, arg1, arg2, arg3, arg4)
+}
+
+// SetLease mocks base method
+func (m *MockIKeeper) SetLease(arg0 types0.KVStore, arg1, arg2 string, arg3, arg4 int64) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "SetLease", arg0, arg1, arg2, arg3, arg4)
+}
+
+// SetLease indicates an expected call of SetLease
+func (mr *MockIKeeperMockRecorder) SetLease(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetLease", reflect.TypeOf((*MockIKeeper)(nil).SetLease), arg0, arg1, arg2, arg3, arg4)
 }
 
 // SetValue mocks base method
@@ -208,7 +272,7 @@ func (m *MockIKeeper) SetValue(arg0 types1.Context, arg1 types0.KVStore, arg2, a
 }
 
 // SetValue indicates an expected call of SetValue
-func (mr *MockIKeeperMockRecorder) SetBLZValue(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
+func (mr *MockIKeeperMockRecorder) SetValue(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetValue", reflect.TypeOf((*MockIKeeper)(nil).SetValue), arg0, arg1, arg2, arg3, arg4)
 }

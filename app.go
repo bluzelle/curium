@@ -42,9 +42,12 @@ import (
 	"time"
 )
 
-const crudModuleEntry = "bluzelle_crud"
-const maxKeysSize = uint64(102400)
-const maxKeyValuesSize = uint64(102400)
+const (
+	crudModuleEntry         = "bluzelle_crud"
+	maxKeysSize             = uint64(102400)
+	maxKeyValuesSize        = uint64(102400)
+	DefaultLeaseBlockHeight = int64(10 * 86400 / 5) // (10 days of blocks * seconds/day) / 5
+)
 
 var (
 	// default home directories for the application CLI
@@ -136,7 +139,7 @@ func NewCRUDApp(
 	bApp.SetAppVersion(version.Version)
 
 	keys := sdk.NewKVStoreKeys(bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
-		supply.StoreKey, distr.StoreKey, slashing.StoreKey, params.StoreKey, crud.StoreKey, faucet.StoreKey)
+		supply.StoreKey, distr.StoreKey, slashing.StoreKey, params.StoreKey, crud.StoreKey, faucet.StoreKey, crud.LeaseKey)
 
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -219,19 +222,16 @@ func NewCRUDApp(
 	app.crudKeeper = crud.NewKeeper(
 		app.bankKeeper,
 		keys[crud.StoreKey],
+		keys[crud.LeaseKey],
 		app.cdc,
-		crud.MaxKeeperSizes{MaxKeysSize: maxKeysSize, MaxKeyValuesSize: maxKeyValuesSize},
+		crud.MaxKeeperSizes{MaxKeysSize: maxKeysSize, MaxKeyValuesSize: maxKeyValuesSize, MaxDefaultLeaseBlocks: DefaultLeaseBlockHeight},
 	)
-
-	// Example use of the faucet:
-	//
-	// blzcli tx faucet mintfor $(blzcli keys show neeraj -a) --from vuser --gas-prices 0.01bnt
 
 	app.faucetKeeper = faucet.NewKeeper(
 		app.supplyKeeper,
 		app.stakingKeeper,
-		2000000000,    // How many tokens to mint out for every successful request
-		5*time.Minute, // Time you have to wait before you can use the faucet again for a given beneficiary address
+		2000000000,
+		5*time.Minute,
 		keys[faucet.StoreKey],
 		app.cdc)
 
@@ -320,7 +320,9 @@ func (app *CRUDApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) ab
 }
 
 func (app *CRUDApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
-	return app.mm.EndBlock(ctx, req)
+	r := app.mm.EndBlock(ctx, req)
+	app.crudKeeper.ProcessLeasesAtBlockHeight(ctx, app.crudKeeper.GetKVStore(ctx), app.crudKeeper.GetLeaseStore(ctx), ctx.BlockHeight())
+	return r
 }
 
 func (app *CRUDApp) LoadHeight(height int64) error {

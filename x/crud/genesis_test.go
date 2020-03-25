@@ -47,11 +47,11 @@ func TestValidateGenesis(t *testing.T) {
 
 	assert.Nil(t, ValidateGenesis(genesisState))
 
-	blzValues = append(blzValues, types.BLZValue{"test", []byte("notnilowner")})
+	blzValues = append(blzValues, types.BLZValue{"test", 0, 0, []byte("notnilowner")})
 
 	assert.Nil(t, ValidateGenesis(genesisState))
 
-	blzValues = append(blzValues, types.BLZValue{"test", nil})
+	blzValues = append(blzValues, types.BLZValue{"test", 0, 0, nil})
 
 	assert.Nil(t, ValidateGenesis(genesisState))
 }
@@ -65,7 +65,7 @@ func TestInitGenesis(t *testing.T) {
 	data.BlzValues = append(data.BlzValues, types.BLZValue{Value: "test", Owner: owner})
 
 	mockKeeper.EXPECT().
-		SetBLZValue(ctx, nil, "UUID-Genesis", "Key-Genesis",
+		SetValue(ctx, nil, "UUID-Genesis", "Key-Genesis",
 			types.BLZValue{Value: "test", Owner: owner})
 
 	mockKeeper.EXPECT().

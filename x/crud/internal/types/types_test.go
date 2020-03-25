@@ -21,10 +21,6 @@ import (
 	"testing"
 )
 
-func TestNewBLZValue(t *testing.T) {
-	assert.True(t, reflect.DeepEqual(NewBLZValue(), BLZValue{}))
-}
-
 func TestBLZValue_Unmarshal(t *testing.T) {
 	value := BLZValue{
 		Value: "value",
