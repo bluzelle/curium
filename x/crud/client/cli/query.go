@@ -39,6 +39,7 @@ func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 		GetCmdQKeys(storeKey, cdc),
 		GetCmdQKeyValues(storeKey, cdc),
 		GetCmdQCount(storeKey, cdc),
+		GetCmdQGetLease(storeKey, cdc),
 	)...)
 
 	return crudQueryCmd
@@ -143,6 +144,28 @@ func GetCmdQCount(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			var out types.QueryResultCount
 			cdc.MustUnmarshalJSON(res, &out)
 
+			return cliCtx.PrintOutput(out)
+		},
+	}
+}
+
+func GetCmdQGetLease(queryRoute string, cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "getlease [UUID] [key]",
+		Short: "getlease UUID key",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			UUID := args[0]
+			key := args[1]
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/getlease/%s/%s", queryRoute, UUID, key), nil)
+
+			if err != nil {
+				fmt.Printf("could not read key - %s : %s\n", UUID, key)
+				return nil
+			}
+			var out types.QueryResultLease
+			cdc.MustUnmarshalJSON(res, &out)
 			return cliCtx.PrintOutput(out)
 		},
 	}

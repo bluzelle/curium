@@ -172,3 +172,37 @@ func Test_queryVersion(t *testing.T) {
 	assert.Equal(t, json_result.ServerName, "<appd>")
 	assert.Equal(t, json_result.ClientName, "<appcli>")
 }
+
+func Test_queryGetLease(t *testing.T) {
+	ctx, cdc, mockKeeper := initTest(t)
+
+	expectedOwner := []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
+
+	mockKeeper.EXPECT().GetKVStore(gomock.Any()).AnyTimes().Return(nil)
+	mockKeeper.EXPECT().GetValue(gomock.Any(), nil, "uuid", "key").Return(types.BLZValue{
+		Value:  "test",
+		Lease:  10,
+		Height: 1000,
+		Owner:  expectedOwner,
+	})
+
+	mockKeeper.EXPECT().GetCdc().AnyTimes().Return(cdc)
+
+	newCtx := ctx.WithBlockHeight(1009)
+
+	result, err := NewQuerier(mockKeeper)(newCtx, []string{"getlease", "uuid", "key"}, abci.RequestQuery{})
+	assert.Nil(t, err)
+
+	json_result := types.QueryResultLease{}
+	json.Unmarshal(result, &json_result)
+
+	assert.Equal(t, "uuid", json_result.UUID)
+	assert.Equal(t, "key", json_result.Key)
+	assert.Equal(t, int64(1), json_result.Lease)
+
+	mockKeeper.EXPECT().GetValue(gomock.Any(), nil, "uuid", "key")
+
+	_, err = NewQuerier(mockKeeper)(newCtx, []string{"getlease", "uuid", "key"}, abci.RequestQuery{})
+	assert.NotNil(t, err)
+
+}

@@ -15,11 +15,9 @@
 package types
 
 type QueryResultRead struct {
-	UUID   string `json:"uuid"`
-	Key    string `json:"key"`
-	Value  string `json:"value"`
-	Height int64  `json:"height,string"` // TODO: remove?
-	Lease  int64  `json:"lease,string"`
+	UUID  string `json:"uuid"`
+	Key   string `json:"key"`
+	Value string `json:"value"`
 }
 
 // for fmt.Stringer
@@ -55,4 +53,10 @@ type QueryResultKeyValues struct {
 type QueryResultCount struct {
 	UUID  string `json:"uuid"`
 	Count uint64 `json:"count,string"`
+}
+
+type QueryResultLease struct {
+	UUID  string `json:"uuid"`
+	Key   string `json:"key"`
+	Lease int64  `json:"lease,string"`
 }

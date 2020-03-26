@@ -31,6 +31,7 @@ const (
 	QueryKeyValues = "keyvalues"
 	QueryCount     = "count"
 	QueryVersion   = "version"
+	QueryGetLease  = "getlease"
 )
 
 func NewQuerier(keeper IKeeper) sdk.Querier {
@@ -48,6 +49,8 @@ func NewQuerier(keeper IKeeper) sdk.Querier {
 			return queryCount(ctx, path[1:], req, keeper, keeper.GetCdc())
 		case QueryVersion:
 			return queryVersion()
+		case QueryGetLease:
+			return queryGetLease(ctx, path[1:], req, keeper, keeper.GetCdc())
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown crud query endpoint")
 		}
@@ -61,7 +64,7 @@ func queryRead(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeep
 		return []byte{}, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "key not found")
 	}
 
-	res, err := codec.MarshalJSONIndent(cdc, types.QueryResultRead{UUID: path[0], Key: path[1], Value: blzValue.Value, Height: blzValue.Height, Lease: blzValue.Lease})
+	res, err := codec.MarshalJSONIndent(cdc, types.QueryResultRead{UUID: path[0], Key: path[1], Value: blzValue.Value})
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
@@ -109,4 +112,19 @@ func queryCount(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKee
 
 func queryVersion() ([]byte, error) {
 	return json.Marshal(version.NewInfo())
+}
+
+func queryGetLease(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, error) {
+	blzValue := keeper.GetValue(ctx, keeper.GetKVStore(ctx), path[0], path[1])
+
+	if len(blzValue.Owner) == 0 {
+		return []byte{}, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "key not found")
+	}
+
+	res, err := codec.MarshalJSONIndent(cdc, types.QueryResultLease{UUID: path[0], Key: path[1], Lease: blzValue.Height + blzValue.Lease - ctx.BlockHeight()})
+	if err != nil {
+		panic("could not marshal result to JSON")
+	}
+
+	return res, nil
 }
