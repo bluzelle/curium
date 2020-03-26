@@ -48,6 +48,8 @@ func NewHandler(keeper keeper.IKeeper) sdk.Handler {
 			return handleMsgDeleteAll(ctx, keeper, msg)
 		case types.MsgMultiUpdate:
 			return handleMsgMultiUpdate(ctx, keeper, msg)
+		case types.MsgGetLease:
+			return handleMsgGetLease(ctx, keeper, msg)
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, fmt.Sprintf("Unrecognized crud msg type: %v", msg.Type()))
 		}
@@ -92,7 +94,7 @@ func handleMsgRead(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgRead) (*
 	}
 
 	blzValue := keeper.GetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key)
-	json_data, err := json.Marshal(types.QueryResultRead{msg.UUID, msg.Key, blzValue.Value, blzValue.Height, blzValue.Lease})
+	json_data, err := json.Marshal(types.QueryResultRead{msg.UUID, msg.Key, blzValue.Value})
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "could not marshal result to JSON")
 	}
@@ -165,7 +167,6 @@ func handleMsgKeys(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgKeys) (*
 
 	json_data, err := json.Marshal(keeper.GetKeys(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Owner))
 	if err != nil {
-		fmt.Println(err)
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "could not marshal result to JSON")
 	}
 
@@ -179,7 +180,6 @@ func handleMsgHas(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgHas) (*sd
 
 	json_data, err := json.Marshal(types.QueryResultHas{UUID: msg.UUID, Key: msg.Key, Has: !keeper.GetOwner(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key).Empty()})
 	if err != nil {
-		fmt.Println(err)
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "could not marshal result to JSON")
 	}
 
@@ -214,7 +214,6 @@ func handleMsgKeyValues(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgKey
 
 	json_data, err := json.Marshal(keeper.GetKeyValues(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Owner))
 	if err != nil {
-		fmt.Println(err)
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "could not marshal result to JSON")
 	}
 
@@ -228,7 +227,6 @@ func handleMsgCount(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgCount) 
 
 	json_data, err := json.Marshal(keeper.GetCount(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Owner))
 	if err != nil {
-		fmt.Println(err)
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "could not marshal result to JSON")
 	}
 
@@ -269,4 +267,27 @@ func handleMsgMultiUpdate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgM
 	}
 
 	return &sdk.Result{}, nil
+}
+
+func handleMsgGetLease(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgGetLease) (*sdk.Result, error) {
+	if len(msg.UUID) == 0 || len(msg.Key) == 0 || msg.Owner.Empty() {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
+	}
+
+	value := keeper.GetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key)
+	if value.Owner.Empty() {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Key does not exist")
+	}
+
+	json_data, err := json.Marshal(types.QueryResultLease{
+		UUID:  msg.UUID,
+		Key:   msg.Key,
+		Lease: value.Lease + value.Height - ctx.BlockHeight(),
+	})
+
+	if err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "could not marshal result to JSON")
+	}
+
+	return &sdk.Result{Data: json_data}, nil
 }

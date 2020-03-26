@@ -50,6 +50,7 @@ func GetTxCmd(_ string, cdc *codec.Codec) *cobra.Command {
 		GetCmdCount(cdc),
 		GetCmdDeleteAll(cdc),
 		GetCmdMultiUpdate(cdc),
+		GetCmdGetLease(cdc),
 	)...)
 
 	return crudTxCmd
@@ -299,6 +300,27 @@ func GetCmdMultiUpdate(cdc *codec.Codec) *cobra.Command {
 			}
 
 			return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "incorrect number of k/v arguments")
+		},
+	}
+}
+
+func GetCmdGetLease(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "getlease [UUID] [key]",
+		Short: "get the remaining lease blocks for an existing entry",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
+			msg := types.MsgGetLease{args[0], args[1], cliCtx.GetFromAddress()}
+
+			err := msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
 }

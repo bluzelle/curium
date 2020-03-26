@@ -108,7 +108,7 @@ func Test_handleMsgRead(t *testing.T) {
 			Key:   "key",
 			Owner: owner,
 		}
-		assert.Equal(t, readMsg.Type(), "read")
+		assert.Equal(t, "read", readMsg.Type())
 
 		// always return nil for a store...
 		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
@@ -138,7 +138,7 @@ func Test_handleMsgRead(t *testing.T) {
 		json_result := types.BLZValue{}
 		json.Unmarshal(result.Data, &json_result)
 
-		assert.Equal(t, json_result.Value, "utest")
+		assert.Equal(t, "utest", json_result.Value)
 	}
 
 	// Test for empty message parameters
@@ -713,4 +713,67 @@ func Test_handleMsgMultiUpdate(t *testing.T) {
 		_, err = handleMsgMultiUpdate(ctx, mockKeeper, types.MsgMultiUpdate{UUID: "uuid", KeyValues: []types.KeyValue{{Key: "key0", Value: "value1"}}})
 		assert.NotNil(t, err)
 	}
+}
+
+func Test_handleMsgGetLease(t *testing.T) {
+	mockCtrl, mockKeeper, ctx, owner := initTest(t)
+	defer mockCtrl.Finish()
+
+	// Key not found test
+	{
+		msgGetLease := types.MsgGetLease{
+			UUID:  "uuid",
+			Key:   "key",
+			Owner: owner,
+		}
+
+		// always return nil for a store...
+		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
+		mockKeeper.EXPECT().GetValue(ctx, nil, msgGetLease.UUID, msgGetLease.Key)
+
+		_, err := NewHandler(mockKeeper)(ctx, msgGetLease)
+		assert.NotNil(t, err)
+		assert.Equal(t, "invalid request: Key does not exist", err.Error())
+	}
+
+	// Get the correct Lease value
+	{
+		msgGetLease := types.MsgGetLease{
+			UUID:  "uuid",
+			Key:   "key",
+			Owner: owner,
+		}
+
+		// always return nil for a store...
+		mockKeeper.EXPECT().GetKVStore(gomock.Any()).AnyTimes().Return(nil)
+		mockKeeper.EXPECT().GetValue(gomock.Any(), nil, msgGetLease.UUID, msgGetLease.Key).Return(types.BLZValue{
+			Value:  "test",
+			Lease:  10,
+			Height: 1000,
+			Owner:  msgGetLease.Owner,
+		})
+
+		newCtx := ctx.WithBlockHeight(1009)
+
+		result, err := NewHandler(mockKeeper)(newCtx, msgGetLease)
+		assert.Nil(t, err)
+
+		json_result := types.QueryResultLease{}
+		json.Unmarshal(result.Data, &json_result)
+
+		assert.Equal(t, int64(1), json_result.Lease)
+	}
+
+	// Test for empty message parameters
+	{
+		_, err := handleMsgGetLease(ctx, mockKeeper, types.MsgGetLease{})
+		assert.NotNil(t, err)
+
+		_, err = handleMsgGetLease(ctx, mockKeeper, types.MsgGetLease{UUID: "uuid"})
+		assert.NotNil(t, err)
+
+		_, err = handleMsgGetLease(ctx, mockKeeper, types.MsgGetLease{UUID: "uuid", Key: "key"})
+		assert.NotNil(t, err)
+	}
+
 }

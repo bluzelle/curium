@@ -464,3 +464,39 @@ func (msg MsgMultiUpdate) GetSignBytes() []byte {
 func (msg MsgMultiUpdate) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner}
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// GetLease
+type MsgGetLease struct {
+	UUID  string
+	Key   string
+	Owner sdk.AccAddress
+}
+
+func (msg MsgGetLease) Route() string { return RouterKey }
+
+func (msg MsgGetLease) Type() string { return "getlease" }
+
+func (msg MsgGetLease) ValidateBasic() error {
+	if msg.Owner.Empty() {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
+	}
+
+	if len(msg.UUID) == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID empty")
+	}
+
+	if len(msg.Key) == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Key empty")
+	}
+
+	return nil
+}
+
+func (msg MsgGetLease) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
+
+func (msg MsgGetLease) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Owner}
+}
