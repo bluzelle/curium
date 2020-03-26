@@ -560,3 +560,55 @@ func TestMsgMultiUpdate_GetSigners(t *testing.T) {
 	msg := NewMsgMultiUpdate("uuid", []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"), nil)
 	Equal(t, msg.GetSigners(), []sdk.AccAddress{msg.Owner})
 }
+
+/////////////////////////////////////////////////////////////////////////////////
+func TestMsgGetLease_Route(t *testing.T) {
+	Equal(t, "crud", MsgGetLease{}.Route())
+}
+
+func TestMsgGetLease_Type(t *testing.T) {
+	Equal(t, "getlease", MsgGetLease{}.Type())
+}
+
+func TestMsgGetLease_ValidateBasic(t *testing.T) {
+	sut := MsgGetLease{
+		UUID:  "uuid",
+		Key:   "key",
+		Owner: []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"),
+	}
+
+	Nil(t, sut.ValidateBasic())
+
+	sut.UUID = ""
+	Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID empty").Error(), sut.ValidateBasic().Error())
+
+	sut.UUID = "uuid"
+	sut.Key = ""
+	Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Key empty").Error(), sut.ValidateBasic().Error())
+
+	sut.UUID = "uuid"
+	sut.Key = "key"
+	sut.Owner = nil
+
+	Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "").Error(), sut.ValidateBasic().Error())
+
+}
+
+func TestMsgGetLease_GetSignBytes(t *testing.T) {
+	sut := MsgGetLease{
+		UUID:  "uuid",
+		Key:   "key",
+		Owner: []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"),
+	}
+	Equal(t, "{\"type\":\"crud/getlease\",\"value\":{\"Key\":\"key\",\"Owner\":\"cosmos1vfk827n9d3kx2vt5xpuhwardwfj82mryvcmxsdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\"}}", string(sut.GetSignBytes()))
+}
+
+func TestMsgGetLease_GetSigners(t *testing.T) {
+	sut := MsgGetLease{
+		UUID:  "uuid",
+		Key:   "key",
+		Owner: []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"),
+	}
+	Equal(t, sut.GetSigners(), []sdk.AccAddress{sut.Owner})
+
+}
