@@ -46,3 +46,14 @@ type KeyValue struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
 }
+
+type KeyLease struct {
+	Key   string `json:"key"`
+	Lease int64  `json:"lease,string"`
+}
+
+type KeyLeases []KeyLease
+
+func (a KeyLeases) Len() int           { return len(a) }
+func (a KeyLeases) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a KeyLeases) Less(i, j int) bool { return a[i].Lease < a[j].Lease }

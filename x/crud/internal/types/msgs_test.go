@@ -612,3 +612,52 @@ func TestMsgGetLease_GetSigners(t *testing.T) {
 	Equal(t, sut.GetSigners(), []sdk.AccAddress{sut.Owner})
 
 }
+
+/////////////////////////////////////////////////////////////////////////////////
+func TestMsgGetNShortestLease_Route(t *testing.T) {
+	Equal(t, "crud", MsgGetNShortestLease{}.Route())
+}
+
+func TestMsgGetNShortestLease_Type(t *testing.T) {
+	Equal(t, "getnshortestlease", MsgGetNShortestLease{}.Type())
+}
+
+func TestMsgGetNShortestLease_ValidateBasic(t *testing.T) {
+	sut := MsgGetNShortestLease{
+		UUID:  "uuid",
+		N:     10,
+		Owner: []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"),
+	}
+
+	Nil(t, sut.ValidateBasic())
+
+	sut.UUID = ""
+	Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID empty").Error(), sut.ValidateBasic().Error())
+
+	sut.UUID = "uuid"
+	sut.N = 0
+	Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "N must be larger than 0").Error(), sut.ValidateBasic().Error())
+
+	sut.Owner = nil
+	sut.N = 596740
+	Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "").Error(), sut.ValidateBasic().Error())
+
+}
+
+func TestMsgGetNShortestLease_GetSignBytes(t *testing.T) {
+	sut := MsgGetNShortestLease{
+		UUID:  "uuid",
+		N:     10,
+		Owner: []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"),
+	}
+	Equal(t, "{\"type\":\"crud/getnshortestlease\",\"value\":{\"N\":\"10\",\"Owner\":\"cosmos1vfk827n9d3kx2vt5xpuhwardwfj82mryvcmxsdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\"}}", string(sut.GetSignBytes()))
+}
+
+func TestMsgGetNShortestLease_GetSigners(t *testing.T) {
+	sut := MsgGetNShortestLease{
+		UUID:  "uuid",
+		N:     10,
+		Owner: []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"),
+	}
+	Equal(t, sut.GetSigners(), []sdk.AccAddress{sut.Owner})
+}

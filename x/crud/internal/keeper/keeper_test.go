@@ -15,6 +15,7 @@
 package keeper
 
 import (
+	"fmt"
 	"github.com/bluzelle/curium/x/crud/internal/types"
 	"github.com/bluzelle/curium/x/crud/mocks"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -161,7 +162,6 @@ func TestKeeper_GetValuesIterator(t *testing.T) {
 }
 
 func TestKeeper_GetKeys(t *testing.T) {
-	// TODO: ensure that we only get keys associated with the owner
 	ctx, testStore, owner, cdc := initKeeperTest(t)
 	keeper := NewKeeper(nil, nil, nil, cdc, MaxKeeperSizes{MaxKeysSize: 1024})
 
@@ -489,4 +489,36 @@ func TestKeeper_GetCdc(t *testing.T) {
 	keeper := NewKeeper(nil, nil, nil, cdc, MaxKeeperSizes{MaxDefaultLeaseBlocks: DefaultLeaseBlockHeight})
 
 	assert.Equal(t, cdc, keeper.GetCdc())
+}
+
+func TestKeeper_GetNShortestLease(t *testing.T) {
+	ctx, testStore, owner, cdc := initKeeperTest(t)
+	keeper := NewKeeper(nil, nil, nil, cdc, MaxKeeperSizes{MaxKeysSize: 1024})
+
+	currentBlockHeight := int64(1)
+
+	for i := 0; i < 10; i++ {
+		l := int64(10000 - 10*i)
+		value := types.BLZValue{
+			Value:  "value",
+			Lease:  l,
+			Height: 1000,
+			Owner:  owner,
+		}
+		testStore.Set([]byte(MakeMetaKey("uuid", fmt.Sprintf("key%d", l))), cdc.MustMarshalBinaryBare(value))
+	}
+
+	// there are at least 10 keys
+	newCtx := ctx.WithBlockHeight(currentBlockHeight)
+	response := keeper.GetNShortestLease(newCtx, testStore, "uuid", owner, 5)
+
+	assert.Equal(t, "uuid", response.UUID)
+	assert.Equal(t, 5, len(response.KeyLeases))
+
+	assert.Equal(t, "key9910", response.KeyLeases[0].Key)
+	assert.Equal(t, int64(9910+1000-currentBlockHeight), response.KeyLeases[0].Lease)
+
+	response = keeper.GetNShortestLease(newCtx, testStore, "wronguuid", owner, 5)
+	assert.Equal(t, "wronguuid", response.UUID)
+	assert.Equal(t, 0, len(response.KeyLeases))
 }

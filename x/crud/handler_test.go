@@ -777,3 +777,43 @@ func Test_handleMsgGetLease(t *testing.T) {
 	}
 
 }
+
+func Test_handleMsgGetNShortestLease(t *testing.T) {
+	mockCtrl, mockKeeper, ctx, owner := initTest(t)
+	defer mockCtrl.Finish()
+
+	{
+		accepted := types.KeyLeases{{"key00", 11},
+			{"key01", 22},
+			{"key02", 33},
+			{"key03", 44},
+			{"key04", 55}}
+
+		response := types.QueryResultNShortestLeaseKeys{
+			UUID:      "uuid",
+			KeyLeases: accepted,
+		}
+
+		mockKeeper.EXPECT().GetKVStore(gomock.Any()).AnyTimes().Return(nil)
+		mockKeeper.EXPECT().GetNShortestLease(ctx, nil, "uuid", gomock.Any(), uint64(5)).Return(response)
+
+		result, err := NewHandler(mockKeeper)(ctx, types.MsgGetNShortestLease{UUID: "uuid", Owner: owner, N: 5})
+
+		assert.Nil(t, err)
+		json_result := types.QueryResultNShortestLeaseKeys{}
+		json.Unmarshal(result.Data, &json_result)
+		assert.True(t, reflect.DeepEqual(response, json_result))
+	}
+
+	// Test for empty message parameters
+	{
+		_, err := handleMsgGetNShortestLease(ctx, mockKeeper, types.MsgGetNShortestLease{})
+		assert.NotNil(t, err)
+
+		_, err = handleMsgGetNShortestLease(ctx, mockKeeper, types.MsgGetNShortestLease{UUID: "uuid"})
+		assert.NotNil(t, err)
+
+		_, err = handleMsgGetNShortestLease(ctx, mockKeeper, types.MsgGetNShortestLease{UUID: "uuid", N: 11})
+		assert.NotNil(t, err)
+	}
+}

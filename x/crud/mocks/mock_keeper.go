@@ -171,6 +171,20 @@ func (mr *MockIKeeperMockRecorder) GetLeaseStore(arg0 interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLeaseStore", reflect.TypeOf((*MockIKeeper)(nil).GetLeaseStore), arg0)
 }
 
+// GetNShortestLease mocks base method
+func (m *MockIKeeper) GetNShortestLease(arg0 types1.Context, arg1 types0.KVStore, arg2 string, arg3 types1.AccAddress, arg4 uint64) types.QueryResultNShortestLeaseKeys {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetNShortestLease", arg0, arg1, arg2, arg3, arg4)
+	ret0, _ := ret[0].(types.QueryResultNShortestLeaseKeys)
+	return ret0
+}
+
+// GetNShortestLease indicates an expected call of GetNShortestLease
+func (mr *MockIKeeperMockRecorder) GetNShortestLease(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNShortestLease", reflect.TypeOf((*MockIKeeper)(nil).GetNShortestLease), arg0, arg1, arg2, arg3, arg4)
+}
+
 // GetOwner mocks base method
 func (m *MockIKeeper) GetOwner(arg0 types1.Context, arg1 types0.KVStore, arg2, arg3 string) types1.AccAddress {
 	m.ctrl.T.Helper()
