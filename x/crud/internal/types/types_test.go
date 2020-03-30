@@ -18,6 +18,7 @@ import (
 	cc "github.com/cosmos/cosmos-sdk/codec"
 	"github.com/stretchr/testify/assert"
 	"reflect"
+	"sort"
 	"testing"
 )
 
@@ -46,4 +47,32 @@ func TestBLZValue_String(t *testing.T) {
 		Value: "value",
 	}
 	assert.Equal(t, value.String(), "Value: value Owner: <empty>")
+}
+
+func TestKeyLeases_Sort(t *testing.T) {
+	keyLeases := KeyLeases{}
+	keyLeases = append(keyLeases, KeyLease{
+		Key:   "three",
+		Lease: 3,
+	})
+
+	keyLeases = append(keyLeases, KeyLease{
+		Key:   "one",
+		Lease: 1,
+	})
+
+	keyLeases = append(keyLeases, KeyLease{
+		Key:   "zero",
+		Lease: 0,
+	})
+
+	keyLeases = append(keyLeases, KeyLease{
+		Key:   "two",
+		Lease: 2,
+	})
+
+	sort.Sort(keyLeases)
+
+	assert.Equal(t, int64(0), keyLeases[0].Lease)
+	assert.Equal(t, int64(3), keyLeases[len(keyLeases)-1].Lease)
 }

@@ -22,6 +22,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/spf13/cobra"
+	"strconv"
 )
 
 func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
@@ -40,6 +41,7 @@ func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 		GetCmdQKeyValues(storeKey, cdc),
 		GetCmdQCount(storeKey, cdc),
 		GetCmdQGetLease(storeKey, cdc),
+		GetCmdQGetNShortestLease(storeKey, cdc),
 	)...)
 
 	return crudQueryCmd
@@ -166,6 +168,36 @@ func GetCmdQGetLease(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 			var out types.QueryResultLease
 			cdc.MustUnmarshalJSON(res, &out)
+			return cliCtx.PrintOutput(out)
+		},
+	}
+}
+
+func GetCmdQGetNShortestLease(queryRoute string, cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "getnshortestlease [UUID] [N]",
+		Short: "getnshortestlease UUID N",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			UUID := args[0]
+			N, err := strconv.ParseUint(args[1], 10, 64)
+
+			if err != nil {
+				fmt.Println(err.Error())
+				return nil
+			}
+
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/getnshortestlease/%s/%d", queryRoute, UUID, N), nil)
+
+			var out types.QueryResultNShortestLeaseKeys
+			cdc.MustUnmarshalJSON(res, &out)
+
+			// ensure we don't lose the fact that the keys list is empty...
+			if out.KeyLeases == nil {
+				out.KeyLeases = make([]types.KeyLease, 0)
+			}
+
 			return cliCtx.PrintOutput(out)
 		},
 	}
