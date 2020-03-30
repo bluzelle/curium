@@ -22,16 +22,18 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/version"
 	abci "github.com/tendermint/tendermint/abci/types"
+	"strconv"
 )
 
 const (
-	QueryRead      = "read"
-	QueryHas       = "has"
-	QueryKeys      = "keys"
-	QueryKeyValues = "keyvalues"
-	QueryCount     = "count"
-	QueryVersion   = "version"
-	QueryGetLease  = "getlease"
+	QueryRead              = "read"
+	QueryHas               = "has"
+	QueryKeys              = "keys"
+	QueryKeyValues         = "keyvalues"
+	QueryCount             = "count"
+	QueryVersion           = "version"
+	QueryGetLease          = "getlease"
+	QueryGetNShortestLease = "getnshortestlease"
 )
 
 func NewQuerier(keeper IKeeper) sdk.Querier {
@@ -51,6 +53,8 @@ func NewQuerier(keeper IKeeper) sdk.Querier {
 			return queryVersion()
 		case QueryGetLease:
 			return queryGetLease(ctx, path[1:], req, keeper, keeper.GetCdc())
+		case QueryGetNShortestLease:
+			return queryGetNShortestLease(ctx, path[1:], req, keeper, keeper.GetCdc())
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown crud query endpoint")
 		}
@@ -122,6 +126,23 @@ func queryGetLease(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper I
 	}
 
 	res, err := codec.MarshalJSONIndent(cdc, types.QueryResultLease{UUID: path[0], Key: path[1], Lease: blzValue.Height + blzValue.Lease - ctx.BlockHeight()})
+	if err != nil {
+		panic("could not marshal result to JSON")
+	}
+
+	return res, nil
+}
+
+func queryGetNShortestLease(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, error) {
+
+	N, err := strconv.ParseUint(path[1], 10, 64)
+	if err != nil {
+		return []byte{}, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, err.Error())
+	}
+
+	value := keeper.GetNShortestLease(ctx, keeper.GetKVStore(ctx), path[0], nil, N)
+
+	res, err := codec.MarshalJSONIndent(cdc, value)
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}

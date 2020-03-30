@@ -26,6 +26,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/spf13/cobra"
+	"strconv"
 )
 
 var leaseValue int64
@@ -51,6 +52,7 @@ func GetTxCmd(_ string, cdc *codec.Codec) *cobra.Command {
 		GetCmdDeleteAll(cdc),
 		GetCmdMultiUpdate(cdc),
 		GetCmdGetLease(cdc),
+		GetCmdGetNShortestLease(cdc),
 	)...)
 
 	return crudTxCmd
@@ -316,6 +318,34 @@ func GetCmdGetLease(cdc *codec.Codec) *cobra.Command {
 			msg := types.MsgGetLease{args[0], args[1], cliCtx.GetFromAddress()}
 
 			err := msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+		},
+	}
+}
+
+func GetCmdGetNShortestLease(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "getnshortestlease [UUID] [N]",
+		Short: "get the N shortest remaining lease blocks for an existing UUID",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
+
+			N, err := strconv.ParseUint(args[1], 10, 64)
+
+			if err != nil {
+				return err
+			}
+
+			msg := types.MsgGetNShortestLease{args[0], N, cliCtx.GetFromAddress()}
+
+			err = msg.ValidateBasic()
 			if err != nil {
 				return err
 			}

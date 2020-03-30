@@ -22,6 +22,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
+	"sort"
 	"strconv"
 )
 
@@ -32,24 +33,25 @@ type MaxKeeperSizes struct {
 }
 
 type IKeeper interface {
-	SetValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string, value types.BLZValue)
-	GetValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string) types.BLZValue
-	DeleteValue(ctx sdk.Context, store sdk.KVStore, leaseStore sdk.KVStore, UUID string, key string)
-	IsKeyPresent(ctx sdk.Context, store sdk.KVStore, UUID string, key string) bool
-	GetValuesIterator(ctx sdk.Context, store sdk.KVStore) sdk.Iterator
-	GetKeys(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultKeys
-	GetOwner(ctx sdk.Context, store sdk.KVStore, UUID string, key string) sdk.AccAddress
-	GetKVStore(ctx sdk.Context) sdk.KVStore
-	GetLeaseStore(ctx sdk.Context) sdk.KVStore
-	RenameKey(ctx sdk.Context, store sdk.KVStore, UUID string, key string, newkey string) bool
-	GetCdc() *codec.Codec
-	GetKeyValues(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultKeyValues
-	GetCount(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultCount
 	DeleteAll(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress)
-	SetLease(leaseStore sdk.KVStore, UUID string, key string, blockHeight int64, lease int64)
 	DeleteLease(leaseStore sdk.KVStore, UUID string, key string, blockHeight int64, leaseBlocks int64)
-	ProcessLeasesAtBlockHeight(ctx sdk.Context, store sdk.KVStore, leaseStore sdk.KVStore, lease int64)
+	DeleteValue(ctx sdk.Context, store sdk.KVStore, leaseStore sdk.KVStore, UUID string, key string)
+	GetCdc() *codec.Codec
+	GetCount(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultCount
 	GetDefaultLeaseBlocks() int64
+	GetKVStore(ctx sdk.Context) sdk.KVStore
+	GetKeyValues(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultKeyValues
+	GetKeys(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultKeys
+	GetLeaseStore(ctx sdk.Context) sdk.KVStore
+	GetNShortestLease(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress, n uint64) types.QueryResultNShortestLeaseKeys
+	GetOwner(ctx sdk.Context, store sdk.KVStore, UUID string, key string) sdk.AccAddress
+	GetValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string) types.BLZValue
+	GetValuesIterator(ctx sdk.Context, store sdk.KVStore) sdk.Iterator
+	IsKeyPresent(ctx sdk.Context, store sdk.KVStore, UUID string, key string) bool
+	ProcessLeasesAtBlockHeight(ctx sdk.Context, store sdk.KVStore, leaseStore sdk.KVStore, lease int64)
+	RenameKey(ctx sdk.Context, store sdk.KVStore, UUID string, key string, newkey string) bool
+	SetLease(leaseStore sdk.KVStore, UUID string, key string, blockHeight int64, lease int64)
+	SetValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string, value types.BLZValue)
 }
 
 type Keeper struct {
@@ -280,4 +282,25 @@ func (k Keeper) ProcessLeasesAtBlockHeight(ctx sdk.Context, store sdk.KVStore, l
 		store.Delete(iterator.Key()[len(prefix):])
 		leaseStore.Delete(iterator.Key())
 	}
+}
+
+func (k Keeper) GetNShortestLease(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress, n uint64) types.QueryResultNShortestLeaseKeys {
+	keys := k.GetKeys(ctx, store, UUID, owner)
+
+	if len(keys.Keys) == 0 {
+		return types.QueryResultNShortestLeaseKeys{UUID: UUID, KeyLeases: make([]types.KeyLease, 0)}
+	}
+
+	var keyLeases = []types.KeyLease{}
+	for i := range keys.Keys {
+		value := k.GetValue(ctx, store, UUID, keys.Keys[i])
+		keyLeases = append(keyLeases, types.KeyLease{Key: keys.Keys[i], Lease: value.Lease + value.Height - ctx.BlockHeight()})
+	}
+
+	sort.Sort(types.KeyLeases(keyLeases))
+
+	if len(keyLeases) < int(n) {
+		return types.QueryResultNShortestLeaseKeys{UUID: UUID, KeyLeases: keyLeases}
+	}
+	return types.QueryResultNShortestLeaseKeys{UUID: UUID, KeyLeases: keyLeases[:n]}
 }

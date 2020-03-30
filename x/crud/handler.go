@@ -50,6 +50,8 @@ func NewHandler(keeper keeper.IKeeper) sdk.Handler {
 			return handleMsgMultiUpdate(ctx, keeper, msg)
 		case types.MsgGetLease:
 			return handleMsgGetLease(ctx, keeper, msg)
+		case types.MsgGetNShortestLease:
+			return handleMsgGetNShortestLease(ctx, keeper, msg)
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, fmt.Sprintf("Unrecognized crud msg type: %v", msg.Type()))
 		}
@@ -284,6 +286,22 @@ func handleMsgGetLease(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgGetL
 		Key:   msg.Key,
 		Lease: value.Lease + value.Height - ctx.BlockHeight(),
 	})
+
+	if err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "could not marshal result to JSON")
+	}
+
+	return &sdk.Result{Data: json_data}, nil
+}
+
+func handleMsgGetNShortestLease(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgGetNShortestLease) (*sdk.Result, error) {
+	if len(msg.UUID) == 0 || msg.N == 0 || msg.Owner.Empty() {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
+	}
+
+	value := keeper.GetNShortestLease(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Owner, msg.N)
+
+	json_data, err := json.Marshal(value)
 
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "could not marshal result to JSON")

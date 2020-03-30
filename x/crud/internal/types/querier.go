@@ -60,3 +60,8 @@ type QueryResultLease struct {
 	Key   string `json:"key"`
 	Lease int64  `json:"lease,string"`
 }
+
+type QueryResultNShortestLeaseKeys struct {
+	UUID      string     `json:"uuid"`
+	KeyLeases []KeyLease `json:"keyleases"`
+}

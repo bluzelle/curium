@@ -500,3 +500,39 @@ func (msg MsgGetLease) GetSignBytes() []byte {
 func (msg MsgGetLease) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner}
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// GetLease
+type MsgGetNShortestLease struct {
+	UUID  string
+	N     uint64
+	Owner sdk.AccAddress
+}
+
+func (msg MsgGetNShortestLease) Route() string { return RouterKey }
+
+func (msg MsgGetNShortestLease) Type() string { return "getnshortestlease" }
+
+func (msg MsgGetNShortestLease) ValidateBasic() error {
+	if msg.Owner.Empty() {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
+	}
+
+	if len(msg.UUID) == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID empty")
+	}
+
+	if msg.N == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "N must be larger than 0")
+	}
+
+	return nil
+}
+
+func (msg MsgGetNShortestLease) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
+
+func (msg MsgGetNShortestLease) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Owner}
+}
