@@ -41,6 +41,7 @@ Deploy Additional Nodes
         blzcli config output json 
         blzcli config indent true 
         blzcli config trust-node true
+        blzcli config keyring-backend test
 
 5.  Edit ".blzd/config/config/config.toml" to add the address of a node that is
     already a member of the zone that this node will be joining to the comma 
@@ -71,9 +72,6 @@ Deploy Additional Nodes
         blzcli keys add vuser
 
     which will produce the following output
-
-        Enter a passphrase to encrypt your key to disk:
-        Repeat the passphrase:
         
         - name: vuser
           type: local
