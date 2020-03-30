@@ -63,7 +63,6 @@ for other commands, see below:
 >Example:
 
     $ blzcli keys show vuser
-    Enter keyring passphrase:
     {
       "name": "vuser",
       "type": "local",
@@ -171,7 +170,6 @@ request transaction
 >Example:
 
     $ blzcli query auth account (blzcli keys show <key name> -a)
-    Enter keyring passphrase:
     {
       "type": "cosmos-sdk/Account",
       "value": {
@@ -229,7 +227,6 @@ request transaction
 >Example:
 
     $ blzcli query distribution rewards bluzelle1<...>
-    Enter keyring passphrase:
     {
     "rewards": [
         {

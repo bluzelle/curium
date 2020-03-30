@@ -63,6 +63,7 @@ document.
         blzcli config output json 
         blzcli config indent true 
         blzcli config trust-node true
+        blzcli config keyring-backend test
         
     where “bluzelle” is the zone’s chain-id.
 
@@ -71,10 +72,7 @@ document.
 
         blzcli keys add vuser
         
-    which will produce the output 
-        
-        Enter a passphrase to encrypt your key to disk:
-        Repeat the passphrase:
+    which will produce the output       
         
         - name: vuser
           type: local
@@ -106,11 +104,10 @@ document.
 9.  As this is the first node in the zone, it needs an initial transaction for 
     the blockchain. 
 
-        blzd gentx --name vuser --amount 10000000000000ubnt
+        blzd gentx --name vuser --amount 10000000000000ubnt --keyring-backend test
         
     which will produce the output:
         
-        Password to sign with 'vuser':
         Genesis transaction written to "/home/rich/.blzd/config/gentx/gentx-<...>.json"
         
     remember to specify the  amount of coins to bond using the --amount 
