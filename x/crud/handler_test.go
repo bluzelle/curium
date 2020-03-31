@@ -817,3 +817,66 @@ func Test_handleMsgGetNShortestLease(t *testing.T) {
 		assert.NotNil(t, err)
 	}
 }
+
+func Test_handleMsgRenewLease(t *testing.T) {
+
+	mockCtrl, mockKeeper, ctx, owner := initTest(t)
+	defer mockCtrl.Finish()
+
+	mockKeeper.EXPECT().GetDefaultLeaseBlocks().AnyTimes().Return(DefaultLeaseBlockHeight)
+
+	// renew the lease to the default and update height
+	{
+		renewMsg := types.MsgRenewLease{
+			UUID:  "uuid",
+			Key:   "key",
+			Lease: 0,
+			Owner: owner,
+		}
+
+		// always return nil for a store...
+		ctx := ctx.WithBlockHeight(1100)
+		mockKeeper.EXPECT().GetKVStore(gomock.Any()).AnyTimes().Return(nil)
+		mockKeeper.EXPECT().GetLeaseStore(gomock.Any()).AnyTimes()
+		mockKeeper.EXPECT().GetOwner(ctx, nil, renewMsg.UUID, renewMsg.Key).Return(owner)
+		mockKeeper.EXPECT().GetValue(ctx, nil, renewMsg.UUID, renewMsg.Key).Return(types.BLZValue{
+			Value:  "value",
+			Lease:  100,
+			Owner:  owner,
+			Height: 1000,
+		})
+
+		mockKeeper.EXPECT().DeleteLease(nil, renewMsg.UUID, renewMsg.Key, int64(1000), int64(100))
+		mockKeeper.EXPECT().SetValue(ctx, nil, renewMsg.UUID, renewMsg.Key, types.BLZValue{
+			Value:  "value",
+			Lease:  DefaultLeaseBlockHeight,
+			Owner:  owner,
+			Height: 1100,
+		})
+
+		mockKeeper.EXPECT().SetLease(gomock.Any(), renewMsg.UUID, renewMsg.Key, int64(1100), DefaultLeaseBlockHeight)
+		_, err := NewHandler(mockKeeper)(ctx, renewMsg)
+		assert.Nil(t, err)
+
+		renewMsg.Owner = []byte("BADOWNER1t0helpusuldf6h4wqrnnpyp9wr6law2u5jwa23")
+		mockKeeper.EXPECT().GetOwner(ctx, nil, renewMsg.UUID, renewMsg.Key).Return(owner)
+		_, err = NewHandler(mockKeeper)(ctx, renewMsg)
+		assert.NotNil(t, err)
+
+		mockKeeper.EXPECT().GetOwner(ctx, nil, renewMsg.UUID, renewMsg.Key)
+		_, err = NewHandler(mockKeeper)(ctx, renewMsg)
+		assert.NotNil(t, err)
+	}
+
+	// Test for empty message parameters
+	{
+		_, err := handleMsgRenewLease(ctx, mockKeeper, types.MsgRenewLease{})
+		assert.NotNil(t, err)
+
+		_, err = handleMsgRenewLease(ctx, mockKeeper, types.MsgRenewLease{UUID: "uuid"})
+		assert.NotNil(t, err)
+
+		_, err = handleMsgRenewLease(ctx, mockKeeper, types.MsgRenewLease{UUID: "uuid", Key: "key"})
+		assert.NotNil(t, err)
+	}
+}
