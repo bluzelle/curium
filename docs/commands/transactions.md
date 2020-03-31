@@ -116,6 +116,13 @@ the result, for example, a "tx crud read" command will return
         key00 "better value" key01 "new value" \
         key02 "good value" key04 "new value"  \
         --gas-prices 10.0ubnt --from vuser
+***
+## getlease
+> get the remaining lease blocks for an existing entry
+
+***
+## getnshortestlease 
+> get the N shortest remaining lease blocks for an existing UUID
 
 ***
 [queries](./queries.md) | [home](../../README.md)

@@ -50,7 +50,7 @@ Curium cli. These commands do not use gas and results are returned directly.
     blzcli q crud getlease <uuid> <key>
 ***
 ## getnshortestlease 
-> returns a list of N keys associated with UUID, with the shortest leases
+> returns a list of N keys, associated with UUID, with the shortest leases
 
     blzcli q crud getnshortestlease <uuid> <N>
 
