@@ -1,49 +1,8 @@
-[prev](../setup/deployaddl.md) | [next](../commands/useful.md)
-***
-Bluzelle CRUD Commands
-======================
-# Queries
->The querying subcommands provide access to the unsigned functionaity of the 
-Curium cli. These commands do not use gas and results are returned directly.
+[queries](./queries.md) | [home](../../README.md)
 
->The CLI can provide usage help for the queries with the following command:
+Transactional CRUD Commands
+====================================
 
-    blzcli q --help
-
-
-# CRUD Queries
-***
-## read        
->read UUID key
-
-    blzcli q crud read <uuid> <key>
-
-***
-## has         
->has UUID key
-
-     blzcli q crud has <uuid> <key>
-
-***
-## keys        
->keys UUID
-
-    blzcli q crud keys <uuid>
-
-***
-## keyvalues   
->keyvalues UUID
-
-    blzcli q crud keyvalues <uuid>
-
-***
-## count       
->count UUID
-
-    blzcli q crud count <uuid>
-
-***
-# Transactions
 >Transactional commands can be crytographically signed and require gas to 
 perform. Where a command has a return value users must employ the "tx" 
 query to retrieve the response.
@@ -158,6 +117,5 @@ the result, for example, a "tx crud read" command will return
         key02 "good value" key04 "new value"  \
         --gas-prices 10.0ubnt --from vuser
 
-
 ***
-[prev](../setup/deployaddl.md) | [next](../commands/useful.md)
+[queries](./queries.md) | [home](../../README.md)

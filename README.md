@@ -28,5 +28,6 @@ deploying a multi-node Curium Zone.
 
 Using the Bluzelle Curium Multi-Validator Zone
 ----------------------------------------------
-- [Queries and Transactions](./docs/commands/qAndTX.md)
+- [Queries](./docs/commands/queries.md)
+- [Transactions](./docs/commands/transactions.md)
 - [Useful Operations](./docs/commands/useful.md) 

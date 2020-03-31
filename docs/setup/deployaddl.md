@@ -1,4 +1,4 @@
-[prev](./deploy.md) | [next](../commands/qAndTX.md)
+[prev](./deploy.md) | [next](../commands/queries.md)
 ***
 Deploy Additional Nodes
 ========================
