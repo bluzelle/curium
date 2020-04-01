@@ -25,17 +25,18 @@ func init() {
 }
 
 func RegisterCodec(cdc *codec.Codec) {
-	cdc.RegisterConcrete(MsgCreate{}, "crud/create", nil)
-	cdc.RegisterConcrete(MsgRead{}, "crud/read", nil)
-	cdc.RegisterConcrete(MsgUpdate{}, "crud/update", nil)
-	cdc.RegisterConcrete(MsgDelete{}, "crud/delete", nil)
-	cdc.RegisterConcrete(MsgKeys{}, "crud/keys", nil)
-	cdc.RegisterConcrete(MsgKeyValues{}, "crud/keyvalues", nil)
-	cdc.RegisterConcrete(MsgHas{}, "crud/has", nil)
-	cdc.RegisterConcrete(MsgRename{}, "crud/rename", nil)
 	cdc.RegisterConcrete(MsgCount{}, "crud/count", nil)
+	cdc.RegisterConcrete(MsgCreate{}, "crud/create", nil)
 	cdc.RegisterConcrete(MsgDeleteAll{}, "crud/deleteall", nil)
-	cdc.RegisterConcrete(MsgMultiUpdate{}, "crud/multiupdate", nil)
+	cdc.RegisterConcrete(MsgDelete{}, "crud/delete", nil)
 	cdc.RegisterConcrete(MsgGetLease{}, "crud/getlease", nil)
 	cdc.RegisterConcrete(MsgGetNShortestLease{}, "crud/getnshortestlease", nil)
+	cdc.RegisterConcrete(MsgHas{}, "crud/has", nil)
+	cdc.RegisterConcrete(MsgKeyValues{}, "crud/keyvalues", nil)
+	cdc.RegisterConcrete(MsgKeys{}, "crud/keys", nil)
+	cdc.RegisterConcrete(MsgMultiUpdate{}, "crud/multiupdate", nil)
+	cdc.RegisterConcrete(MsgRead{}, "crud/read", nil)
+	cdc.RegisterConcrete(MsgRename{}, "crud/rename", nil)
+	cdc.RegisterConcrete(MsgRenewLease{}, "crud/renewlease", nil)
+	cdc.RegisterConcrete(MsgUpdate{}, "crud/update", nil)
 }

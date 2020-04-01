@@ -52,6 +52,9 @@ func NewHandler(keeper keeper.IKeeper) sdk.Handler {
 			return handleMsgGetLease(ctx, keeper, msg)
 		case types.MsgGetNShortestLease:
 			return handleMsgGetNShortestLease(ctx, keeper, msg)
+		case types.MsgRenewLease:
+			return handleMsgRenewLease(ctx, keeper, msg)
+
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, fmt.Sprintf("Unrecognized crud msg type: %v", msg.Type()))
 		}
@@ -308,4 +311,36 @@ func handleMsgGetNShortestLease(ctx sdk.Context, keeper keeper.IKeeper, msg type
 	}
 
 	return &sdk.Result{Data: json_data}, nil
+}
+
+func handleMsgRenewLease(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgRenewLease) (*sdk.Result, error) {
+	if len(msg.UUID) == 0 || len(msg.Key) == 0 || msg.Owner.Empty() {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
+	}
+
+	owner := keeper.GetOwner(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key)
+	if owner.Empty() {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Key does not exist")
+	}
+
+	if !msg.Owner.Equals(owner) {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Incorrect Owner")
+	}
+
+	if msg.Lease == 0 {
+		msg.Lease = keeper.GetDefaultLeaseBlocks()
+	}
+
+	blzValue := keeper.GetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key)
+
+	leaseCtx := ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
+	keeper.DeleteLease(keeper.GetLeaseStore(leaseCtx), msg.UUID, msg.Key, blzValue.Height, blzValue.Lease)
+
+	blzValue.Height = ctx.BlockHeight()
+	blzValue.Lease = msg.Lease
+
+	keeper.SetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key, blzValue)
+	keeper.SetLease(keeper.GetLeaseStore(leaseCtx), msg.UUID, msg.Key, blzValue.Height, blzValue.Lease)
+
+	return &sdk.Result{}, nil
 }
