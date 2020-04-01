@@ -57,10 +57,10 @@ func Test_queryRead(t *testing.T) {
 	result, err := NewQuerier(mockKeeper)(ctx, []string{"read", "uuid", "key"}, abci.RequestQuery{})
 	assert.Nil(t, err)
 
-	json_result := types.BLZValue{}
-	json.Unmarshal(result, &json_result)
+	jsonResult := types.BLZValue{}
+	json.Unmarshal(result, &jsonResult)
 
-	assert.Equal(t, json_result.Value, expectedValue)
+	assert.Equal(t, jsonResult.Value, expectedValue)
 
 	// item does not exist.
 	mockKeeper.EXPECT().GetValue(ctx, nil, "uuid", "key")
@@ -87,10 +87,10 @@ func Test_queryHas(t *testing.T) {
 		t.Error("Expected nil error")
 	}
 
-	json_result := types.QueryResultHas{}
-	json.Unmarshal(result, &json_result)
+	jsonResult := types.QueryResultHas{}
+	json.Unmarshal(result, &jsonResult)
 
-	assert.True(t, json_result.Has)
+	assert.True(t, jsonResult.Has)
 }
 
 func Test_queryKeys(t *testing.T) {
@@ -109,10 +109,10 @@ func Test_queryKeys(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	json_result := types.QueryResultKeys{}
-	json.Unmarshal(result, &json_result)
+	jsonResult := types.QueryResultKeys{}
+	json.Unmarshal(result, &jsonResult)
 
-	assert.True(t, reflect.DeepEqual(acceptedKeys, json_result.Keys))
+	assert.True(t, reflect.DeepEqual(acceptedKeys, jsonResult.Keys))
 }
 
 func Test_queryKeyValues(t *testing.T) {
@@ -132,10 +132,10 @@ func Test_queryKeyValues(t *testing.T) {
 	result, err := NewQuerier(mockKeeper)(ctx, []string{"keyvalues", "uuid"}, abci.RequestQuery{})
 	assert.Nil(t, err)
 
-	json_result := types.QueryResultKeyValues{}
-	json.Unmarshal(result, &json_result)
+	jsonResult := types.QueryResultKeyValues{}
+	json.Unmarshal(result, &jsonResult)
 
-	assert.True(t, reflect.DeepEqual(acceptedKeyValues, json_result))
+	assert.True(t, reflect.DeepEqual(acceptedKeyValues, jsonResult))
 }
 
 func Test_queryCount(t *testing.T) {
@@ -152,11 +152,11 @@ func Test_queryCount(t *testing.T) {
 	result, err := NewQuerier(mockKeeper)(ctx, []string{"count", "uuid"}, abci.RequestQuery{})
 	assert.Nil(t, err)
 
-	json_result := types.QueryResultCount{}
-	json.Unmarshal(result, &json_result)
+	jsonResult := types.QueryResultCount{}
+	json.Unmarshal(result, &jsonResult)
 
-	assert.Equal(t, "uuid", json_result.UUID)
-	assert.Equal(t, uint64(2), json_result.Count)
+	assert.Equal(t, "uuid", jsonResult.UUID)
+	assert.Equal(t, uint64(2), jsonResult.Count)
 }
 
 func Test_queryVersion(t *testing.T) {
@@ -164,13 +164,13 @@ func Test_queryVersion(t *testing.T) {
 	result, err := NewQuerier(mockKeeper)(ctx, []string{"version"}, abci.RequestQuery{})
 	assert.Nil(t, err)
 
-	json_result := version.Info{}
-	json.Unmarshal(result, &json_result)
+	jsonResult := version.Info{}
+	json.Unmarshal(result, &jsonResult)
 
 	// We can only verify that the api got called and not the data since that is set
 	// only when we build the client & server processes.
-	assert.Equal(t, json_result.ServerName, "<appd>")
-	assert.Equal(t, json_result.ClientName, "<appcli>")
+	assert.Equal(t, jsonResult.ServerName, "<appd>")
+	assert.Equal(t, jsonResult.ClientName, "<appcli>")
 }
 
 func Test_queryGetLease(t *testing.T) {
@@ -193,12 +193,12 @@ func Test_queryGetLease(t *testing.T) {
 	result, err := NewQuerier(mockKeeper)(newCtx, []string{"getlease", "uuid", "key"}, abci.RequestQuery{})
 	assert.Nil(t, err)
 
-	json_result := types.QueryResultLease{}
-	json.Unmarshal(result, &json_result)
+	jsonResult := types.QueryResultLease{}
+	json.Unmarshal(result, &jsonResult)
 
-	assert.Equal(t, "uuid", json_result.UUID)
-	assert.Equal(t, "key", json_result.Key)
-	assert.Equal(t, int64(1), json_result.Lease)
+	assert.Equal(t, "uuid", jsonResult.UUID)
+	assert.Equal(t, "key", jsonResult.Key)
+	assert.Equal(t, int64(1), jsonResult.Lease)
 
 	mockKeeper.EXPECT().GetValue(gomock.Any(), nil, "uuid", "key")
 
@@ -225,12 +225,12 @@ func Test_queryGetNShortestLease(t *testing.T) {
 	result, err := NewQuerier(mockKeeper)(ctx, []string{"getnshortestlease", "uuid", "10"}, abci.RequestQuery{})
 	assert.Nil(t, err)
 
-	json_result := types.QueryResultNShortestLeaseKeys{}
-	json.Unmarshal(result, &json_result)
+	jsonResult := types.QueryResultNShortestLeaseKeys{}
+	json.Unmarshal(result, &jsonResult)
 
-	assert.Equal(t, "uuid", json_result.UUID)
-	assert.Equal(t, "key00", json_result.KeyLeases[0].Key)
-	assert.Equal(t, int64(100), json_result.KeyLeases[0].Lease)
+	assert.Equal(t, "uuid", jsonResult.UUID)
+	assert.Equal(t, "key00", jsonResult.KeyLeases[0].Key)
+	assert.Equal(t, int64(100), jsonResult.KeyLeases[0].Lease)
 
 	_, err = NewQuerier(mockKeeper)(ctx, []string{"getnshortestlease", "uuid", "abcd"}, abci.RequestQuery{})
 

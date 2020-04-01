@@ -54,7 +54,8 @@ func NewHandler(keeper keeper.IKeeper) sdk.Handler {
 			return handleMsgGetNShortestLease(ctx, keeper, msg)
 		case types.MsgRenewLease:
 			return handleMsgRenewLease(ctx, keeper, msg)
-
+		case types.MsgRenewLeaseAll:
+			return handleMsgRenewLeaseAll(ctx, keeper, msg)
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, fmt.Sprintf("Unrecognized crud msg type: %v", msg.Type()))
 		}
@@ -99,12 +100,12 @@ func handleMsgRead(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgRead) (*
 	}
 
 	blzValue := keeper.GetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key)
-	json_data, err := json.Marshal(types.QueryResultRead{msg.UUID, msg.Key, blzValue.Value})
+	jsonData, err := json.Marshal(types.QueryResultRead{UUID: msg.UUID, Key: msg.Key, Value: blzValue.Value})
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "could not marshal result to JSON")
 	}
 
-	return &sdk.Result{Data: json_data}, nil
+	return &sdk.Result{Data: jsonData}, nil
 }
 
 func handleMsgUpdate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgUpdate) (*sdk.Result, error) {
@@ -170,12 +171,12 @@ func handleMsgKeys(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgKeys) (*
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
 	}
 
-	json_data, err := json.Marshal(keeper.GetKeys(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Owner))
+	jsonData, err := json.Marshal(keeper.GetKeys(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Owner))
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "could not marshal result to JSON")
 	}
 
-	return &sdk.Result{Data: json_data}, nil
+	return &sdk.Result{Data: jsonData}, nil
 }
 
 func handleMsgHas(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgHas) (*sdk.Result, error) {
@@ -183,12 +184,12 @@ func handleMsgHas(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgHas) (*sd
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
 	}
 
-	json_data, err := json.Marshal(types.QueryResultHas{UUID: msg.UUID, Key: msg.Key, Has: !keeper.GetOwner(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key).Empty()})
+	jsonData, err := json.Marshal(types.QueryResultHas{UUID: msg.UUID, Key: msg.Key, Has: !keeper.GetOwner(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key).Empty()})
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "could not marshal result to JSON")
 	}
 
-	return &sdk.Result{Data: json_data}, nil
+	return &sdk.Result{Data: jsonData}, nil
 }
 
 func handleMsgRename(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgRename) (*sdk.Result, error) {
@@ -217,12 +218,12 @@ func handleMsgKeyValues(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgKey
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
 	}
 
-	json_data, err := json.Marshal(keeper.GetKeyValues(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Owner))
+	jsonData, err := json.Marshal(keeper.GetKeyValues(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Owner))
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "could not marshal result to JSON")
 	}
 
-	return &sdk.Result{Data: json_data}, nil
+	return &sdk.Result{Data: jsonData}, nil
 }
 
 func handleMsgCount(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgCount) (*sdk.Result, error) {
@@ -230,12 +231,12 @@ func handleMsgCount(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgCount) 
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
 	}
 
-	json_data, err := json.Marshal(keeper.GetCount(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Owner))
+	jsonData, err := json.Marshal(keeper.GetCount(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Owner))
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "could not marshal result to JSON")
 	}
 
-	return &sdk.Result{Data: json_data}, nil
+	return &sdk.Result{Data: jsonData}, nil
 }
 
 func handleMsgDeleteAll(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgDeleteAll) (*sdk.Result, error) {
@@ -284,7 +285,7 @@ func handleMsgGetLease(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgGetL
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Key does not exist")
 	}
 
-	json_data, err := json.Marshal(types.QueryResultLease{
+	jsonData, err := json.Marshal(types.QueryResultLease{
 		UUID:  msg.UUID,
 		Key:   msg.Key,
 		Lease: value.Lease + value.Height - ctx.BlockHeight(),
@@ -294,7 +295,7 @@ func handleMsgGetLease(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgGetL
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "could not marshal result to JSON")
 	}
 
-	return &sdk.Result{Data: json_data}, nil
+	return &sdk.Result{Data: jsonData}, nil
 }
 
 func handleMsgGetNShortestLease(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgGetNShortestLease) (*sdk.Result, error) {
@@ -304,13 +305,13 @@ func handleMsgGetNShortestLease(ctx sdk.Context, keeper keeper.IKeeper, msg type
 
 	value := keeper.GetNShortestLease(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Owner, msg.N)
 
-	json_data, err := json.Marshal(value)
+	jsonData, err := json.Marshal(value)
 
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "could not marshal result to JSON")
 	}
 
-	return &sdk.Result{Data: json_data}, nil
+	return &sdk.Result{Data: jsonData}, nil
 }
 
 func handleMsgRenewLease(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgRenewLease) (*sdk.Result, error) {
@@ -331,16 +332,40 @@ func handleMsgRenewLease(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgRe
 		msg.Lease = keeper.GetDefaultLeaseBlocks()
 	}
 
-	blzValue := keeper.GetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key)
-
-	leaseCtx := ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
-	keeper.DeleteLease(keeper.GetLeaseStore(leaseCtx), msg.UUID, msg.Key, blzValue.Height, blzValue.Lease)
-
-	blzValue.Height = ctx.BlockHeight()
-	blzValue.Lease = msg.Lease
-
-	keeper.SetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key, blzValue)
-	keeper.SetLease(keeper.GetLeaseStore(leaseCtx), msg.UUID, msg.Key, blzValue.Height, blzValue.Lease)
+	updateLease(ctx, keeper, msg.UUID, msg.Key, msg.Lease)
 
 	return &sdk.Result{}, nil
+}
+
+func handleMsgRenewLeaseAll(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgRenewLeaseAll) (*sdk.Result, error) {
+	if len(msg.UUID) == 0 || msg.Owner.Empty() {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
+	}
+
+	value := keeper.GetKeys(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Owner)
+	if len(value.Keys) == 0 {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID does not exist")
+	}
+
+	if msg.Lease == 0 {
+		msg.Lease = keeper.GetDefaultLeaseBlocks()
+	}
+
+	for i := range value.Keys[:] {
+		updateLease(ctx, keeper, msg.UUID, value.Keys[i], msg.Lease)
+	}
+
+	return &sdk.Result{}, nil
+}
+
+func updateLease(ctx sdk.Context, keeper keeper.IKeeper, UUID string, key string, lease int64) {
+	blzValue := keeper.GetValue(ctx, keeper.GetKVStore(ctx), UUID, key)
+
+	leaseCtx := ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
+	keeper.DeleteLease(keeper.GetLeaseStore(leaseCtx), UUID, key, blzValue.Height, blzValue.Lease)
+
+	blzValue.Height = ctx.BlockHeight()
+	blzValue.Lease = lease
+	keeper.SetValue(ctx, keeper.GetKVStore(ctx), UUID, key, blzValue)
+	keeper.SetLease(keeper.GetLeaseStore(leaseCtx), UUID, key, blzValue.Height, blzValue.Lease)
 }

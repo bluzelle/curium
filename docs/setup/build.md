@@ -48,7 +48,7 @@ Build the Curium Project
 
         Use "blzcli [command] --help" for more information about a command.
 
-    similarly for the Bluzelle daemon:
+    similarly, for the Bluzelle daemon:
 
         cd
         blzd

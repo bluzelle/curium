@@ -137,7 +137,7 @@ func BlzUpdateHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.MsgUpdate{req.UUID, req.Key, req.Value, req.Lease, addr}
+		msg := types.MsgUpdate{UUID: req.UUID, Key: req.Key, Value: req.Value, Lease: req.Lease, Owner: addr}
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -238,7 +238,7 @@ type keysReq struct {
 
 func BlzKeysHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req hasReq
+		var req keysReq
 
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
@@ -269,7 +269,7 @@ func BlzKeysHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 func BlzKeyValuesHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req hasReq
+		var req keysReq
 
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
@@ -487,7 +487,7 @@ func BlzGetLeaseHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// create the message
-		msg := types.MsgGetLease{req.UUID, req.Key, addr}
+		msg := types.MsgGetLease{UUID: req.UUID, Key: req.Key, Owner: addr}
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -528,7 +528,7 @@ func BlzGetNShortestLeaseHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// create the message
-		msg := types.MsgGetNShortestLease{req.UUID, req.N, addr}
+		msg := types.MsgGetNShortestLease{UUID: req.UUID, N: req.N, Owner: addr}
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -573,6 +573,51 @@ func BlzRenewLease(cliCtx context.CLIContext) http.HandlerFunc {
 		msg := types.MsgRenewLease{
 			UUID:  req.UUID,
 			Key:   req.Key,
+			Lease: req.Lease,
+			Owner: addr,
+		}
+		err = msg.ValidateBasic()
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		utils.WriteGenerateStdTxResponse(w, cliCtx, baseReq, []sdk.Msg{msg})
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Renew Lease
+type RenewLeaseAllReq struct {
+	BaseReq rest.BaseReq
+	UUID    string
+	Lease   int64
+	Owner   string
+}
+
+func BlzRenewLeaseAll(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req RenewLeaseAllReq
+
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
+			return
+		}
+
+		baseReq := req.BaseReq.Sanitize()
+		if !baseReq.ValidateBasic(w) {
+			return
+		}
+
+		addr, err := sdk.AccAddressFromBech32(req.Owner)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		// create the message
+		msg := types.MsgRenewLeaseAll{
+			UUID:  req.UUID,
 			Lease: req.Lease,
 			Owner: addr,
 		}

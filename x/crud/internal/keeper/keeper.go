@@ -75,7 +75,7 @@ func NewKeeper(coinKeeper bank.Keeper, storeKey sdk.StoreKey, leaseKey sdk.Store
 	return Keeper{
 		CoinKeeper: coinKeeper,
 		storeKey:   storeKey,
-		leaseKey:   storeKey,
+		leaseKey:   leaseKey,
 		cdc:        cdc,
 		mks:        mks,
 	}
@@ -100,9 +100,9 @@ func (k Keeper) SetValue(_ sdk.Context, store sdk.KVStore, UUID string, key stri
 	store.Set([]byte(MakeMetaKey(UUID, key)), k.cdc.MustMarshalBinaryBare(value))
 }
 
-func (k Keeper) GetValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string) types.BLZValue {
+func (k Keeper) GetValue(_ sdk.Context, store sdk.KVStore, UUID string, key string) types.BLZValue {
 	metaKey := MakeMetaKey(UUID, key)
-	if !k.isUUIDKeyPresent(ctx, store, metaKey) {
+	if !k.isUUIDKeyPresent(store, metaKey) {
 		return types.BLZValue{}
 	}
 
@@ -112,7 +112,7 @@ func (k Keeper) GetValue(ctx sdk.Context, store sdk.KVStore, UUID string, key st
 	return value
 }
 
-func (k Keeper) DeleteValue(ctx sdk.Context, store sdk.KVStore, leaseStore sdk.KVStore, UUID string, key string) {
+func (k Keeper) DeleteValue(_ sdk.Context, store sdk.KVStore, leaseStore sdk.KVStore, UUID string, key string) {
 	metaKey := []byte(MakeMetaKey(UUID, key))
 	if leaseStore != nil {
 		kv := store.Get(metaKey)
@@ -123,15 +123,15 @@ func (k Keeper) DeleteValue(ctx sdk.Context, store sdk.KVStore, leaseStore sdk.K
 	store.Delete(metaKey)
 }
 
-func (k Keeper) IsKeyPresent(ctx sdk.Context, store sdk.KVStore, UUID string, key string) bool {
-	return k.isUUIDKeyPresent(ctx, store, MakeMetaKey(UUID, key))
+func (k Keeper) IsKeyPresent(_ sdk.Context, store sdk.KVStore, UUID string, key string) bool {
+	return k.isUUIDKeyPresent(store, MakeMetaKey(UUID, key))
 }
 
-func (k Keeper) isUUIDKeyPresent(ctx sdk.Context, store sdk.KVStore, key string) bool {
+func (k Keeper) isUUIDKeyPresent(store sdk.KVStore, key string) bool {
 	return store.Has([]byte(key))
 }
 
-func (k Keeper) GetValuesIterator(ctx sdk.Context, store sdk.KVStore) sdk.Iterator {
+func (k Keeper) GetValuesIterator(_ sdk.Context, store sdk.KVStore) sdk.Iterator {
 	return sdk.KVStorePrefixIterator(store, []byte{})
 }
 
@@ -170,7 +170,7 @@ func (k Keeper) GetOwner(ctx sdk.Context, store sdk.KVStore, UUID string, key st
 }
 
 func (k Keeper) RenameKey(ctx sdk.Context, store sdk.KVStore, UUID string, key string, newKey string) bool {
-	if k.isUUIDKeyPresent(ctx, store, MakeMetaKey(UUID, newKey)) {
+	if k.isUUIDKeyPresent(store, MakeMetaKey(UUID, newKey)) {
 		return false
 	}
 
@@ -224,7 +224,7 @@ func (k Keeper) GetKeyValues(ctx sdk.Context, store sdk.KVStore, UUID string, ow
 	return keyValues
 }
 
-func (k Keeper) GetCount(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultCount {
+func (k Keeper) GetCount(_ sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultCount {
 	prefix := UUID + "\x00"
 	iterator := sdk.KVStorePrefixIterator(store, []byte(prefix))
 	defer iterator.Close()
@@ -243,7 +243,7 @@ func (k Keeper) GetCount(ctx sdk.Context, store sdk.KVStore, UUID string, owner 
 	return count
 }
 
-func (k Keeper) DeleteAll(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) {
+func (k Keeper) DeleteAll(_ sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) {
 	prefix := UUID + "\x00"
 	iterator := sdk.KVStorePrefixIterator(store, []byte(prefix))
 	defer iterator.Close()
@@ -272,7 +272,7 @@ func (k Keeper) DeleteLease(leaseStore sdk.KVStore, UUID string, key string, blo
 	leaseStore.Delete([]byte(MakeLeaseKey(blockHeight+leaseBlocks, UUID, key)))
 }
 
-func (k Keeper) ProcessLeasesAtBlockHeight(ctx sdk.Context, store sdk.KVStore, leaseStore sdk.KVStore, lease int64) {
+func (k Keeper) ProcessLeasesAtBlockHeight(_ sdk.Context, store sdk.KVStore, leaseStore sdk.KVStore, lease int64) {
 	prefix := strconv.FormatInt(lease, 10) + "\x00"
 	iterator := sdk.KVStorePrefixIterator(leaseStore, []byte(prefix))
 	defer iterator.Close()
@@ -291,7 +291,7 @@ func (k Keeper) GetNShortestLease(ctx sdk.Context, store sdk.KVStore, UUID strin
 		return types.QueryResultNShortestLeaseKeys{UUID: UUID, KeyLeases: make([]types.KeyLease, 0)}
 	}
 
-	var keyLeases = []types.KeyLease{}
+	var keyLeases []types.KeyLease
 	for i := range keys.Keys {
 		value := k.GetValue(ctx, store, UUID, keys.Keys[i])
 		keyLeases = append(keyLeases, types.KeyLease{Key: keys.Keys[i], Lease: value.Lease + value.Height - ctx.BlockHeight()})

@@ -53,6 +53,7 @@ func GetTxCmd(_ string, cdc *codec.Codec) *cobra.Command {
 		GetCmdRead(cdc),
 		GetCmdRename(cdc),
 		GetCmdRenewLease(cdc),
+		GetCmdRenewLeaseAll(cdc),
 		GetCmdUpdate(cdc),
 	)...)
 
@@ -316,7 +317,7 @@ func GetCmdGetLease(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			msg := types.MsgGetLease{args[0], args[1], cliCtx.GetFromAddress()}
+			msg := types.MsgGetLease{UUID: args[0], Key: args[1], Owner: cliCtx.GetFromAddress()}
 
 			err := msg.ValidateBasic()
 			if err != nil {
@@ -344,7 +345,7 @@ func GetCmdGetNShortestLease(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := types.MsgGetNShortestLease{args[0], N, cliCtx.GetFromAddress()}
+			msg := types.MsgGetNShortestLease{UUID: args[0], N: N, Owner: cliCtx.GetFromAddress()}
 
 			err = msg.ValidateBasic()
 			if err != nil {
@@ -369,6 +370,35 @@ func GetCmdRenewLease(cdc *codec.Codec) *cobra.Command {
 			msg := types.MsgRenewLease{
 				UUID:  args[0],
 				Key:   args[1],
+				Lease: leaseValue,
+				Owner: cliCtx.GetFromAddress(),
+			}
+
+			err := msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+		},
+	}
+
+	cc.PersistentFlags().Int64Var(&leaseValue, "lease", 0, "lease in blocks (default 172800 (10 days))")
+	return &cc
+}
+
+func GetCmdRenewLeaseAll(cdc *codec.Codec) *cobra.Command {
+	cc := cobra.Command{
+		Use:   "renewleaseall [UUID]",
+		Short: "renew the lease of all existing entries in the database",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
+
+			msg := types.MsgRenewLeaseAll{
+				UUID:  args[0],
 				Lease: leaseValue,
 				Owner: cliCtx.GetFromAddress(),
 			}

@@ -573,3 +573,39 @@ func (msg MsgRenewLease) GetSignBytes() []byte {
 func (msg MsgRenewLease) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner}
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// RenewLeaseAll
+type MsgRenewLeaseAll struct {
+	UUID  string
+	Lease int64
+	Owner sdk.AccAddress
+}
+
+func (msg MsgRenewLeaseAll) Route() string { return RouterKey }
+
+func (msg MsgRenewLeaseAll) Type() string { return "renewleaseall" }
+
+func (msg MsgRenewLeaseAll) ValidateBasic() error {
+	if msg.Owner.Empty() {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
+	}
+
+	if len(msg.UUID) == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID empty")
+	}
+
+	if msg.Lease < 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Lease negative")
+	}
+
+	return nil
+}
+
+func (msg MsgRenewLeaseAll) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
+
+func (msg MsgRenewLeaseAll) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Owner}
+}
