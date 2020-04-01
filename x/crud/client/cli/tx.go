@@ -40,19 +40,20 @@ func GetTxCmd(_ string, cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 	crudTxCmd.AddCommand(flags.PostCommands(
-		GetCmdCreate(cdc),
-		GetCmdRead(cdc),
-		GetCmdUpdate(cdc),
-		GetCmdDelete(cdc),
-		GetCmdKeys(cdc),
-		GetCmdHas(cdc),
-		GetCmdRename(cdc),
-		GetCmdKeyValues(cdc),
 		GetCmdCount(cdc),
+		GetCmdCreate(cdc),
+		GetCmdDelete(cdc),
 		GetCmdDeleteAll(cdc),
-		GetCmdMultiUpdate(cdc),
 		GetCmdGetLease(cdc),
 		GetCmdGetNShortestLease(cdc),
+		GetCmdHas(cdc),
+		GetCmdKeyValues(cdc),
+		GetCmdKeys(cdc),
+		GetCmdMultiUpdate(cdc),
+		GetCmdRead(cdc),
+		GetCmdRename(cdc),
+		GetCmdRenewLease(cdc),
+		GetCmdUpdate(cdc),
 	)...)
 
 	return crudTxCmd
@@ -353,4 +354,34 @@ func GetCmdGetNShortestLease(cdc *codec.Codec) *cobra.Command {
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
+}
+
+func GetCmdRenewLease(cdc *codec.Codec) *cobra.Command {
+	cc := cobra.Command{
+		Use:   "renewlease [UUID] [key]",
+		Short: "renew the lease of an existing entry in the database",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
+
+			msg := types.MsgRenewLease{
+				UUID:  args[0],
+				Key:   args[1],
+				Lease: leaseValue,
+				Owner: cliCtx.GetFromAddress(),
+			}
+
+			err := msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+		},
+	}
+
+	cc.PersistentFlags().Int64Var(&leaseValue, "lease", 0, "lease in blocks (default 172800 (10 days))")
+	return &cc
 }

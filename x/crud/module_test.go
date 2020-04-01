@@ -102,7 +102,7 @@ func TestAppModuleBasic_GetTxCmd(t *testing.T) {
 		assert.Equal(t, 2, cmd.SuggestionsMinimumDistance)
 
 		commands := cmd.Commands()
-		assert.Len(t, commands, 13)
+		assert.Len(t, commands, 14)
 	}
 }
 
