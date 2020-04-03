@@ -17,41 +17,28 @@ package crud
 import (
 	"github.com/bluzelle/curium/x/crud/internal/types"
 	"github.com/bluzelle/curium/x/crud/mocks"
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/store/cachekv"
-	"github.com/cosmos/cosmos-sdk/store/dbadapter"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	abci "github.com/tendermint/tendermint/abci/types"
-	dbm "github.com/tendermint/tm-db"
 	"testing"
 )
-
-func initKeeperTest(t *testing.T) (sdk.Context, sdk.KVStore, []byte, *codec.Codec) {
-
-	return sdk.NewContext(nil, abci.Header{}, false, nil),
-		cachekv.NewStore(dbadapter.Store{dbm.NewMemDB()}),
-		[]byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"),
-		codec.New()
-}
 
 func TestNewGenesisState(t *testing.T) {
 	assert.Empty(t, NewGenesisState(nil).BlzValues)
 }
 
 func TestValidateGenesis(t *testing.T) {
-	blzValues := []types.BLZValue{}
+	var blzValues []types.BLZValue
 
 	genesisState := NewGenesisState(blzValues)
 
 	assert.Nil(t, ValidateGenesis(genesisState))
 
-	blzValues = append(blzValues, types.BLZValue{"test", 0, 0, []byte("notnilowner")})
+	blzValues = append(blzValues, types.BLZValue{Value: "test", Owner: []byte("notnilowner")})
 
 	assert.Nil(t, ValidateGenesis(genesisState))
 
-	blzValues = append(blzValues, types.BLZValue{"test", 0, 0, nil})
+	blzValues = append(blzValues, types.BLZValue{Value: "test"})
 
 	assert.Nil(t, ValidateGenesis(genesisState))
 }

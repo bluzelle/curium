@@ -706,3 +706,44 @@ func TestMsgRenewLease_GetSigners(t *testing.T) {
 	sut := MsgRenewLease{UUID: "uuid", Key: "key", Lease: int64(100), Owner: owner}
 	Equal(t, sut.GetSigners(), []sdk.AccAddress{sut.Owner})
 }
+
+/////////////////////////////////////////////////////////////////////////////////
+func TestMsgRenewLeaseAll_Route(t *testing.T) {
+	Equal(t, "crud", MsgRenewLease{}.Route())
+}
+
+func TestMsgRenewLeaseAll_Type(t *testing.T) {
+	Equal(t, "renewleaseall", MsgRenewLeaseAll{}.Type())
+}
+
+func TestMsgRenewLeaseAll_ValidateBasic(t *testing.T) {
+	owner := []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
+	sut := MsgRenewLeaseAll{UUID: "uuid", Lease: int64(100), Owner: owner}
+
+	Nil(t, sut.ValidateBasic())
+
+	sut.Owner = nil
+	NotNil(t, sut.ValidateBasic())
+
+	sut.Owner = owner
+	sut.UUID = ""
+	Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID empty").Error(), sut.ValidateBasic().Error())
+
+	sut.UUID = "uuid"
+	sut.Lease = -5
+	Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Lease negative").Error(), sut.ValidateBasic().Error())
+}
+
+func TestMsgRenewLeaseAll_GetSignBytes(t *testing.T) {
+	owner := []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
+	sut := MsgRenewLeaseAll{UUID: "uuid", Lease: int64(100), Owner: owner}
+	Equal(t,
+		"{\"type\":\"crud/renewleaseall\",\"value\":{\"Lease\":\"100\",\"Owner\":\"cosmos1vfk827n9d3kx2vt5xpuhwardwfj82mryvcmxsdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\"}}",
+		string(sut.GetSignBytes()))
+}
+
+func TestMsgRenewLeaseAll_GetSigners(t *testing.T) {
+	owner := []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
+	sut := MsgRenewLeaseAll{UUID: "uuid", Lease: int64(100), Owner: owner}
+	Equal(t, sut.GetSigners(), []sdk.AccAddress{sut.Owner})
+}

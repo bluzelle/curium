@@ -33,9 +33,9 @@ import (
 
 const DefaultLeaseBlockHeight = int64(10 * 86400 / 5) // (10 days of blocks * seconds/day) / 5
 
-func initKeeperTest(t *testing.T) (sdk.Context, sdk.KVStore, []byte, *codec.Codec) {
+func initKeeperTest() (sdk.Context, sdk.KVStore, []byte, *codec.Codec) {
 	return sdk.NewContext(nil, abci.Header{}, false, nil),
-		cachekv.NewStore(dbadapter.Store{dbm.NewMemDB()}),
+		cachekv.NewStore(dbadapter.Store{DB: dbm.NewMemDB()}),
 		[]byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"),
 		codec.New()
 }
@@ -56,7 +56,7 @@ func Test_MakeLeaseKey(t *testing.T) {
 }
 
 func TestKeeper_SetValue(t *testing.T) {
-	ctx, testStore, owner, cdc := initKeeperTest(t)
+	ctx, testStore, owner, cdc := initKeeperTest()
 
 	keeper := NewKeeper(nil, nil, nil, cdc, MaxKeeperSizes{})
 
@@ -83,7 +83,7 @@ func TestKeeper_SetValue(t *testing.T) {
 }
 
 func TestKeeper_GetValue(t *testing.T) {
-	ctx, testStore, owner, cdc := initKeeperTest(t)
+	ctx, testStore, owner, cdc := initKeeperTest()
 	keeper := NewKeeper(nil, nil, nil, cdc, MaxKeeperSizes{})
 
 	// test value not found
@@ -104,8 +104,7 @@ func TestKeeper_GetValue(t *testing.T) {
 }
 
 func TestKeeper_DeleteValue(t *testing.T) {
-	// TODO: test the deletion of lease here
-	ctx, testStore, owner, cdc := initKeeperTest(t)
+	ctx, testStore, owner, cdc := initKeeperTest()
 	keeper := NewKeeper(nil, nil, nil, cdc, MaxKeeperSizes{})
 
 	keeper.SetValue(ctx, testStore, "uuid", "key", types.BLZValue{
@@ -126,7 +125,7 @@ func TestKeeper_DeleteValue(t *testing.T) {
 }
 
 func TestKeeper_IsKeyPresent(t *testing.T) {
-	ctx, testStore, owner, cdc := initKeeperTest(t)
+	ctx, testStore, owner, cdc := initKeeperTest()
 	keeper := NewKeeper(nil, nil, nil, cdc, MaxKeeperSizes{})
 
 	assert.False(t, keeper.IsKeyPresent(ctx, testStore, "uuid", "key"))
@@ -140,7 +139,7 @@ func TestKeeper_IsKeyPresent(t *testing.T) {
 }
 
 func TestKeeper_GetValuesIterator(t *testing.T) {
-	ctx, testStore, owner, cdc := initKeeperTest(t)
+	ctx, testStore, owner, cdc := initKeeperTest()
 	keeper := NewKeeper(nil, nil, nil, cdc, MaxKeeperSizes{})
 
 	result := keeper.GetValuesIterator(ctx, testStore)
@@ -162,7 +161,7 @@ func TestKeeper_GetValuesIterator(t *testing.T) {
 }
 
 func TestKeeper_GetKeys(t *testing.T) {
-	ctx, testStore, owner, cdc := initKeeperTest(t)
+	ctx, testStore, owner, cdc := initKeeperTest()
 	keeper := NewKeeper(nil, nil, nil, cdc, MaxKeeperSizes{MaxKeysSize: 1024})
 
 	keys := keeper.GetKeys(ctx, testStore, "uuid", nil)
@@ -194,7 +193,7 @@ func TestKeeper_GetKeys(t *testing.T) {
 
 func TestKeeper_GetKeys_no_owner_for_query_usage(t *testing.T) {
 	// TODO: ensure that we only get keys associated with the owner
-	ctx, testStore, owner, cdc := initKeeperTest(t)
+	ctx, testStore, owner, cdc := initKeeperTest()
 	keeper := NewKeeper(nil, nil, nil, cdc, MaxKeeperSizes{MaxKeysSize: 1024})
 
 	keys := keeper.GetKeys(ctx, testStore, "uuid", nil)
@@ -225,7 +224,7 @@ func TestKeeper_GetKeys_no_owner_for_query_usage(t *testing.T) {
 }
 
 func TestKeeper_GetKeys_MaxSize(t *testing.T) {
-	ctx, testStore, owner, cdc := initKeeperTest(t)
+	ctx, testStore, owner, cdc := initKeeperTest()
 
 	// test max keys size
 	{
@@ -253,7 +252,7 @@ func TestKeeper_GetKeys_MaxSize(t *testing.T) {
 }
 
 func TestKeeper_GetOwner(t *testing.T) {
-	ctx, testStore, owner, cdc := initKeeperTest(t)
+	ctx, testStore, owner, cdc := initKeeperTest()
 	keeper := NewKeeper(nil, nil, nil, cdc, MaxKeeperSizes{})
 
 	keeper.SetValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
@@ -265,7 +264,7 @@ func TestKeeper_GetOwner(t *testing.T) {
 }
 
 func TestKeeper_RenameKey(t *testing.T) {
-	ctx, testStore, owner, cdc := initKeeperTest(t)
+	ctx, testStore, owner, cdc := initKeeperTest()
 
 	keeper := NewKeeper(nil, nil, nil, cdc, MaxKeeperSizes{})
 
@@ -288,7 +287,7 @@ func TestKeeper_RenameKey(t *testing.T) {
 }
 
 func TestKeeper_GetKeyValues(t *testing.T) {
-	ctx, testStore, owner, cdc := initKeeperTest(t)
+	ctx, testStore, owner, cdc := initKeeperTest()
 	keeper := NewKeeper(nil, nil, nil, cdc, MaxKeeperSizes{MaxKeyValuesSize: 1024})
 
 	kvs := keeper.GetKeyValues(ctx, testStore, "uuid", owner)
@@ -311,7 +310,7 @@ func TestKeeper_GetKeyValues(t *testing.T) {
 }
 
 func TestKeeper_GetKeyValues_no_owner_for_query_usage(t *testing.T) {
-	ctx, testStore, owner, cdc := initKeeperTest(t)
+	ctx, testStore, owner, cdc := initKeeperTest()
 	keeper := NewKeeper(nil, nil, nil, cdc, MaxKeeperSizes{MaxKeyValuesSize: 1024})
 
 	kvs := keeper.GetKeyValues(ctx, testStore, "uuid", owner)
@@ -336,7 +335,7 @@ func TestKeeper_GetKeyValues_no_owner_for_query_usage(t *testing.T) {
 }
 
 func TestKeeper_GetKeyValues_MaxSize(t *testing.T) {
-	ctx, testStore, owner, cdc := initKeeperTest(t)
+	ctx, testStore, owner, cdc := initKeeperTest()
 
 	// test max keys size
 	{
@@ -364,7 +363,7 @@ func TestKeeper_GetKeyValues_MaxSize(t *testing.T) {
 }
 
 func TestKeeper_GetCount(t *testing.T) {
-	ctx, testStore, owner, cdc := initKeeperTest(t)
+	ctx, testStore, owner, cdc := initKeeperTest()
 	keeper := NewKeeper(nil, nil, nil, cdc, MaxKeeperSizes{})
 
 	count := keeper.GetCount(ctx, testStore, "uuid", nil)
@@ -390,7 +389,7 @@ func TestKeeper_GetCount(t *testing.T) {
 }
 
 func TestKeeper_GetCount_no_owner_for_query_usage(t *testing.T) {
-	ctx, testStore, owner, cdc := initKeeperTest(t)
+	ctx, testStore, owner, cdc := initKeeperTest()
 	keeper := NewKeeper(nil, nil, nil, cdc, MaxKeeperSizes{})
 
 	count := keeper.GetCount(ctx, testStore, "uuid", nil)
@@ -410,7 +409,7 @@ func TestKeeper_GetCount_no_owner_for_query_usage(t *testing.T) {
 }
 
 func TestKeeper_DeleteAll(t *testing.T) {
-	ctx, testStore, owner, cdc := initKeeperTest(t)
+	ctx, testStore, owner, cdc := initKeeperTest()
 	keeper := NewKeeper(nil, nil, nil, cdc, MaxKeeperSizes{})
 
 	keeper.SetValue(ctx, testStore, "uuid", "key0", types.BLZValue{Value: "value", Owner: owner})
@@ -431,7 +430,7 @@ func TestKeeper_DeleteAll(t *testing.T) {
 }
 
 func TestKeeper_SetLease(t *testing.T) {
-	ctx, testStore, _, cdc := initKeeperTest(t)
+	ctx, testStore, _, cdc := initKeeperTest()
 	ctx = ctx.WithBlockHeight(2000)
 	keeper := NewKeeper(nil, nil, nil, cdc, MaxKeeperSizes{MaxDefaultLeaseBlocks: DefaultLeaseBlockHeight})
 	keeper.SetLease(testStore, "uuid", "key", ctx.BlockHeight(), 0)
@@ -445,7 +444,7 @@ func TestKeeper_SetLease(t *testing.T) {
 }
 
 func TestKeeper_DeleteLease(t *testing.T) {
-	ctx, testStore, _, cdc := initKeeperTest(t)
+	ctx, testStore, _, cdc := initKeeperTest()
 	ctx = ctx.WithBlockHeight(2000)
 
 	keeper := NewKeeper(nil, nil, nil, cdc, MaxKeeperSizes{MaxDefaultLeaseBlocks: DefaultLeaseBlockHeight})
@@ -459,7 +458,7 @@ func TestKeeper_DeleteLease(t *testing.T) {
 }
 
 func TestKeeper_ProcessLeasesAtBlockHeight(t *testing.T) {
-	ctx, testStore, owner, cdc := initKeeperTest(t)
+	ctx, testStore, owner, cdc := initKeeperTest()
 
 	keeper := NewKeeper(nil, nil, nil, cdc, MaxKeeperSizes{MaxDefaultLeaseBlocks: DefaultLeaseBlockHeight})
 
@@ -479,20 +478,20 @@ func TestKeeper_ProcessLeasesAtBlockHeight(t *testing.T) {
 }
 
 func TestKeeper_GetDefaultLeaseBlocks(t *testing.T) {
-	_, _, _, cdc := initKeeperTest(t)
+	_, _, _, cdc := initKeeperTest()
 	keeper := NewKeeper(nil, nil, nil, cdc, MaxKeeperSizes{MaxDefaultLeaseBlocks: DefaultLeaseBlockHeight})
 	assert.Equal(t, DefaultLeaseBlockHeight, keeper.GetDefaultLeaseBlocks())
 }
 
 func TestKeeper_GetCdc(t *testing.T) {
-	_, _, _, cdc := initKeeperTest(t)
+	_, _, _, cdc := initKeeperTest()
 	keeper := NewKeeper(nil, nil, nil, cdc, MaxKeeperSizes{MaxDefaultLeaseBlocks: DefaultLeaseBlockHeight})
 
 	assert.Equal(t, cdc, keeper.GetCdc())
 }
 
 func TestKeeper_GetNShortestLease(t *testing.T) {
-	ctx, testStore, owner, cdc := initKeeperTest(t)
+	ctx, testStore, owner, cdc := initKeeperTest()
 	keeper := NewKeeper(nil, nil, nil, cdc, MaxKeeperSizes{MaxKeysSize: 1024})
 
 	currentBlockHeight := int64(1)
@@ -516,9 +515,14 @@ func TestKeeper_GetNShortestLease(t *testing.T) {
 	assert.Equal(t, 5, len(response.KeyLeases))
 
 	assert.Equal(t, "key9910", response.KeyLeases[0].Key)
-	assert.Equal(t, int64(9910+1000-currentBlockHeight), response.KeyLeases[0].Lease)
+	assert.Equal(t, 9910+1000-currentBlockHeight, response.KeyLeases[0].Lease)
 
 	response = keeper.GetNShortestLease(newCtx, testStore, "wronguuid", owner, 5)
 	assert.Equal(t, "wronguuid", response.UUID)
 	assert.Equal(t, 0, len(response.KeyLeases))
+
+	response = keeper.GetNShortestLease(newCtx, testStore, "uuid", owner, 11)
+	assert.Equal(t, "uuid", response.UUID)
+	assert.Equal(t, 10, len(response.KeyLeases))
+
 }

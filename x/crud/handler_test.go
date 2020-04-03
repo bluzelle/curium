@@ -122,23 +122,23 @@ func Test_handleMsgRead(t *testing.T) {
 
 	// key returned in result
 	{
-		read_msg := types.MsgRead{
+		readMsg := types.MsgRead{
 			UUID:  "uuid",
 			Key:   "key",
 			Owner: owner,
 		}
-		mockKeeper.EXPECT().GetOwner(ctx, nil, read_msg.UUID, read_msg.Key).Return(owner)
-		mockKeeper.EXPECT().GetValue(ctx, nil, read_msg.UUID, read_msg.Key).Return(types.BLZValue{Value: "utest", Owner: owner})
+		mockKeeper.EXPECT().GetOwner(ctx, nil, readMsg.UUID, readMsg.Key).Return(owner)
+		mockKeeper.EXPECT().GetValue(ctx, nil, readMsg.UUID, readMsg.Key).Return(types.BLZValue{Value: "utest", Owner: owner})
 
-		result, err := handleMsgRead(ctx, mockKeeper, read_msg)
+		result, err := handleMsgRead(ctx, mockKeeper, readMsg)
 
 		assert.Nil(t, err)
 		assert.NotEmpty(t, result.Data)
 
-		json_result := types.BLZValue{}
-		json.Unmarshal(result.Data, &json_result)
+		jsonResult := types.BLZValue{}
+		json.Unmarshal(result.Data, &jsonResult)
 
-		assert.Equal(t, "utest", json_result.Value)
+		assert.Equal(t, "utest", jsonResult.Value)
 	}
 
 	// Test for empty message parameters
@@ -416,10 +416,10 @@ func Test_handleMsgKeys(t *testing.T) {
 		assert.Nil(t, err)
 		assert.NotEmpty(t, result.Data)
 
-		json_result := types.QueryResultKeys{}
-		json.Unmarshal(result.Data, &json_result)
+		jsonResult := types.QueryResultKeys{}
+		json.Unmarshal(result.Data, &jsonResult)
 
-		assert.True(t, reflect.DeepEqual(json_result.Keys, acceptedKeys))
+		assert.True(t, reflect.DeepEqual(jsonResult.Keys, acceptedKeys))
 	}
 
 	// Test for empty message parameters
@@ -453,21 +453,21 @@ func Test_handleMsgHas(t *testing.T) {
 		result, err := NewHandler(mockKeeper)(ctx, hasMsg)
 		assert.Nil(t, err)
 
-		json_result := types.QueryResultHas{}
-		json.Unmarshal(result.Data, &json_result)
+		jsonResult := types.QueryResultHas{}
+		json.Unmarshal(result.Data, &jsonResult)
 
-		assert.True(t, json_result.Has)
-		assert.Equal(t, json_result.UUID, hasMsg.UUID)
-		assert.Equal(t, json_result.Key, hasMsg.Key)
+		assert.True(t, jsonResult.Has)
+		assert.Equal(t, jsonResult.UUID, hasMsg.UUID)
+		assert.Equal(t, jsonResult.Key, hasMsg.Key)
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, hasMsg.UUID, hasMsg.Key)
 
 		result, err = handleMsgHas(ctx, mockKeeper, hasMsg)
 		assert.Nil(t, err)
 
-		json_result = types.QueryResultHas{}
-		json.Unmarshal(result.Data, &json_result)
-		assert.False(t, json_result.Has)
+		jsonResult = types.QueryResultHas{}
+		json.Unmarshal(result.Data, &jsonResult)
+		assert.False(t, jsonResult.Has)
 	}
 
 	// Test for empty message parameters
@@ -553,7 +553,7 @@ func Test_handleMsgKeyValues(t *testing.T) {
 		// always return nil for a store...
 		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
 
-		keyValues := []types.KeyValue{}
+		var keyValues []types.KeyValue
 		keyValues = append(keyValues, types.KeyValue{Key: "key0", Value: "value0"})
 		keyValues = append(keyValues, types.KeyValue{Key: "key1", Value: "value1"})
 
@@ -565,10 +565,10 @@ func Test_handleMsgKeyValues(t *testing.T) {
 		assert.Nil(t, err)
 		assert.NotEmpty(t, result.Data)
 
-		json_result := types.QueryResultKeyValues{}
-		json.Unmarshal(result.Data, &json_result)
+		jsonResult := types.QueryResultKeyValues{}
+		json.Unmarshal(result.Data, &jsonResult)
 
-		assert.True(t, reflect.DeepEqual(json_result, acceptedKeyValues))
+		assert.True(t, reflect.DeepEqual(jsonResult, acceptedKeyValues))
 	}
 
 	// Test for empty message parameters
@@ -599,11 +599,11 @@ func Test_handleMsgCount(t *testing.T) {
 		result, err := NewHandler(mockKeeper)(ctx, countMsg)
 		assert.Nil(t, err)
 
-		json_result := types.QueryResultCount{}
-		json.Unmarshal(result.Data, &json_result)
+		jsonResult := types.QueryResultCount{}
+		json.Unmarshal(result.Data, &jsonResult)
 
-		assert.Equal(t, countMsg.UUID, json_result.UUID)
-		assert.Equal(t, uint64(123), json_result.Count)
+		assert.Equal(t, countMsg.UUID, jsonResult.UUID)
+		assert.Equal(t, uint64(123), jsonResult.Count)
 	}
 
 	// Test for empty message parameters
@@ -623,8 +623,6 @@ func Test_handleMsgDeleteAll(t *testing.T) {
 	// Simple delete test key does not exist
 	{
 		deleteAllMsg := types.MsgDeleteAll{UUID: "uuid", Owner: owner}
-
-		assert.Equal(t, "deleteall", deleteAllMsg.Type())
 
 		// always return nil for a store...
 		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
@@ -758,10 +756,10 @@ func Test_handleMsgGetLease(t *testing.T) {
 		result, err := NewHandler(mockKeeper)(newCtx, msgGetLease)
 		assert.Nil(t, err)
 
-		json_result := types.QueryResultLease{}
-		json.Unmarshal(result.Data, &json_result)
+		jsonResult := types.QueryResultLease{}
+		json.Unmarshal(result.Data, &jsonResult)
 
-		assert.Equal(t, int64(1), json_result.Lease)
+		assert.Equal(t, int64(1), jsonResult.Lease)
 	}
 
 	// Test for empty message parameters
@@ -800,9 +798,9 @@ func Test_handleMsgGetNShortestLease(t *testing.T) {
 		result, err := NewHandler(mockKeeper)(ctx, types.MsgGetNShortestLease{UUID: "uuid", Owner: owner, N: 5})
 
 		assert.Nil(t, err)
-		json_result := types.QueryResultNShortestLeaseKeys{}
-		json.Unmarshal(result.Data, &json_result)
-		assert.True(t, reflect.DeepEqual(response, json_result))
+		jsonResult := types.QueryResultNShortestLeaseKeys{}
+		json.Unmarshal(result.Data, &jsonResult)
+		assert.True(t, reflect.DeepEqual(response, jsonResult))
 	}
 
 	// Test for empty message parameters
@@ -877,6 +875,82 @@ func Test_handleMsgRenewLease(t *testing.T) {
 		assert.NotNil(t, err)
 
 		_, err = handleMsgRenewLease(ctx, mockKeeper, types.MsgRenewLease{UUID: "uuid", Key: "key"})
+		assert.NotNil(t, err)
+	}
+}
+
+func Test_handleMsgRenewLeaseAll(t *testing.T) {
+
+	mockCtrl, mockKeeper, ctx, owner := initTest(t)
+	defer mockCtrl.Finish()
+
+	msg := types.MsgRenewLeaseAll{UUID: "uuid", Lease: 0, Owner: owner}
+
+	ctx = ctx.WithBlockHeight(int64(500))
+
+	mockKeeper.EXPECT().GetKVStore(gomock.Any()).AnyTimes().Return(nil)
+	mockKeeper.EXPECT().GetLeaseStore(gomock.Any()).AnyTimes().Return(nil)
+	mockKeeper.EXPECT().GetKeys(ctx, nil, msg.UUID, msg.Owner)
+	mockKeeper.EXPECT().GetDefaultLeaseBlocks().AnyTimes().Return(DefaultLeaseBlockHeight)
+
+	_, err := NewHandler(mockKeeper)(ctx, msg)
+	assert.Equal(t, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID does not exist").Error(), err.Error())
+
+	// testing that default lease applies to all keys owned by a UUID and owner
+	{
+		mockKeeper.EXPECT().GetKeys(gomock.Any(), nil, msg.UUID, msg.Owner).Return(types.QueryResultKeys{
+			UUID: msg.UUID,
+			Keys: []string{"one", "two"},
+		})
+
+		ctx = ctx.WithBlockHeight(8000)
+		mockKeeper.EXPECT().GetValue(gomock.Any(), nil, msg.UUID, "one").Return(types.BLZValue{
+			Value:  "value",
+			Lease:  1700,
+			Height: 7000,
+			Owner:  msg.Owner,
+		})
+
+		mockKeeper.EXPECT().GetValue(gomock.Any(), nil, msg.UUID, "two").Return(types.BLZValue{
+			Value:  "value",
+			Lease:  600,
+			Height: 7500,
+			Owner:  msg.Owner,
+		})
+
+		mockKeeper.EXPECT().DeleteLease(nil, msg.UUID, "one", int64(7000), int64(1700))
+		mockKeeper.EXPECT().DeleteLease(nil, msg.UUID, "two", int64(7500), int64(600))
+
+		mockKeeper.EXPECT().SetValue(ctx, nil, msg.UUID, "one", types.BLZValue{
+			Value:  "value",
+			Lease:  DefaultLeaseBlockHeight,
+			Height: 8000,
+			Owner:  msg.Owner,
+		})
+
+		mockKeeper.EXPECT().SetValue(ctx, nil, msg.UUID, "two", types.BLZValue{
+			Value:  "value",
+			Lease:  DefaultLeaseBlockHeight,
+			Height: 8000,
+			Owner:  msg.Owner,
+		})
+
+		mockKeeper.EXPECT().SetLease(nil, msg.UUID, "one", int64(8000), DefaultLeaseBlockHeight)
+		mockKeeper.EXPECT().SetLease(nil, msg.UUID, "two", int64(8000), DefaultLeaseBlockHeight)
+
+		_, err = handleMsgRenewLeaseAll(ctx, mockKeeper, msg)
+		assert.Nil(t, err)
+	}
+
+	// Test for empty message parameters
+	{
+		_, err := handleMsgRenewLeaseAll(ctx, mockKeeper, types.MsgRenewLeaseAll{})
+		assert.NotNil(t, err)
+
+		_, err = handleMsgRenewLeaseAll(ctx, mockKeeper, types.MsgRenewLeaseAll{UUID: "uuid"})
+		assert.NotNil(t, err)
+
+		_, err = handleMsgRenewLeaseAll(ctx, mockKeeper, types.MsgRenewLeaseAll{UUID: "uuid", Lease: 0})
 		assert.NotNil(t, err)
 	}
 }

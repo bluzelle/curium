@@ -31,7 +31,7 @@ type BLZValue struct {
 func (kv BLZValue) Unmarshal(b []byte) BLZValue {
 	var cdc = cc.New()
 	value := BLZValue{}
-	cdc.UnmarshalBinaryBare(b, &value)
+	_ = cdc.UnmarshalBinaryBare(b, &value)
 	return value
 }
 
