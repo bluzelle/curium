@@ -22,6 +22,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"math"
 	"reflect"
 	"testing"
 )
@@ -953,4 +954,21 @@ func Test_handleMsgRenewLeaseAll(t *testing.T) {
 		_, err = handleMsgRenewLeaseAll(ctx, mockKeeper, types.MsgRenewLeaseAll{UUID: "uuid", Lease: 0})
 		assert.NotNil(t, err)
 	}
+}
+
+func TestLeaseGasRate(t *testing.T) {
+	DEFAULT_BLOCKS := int64(10 * 24 * 60 * 60 / 5)
+	var expected map[int64]float64
+	expected = make(map[int64]float64)
+	expected[0] = 30.0
+	expected[DEFAULT_BLOCKS/5] = 29.0
+	expected[3.0*DEFAULT_BLOCKS/5.0] = 20.0
+	expected[DEFAULT_BLOCKS] = 10.0 + 1.0
+	expected[20.0*DEFAULT_BLOCKS] = 10.0
+
+	totalError := 0.0
+	for blocks, leaseRate := range expected {
+		totalError += math.Abs(leaseRate-LeaseGasRate(blocks)) / leaseRate
+	}
+	assert.True(t, totalError < 0.1)
 }
