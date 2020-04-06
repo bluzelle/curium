@@ -21,6 +21,14 @@ import (
 	"github.com/bluzelle/curium/x/crud/internal/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"math"
+)
+
+const (
+	LeaseGasRateDefault         float64 = 10.0
+	LeaseGasRateMaximum         float64 = 20.0
+	LeaseGasRateInflectionBlock int64   = 8640
+	LeaseGasRateShift           int64   = 86400
 )
 
 func NewHandler(keeper keeper.IKeeper) sdk.Handler {
@@ -62,6 +70,17 @@ func NewHandler(keeper keeper.IKeeper) sdk.Handler {
 	}
 }
 
+// TODO Move this function to somewhere ?
+// L_r = C + \frac{m_r}{1+K e^{-(\frac{l-l_s}{B})}}
+// C = 10 gas/block
+// B = 8640 blocks
+// l_s = 86400 blocks
+// m_r = 20 gas/block (note add C to this to get max)
+// K = 1.0 Rate inflection adjustment
+func leaseGasRate(lease int64) float64 {
+	return LeaseGasRateDefault + LeaseGasRateMaximum/(1.0+math.Exp(-float64((lease-LeaseGasRateShift)/LeaseGasRateInflectionBlock)))
+}
+
 func handleMsgCreate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgCreate) (*sdk.Result, error) {
 	if len(msg.UUID) == 0 || len(msg.Key) == 0 || msg.Owner.Empty() {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
@@ -85,6 +104,11 @@ func handleMsgCreate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgCreate
 
 	leaseCtx := ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 	keeper.SetLease(keeper.GetLeaseStore(leaseCtx), msg.UUID, msg.Key, ctx.BlockHeight(), msg.Lease)
+
+	// charge for lease
+	gasRate := leaseGasRate(msg.Lease)
+	valueSize := float64(len(msg.UUID) + len(msg.Key) + len(msg.Value))
+	ctx.GasMeter().ConsumeGas(uint64(gasRate*valueSize), "lease")
 
 	return &sdk.Result{}, nil
 }
@@ -139,6 +163,14 @@ func handleMsgUpdate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgUpdate
 		leaseCtx := ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 		keeper.DeleteLease(keeper.GetLeaseStore(leaseCtx), msg.UUID, msg.Key, oldBlzValue.Height, oldBlzValue.Lease)
 		keeper.SetLease(keeper.GetLeaseStore(leaseCtx), msg.UUID, msg.Key, oldBlzValue.Height, newLease)
+
+		// charge for lease if applicable
+		if newLease > oldBlzValue.Lease {
+			// TOOO: Verify that this makes sense over, say leaseGasRate(newLease - oldBlzValue.Lease)
+			gasRate := leaseGasRate(newLease) - leaseGasRate(oldBlzValue.Lease)
+			valueSize := float64(len(msg.UUID) + len(msg.Key) + len(msg.Value))
+			ctx.GasMeter().ConsumeGas(uint64(gasRate*valueSize), "lease")
+		}
 	} else {
 		keeper.SetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key, types.BLZValue{Value: msg.Value, Lease: oldBlzValue.Lease,
 			Owner: msg.Owner, Height: oldBlzValue.Height})
@@ -351,9 +383,11 @@ func handleMsgRenewLeaseAll(ctx sdk.Context, keeper keeper.IKeeper, msg types.Ms
 		msg.Lease = keeper.GetDefaultLeaseBlocks()
 	}
 
+	fmt.Println(ctx.GasMeter().GasConsumed())
 	for i := range value.Keys[:] {
 		updateLease(ctx, keeper, msg.UUID, value.Keys[i], msg.Lease)
 	}
+	fmt.Println(ctx.GasMeter().GasConsumed())
 
 	return &sdk.Result{}, nil
 }
@@ -363,6 +397,14 @@ func updateLease(ctx sdk.Context, keeper keeper.IKeeper, UUID string, key string
 
 	leaseCtx := ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 	keeper.DeleteLease(keeper.GetLeaseStore(leaseCtx), UUID, key, blzValue.Height, blzValue.Lease)
+
+	// charge for lease if applicable
+	if lease > blzValue.Lease {
+		// TODO: Verify this math
+		gasRate := leaseGasRate(lease) - leaseGasRate(blzValue.Lease)
+		valueSize := float64(len(UUID) + len(key) + len(blzValue.Value))
+		ctx.GasMeter().ConsumeGas(uint64(gasRate*valueSize), "lease")
+	}
 
 	blzValue.Height = ctx.BlockHeight()
 	blzValue.Lease = lease
