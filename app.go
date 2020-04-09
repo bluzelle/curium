@@ -27,7 +27,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
+	"github.com/cosmos/cosmos-sdk/x/gov"
 	"github.com/cosmos/cosmos-sdk/x/params"
+	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
@@ -63,11 +65,12 @@ var (
 		bank.AppModuleBasic{},
 		staking.AppModuleBasic{},
 		distr.AppModuleBasic{},
+		gov.NewAppModuleBasic(paramsclient.ProposalHandler, distr.ProposalHandler),
 		params.AppModuleBasic{},
 		slashing.AppModuleBasic{},
 		supply.AppModuleBasic{},
-		crud.AppModule{},
-		faucet.AppModule{},
+		crud.AppModuleBasic{},
+		faucet.AppModuleBasic{},
 	)
 
 	// account permissions
@@ -77,6 +80,7 @@ var (
 		staking.BondedPoolName:    {supply.Burner, supply.Staking},
 		staking.NotBondedPoolName: {supply.Burner, supply.Staking},
 		faucet.ModuleName:         {supply.Minter}, // add permissions for faucet
+		gov.ModuleName:            {supply.Burner},
 	}
 )
 
@@ -117,6 +121,7 @@ type CRUDApp struct {
 	stakingKeeper  staking.Keeper
 	slashingKeeper slashing.Keeper
 	distrKeeper    distr.Keeper
+	govKeeper      gov.Keeper
 	supplyKeeper   supply.Keeper
 	paramsKeeper   params.Keeper
 	crudKeeper     crud.Keeper
@@ -127,7 +132,9 @@ type CRUDApp struct {
 }
 
 func NewCRUDApp(
-	logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseApp),
+	logger log.Logger,
+	db dbm.DB,
+	baseAppOptions ...func(*bam.BaseApp),
 ) *CRUDApp {
 
 	// First define the top level codec that will be shared by the different modules
@@ -138,8 +145,11 @@ func NewCRUDApp(
 
 	bApp.SetAppVersion(version.Version)
 
-	keys := sdk.NewKVStoreKeys(bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
-		supply.StoreKey, distr.StoreKey, slashing.StoreKey, params.StoreKey, crud.StoreKey, faucet.StoreKey, crud.LeaseKey)
+	keys := sdk.NewKVStoreKeys(
+		bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
+		supply.StoreKey, distr.StoreKey, slashing.StoreKey,
+		gov.StoreKey, params.StoreKey, crud.StoreKey,
+		faucet.StoreKey, crud.LeaseKey)
 
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -159,6 +169,7 @@ func NewCRUDApp(
 	stakingSubspace := app.paramsKeeper.Subspace(staking.DefaultParamspace)
 	distrSubspace := app.paramsKeeper.Subspace(distr.DefaultParamspace)
 	slashingSubspace := app.paramsKeeper.Subspace(slashing.DefaultParamspace)
+	govSubspace := app.paramsKeeper.Subspace(gov.DefaultParamspace).WithKeyTable(gov.ParamKeyTable())
 
 	// The AccountKeeper handles address -> account lookups
 	app.accountKeeper = auth.NewAccountKeeper(
@@ -209,6 +220,19 @@ func NewCRUDApp(
 		slashingSubspace,
 	)
 
+	govRouter := gov.NewRouter()
+	govRouter.AddRoute(gov.RouterKey, gov.ProposalHandler).
+		AddRoute(distr.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.distrKeeper))
+
+	app.govKeeper = gov.NewKeeper(
+		app.cdc,
+		keys[gov.StoreKey],
+		govSubspace,
+		app.supplyKeeper,
+		&stakingKeeper,
+		govRouter,
+	)
+
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.stakingKeeper = *stakingKeeper.SetHooks(
@@ -246,13 +270,14 @@ func NewCRUDApp(
 		crud.NewAppModule(!bluzelleCrud, app.crudKeeper, app.bankKeeper),
 		faucet.NewAppModule(app.faucetKeeper), // faucet module
 		supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
+		gov.NewAppModule(app.govKeeper, app.accountKeeper, app.supplyKeeper),
 		distr.NewAppModule(app.distrKeeper, app.accountKeeper, app.supplyKeeper, app.stakingKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.accountKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
 	)
 
 	app.mm.SetOrderBeginBlockers(distr.ModuleName, slashing.ModuleName)
-	app.mm.SetOrderEndBlockers(staking.ModuleName)
+	app.mm.SetOrderEndBlockers(gov.ModuleName, staking.ModuleName)
 
 	// Sets the order of Genesis - Order matters, genutil is to always come last
 	// NOTE: The genutils moodule must occur after staking so that pools are
@@ -263,6 +288,7 @@ func NewCRUDApp(
 		auth.ModuleName,
 		bank.ModuleName,
 		slashing.ModuleName,
+		gov.ModuleName,
 		crud.ModuleName,
 		supply.ModuleName,
 		genutil.ModuleName,
