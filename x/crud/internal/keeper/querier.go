@@ -15,12 +15,10 @@
 package keeper
 
 import (
-	"encoding/json"
 	"github.com/bluzelle/curium/x/crud/internal/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/cosmos/cosmos-sdk/version"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"strconv"
 )
@@ -31,7 +29,6 @@ const (
 	QueryKeys              = "keys"
 	QueryKeyValues         = "keyvalues"
 	QueryCount             = "count"
-	QueryVersion           = "version"
 	QueryGetLease          = "getlease"
 	QueryGetNShortestLease = "getnshortestlease"
 )
@@ -49,8 +46,6 @@ func NewQuerier(keeper IKeeper) sdk.Querier {
 			return queryKeyValues(ctx, path[1:], req, keeper, keeper.GetCdc())
 		case QueryCount:
 			return queryCount(ctx, path[1:], req, keeper, keeper.GetCdc())
-		case QueryVersion:
-			return queryVersion()
 		case QueryGetLease:
 			return queryGetLease(ctx, path[1:], req, keeper, keeper.GetCdc())
 		case QueryGetNShortestLease:
@@ -112,10 +107,6 @@ func queryCount(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKee
 	}
 
 	return res, nil
-}
-
-func queryVersion() ([]byte, error) {
-	return json.Marshal(version.NewInfo())
 }
 
 func queryGetLease(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, error) {

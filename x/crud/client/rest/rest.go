@@ -43,7 +43,6 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, storeName string) 
 	r.HandleFunc(fmt.Sprintf("/%s/read/{UUID}/{key}", storeName), BlzQReadHandler(cliCtx, storeName)).Methods("GET")
 	r.HandleFunc(fmt.Sprintf("/%s/rename", storeName), BlzRenameHandler(cliCtx)).Methods("POST")
 	r.HandleFunc(fmt.Sprintf("/%s/update", storeName), BlzUpdateHandler(cliCtx)).Methods("POST")
-	r.HandleFunc(fmt.Sprintf("/%s/version", storeName), BlzQVersionHandler(cliCtx, storeName)).Methods("GET")
 	r.HandleFunc(fmt.Sprintf("/%s/renewlease", storeName), BlzRenewLease(cliCtx)).Methods("POST")
 	r.HandleFunc(fmt.Sprintf("/%s/renewleaseall", storeName), BlzRenewLeaseAll(cliCtx)).Methods("POST")
 }

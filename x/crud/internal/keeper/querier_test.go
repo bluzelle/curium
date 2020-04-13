@@ -20,7 +20,6 @@ import (
 	"github.com/bluzelle/curium/x/crud/mocks"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -157,20 +156,6 @@ func Test_queryCount(t *testing.T) {
 
 	assert.Equal(t, "uuid", jsonResult.UUID)
 	assert.Equal(t, uint64(2), jsonResult.Count)
-}
-
-func Test_queryVersion(t *testing.T) {
-	ctx, _, mockKeeper := initTest(t)
-	result, err := NewQuerier(mockKeeper)(ctx, []string{"version"}, abci.RequestQuery{})
-	assert.Nil(t, err)
-
-	jsonResult := version.Info{}
-	json.Unmarshal(result, &jsonResult)
-
-	// We can only verify that the api got called and not the data since that is set
-	// only when we build the client & server processes.
-	assert.Equal(t, jsonResult.ServerName, "<appd>")
-	assert.Equal(t, jsonResult.ClientName, "<appcli>")
 }
 
 func Test_queryGetLease(t *testing.T) {
