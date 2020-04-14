@@ -24,9 +24,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
@@ -281,7 +278,7 @@ func NewCRUDApp(
 
 	// The AnteHandler handles signature verification and transaction pre-processing
 	app.SetAnteHandler(
-		NewAnteHandler1(
+		auth.NewAnteHandler(
 			app.accountKeeper,
 			app.supplyKeeper,
 			auth.DefaultSigVerificationGasConsumer,
@@ -376,6 +373,7 @@ func (app *CRUDApp) ExportAppStateAndValidators(_ bool, _ []string) (appState js
 	return appState, validators, nil
 }
 
+/*
 func NewAnteHandler1(ak keeper.AccountKeeper, supplyKeeper types.SupplyKeeper, sigGasConsumer ante.SignatureVerificationGasConsumer) sdk.AnteHandler {
 	return sdk.ChainAnteDecorators(
 		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
@@ -392,3 +390,4 @@ func NewAnteHandler1(ak keeper.AccountKeeper, supplyKeeper types.SupplyKeeper, s
 		ante.NewIncrementSequenceDecorator(ak), // innermost AnteDecorator
 	)
 }
+*/
