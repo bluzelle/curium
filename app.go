@@ -297,6 +297,24 @@ func NewCRUDApp(
 		tmos.Exit(err.Error())
 	}
 
+	/*ctx := app.NewContext(true, abci.Header{Height: app.LastBlockHeight()})
+	//genState := app.mm.ExportGenesis(ctx)
+	//
+	//g := auth.GetGenesisStateFromAppState(cdc, genState)
+	//for i := range g.Accounts[:] {
+	// println(g.Accounts[i].GetAddress().String())
+	// println(g.Accounts[i].GetAccountNumber())
+	// println()
+	//}
+	addr, err := sdk.AccAddressFromBech32("bluzelle1fx6k4vfa7tuua0r86v6hl6g704cmyz6lx8x2u9")
+	if err != nil {
+		println(err)
+	}
+	coins := app.bankKeeper.GetCoins(ctx, addr)
+	println(coins.AmountOf("ubnt").String())
+
+	*/
+
 	return app
 }
 
