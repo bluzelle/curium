@@ -24,6 +24,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/auth/ante"
+	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
@@ -277,11 +280,15 @@ func NewCRUDApp(
 	app.SetEndBlocker(app.EndBlocker)
 
 	// The AnteHandler handles signature verification and transaction pre-processing
+	// (bk bank.Keeper, ak keeper.AccountKeeper, supplyKeeper types.SupplyKeeper, sigGasConsumer ante.SignatureVerificationGasConsumer, ua sdk.Address)
+	ua, _ := sdk.AccAddressFromBech32("bluzelle1fx6k4vfa7tuua0r86v6hl6g704cmyz6lx8x2u9")
 	app.SetAnteHandler(
-		auth.NewAnteHandler(
+		NewAnteHandler1(
+			app.bankKeeper,
 			app.accountKeeper,
 			app.supplyKeeper,
 			auth.DefaultSigVerificationGasConsumer,
+			ua,
 		),
 	)
 
@@ -373,21 +380,19 @@ func (app *CRUDApp) ExportAppStateAndValidators(_ bool, _ []string) (appState js
 	return appState, validators, nil
 }
 
-/*
-func NewAnteHandler1(ak keeper.AccountKeeper, supplyKeeper types.SupplyKeeper, sigGasConsumer ante.SignatureVerificationGasConsumer) sdk.AnteHandler {
+func NewAnteHandler1(bk bank.Keeper, ak keeper.AccountKeeper, supplyKeeper types.SupplyKeeper, sigGasConsumer ante.SignatureVerificationGasConsumer, ua sdk.Address) sdk.AnteHandler {
 	return sdk.ChainAnteDecorators(
 		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
 		ante.NewMempoolFeeDecorator(),
-		NewMempoolFeeDecorator(),
 		ante.NewValidateBasicDecorator(),
 		ante.NewValidateMemoDecorator(ak),
 		ante.NewConsumeGasForTxSizeDecorator(ak),
 		ante.NewSetPubKeyDecorator(ak), // SetPubKeyDecorator must be called before all signature verification decorators
 		ante.NewValidateSigCountDecorator(ak),
 		ante.NewDeductFeeDecorator(ak, supplyKeeper),
+		NewDeductFeeDecorator(bk, ak, supplyKeeper, ua),
 		ante.NewSigGasConsumeDecorator(ak, sigGasConsumer),
 		ante.NewSigVerificationDecorator(ak),
 		ante.NewIncrementSequenceDecorator(ak), // innermost AnteDecorator
 	)
 }
-*/
