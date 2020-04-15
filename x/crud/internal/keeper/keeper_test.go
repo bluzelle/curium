@@ -490,7 +490,7 @@ func TestKeeper_GetCdc(t *testing.T) {
 	assert.Equal(t, cdc, keeper.GetCdc())
 }
 
-func TestKeeper_GetNShortestLease(t *testing.T) {
+func TestKeeper_GetNShortestLeases(t *testing.T) {
 	ctx, testStore, owner, cdc := initKeeperTest()
 	keeper := NewKeeper(nil, nil, nil, cdc, MaxKeeperSizes{MaxKeysSize: 1024})
 
@@ -509,7 +509,7 @@ func TestKeeper_GetNShortestLease(t *testing.T) {
 
 	// there are at least 10 keys
 	newCtx := ctx.WithBlockHeight(currentBlockHeight)
-	response := keeper.GetNShortestLease(newCtx, testStore, "uuid", owner, 5)
+	response := keeper.GetNShortestLeases(newCtx, testStore, "uuid", owner, 5)
 
 	assert.Equal(t, "uuid", response.UUID)
 	assert.Equal(t, 5, len(response.KeyLeases))
@@ -517,11 +517,11 @@ func TestKeeper_GetNShortestLease(t *testing.T) {
 	assert.Equal(t, "key9910", response.KeyLeases[0].Key)
 	assert.Equal(t, 9910+1000-currentBlockHeight, response.KeyLeases[0].Lease)
 
-	response = keeper.GetNShortestLease(newCtx, testStore, "wronguuid", owner, 5)
+	response = keeper.GetNShortestLeases(newCtx, testStore, "wronguuid", owner, 5)
 	assert.Equal(t, "wronguuid", response.UUID)
 	assert.Equal(t, 0, len(response.KeyLeases))
 
-	response = keeper.GetNShortestLease(newCtx, testStore, "uuid", owner, 11)
+	response = keeper.GetNShortestLeases(newCtx, testStore, "uuid", owner, 11)
 	assert.Equal(t, "uuid", response.UUID)
 	assert.Equal(t, 10, len(response.KeyLeases))
 

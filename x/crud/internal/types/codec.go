@@ -30,7 +30,7 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgDeleteAll{}, "crud/deleteall", nil)
 	cdc.RegisterConcrete(MsgDelete{}, "crud/delete", nil)
 	cdc.RegisterConcrete(MsgGetLease{}, "crud/getlease", nil)
-	cdc.RegisterConcrete(MsgGetNShortestLease{}, "crud/getnshortestlease", nil)
+	cdc.RegisterConcrete(MsgGetNShortestLeases{}, "crud/getnshortestleases", nil)
 	cdc.RegisterConcrete(MsgHas{}, "crud/has", nil)
 	cdc.RegisterConcrete(MsgKeyValues{}, "crud/keyvalues", nil)
 	cdc.RegisterConcrete(MsgKeys{}, "crud/keys", nil)

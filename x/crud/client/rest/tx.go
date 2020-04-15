@@ -500,16 +500,16 @@ func BlzGetLeaseHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get N Shortest Lease
-type GetNShortestLeaseReq struct {
+type GetNShortestLeasesReq struct {
 	BaseReq rest.BaseReq
 	UUID    string
 	N       uint64
 	Owner   string
 }
 
-func BlzGetNShortestLeaseHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func BlzGetNShortestLeasesHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req GetNShortestLeaseReq
+		var req GetNShortestLeasesReq
 
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
@@ -528,7 +528,7 @@ func BlzGetNShortestLeaseHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// create the message
-		msg := types.MsgGetNShortestLease{UUID: req.UUID, N: req.N, Owner: addr}
+		msg := types.MsgGetNShortestLeases{UUID: req.UUID, N: req.N, Owner: addr}
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

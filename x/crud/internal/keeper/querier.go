@@ -30,7 +30,7 @@ const (
 	QueryKeyValues         = "keyvalues"
 	QueryCount             = "count"
 	QueryGetLease          = "getlease"
-	QueryGetNShortestLease = "getnshortestlease"
+	QueryGetNShortestLeases = "getnshortestleases"
 )
 
 func NewQuerier(keeper IKeeper) sdk.Querier {
@@ -48,8 +48,8 @@ func NewQuerier(keeper IKeeper) sdk.Querier {
 			return queryCount(ctx, path[1:], req, keeper, keeper.GetCdc())
 		case QueryGetLease:
 			return queryGetLease(ctx, path[1:], req, keeper, keeper.GetCdc())
-		case QueryGetNShortestLease:
-			return queryGetNShortestLease(ctx, path[1:], req, keeper, keeper.GetCdc())
+		case QueryGetNShortestLeases:
+			return queryGetNShortestLeases(ctx, path[1:], req, keeper, keeper.GetCdc())
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown crud query endpoint")
 		}
@@ -124,14 +124,14 @@ func queryGetLease(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper I
 	return res, nil
 }
 
-func queryGetNShortestLease(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, error) {
+func queryGetNShortestLeases(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, error) {
 
 	N, err := strconv.ParseUint(path[1], 10, 64)
 	if err != nil {
 		return []byte{}, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, err.Error())
 	}
 
-	value := keeper.GetNShortestLease(ctx, keeper.GetKVStore(ctx), path[0], nil, N)
+	value := keeper.GetNShortestLeases(ctx, keeper.GetKVStore(ctx), path[0], nil, N)
 
 	res, err := codec.MarshalJSONIndent(cdc, value)
 	if err != nil {

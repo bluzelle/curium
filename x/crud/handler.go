@@ -50,8 +50,8 @@ func NewHandler(keeper keeper.IKeeper) sdk.Handler {
 			return handleMsgMultiUpdate(ctx, keeper, msg)
 		case types.MsgGetLease:
 			return handleMsgGetLease(ctx, keeper, msg)
-		case types.MsgGetNShortestLease:
-			return handleMsgGetNShortestLease(ctx, keeper, msg)
+		case types.MsgGetNShortestLeases:
+			return handleMsgGetNShortestLeases(ctx, keeper, msg)
 		case types.MsgRenewLease:
 			return handleMsgRenewLease(ctx, keeper, msg)
 		case types.MsgRenewLeaseAll:
@@ -298,12 +298,12 @@ func handleMsgGetLease(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgGetL
 	return &sdk.Result{Data: jsonData}, nil
 }
 
-func handleMsgGetNShortestLease(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgGetNShortestLease) (*sdk.Result, error) {
+func handleMsgGetNShortestLeases(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgGetNShortestLeases) (*sdk.Result, error) {
 	if len(msg.UUID) == 0 || msg.N == 0 || msg.Owner.Empty() {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
 	}
 
-	value := keeper.GetNShortestLease(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Owner, msg.N)
+	value := keeper.GetNShortestLeases(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Owner, msg.N)
 
 	jsonData, err := json.Marshal(value)
 
