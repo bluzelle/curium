@@ -31,10 +31,10 @@ type DeductFeeDecorator struct {
 	bk           bank.Keeper
 	ak           keeper.AccountKeeper
 	supplyKeeper types.SupplyKeeper
-	utilityAddr  sdk.Address
+	utilityAddr  sdk.AccAddress
 }
 
-func NewDeductFeeDecorator(bk bank.Keeper, ak keeper.AccountKeeper, sk types.SupplyKeeper, ua sdk.Address) DeductFeeDecorator {
+func NewDeductFeeDecorator(bk bank.Keeper, ak keeper.AccountKeeper, sk types.SupplyKeeper, ua sdk.AccAddress) DeductFeeDecorator {
 	return DeductFeeDecorator{
 		bk:           bk,
 		ak:           ak,
@@ -62,7 +62,7 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 
 	// deduct the fees
 	if !feeTx.GetFee().IsZero() {
-		err = DeductFees(dfd.supplyKeeper, ctx, feePayerAcc, dfd.utilityAddr, feeTx.GetFee())
+		err = DeductFees(dfd.supplyKeeper, dfd.bk, ctx, feePayerAcc, dfd.utilityAddr, feeTx.GetFee())
 		if err != nil {
 			return ctx, err
 		}
@@ -75,7 +75,7 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 //
 // NOTE: We could use the BankKeeper (in addition to the AccountKeeper, because
 // the BankKeeper doesn't give us accounts), but it seems easier to do this.
-func DeductFees(supplyKeeper types.SupplyKeeper, ctx sdk.Context, acc exported.Account, toAcc sdk.Address, fees sdk.Coins) error {
+func DeductFees(supplyKeeper types.SupplyKeeper, bk bank.Keeper, ctx sdk.Context, acc exported.Account, toAcc sdk.AccAddress, fees sdk.Coins) error {
 	blockTime := ctx.BlockHeader().Time
 	coins := acc.GetCoins()
 
@@ -93,9 +93,18 @@ func DeductFees(supplyKeeper types.SupplyKeeper, ctx sdk.Context, acc exported.A
 	// Validate the account has enough "spendable" coins as this will cover cases
 	// such as vesting accounts.
 	spendableCoins := acc.SpendableCoins(blockTime)
-	if _, hasNeg := spendableCoins.SafeSub(fees); hasNeg {
+
+	utilityFee := int64(0.005 * float64(fees.AmountOf("ubnt").Int64()))
+	utilityCoins := sdk.NewCoins(sdk.NewCoin("ubnt", sdk.NewInt(utilityFee)))
+
+	if _, hasNeg := spendableCoins.SafeSub(utilityCoins); hasNeg {
 		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds,
-			"insufficient funds to pay for fees; %s < %s", spendableCoins, fees)
+			"insufficient funds to pay for utility fees; %s < %s", spendableCoins, utilityCoins)
+	}
+
+	err := bk.SendCoins(ctx, acc.GetAddress(), toAcc, utilityCoins)
+	if err != nil {
+		println("oops!")
 	}
 
 	// TODO

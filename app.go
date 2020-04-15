@@ -281,7 +281,7 @@ func NewCRUDApp(
 
 	// The AnteHandler handles signature verification and transaction pre-processing
 	// (bk bank.Keeper, ak keeper.AccountKeeper, supplyKeeper types.SupplyKeeper, sigGasConsumer ante.SignatureVerificationGasConsumer, ua sdk.Address)
-	ua, _ := sdk.AccAddressFromBech32("bluzelle1fx6k4vfa7tuua0r86v6hl6g704cmyz6lx8x2u9")
+	ua, _ := sdk.AccAddressFromBech32("bluzelle1e4nksvdstenurjs5aatw4d25t5gmdp2dtekrpe")
 	app.SetAnteHandler(
 		NewAnteHandler1(
 			app.bankKeeper,
@@ -380,7 +380,7 @@ func (app *CRUDApp) ExportAppStateAndValidators(_ bool, _ []string) (appState js
 	return appState, validators, nil
 }
 
-func NewAnteHandler1(bk bank.Keeper, ak keeper.AccountKeeper, supplyKeeper types.SupplyKeeper, sigGasConsumer ante.SignatureVerificationGasConsumer, ua sdk.Address) sdk.AnteHandler {
+func NewAnteHandler1(bk bank.Keeper, ak keeper.AccountKeeper, supplyKeeper types.SupplyKeeper, sigGasConsumer ante.SignatureVerificationGasConsumer, ua sdk.AccAddress) sdk.AnteHandler {
 	return sdk.ChainAnteDecorators(
 		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
 		ante.NewMempoolFeeDecorator(),
