@@ -2,12 +2,12 @@ package app
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/spf13/viper"
 )
 
 var (
@@ -47,10 +47,6 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 	if !ok {
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a FeeTx")
 	}
-
-	/* if addr := dfd.supplyKeeper.GetModuleAddress(types.FeeCollectorName); addr == nil {
-		panic(fmt.Sprintf("%s module account has not been set", types.FeeCollectorName))
-	} */
 
 	feePayer := feeTx.FeePayer()
 	feePayerAcc := dfd.ak.GetAccount(ctx, feePayer)
@@ -103,15 +99,42 @@ func DeductFees(supplyKeeper types.SupplyKeeper, bk bank.Keeper, ctx sdk.Context
 
 	err := bk.SendCoins(ctx, acc.GetAddress(), toAcc, utilityCoins)
 	if err != nil {
-		println("oops!")
+		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
 	}
 
-	// TODO
-	/*
-		err := supplyKeeper.SendCoinsFromAccountToModule(ctx, acc.GetAddress(), types.FeeCollectorName, fees)
-		if err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
-		}*/
-
 	return nil
+}
+
+//func IsCrudEnabled(nodeHome string) bool {
+//	enabled := true
+//
+//	viper.SetConfigName("app")
+//	viper.SetConfigType("toml")
+//	viper.AddConfigPath(nodeHome + "/config/")
+//
+//	if viper.ReadInConfig() == nil {
+//		if viper.IsSet(crudModuleEntry) {
+//			enabled = viper.GetBool(crudModuleEntry)
+//		}
+//	}
+//	return enabled
+//}
+
+type UtilityFee struct {
+	Fee           float64
+	AccountNumber uint64
+}
+
+func GetUtilityFee(nodeHome string) UtilityFee {
+	viper.SetConfigName("genesis")
+	viper.SetConfigType("json")
+	viper.AddConfigPath(nodeHome + "/config/")
+
+	if viper.ReadInConfig() == nil {
+		println(viper.GetString("genesis_time"))
+
+		//todo: use unmarshad to fee struct
+	}
+
+	return UtilityFee{}
 }

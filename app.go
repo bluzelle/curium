@@ -279,11 +279,13 @@ func NewCRUDApp(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 
+	GetUtilityFee(DefaultNodeHome)
+
 	// The AnteHandler handles signature verification and transaction pre-processing
 	// (bk bank.Keeper, ak keeper.AccountKeeper, supplyKeeper types.SupplyKeeper, sigGasConsumer ante.SignatureVerificationGasConsumer, ua sdk.Address)
-	ua, _ := sdk.AccAddressFromBech32("bluzelle1e4nksvdstenurjs5aatw4d25t5gmdp2dtekrpe")
+	ua, _ := sdk.AccAddressFromBech32("bluzelle1qmt8l7acqdq5ljsm0v62md9k99kjjerw8razqp")
 	app.SetAnteHandler(
-		NewAnteHandler1(
+		NewAnteHandler(
 			app.bankKeeper,
 			app.accountKeeper,
 			app.supplyKeeper,
@@ -300,24 +302,6 @@ func NewCRUDApp(
 	if err != nil {
 		tmos.Exit(err.Error())
 	}
-
-	/*ctx := app.NewContext(true, abci.Header{Height: app.LastBlockHeight()})
-	//genState := app.mm.ExportGenesis(ctx)
-	//
-	//g := auth.GetGenesisStateFromAppState(cdc, genState)
-	//for i := range g.Accounts[:] {
-	// println(g.Accounts[i].GetAddress().String())
-	// println(g.Accounts[i].GetAccountNumber())
-	// println()
-	//}
-	addr, err := sdk.AccAddressFromBech32("bluzelle1fx6k4vfa7tuua0r86v6hl6g704cmyz6lx8x2u9")
-	if err != nil {
-		println(err)
-	}
-	coins := app.bankKeeper.GetCoins(ctx, addr)
-	println(coins.AmountOf("ubnt").String())
-
-	*/
 
 	return app
 }
@@ -365,7 +349,6 @@ func (app *CRUDApp) ModuleAccountAddrs() map[string]bool {
 }
 
 func (app *CRUDApp) ExportAppStateAndValidators(_ bool, _ []string) (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
-
 	// as if they could withdraw from the start of the next block
 	ctx := app.NewContext(true, abci.Header{Height: app.LastBlockHeight()})
 
@@ -380,7 +363,7 @@ func (app *CRUDApp) ExportAppStateAndValidators(_ bool, _ []string) (appState js
 	return appState, validators, nil
 }
 
-func NewAnteHandler1(bk bank.Keeper, ak keeper.AccountKeeper, supplyKeeper types.SupplyKeeper, sigGasConsumer ante.SignatureVerificationGasConsumer, ua sdk.AccAddress) sdk.AnteHandler {
+func NewAnteHandler(bk bank.Keeper, ak keeper.AccountKeeper, supplyKeeper types.SupplyKeeper, sigGasConsumer ante.SignatureVerificationGasConsumer, ua sdk.AccAddress) sdk.AnteHandler {
 	return sdk.ChainAnteDecorators(
 		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
 		ante.NewMempoolFeeDecorator(),
