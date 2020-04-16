@@ -21,6 +21,8 @@ const (
 	flagClientHome = "home-client"
 )
 
+var accountNumber uint64
+
 // AddGenesisAccountCmd returns add-genesis-account cobra Command.
 func AddGenesisAccountCmd(
 	ctx *server.Context, cdc *codec.Codec, defaultNodeHome, defaultClientHome string,
@@ -63,7 +65,7 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 			// create concrete account type based on input parameters
 			var genAccount authexported.GenesisAccount
 
-			baseAccount := auth.NewBaseAccount(addr, coins.Sort(), nil, 0, 0)
+			baseAccount := auth.NewBaseAccount(addr, coins.Sort(), nil, accountNumber, 0)
 
 			genAccount = baseAccount
 
@@ -107,6 +109,7 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 
 	cmd.Flags().String(cli.HomeFlag, defaultNodeHome, "node's home directory")
 	cmd.Flags().String(flagClientHome, defaultClientHome, "client's home directory")
+	cmd.PersistentFlags().Uint64Var(&accountNumber, "account", 0, "account number")
 
 	return cmd
 }

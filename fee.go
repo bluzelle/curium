@@ -1,12 +1,11 @@
 package app
 
 import (
-	"github.com/cosmos/cosmos-sdk/x/bank"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/cosmos/cosmos-sdk/x/bank"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
