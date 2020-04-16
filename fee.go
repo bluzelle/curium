@@ -105,26 +105,6 @@ func DeductFees(supplyKeeper types.SupplyKeeper, bk bank.Keeper, ctx sdk.Context
 	return nil
 }
 
-//func IsCrudEnabled(nodeHome string) bool {
-//	enabled := true
-//
-//	viper.SetConfigName("app")
-//	viper.SetConfigType("toml")
-//	viper.AddConfigPath(nodeHome + "/config/")
-//
-//	if viper.ReadInConfig() == nil {
-//		if viper.IsSet(crudModuleEntry) {
-//			enabled = viper.GetBool(crudModuleEntry)
-//		}
-//	}
-//	return enabled
-//}
-
-type UtilityFee struct {
-	Fee           float64
-	AccountNumber uint64
-}
-
 func GetUtilityFee(nodeHome string) UtilityFee {
 	viper.SetConfigName("genesis")
 	viper.SetConfigType("json")
@@ -133,7 +113,7 @@ func GetUtilityFee(nodeHome string) UtilityFee {
 	if viper.ReadInConfig() == nil {
 		println(viper.GetString("genesis_time"))
 
-		//todo: use unmarshad to fee struct
+		//todo: use unmarshal to fee struct
 	}
 
 	return UtilityFee{}

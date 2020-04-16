@@ -61,6 +61,7 @@ var (
 
 	// ModuleBasicManager is in charge of setting up basic module elements
 	ModuleBasics = module.NewBasicManager(
+		AppModuleBasic{},
 		genutil.AppModuleBasic{},
 		auth.AppModuleBasic{},
 		bank.AppModuleBasic{},
@@ -243,6 +244,7 @@ func NewCRUDApp(
 	logger.Info("Module setup", crudModuleEntry, bluzelleCrud)
 
 	app.mm = module.NewManager(
+		NewAppModule(),
 		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx),
 		auth.NewAppModule(app.accountKeeper),
 		bank.NewAppModule(app.bankKeeper, app.accountKeeper),
@@ -261,6 +263,7 @@ func NewCRUDApp(
 	// NOTE: The genutils moodule must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
 	app.mm.SetOrderInitGenesis(
+		ModuleName,
 		distr.ModuleName,
 		staking.ModuleName,
 		auth.ModuleName,
