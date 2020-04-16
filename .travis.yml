@@ -48,5 +48,6 @@ script:
       cd ..
       yarn test-install
       echo ">>RUNNING INTEGRATION TESTS<<"
+      sed -i 's/"test": "mocha/"test": "mocha -g \\"blzd|cli\\"/g' package.json
       yarn test
     fi
