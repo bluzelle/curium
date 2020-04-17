@@ -48,5 +48,6 @@ script:
       cd ..
       yarn test-install
       echo ">>RUNNING INTEGRATION TESTS<<"
+      sed -i 's/"test": "mocha/"test": "mocha --grep \\"faucet|blzcli|blzd|tendermint-validator-set\\"/g' package.json
       yarn test
     fi
