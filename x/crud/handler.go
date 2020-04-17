@@ -25,10 +25,11 @@ import (
 )
 
 const (
-	LeaseGasRateDefault         float64 = 10.0
-	LeaseGasRateMaximum         float64 = 20.0
-	LeaseGasRateInflectionBlock int64   = 8640
-	LeaseGasRateShift           int64   = 86400
+	LeaseGasRateDefaultValue float64 = 10.0
+	LeaseGasRateMaximumValue float64 = 30.0
+	LeaseGasRateParamB       float64 = 3.19621
+	LeaseGasRateParamC       float64 = 172875
+	LeaseGasRateParamG       float64 = 3.8925
 )
 
 func NewHandler(keeper keeper.IKeeper) sdk.Handler {
@@ -70,15 +71,9 @@ func NewHandler(keeper keeper.IKeeper) sdk.Handler {
 	}
 }
 
-// TODO Move this function to somewhere ?
-// L_r = C + \frac{m_r}{1+K e^{-(\frac{l-l_s}{B})}}
-// C = 10 gas/block
-// B = 8640 blocks
-// l_s = 86400 blocks
-// m_r = 20 gas/block (note add C to this to get max)
-// K = 1.0 Rate inflection adjustment
-func leaseGasRate(lease int64) float64 {
-	return LeaseGasRateDefault + LeaseGasRateMaximum/(1.0+math.Exp(-float64((lease-LeaseGasRateShift)/LeaseGasRateInflectionBlock)))
+func LeaseGasRate(lease int64) float64 {
+	return LeaseGasRateDefaultValue + (LeaseGasRateMaximumValue-LeaseGasRateDefaultValue)/
+		math.Pow(1.0+math.Pow(float64(lease)/LeaseGasRateParamC, LeaseGasRateParamB), LeaseGasRateParamG)
 }
 
 func handleMsgCreate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgCreate) (*sdk.Result, error) {
@@ -106,7 +101,7 @@ func handleMsgCreate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgCreate
 	keeper.SetLease(keeper.GetLeaseStore(leaseCtx), msg.UUID, msg.Key, ctx.BlockHeight(), msg.Lease)
 
 	// charge for lease
-	gasRate := leaseGasRate(msg.Lease)
+	gasRate := LeaseGasRate(msg.Lease)
 	valueSize := float64(len(msg.UUID) + len(msg.Key) + len(msg.Value))
 	ctx.GasMeter().ConsumeGas(uint64(gasRate*valueSize), "lease")
 
@@ -167,7 +162,7 @@ func handleMsgUpdate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgUpdate
 		// charge for lease if applicable
 		if newLease > oldBlzValue.Lease {
 			// TOOO: Verify that this makes sense over, say leaseGasRate(newLease - oldBlzValue.Lease)
-			gasRate := leaseGasRate(newLease) - leaseGasRate(oldBlzValue.Lease)
+			gasRate := LeaseGasRate(newLease) - LeaseGasRate(oldBlzValue.Lease)
 			valueSize := float64(len(msg.UUID) + len(msg.Key) + len(msg.Value))
 			ctx.GasMeter().ConsumeGas(uint64(gasRate*valueSize), "lease")
 		}
@@ -401,7 +396,7 @@ func updateLease(ctx sdk.Context, keeper keeper.IKeeper, UUID string, key string
 	// charge for lease if applicable
 	if lease > blzValue.Lease {
 		// TODO: Verify this math
-		gasRate := leaseGasRate(lease) - leaseGasRate(blzValue.Lease)
+		gasRate := LeaseGasRate(lease) - LeaseGasRate(blzValue.Lease)
 		valueSize := float64(len(UUID) + len(key) + len(blzValue.Value))
 		ctx.GasMeter().ConsumeGas(uint64(gasRate*valueSize), "lease")
 	}
