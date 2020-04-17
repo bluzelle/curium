@@ -143,7 +143,7 @@ func (am AppModule) ExportGenesis(ctx sdk.Context) json.RawMessage {
 	return nil
 }
 
-func GetUtilityTax(nodeHome string) (float64, sdk.AccAddress) {
+func getUtilityTax(nodeHome string) (float64, sdk.AccAddress) {
 	genFile := nodeHome + "/config/genesis.json"
 	cdc := codec.New()
 
@@ -184,7 +184,7 @@ func GetUtilityTax(nodeHome string) (float64, sdk.AccAddress) {
 ///////////////////////////////////////////////////////////////////////////////
 
 func NewDeductFeeDecorator(bk bank.Keeper, ak keeper.AccountKeeper, sk types.SupplyKeeper, homeDir string) DeductFeeDecorator {
-	tax, ua := GetUtilityTax(homeDir)
+	tax, ua := getUtilityTax(homeDir)
 	return DeductFeeDecorator{
 		bk:           bk,
 		ak:           ak,
@@ -209,7 +209,7 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 
 	// deduct the fees
 	if !feeTx.GetFee().IsZero() {
-		err = DeductFees(dfd.supplyKeeper, dfd.bk, ctx, feePayerAcc, dfd.utilityAddr, feeTx.GetFee())
+		err = DeductFees(dfd.supplyKeeper, dfd.bk, ctx, feePayerAcc, dfd.utilityAddr, feeTx.GetFee(), dfd.tax)
 		if err != nil {
 			return ctx, err
 		}
@@ -219,7 +219,7 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 }
 
 // DeductFees deducts fees from the given account.
-func DeductFees(supplyKeeper types.SupplyKeeper, bk bank.Keeper, ctx sdk.Context, acc exported.Account, toAcc sdk.AccAddress, fees sdk.Coins) error {
+func DeductFees(supplyKeeper types.SupplyKeeper, bk bank.Keeper, ctx sdk.Context, acc exported.Account, toAcc sdk.AccAddress, fees sdk.Coins, tax float64) error {
 	blockTime := ctx.BlockHeader().Time
 	coins := acc.GetCoins()
 
@@ -238,7 +238,8 @@ func DeductFees(supplyKeeper types.SupplyKeeper, bk bank.Keeper, ctx sdk.Context
 	// such as vesting accounts.
 	spendableCoins := acc.SpendableCoins(blockTime)
 
-	utilityFee := int64(0.005 * float64(fees.AmountOf("ubnt").Int64()))
+	// TODO: don't specify ubnt!
+	utilityFee := int64(tax * 0.01 * float64(fees.AmountOf("ubnt").Int64()))
 	utilityCoins := sdk.NewCoins(sdk.NewCoin("ubnt", sdk.NewInt(utilityFee)))
 
 	if _, hasNeg := spendableCoins.SafeSub(utilityCoins); hasNeg {
