@@ -18,6 +18,7 @@ import (
 	"encoding/json"
 	bluzellechain "github.com/bluzelle/curium/types"
 	"github.com/bluzelle/curium/x/crud"
+	"github.com/bluzelle/curium/x/utilityfee"
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -61,7 +62,7 @@ var (
 
 	// ModuleBasicManager is in charge of setting up basic module elements
 	ModuleBasics = module.NewBasicManager(
-		AppModuleBasic{},
+		utilityfee.AppModuleBasic{},
 		genutil.AppModuleBasic{},
 		auth.AppModuleBasic{},
 		bank.AppModuleBasic{},
@@ -244,7 +245,7 @@ func NewCRUDApp(
 	logger.Info("Module setup", crudModuleEntry, bluzelleCrud)
 
 	app.mm = module.NewManager(
-		NewAppModule(),
+		utilityfee.NewAppModule(),
 		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx),
 		auth.NewAppModule(app.accountKeeper),
 		bank.NewAppModule(app.bankKeeper, app.accountKeeper),
@@ -263,7 +264,7 @@ func NewCRUDApp(
 	// NOTE: The genutils moodule must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
 	app.mm.SetOrderInitGenesis(
-		ModuleName,
+		utilityfee.ModuleName,
 		distr.ModuleName,
 		staking.ModuleName,
 		auth.ModuleName,
@@ -282,18 +283,14 @@ func NewCRUDApp(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 
-	GetUtilityFee(DefaultNodeHome)
-
 	// The AnteHandler handles signature verification and transaction pre-processing
 	// (bk bank.Keeper, ak keeper.AccountKeeper, supplyKeeper types.SupplyKeeper, sigGasConsumer ante.SignatureVerificationGasConsumer, ua sdk.Address)
-	ua, _ := sdk.AccAddressFromBech32("bluzelle1qmt8l7acqdq5ljsm0v62md9k99kjjerw8razqp")
 	app.SetAnteHandler(
 		NewAnteHandler(
 			app.bankKeeper,
 			app.accountKeeper,
 			app.supplyKeeper,
 			auth.DefaultSigVerificationGasConsumer,
-			ua,
 		),
 	)
 
@@ -366,7 +363,7 @@ func (app *CRUDApp) ExportAppStateAndValidators(_ bool, _ []string) (appState js
 	return appState, validators, nil
 }
 
-func NewAnteHandler(bk bank.Keeper, ak keeper.AccountKeeper, supplyKeeper types.SupplyKeeper, sigGasConsumer ante.SignatureVerificationGasConsumer, ua sdk.AccAddress) sdk.AnteHandler {
+func NewAnteHandler(bk bank.Keeper, ak keeper.AccountKeeper, supplyKeeper types.SupplyKeeper, sigGasConsumer ante.SignatureVerificationGasConsumer) sdk.AnteHandler {
 	return sdk.ChainAnteDecorators(
 		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
 		ante.NewMempoolFeeDecorator(),
@@ -376,7 +373,7 @@ func NewAnteHandler(bk bank.Keeper, ak keeper.AccountKeeper, supplyKeeper types.
 		ante.NewSetPubKeyDecorator(ak), // SetPubKeyDecorator must be called before all signature verification decorators
 		ante.NewValidateSigCountDecorator(ak),
 		ante.NewDeductFeeDecorator(ak, supplyKeeper),
-		NewDeductFeeDecorator(bk, ak, supplyKeeper, ua),
+		utilityfee.NewDeductFeeDecorator(bk, ak, supplyKeeper, DefaultNodeHome),
 		ante.NewSigGasConsumeDecorator(ak, sigGasConsumer),
 		ante.NewSigVerificationDecorator(ak),
 		ante.NewIncrementSequenceDecorator(ak), // innermost AnteDecorator
