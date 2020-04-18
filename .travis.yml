@@ -48,5 +48,5 @@ script:
       cd ..
       yarn test-install
       echo ">>RUNNING INTEGRATION TESTS<<"
-      yarn test -g "blzd|cli"
+      yarn test -g 'blzd|cli'
     fi
