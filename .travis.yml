@@ -48,5 +48,5 @@ script:
       cd ..
       yarn test-install
       echo ">>RUNNING INTEGRATION TESTS<<"
-      npm test -- -g 'blzd|cli'
+      yarn test -g 'all specifications cli|all specifications blzd'
     fi
