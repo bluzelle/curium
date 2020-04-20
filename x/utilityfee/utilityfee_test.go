@@ -15,9 +15,15 @@
 package utilityfee
 
 import (
+	"encoding/json"
 	bluzellechain "github.com/bluzelle/curium/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/stretchr/testify/assert"
+	abci "github.com/tendermint/tendermint/abci/types"
+	"reflect"
 	"testing"
 )
 
@@ -60,10 +66,18 @@ func TestAppModule_EndBlock(t *testing.T) {
 func TestAppModule_getUtilityTax(t *testing.T) {
 	initTest()
 
+	var bk bank.Keeper
+	var ac keeper.AccountKeeper
+	var sk types.SupplyKeeper
+
+	ndfd := NewDeductFeeDecorator(bk, ac, sk, "genesis.json")
+	// DeductFeeDecorator
+	assert.True(t, reflect.TypeOf(ndfd) == reflect.TypeOf(DeductFeeDecorator{}))
+
 	// valid config...
-	tax, ac := getUtilityTax("genesis.json")
+	tax, acc := getUtilityTax("genesis.json")
 	assert.Equal(t, 0.5, tax)
-	assert.Equal(t, "bluzelle1tfqzcch3dx9ly72nwtvqcn222a5d7yn65xdzkk", ac.String())
+	assert.Equal(t, "bluzelle1tfqzcch3dx9ly72nwtvqcn222a5d7yn65xdzkk", acc.String())
 }
 
 func TestAppModule_getUtilityTaxMissingGenesis(t *testing.T) {
@@ -121,10 +135,22 @@ func TestAppModule_getUtilityTaxMissingAccount(t *testing.T) {
 	getUtilityTax("genesis-missing-account.json")
 }
 
-func TestDeductFeeDecorator_AnteHandle(t *testing.T) {
+func TestAppModule_nil_methods(t *testing.T) {
+	am := NewAppModule()
 
-}
+	assert.Nil(t, am.ValidateGenesis(json.RawMessage{}))
 
-func TestDeductFees(t *testing.T) {
+	assert.Nil(t, am.GetQueryCmd(nil))
 
+	assert.Nil(t, am.GetTxCmd(nil))
+
+	assert.Nil(t, am.NewHandler())
+
+	assert.Nil(t, am.NewQuerierHandler())
+
+	assert.Nil(t, am.InitGenesis(sdk.Context{}, nil))
+
+	assert.Nil(t, am.ExportGenesis(sdk.Context{}))
+
+	assert.True(t, reflect.TypeOf(am.EndBlock(sdk.Context{}, abci.RequestEndBlock{})) == reflect.TypeOf([]abci.ValidatorUpdate{}))
 }
