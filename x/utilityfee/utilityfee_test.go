@@ -15,9 +15,16 @@
 package utilityfee
 
 import (
+	bluzellechain "github.com/bluzelle/curium/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
+
+func initTest() {
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(bluzellechain.Bech32PrefixAccAddr, bluzellechain.Bech32PrefixAccPub)
+}
 
 func TestAppModuleBasic_Name(t *testing.T) {
 	sut := AppModuleBasic{}
@@ -51,6 +58,67 @@ func TestAppModule_EndBlock(t *testing.T) {
 }
 
 func TestAppModule_getUtilityTax(t *testing.T) {
+	initTest()
+
+	// valid config...
+	tax, ac := getUtilityTax("genesis.json")
+	assert.Equal(t, 0.5, tax)
+	assert.Equal(t, "bluzelle1tfqzcch3dx9ly72nwtvqcn222a5d7yn65xdzkk", ac.String())
+}
+
+func TestAppModule_getUtilityTaxMissingGenesis(t *testing.T) {
+	initTest()
+	defer func() {
+		if r := recover(); r != nil {
+			assert.Equal(t, "missing-genesis.json does not exist, run `init` first", r)
+		}
+	}()
+
+	getUtilityTax("missing-genesis.json")
+}
+
+func TestAppModule_getUtilityTaxNoAppState(t *testing.T) {
+	initTest()
+	defer func() {
+		if r := recover(); r != nil {
+			assert.Equal(t, "unexpected end of JSON input", r)
+		}
+	}()
+
+	getUtilityTax("genesis-no-appstate.json")
+}
+
+func TestAppModule_getUtilityTaxBadTaxFormat(t *testing.T) {
+	initTest()
+	defer func() {
+		if r := recover(); r != nil {
+			assert.Equal(t, "strconv.ParseFloat: parsing \"asdf\": invalid syntax", r)
+		}
+	}()
+
+	getUtilityTax("genesis-bad-tax.json")
+}
+
+func TestAppModule_getUtilityTaxBadAccountFormat(t *testing.T) {
+	initTest()
+	defer func() {
+		if r := recover(); r != nil {
+			assert.Equal(t, "strconv.ParseUint: parsing \"-1\": invalid syntax", r)
+		}
+	}()
+
+	getUtilityTax("genesis-bad-account.json")
+}
+
+func TestAppModule_getUtilityTaxMissingAccount(t *testing.T) {
+	initTest()
+	defer func() {
+		if r := recover(); r != nil {
+			assert.Equal(t, "genesis account number 2 does not exist", r)
+		}
+	}()
+
+	getUtilityTax("genesis-missing-account.json")
 }
 
 func TestDeductFeeDecorator_AnteHandle(t *testing.T) {
