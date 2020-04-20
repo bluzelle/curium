@@ -213,7 +213,7 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 
 	// deduct the fees
 	if !feeTx.GetFee().IsZero() {
-		err = DeductFees(dfd.supplyKeeper, dfd.bk, ctx, feePayerAcc, dfd.utilityAddr, feeTx.GetFee(), dfd.tax)
+		err = deductFees(dfd.supplyKeeper, dfd.bk, ctx, feePayerAcc, dfd.utilityAddr, feeTx.GetFee(), dfd.tax)
 		if err != nil {
 			return ctx, err
 		}
@@ -222,8 +222,7 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 	return next(ctx, tx, simulate)
 }
 
-// DeductFees deducts fees from the given account.
-func DeductFees(supplyKeeper types.SupplyKeeper, bk bank.Keeper, ctx sdk.Context, acc exported.Account, toAcc sdk.AccAddress, fees sdk.Coins, tax float64) error {
+func deductFees(supplyKeeper types.SupplyKeeper, bk bank.Keeper, ctx sdk.Context, acc exported.Account, toAcc sdk.AccAddress, fees sdk.Coins, tax float64) error {
 	blockTime := ctx.BlockHeader().Time
 	coins := acc.GetCoins()
 
