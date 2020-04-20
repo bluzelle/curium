@@ -373,7 +373,7 @@ func NewAnteHandler(bk bank.Keeper, ak keeper.AccountKeeper, supplyKeeper types.
 		ante.NewSetPubKeyDecorator(ak), // SetPubKeyDecorator must be called before all signature verification decorators
 		ante.NewValidateSigCountDecorator(ak),
 		ante.NewDeductFeeDecorator(ak, supplyKeeper),
-		utilityfee.NewDeductFeeDecorator(bk, ak, supplyKeeper, DefaultNodeHome),
+		utilityfee.NewDeductFeeDecorator(bk, ak, supplyKeeper, DefaultNodeHome+"/config/genesis.json"),
 		ante.NewSigGasConsumeDecorator(ak, sigGasConsumer),
 		ante.NewSigVerificationDecorator(ak),
 		ante.NewIncrementSequenceDecorator(ak), // innermost AnteDecorator

@@ -41,6 +41,8 @@ var (
 	_          FeeTx                 = (*types.StdTx)(nil) // assert StdTx implements FeeTx
 )
 
+const FeeDenom = "ubnt"
+
 type UtilityFee struct {
 	Tax           string `json:"tax"`
 	AccountNumber string `json:"account_number"`
@@ -143,10 +145,8 @@ func (am AppModule) ExportGenesis(ctx sdk.Context) json.RawMessage {
 	return nil
 }
 
-func getUtilityTax(nodeHome string) (float64, sdk.AccAddress) {
-	genFile := nodeHome + "/config/genesis.json"
+func getUtilityTax(genFile string) (float64, sdk.AccAddress) {
 	cdc := codec.New()
-
 	appState, _, err := genutil.GenesisStateFromGenFile(cdc, genFile)
 	if err != nil {
 		panic(fmt.Sprintf("%s does not exist, run `init` first", genFile))
@@ -178,13 +178,17 @@ func getUtilityTax(nodeHome string) (float64, sdk.AccAddress) {
 		}
 	}
 
+	if ac == nil {
+		panic(fmt.Sprintf("genesis account number %d does not exist", accountNumber))
+	}
+
 	return tax, ac
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-func NewDeductFeeDecorator(bk bank.Keeper, ak keeper.AccountKeeper, sk types.SupplyKeeper, homeDir string) DeductFeeDecorator {
-	tax, ua := getUtilityTax(homeDir)
+func NewDeductFeeDecorator(bk bank.Keeper, ak keeper.AccountKeeper, sk types.SupplyKeeper, genFile string) DeductFeeDecorator {
+	tax, ua := getUtilityTax(genFile)
 	return DeductFeeDecorator{
 		bk:           bk,
 		ak:           ak,
@@ -234,13 +238,11 @@ func DeductFees(supplyKeeper types.SupplyKeeper, bk bank.Keeper, ctx sdk.Context
 			"insufficient funds to pay for fees; %s < %s", coins, fees)
 	}
 
-	// Validate the account has enough "spendable" coins as this will cover cases
-	// such as vesting accounts.
+	// Validate the account has enough "spendable" coins...
 	spendableCoins := acc.SpendableCoins(blockTime)
 
-	// TODO: don't specify ubnt!
-	utilityFee := int64(tax * 0.01 * float64(fees.AmountOf("ubnt").Int64()))
-	utilityCoins := sdk.NewCoins(sdk.NewCoin("ubnt", sdk.NewInt(utilityFee)))
+	utilityFee := int64(tax * 0.01 * float64(fees.AmountOf(FeeDenom).Int64()))
+	utilityCoins := sdk.NewCoins(sdk.NewCoin(FeeDenom, sdk.NewInt(utilityFee)))
 
 	if _, hasNeg := spendableCoins.SafeSub(utilityCoins); hasNeg {
 		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds,
