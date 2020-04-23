@@ -614,16 +614,16 @@ func TestMsgGetLease_GetSigners(t *testing.T) {
 }
 
 /////////////////////////////////////////////////////////////////////////////////
-func TestMsgGetNShortestLease_Route(t *testing.T) {
-	Equal(t, "crud", MsgGetNShortestLease{}.Route())
+func TestMsgGetNShortestLeases_Route(t *testing.T) {
+	Equal(t, "crud", MsgGetNShortestLeases{}.Route())
 }
 
-func TestMsgGetNShortestLease_Type(t *testing.T) {
-	Equal(t, "getnshortestlease", MsgGetNShortestLease{}.Type())
+func TestMsgGetNShortestLeases_Type(t *testing.T) {
+	Equal(t, "getnshortestleases", MsgGetNShortestLeases{}.Type())
 }
 
-func TestMsgGetNShortestLease_ValidateBasic(t *testing.T) {
-	sut := MsgGetNShortestLease{
+func TestMsgGetNShortestLeases_ValidateBasic(t *testing.T) {
+	sut := MsgGetNShortestLeases{
 		UUID:  "uuid",
 		N:     10,
 		Owner: []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"),
@@ -644,17 +644,17 @@ func TestMsgGetNShortestLease_ValidateBasic(t *testing.T) {
 
 }
 
-func TestMsgGetNShortestLease_GetSignBytes(t *testing.T) {
-	sut := MsgGetNShortestLease{
+func TestMsgGetNShortestLeases_GetSignBytes(t *testing.T) {
+	sut := MsgGetNShortestLeases{
 		UUID:  "uuid",
 		N:     10,
 		Owner: []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"),
 	}
-	Equal(t, "{\"type\":\"crud/getnshortestlease\",\"value\":{\"N\":\"10\",\"Owner\":\"cosmos1vfk827n9d3kx2vt5xpuhwardwfj82mryvcmxsdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\"}}", string(sut.GetSignBytes()))
+	Equal(t, "{\"type\":\"crud/getnshortestleases\",\"value\":{\"N\":\"10\",\"Owner\":\"cosmos1vfk827n9d3kx2vt5xpuhwardwfj82mryvcmxsdrhw9exumns09crjamjxekxzaejw56k5ampxgeslhg4h3\",\"UUID\":\"uuid\"}}", string(sut.GetSignBytes()))
 }
 
-func TestMsgGetNShortestLease_GetSigners(t *testing.T) {
-	sut := MsgGetNShortestLease{
+func TestMsgGetNShortestLeases_GetSigners(t *testing.T) {
+	sut := MsgGetNShortestLeases{
 		UUID:  "uuid",
 		N:     10,
 		Owner: []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23"),

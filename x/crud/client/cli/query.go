@@ -41,7 +41,7 @@ func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 		GetCmdQKeyValues(storeKey, cdc),
 		GetCmdQCount(storeKey, cdc),
 		GetCmdQGetLease(storeKey, cdc),
-		GetCmdQGetNShortestLease(storeKey, cdc),
+		GetCmdQGetNShortestLeases(storeKey, cdc),
 	)...)
 
 	return crudQueryCmd
@@ -173,10 +173,10 @@ func GetCmdQGetLease(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetCmdQGetNShortestLease(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQGetNShortestLeases(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "getnshortestlease [UUID] [N]",
-		Short: "getnshortestlease UUID N",
+		Use:   "getnshortestleases [UUID] [N]",
+		Short: "getnshortestleases UUID N",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -188,7 +188,7 @@ func GetCmdQGetNShortestLease(queryRoute string, cdc *codec.Codec) *cobra.Comman
 				return nil
 			}
 
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/getnshortestlease/%s/%d", queryRoute, UUID, N), nil)
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/getnshortestleases/%s/%d", queryRoute, UUID, N), nil)
 
 			var out types.QueryResultNShortestLeaseKeys
 			cdc.MustUnmarshalJSON(res, &out)

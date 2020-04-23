@@ -191,11 +191,11 @@ func Test_queryGetLease(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-func Test_queryGetNShortestLease(t *testing.T) {
+func Test_queryGetNShortestLeases(t *testing.T) {
 	ctx, cdc, mockKeeper := initTest(t)
 
 	mockKeeper.EXPECT().GetKVStore(gomock.Any()).AnyTimes().Return(nil)
-	mockKeeper.EXPECT().GetNShortestLease(ctx, nil, "uuid", nil, uint64(10)).Return(types.QueryResultNShortestLeaseKeys{
+	mockKeeper.EXPECT().GetNShortestLeases(ctx, nil, "uuid", nil, uint64(10)).Return(types.QueryResultNShortestLeaseKeys{
 		UUID: "uuid",
 		KeyLeases: types.KeyLeases{
 			types.KeyLease{
@@ -207,7 +207,7 @@ func Test_queryGetNShortestLease(t *testing.T) {
 
 	mockKeeper.EXPECT().GetCdc().AnyTimes().Return(cdc)
 
-	result, err := NewQuerier(mockKeeper)(ctx, []string{"getnshortestlease", "uuid", "10"}, abci.RequestQuery{})
+	result, err := NewQuerier(mockKeeper)(ctx, []string{"getnshortestleases", "uuid", "10"}, abci.RequestQuery{})
 	assert.Nil(t, err)
 
 	jsonResult := types.QueryResultNShortestLeaseKeys{}
@@ -217,7 +217,7 @@ func Test_queryGetNShortestLease(t *testing.T) {
 	assert.Equal(t, "key00", jsonResult.KeyLeases[0].Key)
 	assert.Equal(t, int64(100), jsonResult.KeyLeases[0].Lease)
 
-	_, err = NewQuerier(mockKeeper)(ctx, []string{"getnshortestlease", "uuid", "abcd"}, abci.RequestQuery{})
+	_, err = NewQuerier(mockKeeper)(ctx, []string{"getnshortestleases", "uuid", "abcd"}, abci.RequestQuery{})
 
 	assert.NotNil(t, err)
 }

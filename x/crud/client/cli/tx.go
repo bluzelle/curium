@@ -45,7 +45,7 @@ func GetTxCmd(_ string, cdc *codec.Codec) *cobra.Command {
 		GetCmdDelete(cdc),
 		GetCmdDeleteAll(cdc),
 		GetCmdGetLease(cdc),
-		GetCmdGetNShortestLease(cdc),
+		GetCmdGetNShortestLeases(cdc),
 		GetCmdHas(cdc),
 		GetCmdKeyValues(cdc),
 		GetCmdKeys(cdc),
@@ -329,9 +329,9 @@ func GetCmdGetLease(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetCmdGetNShortestLease(cdc *codec.Codec) *cobra.Command {
+func GetCmdGetNShortestLeases(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "getnshortestlease [UUID] [N]",
+		Use:   "getnshortestleases [UUID] [N]",
 		Short: "get the N shortest remaining lease blocks for an existing UUID",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -345,7 +345,7 @@ func GetCmdGetNShortestLease(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := types.MsgGetNShortestLease{UUID: args[0], N: N, Owner: cliCtx.GetFromAddress()}
+			msg := types.MsgGetNShortestLeases{UUID: args[0], N: N, Owner: cliCtx.GetFromAddress()}
 
 			err = msg.ValidateBasic()
 			if err != nil {

@@ -503,17 +503,17 @@ func (msg MsgGetLease) GetSigners() []sdk.AccAddress {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // GetLease
-type MsgGetNShortestLease struct {
+type MsgGetNShortestLeases struct {
 	UUID  string
 	N     uint64
 	Owner sdk.AccAddress
 }
 
-func (msg MsgGetNShortestLease) Route() string { return RouterKey }
+func (msg MsgGetNShortestLeases) Route() string { return RouterKey }
 
-func (msg MsgGetNShortestLease) Type() string { return "getnshortestlease" }
+func (msg MsgGetNShortestLeases) Type() string { return "getnshortestleases" }
 
-func (msg MsgGetNShortestLease) ValidateBasic() error {
+func (msg MsgGetNShortestLeases) ValidateBasic() error {
 	if msg.Owner.Empty() {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
 	}
@@ -529,11 +529,11 @@ func (msg MsgGetNShortestLease) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgGetNShortestLease) GetSignBytes() []byte {
+func (msg MsgGetNShortestLeases) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
-func (msg MsgGetNShortestLease) GetSigners() []sdk.AccAddress {
+func (msg MsgGetNShortestLeases) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner}
 }
 

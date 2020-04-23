@@ -776,7 +776,7 @@ func Test_handleMsgGetLease(t *testing.T) {
 
 }
 
-func Test_handleMsgGetNShortestLease(t *testing.T) {
+func Test_handleMsgGetNShortestLeases(t *testing.T) {
 	mockCtrl, mockKeeper, ctx, owner := initTest(t)
 	defer mockCtrl.Finish()
 
@@ -793,9 +793,9 @@ func Test_handleMsgGetNShortestLease(t *testing.T) {
 		}
 
 		mockKeeper.EXPECT().GetKVStore(gomock.Any()).AnyTimes().Return(nil)
-		mockKeeper.EXPECT().GetNShortestLease(ctx, nil, "uuid", gomock.Any(), uint64(5)).Return(response)
+		mockKeeper.EXPECT().GetNShortestLeases(ctx, nil, "uuid", gomock.Any(), uint64(5)).Return(response)
 
-		result, err := NewHandler(mockKeeper)(ctx, types.MsgGetNShortestLease{UUID: "uuid", Owner: owner, N: 5})
+		result, err := NewHandler(mockKeeper)(ctx, types.MsgGetNShortestLeases{UUID: "uuid", Owner: owner, N: 5})
 
 		assert.Nil(t, err)
 		jsonResult := types.QueryResultNShortestLeaseKeys{}
@@ -805,13 +805,13 @@ func Test_handleMsgGetNShortestLease(t *testing.T) {
 
 	// Test for empty message parameters
 	{
-		_, err := handleMsgGetNShortestLease(ctx, mockKeeper, types.MsgGetNShortestLease{})
+		_, err := handleMsgGetNShortestLeases(ctx, mockKeeper, types.MsgGetNShortestLeases{})
 		assert.NotNil(t, err)
 
-		_, err = handleMsgGetNShortestLease(ctx, mockKeeper, types.MsgGetNShortestLease{UUID: "uuid"})
+		_, err = handleMsgGetNShortestLeases(ctx, mockKeeper, types.MsgGetNShortestLeases{UUID: "uuid"})
 		assert.NotNil(t, err)
 
-		_, err = handleMsgGetNShortestLease(ctx, mockKeeper, types.MsgGetNShortestLease{UUID: "uuid", N: 11})
+		_, err = handleMsgGetNShortestLeases(ctx, mockKeeper, types.MsgGetNShortestLeases{UUID: "uuid", N: 11})
 		assert.NotNil(t, err)
 	}
 }

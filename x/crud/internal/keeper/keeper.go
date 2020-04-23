@@ -43,7 +43,7 @@ type IKeeper interface {
 	GetKeyValues(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultKeyValues
 	GetKeys(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultKeys
 	GetLeaseStore(ctx sdk.Context) sdk.KVStore
-	GetNShortestLease(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress, n uint64) types.QueryResultNShortestLeaseKeys
+	GetNShortestLeases(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress, n uint64) types.QueryResultNShortestLeaseKeys
 	GetOwner(ctx sdk.Context, store sdk.KVStore, UUID string, key string) sdk.AccAddress
 	GetValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string) types.BLZValue
 	GetValuesIterator(ctx sdk.Context, store sdk.KVStore) sdk.Iterator
@@ -284,7 +284,7 @@ func (k Keeper) ProcessLeasesAtBlockHeight(_ sdk.Context, store sdk.KVStore, lea
 	}
 }
 
-func (k Keeper) GetNShortestLease(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress, n uint64) types.QueryResultNShortestLeaseKeys {
+func (k Keeper) GetNShortestLeases(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress, n uint64) types.QueryResultNShortestLeaseKeys {
 	keys := k.GetKeys(ctx, store, UUID, owner)
 
 	if len(keys.Keys) == 0 {
