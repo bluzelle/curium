@@ -30,3 +30,4 @@ Using the Bluzelle Curium Multi-Validator Zone
 ----------------------------------------------
 - [Queries and Transactions](./docs/commands/qAndTX.md)
 - [Useful Operations](./docs/commands/useful.md) 
+test
