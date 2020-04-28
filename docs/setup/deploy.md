@@ -49,15 +49,21 @@ document.
 
          sed -i -e 's/"bond_denom": "stake"/"bond_denom": "ubnt"/g' \
             ~/.blzd/config/genesis.json
+            
+5.  Edit “.blzd/config/genesis.json” to change denom from “stake” to 
+    “ubnt” (for governance). This can be done from the command line with sed
 
-5.  Edit .blzd/config/app.toml in a text editor and set the minimum-gas-prices 
+         sed -i -e 's/"denom": "stake"/"denom": "ubnt"/g' \
+            ~/.blzd/config/genesis.json
+            
+6.  Edit .blzd/config/app.toml in a text editor and set the minimum-gas-prices 
     to “10.0ubnt”. Every node should have at least this minimum. This can also 
     be done from the command line with sed: 
 
         sed -i -e 's/minimum-gas-prices = ""/minimum-gas-prices = "10.0ubnt"/g' \
             ~/.blzd/config/app.toml
 
-6.  Set the client configuration settings:
+7.  Set the client configuration settings:
 
         blzcli config chain-id bluzelle 
         blzcli config output json 
@@ -67,7 +73,7 @@ document.
         
     where “bluzelle” is the zone’s chain-id.
 
-7.  Derive a new key that will label the validator account for this node, call 
+8.  Derive a new key that will label the validator account for this node, call 
     it “vuser”:
 
         blzcli keys add vuser
@@ -92,7 +98,7 @@ document.
     mnemonic will be used by the Bluzelle javascript client to send 
     transactions to the node.
 
-8.  Add the first account to the blockchain using the vuser key as the account 
+9.  Add the first account to the blockchain using the vuser key as the account 
     identifier
 
         blzd add-genesis-account $(blzcli keys show vuser -a) 500000000000000ubnt
@@ -101,7 +107,7 @@ document.
     given for the ubnt tokens here will be the total amount of tokens available 
     to the zone.
 
-9.  As this is the first node in the zone, it needs an initial transaction for 
+10.  As this is the first node in the zone, it needs an initial transaction for 
     the blockchain. 
 
         blzd gentx --name vuser --amount 10000000000000ubnt --keyring-backend test
@@ -126,7 +132,7 @@ document.
     
         "bluzellevaloper1<...>"
     
-10. Create the genesis file from the first transaction:
+11. Create the genesis file from the first transaction:
 
         blzd collect-gentxs
         
@@ -138,11 +144,11 @@ document.
     ".blzd/config/genesis.json)" that will be copied to the rest of the nodes 
     in the zone.
 
-11. The node can be started with the Bluzelle daemon:
+12. The node can be started with the Bluzelle daemon:
 
         blzd start
         
-12. On a second terminal the http server can be started with the Bluzelle 
+13. On a second terminal the http server can be started with the Bluzelle 
     client
 
         blzcli rest-server
