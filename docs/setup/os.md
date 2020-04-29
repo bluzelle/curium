@@ -6,8 +6,10 @@ OS Setup for Curium
 
 Linux:
 -----
-1.  Install Ubuntu, open incoming tcp ports 26656 and 1317, these are the ports 
-    that the daemon and http servers will use.
+1.  Install Ubuntu, open incoming tcp ports 26656, 26657, and 1317. These are the ports 
+    that the daemon and http servers will use. This will vary depending on your setup. If
+    you are setting up a validator+sentry configuration, the validator will typically 
+    only open up 26656. Sentries will open all three. 
 
 2.  Ensure that APT has the latest software packages:
    
