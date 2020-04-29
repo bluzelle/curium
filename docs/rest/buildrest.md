@@ -54,7 +54,7 @@ instructions on how to set up your OS and Golang development environment.
         Use "blzcli [command] --help" for more information about a command.
 
 4.  Start the Light-client Daemon (LCD) on the command line using thes 
-    rest-server command with the "--node" argument to specify the IP address of 
+    rest-server command with the "--node" argument to specify the IP address and RPC (TCP) port (typically 26657) of 
     a Curium node in the zone to connect to
 
         blzcli rest-server --node <host>:<port>
