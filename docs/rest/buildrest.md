@@ -5,7 +5,7 @@ Starting the Light-client Daemon (Local REST Server)
 ====================================================
 
 >If required, please refer to the [OS Setup for Curium](../setup/os.md) and 
-[Development Environment Setup](./docs/setup/devenv.md) documents for 
+[Development Environment Setup](../setup/devenv.md) documents for 
 instructions on how to set up your OS and Golang development environment.
 
 
