@@ -56,10 +56,10 @@ Deploy Additional Nodes
         persistent_peers = "6ccd<..>cc9c@<nodeip>:26656"
         
     The node list item is created from the node id of the first node and its 
-    server’s ip address and Cosmos port number. In theory, you could point to 
-    any of the nodes already standing, here, or even all or some of them. We 
-    just choose to point to the first one here, for the purposes of the 
-    documentation.
+    server’s ip address (or DNS hostname) and P2P port number. In theory, you 
+    could point to any of the nodes already standing, here, or even all or some 
+    of them. We just choose to point to the first one here, for the purposes of 
+    the documentation.
 
 6.  Edit ".blzd/config/app.toml" to set the minimum-gas-prices  to “10.0ubnt”
 
@@ -70,6 +70,10 @@ Deploy Additional Nodes
         
     Remember that *every* node should have *at least* this minimum. Feel free 
     to set it higher if you wish.
+    
+    Also, add the following, if crud is enabled on the zone:
+    
+        bluzelle_crud = true
     
 7.  *Optional - Validating Nodes Only*   
     Create the key that will be used to label the validator on this node
