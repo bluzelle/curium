@@ -120,5 +120,6 @@ instruction step applies to both sentries and validators.
 10. Edit ".blzd/config/app.toml", to add the following:
     
         bluzelle_crud = true
+        
 
 [Back](../../README.md)
