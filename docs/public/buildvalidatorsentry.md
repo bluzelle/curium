@@ -4,6 +4,10 @@
 Building a Public TestNet Validator + Sentry
 ============================================
 
+For the following instructions, we will describe the steps to setup a validator
+or a sentry for the existing Public TestNet. Unless otherwise stated, the 
+instruction step applies to both sentries and validators. 
+
 1.  Refer to previous documents for initializing the server, dev environments, 
     and building the Bluzelle Curium applications. Open incoming TCP ports 
     26656 (P2P), 26657 (RPC), and 1317 (RESTful). If you are only running a
@@ -23,7 +27,12 @@ Building a Public TestNet Validator + Sentry
 
         blzd init <moniker> --chain-id <chain-id for the zone>  2>&1 | jq .node_id
 
-    Use a new moniker string that uniquely identifies your validator/sentry. 
+    Use a new moniker string that uniquely identifies your validator/sentry. Please
+    start the moniker with "validator" or "sentry", depending on what you are adding, 
+    and use camel case. Examples:
+    
+        sentryBob
+        validatorBob
     
     Use the chain-id used by the public testnet to identify the zone that this node 
     will connect to. The chain-id is "bluzelle", typically, but to check, use the
@@ -33,7 +42,7 @@ Building a Public TestNet Validator + Sentry
 
     Here is an example of initializing your local daemon config:
 
-        blzd init bobSentry --chain-id bluzelle  2>&1 | jq .node_id
+        blzd init sentryBob --chain-id bluzelle  2>&1 | jq .node_id
         
     The JSON output will contain the node_id. Note this value, so that it can be 
     used to identify this node to other nodes in the zone. Keep in mind that for this 
@@ -42,6 +51,53 @@ Building a Public TestNet Validator + Sentry
     
     There is no need to touch the genesis file, ".blzd/config/genesis.json". It will be 
     completely replaced with the genesis file already in use on the public testnet. We 
-    will perform this step later in this document.    
+    will perform this step later in this document.
+    
+4.  Set the client configuration, and remember to use the chain id of the zone (found above) 
+    that this node will be joining:
+
+        blzcli config chain-id <zone chain-id>
+        blzcli config output json 
+        blzcli config indent true 
+        blzcli config trust-node true
+        blzcli config keyring-backend test
+        
+5.  Collect the node id's of the public sentries on the testnet. The existing public sentries
+    are as follows:
+    
+        a.sentry.testnet.public.bluzelle.com
+        b.sentry.testnet.public.bluzelle.com
+        
+    Use the following command on each, to get their node id:
+    
+        blzcli status --node tcp://<sentry hostname>:26657 | jq ".node_info.id" | tr -d '"'
+        
+    So, for example:
+    
+        blzcli status --node tcp://a.sentry.testnet.public.bluzelle.com:26657 | jq ".node_info.id" | tr -d '"'
+        
+    Note down the sentry hostnames and respective node id's. You will need these next.
+        
+5.  Edit ".blzd/config/config/config.toml". Add the hostnames and node id's and ports
+    of each of the sentries found earlier, as a comma-separated list, to the 
+    "persistent_peers" value (replace the existing value, if any), as follows:
+
+        # Comma separated list of nodes to keep persistent connections to
+        persistent_peers = "<node id>@<node hostname>:26656"
+        
+    So, for example, the following:
+    
+        # Comma separated list of nodes to keep persistent connections to
+        persistent_peers = "1ab16482640f1625a7a802bccdc2cc7afa93ed9e@a.sentry.testnet.public.bluzelle.com:26657,
+        d229f73ac8de82fa788e495c181c7e0dbd72375d@b.sentry.testnet.public.bluzelle.com:26657"
+
+6.  If you are adding a sentry, append your validator's "<node id>@<node hostname>:26656" 
+    entry to the persistent_peers comma-separated list in your sentry.
+    
+    If you are adding a validator, append your sentry's "<node id>@<node hostname>:26656" 
+    entry to the persistent_peers comma-separated list in your validator.
+    
+7. 
+
 
 [Back](../../README.md)
