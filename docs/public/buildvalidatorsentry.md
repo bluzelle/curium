@@ -78,7 +78,7 @@ instruction step applies to both sentries and validators.
         
     Note down the sentry hostnames and respective node id's. You will need these next.
         
-5.  Edit ".blzd/config/config/config.toml". Add the hostnames and node id's and ports
+6.  Edit ".blzd/config/config/config.toml". Add the hostnames and node id's and ports
     of each of the sentries found earlier, as a comma-separated list, to the 
     "persistent_peers" value (replace the existing value, if any), as follows:
 
@@ -90,24 +90,24 @@ instruction step applies to both sentries and validators.
         # Comma separated list of nodes to keep persistent connections to
         persistent_peers = "1ab16482640f1625a7a802bccdc2cc7afa93ed9e@a.sentry.testnet.public.bluzelle.com:26657, d229f73ac8de82fa788e495c181c7e0dbd72375d@b.sentry.testnet.public.bluzelle.com:26657"
 
-6.  If you are adding a sentry, append your validator's "<node id>@<node hostname>:26656" 
+7.  If you are adding a sentry, append your validator's "<node id>@<node hostname>:26656" 
     entry to the persistent_peers comma-separated list in your sentry, in config.toml.
     
     If you are adding a validator, append your sentry's "<node id>@<node hostname>:26656" 
     entry to the persistent_peers comma-separated list in your validator, in config.toml.
     
-7.  If you are adding a sentry, set "pex = true", in config.toml.
+8.  If you are adding a sentry, set "pex = true", in config.toml.
     
     If you are adding a validator, set "pex = false", in config.toml.
     
-8.  If you are adding a sentry, add your validator's node id (only the node id) to the 
+9.  If you are adding a sentry, add your validator's node id (only the node id) to the 
     "private_peer_ids" comma-separated list, in your sentry's config.toml, as follows:
     
     "<node id>"
     
     Note: You can skip this step if you are not adding any of your own validators.
     
-9. Edit ".blzd/config/app.toml" to set the minimum-gas-prices  to “10.0ubnt”
+10. Edit ".blzd/config/app.toml" to set the minimum-gas-prices  to “10.0ubnt”
 
         # The minimum gas prices a validator is willing to accept for processing a
         # transaction. A transaction's fees must meet the minimum of any denomination
@@ -117,7 +117,7 @@ instruction step applies to both sentries and validators.
     Remember that *every* node should have *at least* this minimum. Feel free 
     to set it higher if you wish.
     
-10. Edit ".blzd/config/app.toml", to add the following:
+11. Edit ".blzd/config/app.toml", to add the following:
     
         bluzelle_crud = true
         
