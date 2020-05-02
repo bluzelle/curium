@@ -120,6 +120,109 @@ instruction step applies to both sentries and validators.
 11. Edit ".blzd/config/app.toml", to add the following:
     
         bluzelle_crud = true
+
+12. If you are creating a validator, add a new local keypair for the account that will be 
+    the self-delegator to the validator on this node:
+
+        blzcli keys add vuser
+
+    which will produce the following output
         
+        - name: vuser
+          type: local
+          address: bluzelle1z<...>
+          pubkey: bluzellepub1<...>
+          mnemonic: ""
+          threshold: 0
+          pubkeys: []
+
+        **Important** write this mnemonic phrase in a safe place.
+        It is the only way to recover your account if you ever forget your password.
+
+        poem reason <...> palace
+
+    CRITICAL: Note the address and mnemonic phrase values. You will need these on a
+    long term basis.
+
+13. If you are creating a validator, you will now need to acquire BNT tokens from the 
+    public testnet and send them to the address of the acccount just created for your 
+    validator. 
+    
+    There are various ways you may be able to do this, but this step is beyond the 
+    scope of this document. 
+    
+    Please refer to community documentation and forums to acquire testnet BNT, as 
+    needed. Any amount is sufficient, for the time being.
+  
+14. Copy into your "~/.blzd/config/" directory the public testnet's existing
+    genesis.json file. The easiest way to acquire it is from the following URL:
+    
+        http://testnet.public.bluzelle.com:1317/genesis.json
+    
+    A convenient example to download it to the current folder:
+    
+        wget http://testnet.public.bluzelle.com:1317/genesis.json
+        
+    Ensure to copy over and replace the existing genesis.json file in your 
+    "~/.blzd/config/" folder with the downloaded one from the testnet.  
+ 
+15. Start the Bluzelle daemon 
+
+        blzd start
+        
+    the node will start and catch up to the rest of the zone. Occasionally, 
+    this command will fail, in that case run the following command first
+
+        blzd unsafe-reset-all
+        
+    and then retry the start command.
+
+16. Optional - Validating Nodes Only   
+    When the new node catches up to the rest of the zone, the account that we 
+    have named vuser will have ubnt tokens given to it by another node in the
+    zone, and it can be turned into a validator node, allowed to participate 
+    in validating additions to the blockchain. 
+
+        blzcli tx staking create-validator \
+          --amount=1000000000ubnt \
+          --pubkey=$(blzd tendermint show-validator) \
+          --moniker=curium01 \
+          --commission-rate=0.1 \
+          --commission-max-rate=0.2 \
+          --commission-max-change-rate=0.01 \
+          --min-self-delegation=1 \
+          --gas=auto --gas-adjustment=1.2 \
+          --gas-prices=0.01bnt \
+          --from vuser
+
+    This will stake this node’s validator with the minimum amount of ubnt 
+    tokens to become a validator with 100 voting power. The validator will 
+    participate in validating new operations sent to block chain and earn 
+    rewards and commision for doing so. Be sure to note the validator address 
+    in the output.
+
+12. You can get the current validator set with the command
+
+        blzcli q tendermint-validator-set
+        
+    which will produce the output
+
+        {
+          "block_height": "758",
+          "validators": [
+            {
+              "address": "bluzellevalcons1d<...>",
+              "pub_key": "bluzellevalconspub1<...>",
+              "proposer_priority": "-87",
+              "voting_power": "100"
+            },
+            {
+              "address": "bluzellevalcons1<...>",
+              "pub_key": "bluzellevalconspub1<...>",
+              "proposer_priority": "88",
+              "voting_power": "100"
+            }
+          ]
+        }
 
 [Back](../../README.md)
