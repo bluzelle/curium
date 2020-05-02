@@ -191,7 +191,18 @@ instruction step applies to both sentries and validators.
     and then retry the start command.
 
 17. If you are creating a validator, wait till your new node catches up to the
-    rest of the zone. At this point, the new "vuser" account will also have the 
+    rest of the zone. It will be obvious as the node will slow down output and
+    be getting blocks every 4-5 seconds. To be sure, run the following command
+    in another terminal on the validator and look for false:
+    
+        blzcli status | jq ".sync_info.catching_up"
+        
+    Once completed, also, verify your vuser account has the tokens you funded it
+    with, by asking the local node:
+    
+        blzcli q account $(blzcli keys show vuser -a) | jq ".value.coins"
+    
+    At this point, the new "vuser" account will also have the 
     BNT tokens you funded to it. We now need to add this node as a validator for
     the testnet, as follows:  
 
@@ -212,7 +223,7 @@ instruction step applies to both sentries and validators.
     new operations sent to block chain and earn rewards and commision for doing 
     so. 
     
-    Be sure to note the validator address in the output.
+    Be sure to note the pubkey in the output.
     
     You can experiment with different values for the amount, commission rate,
     and gas price, although the latter should match whatever you put into app.toml. 
@@ -258,6 +269,6 @@ instruction step applies to both sentries and validators.
           ]
         }
         
-    Look for your validator address here, as confirmation.     
+    Look for your pubkey here, as confirmation.     
 
 [Back](../../README.md)
