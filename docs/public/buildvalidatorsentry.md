@@ -17,6 +17,9 @@ instruction step applies to both sentries and validators.
     
     - Sentry: P2P, RPC, RESTful
     - Validator: Only P2P
+    
+    Furthermore, if you are running both, set your validator to ONLY allow
+    incoming 26656 from your sentry's IP. 
 
 2.  If required, remove existing .blz* folders from the user directory (only 
     necessary if you had a pre-existing install). 
@@ -79,7 +82,10 @@ instruction step applies to both sentries and validators.
         
     Note down the sentry hostnames and respective node id's. You will need these next.
         
-6.  Edit ".blzd/config/config/config.toml". Add the hostnames and node id's and ports
+6.  If you are ONLY setting up a validator, do the following. Otherwise, if you are setting
+    up both a validator AND a sentry, ONLY do the following on the sentry. 
+    
+    Edit ".blzd/config/config/config.toml". Add the hostnames and node id's and ports
     of each of the sentries found earlier, as a comma-separated list, to the 
     "persistent_peers" value (replace the existing value, if any), as follows:
 
