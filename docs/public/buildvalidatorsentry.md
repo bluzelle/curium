@@ -11,8 +11,9 @@ instruction step applies to both sentries and validators.
 1.  Refer to previous documents for initializing the server, dev environments, 
     and building the Bluzelle Curium applications. Open incoming TCP ports 
     26656 (P2P), 26657 (RPC), and 1317 (RESTful). If you are only running a
-    validator, open all ports. If you are running both, follow these
-    directives:
+    validator, open all ports. 
+    
+    If you are running both, follow these directives:
     
     - Sentry: P2P, RPC, RESTful
     - Validator: Only P2P
@@ -62,8 +63,8 @@ instruction step applies to both sentries and validators.
         blzcli config trust-node true
         blzcli config keyring-backend test
         
-5.  Collect the node id's of the public sentries on the testnet. The existing public sentries
-    are as follows:
+5.  Collect the node id's of the public sentries on the testnet. The existing public sentry
+    hostnames are as follows:
     
         a.sentry.testnet.public.bluzelle.com
         b.sentry.testnet.public.bluzelle.com
@@ -91,10 +92,12 @@ instruction step applies to both sentries and validators.
         persistent_peers = "1ab16482640f1625a7a802bccdc2cc7afa93ed9e@a.sentry.testnet.public.bluzelle.com:26657, d229f73ac8de82fa788e495c181c7e0dbd72375d@b.sentry.testnet.public.bluzelle.com:26657"
 
 7.  If you are adding a sentry, append your validator's "<node id>@<node hostname>:26656" 
-    entry to the persistent_peers comma-separated list in your sentry, in config.toml.
+    entry to the persistent_peers comma-separated list in your sentry, in config.toml. Only 
+    applicable if you are also adding a validator.
     
     If you are adding a validator, append your sentry's "<node id>@<node hostname>:26656" 
-    entry to the persistent_peers comma-separated list in your validator, in config.toml.
+    entry to the persistent_peers comma-separated list in your validator, in config.toml. Only 
+    applicable if you are also adding a sentry.
     
 8.  If you are adding a sentry, set "pex = true", in config.toml.
     
@@ -105,9 +108,9 @@ instruction step applies to both sentries and validators.
     
     "d229f73ac8de82fa788e495c181c7e0aaa72375e"
     
-    Note: You can skip this step if you are not adding any of your own validators.
+    Note: You can skip this step if you are not adding any validators.
     
-10. Edit ".blzd/config/app.toml" to set the minimum-gas-prices  to “10.0ubnt”
+10. Edit ".blzd/config/app.toml" to set the minimum-gas-prices to “10.0ubnt”
 
         # The minimum gas prices a validator is willing to accept for processing a
         # transaction. A transaction's fees must meet the minimum of any denomination
@@ -177,35 +180,55 @@ instruction step applies to both sentries and validators.
         
     and then retry the start command.
 
-16. Optional - Validating Nodes Only   
-    When the new node catches up to the rest of the zone, the account that we 
-    have named vuser will have ubnt tokens given to it by another node in the
-    zone, and it can be turned into a validator node, allowed to participate 
-    in validating additions to the blockchain. 
+16. If you are creating a validator, wait till your new node catches up to the
+    rest of the zone. At this point, the new "vuser" account will also have the 
+    BNT tokens you funded to it. We now need to add this node as a validator for
+    the testnet, as follows:  
 
         blzcli tx staking create-validator \
-          --amount=1000000000ubnt \
+          --amount=<bonding amount> \
           --pubkey=$(blzd tendermint show-validator) \
-          --moniker=curium01 \
+          --moniker=<your moniker> \
           --commission-rate=0.1 \
           --commission-max-rate=0.2 \
           --commission-max-change-rate=0.01 \
           --min-self-delegation=1 \
           --gas=auto --gas-adjustment=1.2 \
-          --gas-prices=0.01bnt \
+          --gas-prices=<minimum gas price> \
           --from vuser
 
-    This will stake this node’s validator with the minimum amount of ubnt 
-    tokens to become a validator with 100 voting power. The validator will 
-    participate in validating new operations sent to block chain and earn 
-    rewards and commision for doing so. Be sure to note the validator address 
-    in the output.
+    This will stake this node’s validator with the prescribed amount of ubnt 
+    tokens to become a validator. The validator will participate in validating 
+    new operations sent to block chain and earn rewards and commision for doing 
+    so. 
+    
+    Be sure to note the validator address in the output.
+    
+    You can experiment with different values for the amount, commission rate,
+    and gas price, although the latter should match whatever you put into app.toml. 
+    
+    Be sure to not use 100% of the amount of BNT in your vuser account, as you need
+    some BNT to pay for gas.
+    
+    For example:
 
-12. You can get the current validator set with the command
+        blzcli tx staking create-validator \
+          --amount=1000000000ubnt \
+          --pubkey=$(blzd tendermint show-validator) \
+          --moniker=validatorBob \
+          --commission-rate=0.1 \
+          --commission-max-rate=0.2 \
+          --commission-max-change-rate=0.01 \
+          --min-self-delegation=1 \
+          --gas=auto --gas-adjustment=1.2 \
+          --gas-prices=10.0ubnt \
+          --from vuser
+
+17. You can get the current validator set with the command
 
         blzcli q tendermint-validator-set
         
-    which will produce the output
+    which will produce the output like the following:
 
         {
           "block_height": "758",
@@ -224,5 +247,7 @@ instruction step applies to both sentries and validators.
             }
           ]
         }
+        
+    Look for your validator address here, as confirmation.     
 
 [Back](../../README.md)
