@@ -18,7 +18,7 @@ If all you need is the Light-client Daemon (LCD) REST server:
 Bluzelle Curium Public Validator + Sentry Installation
 ------------------------------------------------------
 If you want to setup your own validator + sentry (optional) on our network:
-[Building a public validator + sentry](./docs/public/buildvalidatorsentry.md)
+[Building a Public TestNet Validator + Sentry](./docs/public/buildvalidatorsentry.md)
 
 
 Bluzelle Curium Private Multi-Validator Zone Installation
