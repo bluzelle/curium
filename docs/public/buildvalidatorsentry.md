@@ -269,6 +269,11 @@ instruction step applies to both sentries and validators.
           ]
         }
         
-    Look for your pubkey here, as confirmation.     
+    Look for your pubkey here, as confirmation.    
+    
+    Furthermore, within a few minutes, you should also see your validator listed
+    listed at the Bluzelle Explorer:
+    
+        http://bigdipper.testnet.public.bluzelle.com:3000/validators
 
 [Back](../../README.md)
