@@ -116,7 +116,11 @@ instruction step applies to both sentries and validators.
     
     Note: You can skip this step if you are not adding any validators.
     
-10. Edit ".blzd/config/app.toml" to set the minimum-gas-prices to “10.0ubnt”
+10. In config.toml, set the following:
+
+        addr_book_strict = false
+    
+11. Edit ".blzd/config/app.toml" to set the minimum-gas-prices to “10.0ubnt”
 
         # The minimum gas prices a validator is willing to accept for processing a
         # transaction. A transaction's fees must meet the minimum of any denomination
@@ -126,11 +130,11 @@ instruction step applies to both sentries and validators.
     Remember that *every* node should have *at least* this minimum. Feel free 
     to set it higher if you wish.
     
-11. Edit ".blzd/config/app.toml", to add the following:
+12. Edit ".blzd/config/app.toml", to add the following:
     
         bluzelle_crud = true
 
-12. If you are creating a validator, add a new local keypair for the account that will be 
+13. If you are creating a validator, add a new local keypair for the account that will be 
     the self-delegator to the validator on this node:
 
         blzcli keys add vuser
@@ -153,7 +157,7 @@ instruction step applies to both sentries and validators.
     CRITICAL: Note the address and mnemonic phrase values. You will need these on a
     long term basis.
 
-13. If you are creating a validator, you will now need to acquire BNT tokens from the 
+14. If you are creating a validator, you will now need to acquire BNT tokens from the 
     public testnet and send them to the address of the acccount just created for your 
     validator. 
     
@@ -163,7 +167,7 @@ instruction step applies to both sentries and validators.
     Please refer to community documentation and forums to acquire testnet BNT, as 
     needed. Any amount is sufficient, for the time being.
   
-14. Copy into your "~/.blzd/config/" directory the public testnet's existing
+15. Copy into your "~/.blzd/config/" directory the public testnet's existing
     genesis.json file. The easiest way to acquire it is from the following URL:
     
         http://testnet.public.bluzelle.com:1317/genesis.json
@@ -175,7 +179,7 @@ instruction step applies to both sentries and validators.
     Ensure to copy over and replace the existing genesis.json file in your 
     "~/.blzd/config/" folder with the downloaded one from the testnet.  
  
-15. Start the Bluzelle daemon 
+16. Start the Bluzelle daemon 
 
         blzd start
         
@@ -186,7 +190,7 @@ instruction step applies to both sentries and validators.
         
     and then retry the start command.
 
-16. If you are creating a validator, wait till your new node catches up to the
+17. If you are creating a validator, wait till your new node catches up to the
     rest of the zone. At this point, the new "vuser" account will also have the 
     BNT tokens you funded to it. We now need to add this node as a validator for
     the testnet, as follows:  
@@ -230,7 +234,7 @@ instruction step applies to both sentries and validators.
           --gas-prices=10.0ubnt \
           --from vuser
 
-17. You can get the current validator set with the command
+18. You can get the current validator set with the command
 
         blzcli q tendermint-validator-set
         
