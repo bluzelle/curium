@@ -101,9 +101,9 @@ instruction step applies to both sentries and validators.
     If you are adding a validator, set "pex = false", in config.toml.
     
 9.  If you are adding a sentry, add your validator's node id (only the node id) to the 
-    "private_peer_ids" comma-separated list, in your sentry's config.toml, as follows:
+    "private_peer_ids" comma-separated list, in your sentry's config.toml. For example:
     
-    "<node id>"
+    "d229f73ac8de82fa788e495c181c7e0aaa72375e"
     
     Note: You can skip this step if you are not adding any of your own validators.
     
