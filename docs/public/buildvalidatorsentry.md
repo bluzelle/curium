@@ -1,8 +1,8 @@
 [Back](../../README.md)
 ***
 
-Starting the Light-client Daemon (Local REST Server)
-====================================================
+Building a Public TestNet Validator + Sentry
+============================================
 
 >If required, please refer to the [OS Setup for Curium](../setup/os.md) and 
 [Development Environment Setup](../setup/devenv.md) documents for 
