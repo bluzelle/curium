@@ -9,9 +9,12 @@ or a sentry for the existing Public TestNet. Unless otherwise stated, the
 instruction step applies to both sentries and validators. 
 
 1.  Refer to previous documents for initializing the server, dev environments, 
-    and building the Bluzelle Curium applications. Open incoming TCP ports 
-    26656 (P2P), 26657 (RPC), and 1317 (RESTful). If you are only running a
-    validator, open all ports. 
+    and building the Bluzelle Curium applications.
+    
+    **CRITICAL**: Ensure you have built curium using the "**testnet**" target. 
+    
+    Open incoming TCP ports 26656 (P2P), 26657 (RPC), and 1317 (RESTful). If you 
+    are only running a validator, open all ports. 
     
     If you are running both, follow these directives:
     
