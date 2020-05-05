@@ -212,6 +212,10 @@ instruction step applies to both sentries and validators.
         blzcli tx staking create-validator \
           --amount=<bonding amount> \
           --pubkey=$(blzd tendermint show-validator) \
+          --website="<your website>" \
+          --details="<description of your organization>" \ 
+          --security-contact="<contact information>" \
+          --identity=<keyBase/UPort 16 HEX digit PGP public key hash> \
           --moniker=<your moniker> \
           --commission-rate=0.1 \
           --commission-max-rate=0.2 \
@@ -220,6 +224,12 @@ instruction step applies to both sentries and validators.
           --gas=auto --gas-adjustment=1.2 \
           --gas-prices=<minimum gas price> \
           --from vuser
+
+    The --identity (an optional field) is used to identify your organization, 
+    verifiably. Generate a PGP key on your Keybase account, and provide the 
+    16 HEX digit public key hash (no spaces). This identity is also used to
+    retrieve a logo for your validator's profile, if provided. According to 
+    COSMOS documentation, UPort may alternatively be used.
 
     This will stake this node’s validator with the prescribed amount of ubnt 
     tokens to become a validator. The validator will participate in validating 
@@ -239,7 +249,11 @@ instruction step applies to both sentries and validators.
         blzcli tx staking create-validator \
           --amount=1000000000ubnt \
           --pubkey=$(blzd tendermint show-validator) \
-          --moniker=validatorBob \
+          --website="https://bluzelle.com" \
+          --details="To infinity and beyond" \
+          --security-contact="Neeraj Murarka, CTO @ Bluzelle Networks" \
+          --identity=5615416F70265000 \
+          --moniker=validatorNeeraj \
           --commission-rate=0.1 \
           --commission-max-rate=0.2 \
           --commission-max-change-rate=0.01 \
