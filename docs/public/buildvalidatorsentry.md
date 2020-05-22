@@ -88,7 +88,7 @@ instruction step applies to both sentries and validators.
 6.  If you are ONLY setting up a validator, do the following. Otherwise, if you are setting
     up both a validator AND a sentry, ONLY do the following on the sentry. 
     
-    Edit ".blzd/config/config/config.toml". Add the hostnames and node id's and ports
+    Edit ".blzd/config/config.toml". Add the hostnames and node id's and ports
     of each of the sentries found earlier, as a comma-separated list, to the 
     "persistent_peers" value (replace the existing value, if any), as follows:
 
