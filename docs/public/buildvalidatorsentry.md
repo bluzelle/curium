@@ -14,7 +14,10 @@ instruction step applies to both sentries and validators.
     **CRITICAL**: Ensure you have built curium using the "**testnet**" target. 
     
     Open incoming TCP ports 26656 (P2P), 26657 (RPC), and 1317 (RESTful). If you 
-    are only running a validator, open all ports. 
+    are only running a validator, open all ports. CAVEAT: You do not actually need 
+    open RPC and RESTful, if you are only strictly acting as a validator 
+    or sentry without the desire to support RPC or RESTful services. Feel
+    free to skip RPC and RESTful if you prefer.
     
     If you are running both, follow these directives:
     
