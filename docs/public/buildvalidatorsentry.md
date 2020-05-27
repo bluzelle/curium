@@ -99,6 +99,12 @@ instruction step applies to both sentries and validators.
     
         # Comma separated list of nodes to keep persistent connections to
         persistent_peers = "1ab16482640f1625a7a802bccdc2cc7afa93ed9e@a.sentry.testnet.public.bluzelle.com:26656, d229f73ac8de82fa788e495c181c7e0dbd72375d@b.sentry.testnet.public.bluzelle.com:26656"
+        
+    Next, OPTIONALLY (if you want to provide RPC services as are needed for your own REST proxy,
+    for example), ensure you have opened up RPC to the public in config.toml, by specifying the "laddr"
+    value in the [rpc] section as follows (the default is only to listen on localhost):
+    
+        laddr = "tcp://0.0.0.0:26657"
 
 7.  If you are adding a sentry, append your validator's "<node id>@<node hostname>:26656" 
     entry to the persistent_peers comma-separated list in your sentry, in config.toml. Only 
