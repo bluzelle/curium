@@ -21,7 +21,7 @@ document.
     where moniker is a human readable name for the current node, an appropriate 
     flag would be a string for --chain-id, for example
 
-        blzd init curium00 --chain-id bluzelletest 2>&1 | jq .node_id
+        blzd init curium00 --chain-id bluzelle 2>&1 | jq .node_id
     
     Use the jq command to parse the node_id from the json output. Note the 
     “2>&1” argument, blzd init, in this case sends its output to stderr, so we 
@@ -65,13 +65,13 @@ document.
 
 7.  Set the client configuration settings:
 
-        blzcli config chain-id bluzelletest 
+        blzcli config chain-id bluzelle 
         blzcli config output json 
         blzcli config indent true 
         blzcli config trust-node true
         blzcli config keyring-backend test
         
-    where “bluzelletest” is the zone’s chain-id.
+    where “bluzelle” is the zone’s chain-id.
 
 8.  Derive a new key that will label the validator account for this node, call 
     it “vuser”:
