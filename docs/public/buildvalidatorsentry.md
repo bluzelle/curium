@@ -81,7 +81,6 @@ instruction step applies to both sentries and validators.
         c.sentry.testnet.public.bluzelle.com
         d.sentry.testnet.public.bluzelle.com
         e.sentry.testnet.public.bluzelle.com
-        f.sentry.testnet.public.bluzelle.com
         
     Use the following command on each, to get their node id:
     
