@@ -24,7 +24,7 @@ Deploy Additional Nodes
     use a new moniker string, but use the chain-id used by the existing nodes to 
     identify the zone that this node will connect to
 
-        blzd init curium01 --chain-id bluzelletest  2>&1 | jq .node_id
+        blzd init curium01 --chain-id bluzelle  2>&1 | jq .node_id
         
     The JSON output will contain the node_id, note that value so that it can be 
     used to identify this node to other nodes in the zone (in their respective 
