@@ -30,7 +30,7 @@ document.
     The node_id is used to identify this node to other nodes in the zone (see 
     the “persistent_peers” value in config.toml).
 
-3.  Edit “./blzd/config/config.toml” to add 
+3.  Edit “.blzd/config/config.toml” to add 
 
         output = "json"
 
