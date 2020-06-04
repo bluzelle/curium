@@ -7,6 +7,8 @@ Useful Commands
 >For additional information for these commands please use the "--help" argument 
 on the command line.
 
+
+
 ***
 ## node status info
 >Query remote node for status
@@ -52,6 +54,7 @@ on the command line.
     }
 
 
+
 ***
 ## keys show 
 >Given the name of a key this command returns the type, address and public key 
@@ -69,6 +72,7 @@ for other commands, see below:
       "address": "bluzelle1<...>",
       "pubkey": "bluzellepub1<...>"
     }
+    
     
    
 ***
@@ -100,6 +104,73 @@ for other commands, see below:
     
     blzcli q account (blzcli keys show [key name] -a)
 
+
+
+***
+## get genesis file
+>Get the network's genesis file
+
+    curl http://testnet.public.bluzelle.com:1317/genesis.json
+
+>Example:
+
+    $ curl http://testnet.public.bluzelle.com:1317/genesis.json
+    {
+        "jsonrpc": "2.0",
+        "id": -1,
+        "result": {
+            "genesis": {
+                "genesis_time": "2020-05-29T09:06:28.12740914Z",
+                "chain_id": "bluzelle",
+                "consensus_params": {
+                    "block": {
+                        "max_bytes": "22020096",
+                        "max_gas": "-1",
+                        .
+                        .
+                        .
+    }
+
+
+    
+***
+## get cosmos validator info
+>Get the details on a specific COSMOS validator
+
+    blzcli q staking validator bluzellevaloper1w2s4crgepcvyx6gpgeade40efpdexncuklxaq6
+
+>Example:
+
+    $ blzcli q staking validator bluzellevaloper1w2s4crgepcvyx6gpgeade40efpdexncuklxaq6
+    {
+      "operator_address": "bluzellevaloper1w2s4crgepcvyx6gpgeade40efpdexncuklxaq6",
+      "consensus_pubkey": "bluzellevalconspub1zcjduepqqrl0670chvhhackx9qltsn39w5q2kdx9p4ss3ekrp8cunm3qnevq9xhucf",
+      "jailed": false,
+      "status": 2,
+      "tokens": "12136929000",
+      "delegator_shares": "12138142814.281428142814281428",
+      "description": {
+        "moniker": "Johnnee",
+        "identity": "10570583C83E9D8A",
+        "website": "3457526@GMAIL.COM",
+        "security_contact": "Neeraj Murarka, CTO @ Bluzelle Networks",
+        "details": "I'm BEST"
+      },
+      "unbonding_height": "15427",
+      "unbonding_time": "2020-06-20T12:40:11.466304121Z",
+      "commission": {
+        "commission_rates": {
+          "rate": "0.100000000000000000",
+          "max_rate": "0.200000000000000000",
+          "max_change_rate": "0.010000000000000000"
+        },
+        "update_time": "2020-05-29T11:11:11.924616391Z"
+      },
+      "min_self_delegation": "1"
+    }
+
+
+    
 ***
 ## query tendermint-validator-set
 >Get the full Tendermint validator set for the zone at given height
@@ -108,9 +179,12 @@ for other commands, see below:
 
 >if the height is not specified the current height will be used.
 
+>Pagination is always on and shows max 100 items per page. Be sure
+to use the --limit 100 --page 1 flags. Pages are one-based.
+
 >Example:
 
-    $ blzcli query tendermint-validator-set
+    $ blzcli query tendermint-validator-set --limit 100 --page 1
     {
       "block_height": "48659",
       "validators": [
@@ -129,6 +203,88 @@ for other commands, see below:
         }
       ]
     }
+    
+    
+    
+***
+## tx unjail
+>Unjail validator previously jailed for downtime
+
+    blzcli tx slashing unjail --gas-prices 10.0ubnt --from [validator owner]
+
+>Example:
+
+    $ blzcli tx slashing unjail --gas-prices 10.0ubnt --from vuser
+    {
+      "chain_id": "bluzelle",
+      "account_number": "3",
+      "sequence": "11",
+      "fee": {
+        "amount": [
+          {
+            "denom": "ubnt",
+            "amount": "2000000"
+          }
+        ],
+        "gas": "200000"
+      },
+      "msgs": [
+        {
+          "type": "cosmos-sdk/MsgUnjail",
+          "value": {
+            "address": "bluzellevaloper13nqmczw5kygg0dvj4cxaf4leu72jp02xgcyduv"
+          }
+        }
+      ],
+      "memo": ""
+    }
+
+
+    
+***
+## tx edit-validator
+>Edit an existing validator account
+
+    blzcli tx staking edit-validator --website=[quoted website string] --identity=[16 HEX digit PGP Keybase key hash]  --moniker=[quoted moniker string] --details=[quoted description string] --security-contact=[quoted security contact string] --from [validator owner]
+
+>Example:
+
+    $ blzcli tx staking edit-validator --website="https://bluzelle.com" --identity=5615416F70265000 --moniker="Daemon-Validator-0" --details="To infinity and beyond" --security-contact "Neeraj Murarka, CTO @ Bluzelle Networks" --gas-prices 10.0ubnt --from vuser
+    {
+      "chain_id": "bluzelle",
+      "account_number": "3",
+      "sequence": "10",
+      "fee": {
+        "amount": [
+          {
+            "denom": "ubnt",
+            "amount": "2000000"
+          }
+        ],
+        "gas": "200000"
+      },
+      "msgs": [
+        {
+          "type": "cosmos-sdk/MsgEditValidator",
+          "value": {
+            "description": {
+              "moniker": "Daemon-Validator-0",
+              "identity": "5615416F70265000",
+              "website": "https://bluzelle.com",
+              "security_contact": "Neeraj Murarka, CTO @ Bluzelle Networks",
+              "details": "To infinity and beyond"
+            },
+            "address": "bluzellevaloper13nqmczw5kygg0dvj4cxaf4leu72jp02xgcyduv",
+            "commission_rate": null,
+            "min_self_delegation": null
+          }
+        }
+      ],
+      "memo": ""
+    }
+
+
+    
 ***
 ## query tx
 >Query for a transaction by hash in a committed block
@@ -161,6 +317,8 @@ request transaction
     $ blzcli q tx A88D<...>7 | jq .data | xxd -r -p
     {"uuid":"<uuid>","count":"1"}
 
+
+
 ***
 ## query auth account
 >Query account balance
@@ -186,6 +344,8 @@ request transaction
       }
     }
 
+
+
 ***
 # query distribution validator-outstanding-rewards
 >Query distribution outstanding (un-withdrawn) rewards for a validator and all 
@@ -202,6 +362,8 @@ request transaction
         "amount": "23520000.000000000000000000"
       }
     
+    
+    
 ***
 ## query distribution commission
 >Query validator commission rewards from delegators to that validator.
@@ -217,6 +379,8 @@ request transaction
         "amount": "2352000.000000000000000000"
       }
     ]
+
+
 
 ***
 ## query distribution rewards
