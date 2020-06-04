@@ -20,6 +20,11 @@ Development Environment Setup
     GOPATH is where the golang project source files, packages and binaries 
     are kept. Make sure that the Golang compiler folder *and* the GOBIN are
     in the PATH.
+    
+    BE SURE to source the file that you added these paths to. For example, if 
+    it was to your ".profile" file, do the following:
+    
+        source ~/.profile
   
 3.  Make the Golang working folders with the following commands in a terminal
 
