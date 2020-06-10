@@ -184,13 +184,13 @@ instruction step applies to both sentries and validators.
     needed. Any amount is sufficient, for the time being.
   
 15. Copy into your "~/.blzd/config/" directory the public testnet's existing
-    genesis.json file. The easiest way to acquire it is from the following URL:
+    genesis.json file. You can view it as follows, from our sentry nodes:
     
-        http://testnet.public.bluzelle.com:1317/genesis.json
-    
-    A convenient example to download it to the current folder:
-    
-        wget http://testnet.public.bluzelle.com:1317/genesis.json
+        curl http://testnet.public.bluzelle.com:26657/genesis | jq -C '.result.genesis' | more -r
+   
+    A convenient example to download it to the current folder from our sentry nodes:
+            
+        curl http://testnet.public.bluzelle.com:26657/genesis | jq '.result.genesis' > genesis.json
         
     Ensure to copy over and replace the existing genesis.json file in your 
     "~/.blzd/config/" folder with the downloaded one from the testnet.  
