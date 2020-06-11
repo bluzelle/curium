@@ -13,19 +13,18 @@ instruction step applies to both sentries and validators.
     
     **CRITICAL**: Ensure you have built curium using the "**testnet**" target. 
     
-    Open incoming TCP ports 26656 (P2P), 26657 (RPC), and 1317 (RESTful). If you 
-    are only running a validator, open all ports. 
-    
-    CAVEAT: You do not actually need to open RPC and RESTful, if you are only 
-    strictly acting as a validator or sentry without the desire to support RPC or 
-    RESTful services. Feel free to skip RPC and RESTful if you prefer.
-    
+    Open incoming TCP port 26656 (P2P). Optionally, if you have sufficient firewall
+    and packet filtering security (to protect against DoS and DDoS attacks), you may
+    opt to also open up 26657 (RPC), and 1317 (RESTful). These two ports are only
+    for the purposes of serving clients. If you have no such interest and do not 
+    want to deal with the security considerations, keep them closed.
+          
     If you are running both, follow these directives:
     
-    - Sentry: P2P, RPC, RESTful
+    - Sentry: P2P, RPC (optional), RESTful (optional)
     - Validator: Only P2P
     
-    Furthermore, if you are running both, set your validator to ONLY allow
+    Furthermore, if you are running both, be sure to set your validator to ONLY allow
     incoming 26656 from your sentry's IP. 
 
 2.  If required, remove existing .blz* folders from the user directory (only 
@@ -49,7 +48,7 @@ instruction step applies to both sentries and validators.
     will connect to. The chain-id is "bluzelle", typically, but to check, use the
     following command:
     
-        blzcli status --node tcp://testnet.public.bluzelle.com:26657 | jq ".node_info.network" | tr -d '"'
+        blzcli status --node tcp://dev.testnet.public.bluzelle.com:26657 | jq ".node_info.network" | tr -d '"'
 
     Here is an example of initializing your local daemon config:
 
@@ -73,24 +72,20 @@ instruction step applies to both sentries and validators.
         blzcli config trust-node true
         blzcli config keyring-backend test
         
-5.  Collect the node id's of the public sentries on the testnet. The existing public sentry
-    hostnames are as follows:
+5.  Collect the node id's of the public sentry on the testnet. The existing public sentry
+    hostname is as follows:
     
-        a.sentry.testnet.public.bluzelle.com
-        b.sentry.testnet.public.bluzelle.com
-        c.sentry.testnet.public.bluzelle.com
-        d.sentry.testnet.public.bluzelle.com
-        e.sentry.testnet.public.bluzelle.com
+        dev.testnet.public.bluzelle.com
         
-    Use the following command on each, to get their node id:
+    Use the following command, to get the node id:
     
         blzcli status --node tcp://<sentry hostname>:26657 | jq ".node_info.id" | tr -d '"'
         
     So, for example:
     
-        blzcli status --node tcp://a.sentry.testnet.public.bluzelle.com:26657 | jq ".node_info.id" | tr -d '"'
+        blzcli status --node tcp://dev.testnet.public.bluzelle.com:26657 | jq ".node_info.id" | tr -d '"'
         
-    Note down the sentry hostnames and respective node id's. You will need these next.
+    Note down the sentry hostname and respective node id. You will need this next.
         
 6.  If you are ONLY setting up a validator, do the following. Otherwise, if you are setting
     up both a validator AND a sentry, ONLY do the following on the sentry. 
@@ -105,13 +100,16 @@ instruction step applies to both sentries and validators.
     So, for example, the following:
     
         # Comma separated list of nodes to keep persistent connections to
-        persistent_peers = "1ab16482640f1625a7a802bccdc2cc7afa93ed9e@a.sentry.testnet.public.bluzelle.com:26656, d229f73ac8de82fa788e495c181c7e0dbd72375d@b.sentry.testnet.public.bluzelle.com:26656"
+        persistent_peers = "ae3b71b8bb09ebeb4a5e373a00aab6f98cebb545@dev.testnet.public.bluzelle.com:26656"
         
     Next, OPTIONALLY (if you want to provide RPC services as are needed for your own REST proxy,
     for example), ensure you have opened up RPC to the public in config.toml, by specifying the "laddr"
     value in the [rpc] section as follows (the default is only to listen on localhost):
     
         laddr = "tcp://0.0.0.0:26657"
+        
+    Of course, this depends highly on your setup. If your REST proxy is local to blzd, you can opt
+    to only open up RPC to 127.0.0.1 and restrict access to RPC. 
 
 7.  If you are adding a sentry, append your validator's "<node id>@<node hostname>:26656" 
     entry to the persistent_peers comma-separated list in your sentry, in config.toml. Only 
@@ -186,11 +184,11 @@ instruction step applies to both sentries and validators.
 15. Copy into your "~/.blzd/config/" directory the public testnet's existing
     genesis.json file. You can view it as follows, from our sentry nodes:
     
-        curl http://testnet.public.bluzelle.com:26657/genesis | jq -C '.result.genesis' | more -r
+        curl http://dev.testnet.public.bluzelle.com:26657/genesis | jq -C '.result.genesis' | more -r
    
     A convenient example to download it to the current folder from our sentry nodes:
             
-        curl http://testnet.public.bluzelle.com:26657/genesis | jq '.result.genesis' > genesis.json
+        curl http://dev.testnet.public.bluzelle.com:26657/genesis | jq '.result.genesis' > genesis.json
         
     Ensure to copy over and replace the existing genesis.json file in your 
     "~/.blzd/config/" folder with the downloaded one from the testnet.  
@@ -304,6 +302,6 @@ instruction step applies to both sentries and validators.
     Furthermore, within a few minutes, you should also see your validator listed
     listed at the Bluzelle Explorer:
     
-        http://bigdipper.testnet.public.bluzelle.com:3000/validators
+        http://c.explorer.testnet.public.bluzelle.com/validators
 
 [Back](../../README.md)
