@@ -133,8 +133,20 @@ instruction step applies to both sentries and validators.
 10. In config.toml, set the following:
 
         addr_book_strict = false
+        
+11. In config.toml, set a suitable maximum # of allowed inbound and outbound peers in
+    the [p2p] section. For example, with a node that might be very busy (such as a 
+    sentry to a secure zone for validators), you might want to increase from the defaults,
+    to avoid a situation where peers start to get dropped. Following are the values we
+    have used:
     
-11. Edit ".blzd/config/app.toml" to set the minimum-gas-prices to “10.0ubnt”
+        # Maximum number of inbound peers
+        max_num_inbound_peers = 200
+
+        # Maximum number of outbound peers to connect to, excluding persistent peers
+        max_num_outbound_peers = 100
+    
+12. Edit ".blzd/config/app.toml" to set the minimum-gas-prices to “10.0ubnt”
 
         # The minimum gas prices a validator is willing to accept for processing a
         # transaction. A transaction's fees must meet the minimum of any denomination
@@ -144,11 +156,11 @@ instruction step applies to both sentries and validators.
     Remember that *every* node should have *at least* this minimum. Feel free 
     to set it higher if you wish.
     
-12. Edit ".blzd/config/app.toml", to add the following:
+13. Edit ".blzd/config/app.toml", to add the following:
     
         bluzelle_crud = true
 
-13. If you are creating a validator, add a new local keypair for the account that will be 
+14. If you are creating a validator, add a new local keypair for the account that will be 
     the self-delegator to the validator on this node:
 
         blzcli keys add vuser
@@ -171,7 +183,7 @@ instruction step applies to both sentries and validators.
     CRITICAL: Note the address and mnemonic phrase values. You will need these on a
     long term basis.
 
-14. If you are creating a validator, you will now need to acquire BNT tokens from the 
+15. If you are creating a validator, you will now need to acquire BNT tokens from the 
     public testnet and send them to the address of the acccount just created for your 
     validator. 
     
@@ -181,7 +193,7 @@ instruction step applies to both sentries and validators.
     Please refer to community documentation and forums to acquire testnet BNT, as 
     needed. Any amount is sufficient, for the time being.
   
-15. Copy into your "~/.blzd/config/" directory the public testnet's existing
+16. Copy into your "~/.blzd/config/" directory the public testnet's existing
     genesis.json file. You can view it as follows, from our sentry nodes:
     
         curl http://dev.testnet.public.bluzelle.com:26657/genesis | jq -C '.result.genesis' | more -r
@@ -193,7 +205,7 @@ instruction step applies to both sentries and validators.
     Ensure to copy over and replace the existing genesis.json file in your 
     "~/.blzd/config/" folder with the downloaded one from the testnet.  
  
-16. Start the Bluzelle daemon 
+17. Start the Bluzelle daemon 
 
         blzd start
         
@@ -204,7 +216,7 @@ instruction step applies to both sentries and validators.
         
     and then retry the start command.
 
-17. If you are creating a validator, wait till your new node catches up to the
+18. If you are creating a validator, wait till your new node catches up to the
     rest of the zone. It will be obvious as the node will slow down output and
     be getting blocks every 4-5 seconds. To be sure, run the following command
     in another terminal on the validator and look for false:
@@ -273,9 +285,11 @@ instruction step applies to both sentries and validators.
           --gas-prices=10.0ubnt \
           --from vuser
 
-18. You can get the current validator set with the command
+19. You can get the current validator set with the commands (be sure to check all 
+    available pages -- the limit cannot exceed 100):
 
-        blzcli q tendermint-validator-set
+        blzcli q tendermint-validator-set --limit 100 --page 1
+        blzcli q tendermint-validator-set --limit 100 --page 2
         
     which will produce the output like the following:
 
