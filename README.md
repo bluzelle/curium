@@ -26,6 +26,6 @@ These are steps involved in setting up the OS, Dev Environment, building and dep
 
 ### Using a Bluzelle Curium Multi-Validator Zone
 
-* [Queries and Transactions]()
-* [Useful Operations]() 
+* [Queries and Transactions](docs/commands/qAndTX.md)
+* [Useful Operations](docs/commands/useful.md) 
 
