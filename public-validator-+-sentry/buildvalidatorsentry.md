@@ -26,13 +26,21 @@ For the following instructions, we will describe the steps to setup a validator 
    rm -rf .blz*
    ```
 
-3. Initialize the daemon config.
+3. Initialize the daemon config. 
 
+   Please ensure you have the correct chain-id. We do change it whenever we restart a new network. Run the following command to find it:
+   
    ```text
-   blzd init <moniker> --chain-id <chain-id for the zone>  2>&1 | jq .node_id
+   curl --location --request GET 'http://a.client.sentry.testnet.public.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
    ```
 
-   Use a new moniker string that uniquely identifies your validator/sentry. Please start the moniker with "validator" or "sentry", depending on what you are adding, and use camel case. Examples:
+   ```text
+   blzd init <moniker> --chain-id <chain-id>  2>&1 | jq .node_id
+   ```
+
+   Use a unique moniker string that uniquely identifies your validator/sentry. Please start the moniker with "validator" or "sentry", depending on what you are adding, and use camel case. Try to include your own or company name, if applicable.
+   
+   Examples:
 
    ```text
    sentryBob
@@ -53,37 +61,27 @@ For the following instructions, we will describe the steps to setup a validator 
 
    The JSON output will contain the node\_id. Note this value, so that it can be used to identify this node to other nodes in the zone. Keep in mind that for this document’s purposes, your validator and sentry will both only point at each other, and at other known public sentries. More on this later in this document.
 
-   There is no need to touch the genesis file, ".blzd/config/genesis.json". It will be completely replaced with the genesis file already in use on the public testnet. We will perform this step later in this document.
+   There is no need to touch the genesis file, ".blzd/config/genesis.json" yet. It will be completely replaced with the genesis file already in use on the public TestNet. We will perform this step later in this document.
 
-4. Set the client configuration, and remember to use the chain id of the zone \(found above\) that this node will be joining:
+4. Set the client configuration, and remember to use the chain id of the network \(found above\) that this node will be joining:
 
    ```text
-   blzcli config chain-id <zone chain-id>
+   blzcli config chain-id <chain-id>
    blzcli config output json 
    blzcli config indent true 
    blzcli config trust-node true
    blzcli config keyring-backend test
    ```
 
-5. Collect the node id's of the public sentry on the testnet. The existing public sentry hostname is as follows:
+5. Collect the node id's of the gateway sentries on the TestNet. 
+
+   Use the following command, to get a list of all the gateway sentries, including their IP addresses and node id's:
 
    ```text
-   dev.testnet.public.bluzelle.com
+   curl -s http://client.sentry.testnet.public.bluzelle.com:26657/net_info | jq -C '[.result.peers[] | select(.node_info.moniker | startswith("daemon-sentry-gateway")) | {moniker: .node_info.moniker, id: .node_info.id, ip_address: .remote_ip}] | sort_by(.moniker)'
    ```
 
-   Use the following command, to get the node id:
-
-   ```text
-   blzcli status --node tcp://<sentry hostname>:26657 | jq ".node_info.id" | tr -d '"'
-   ```
-
-   So, for example:
-
-   ```text
-   blzcli status --node tcp://dev.testnet.public.bluzelle.com:26657 | jq ".node_info.id" | tr -d '"'
-   ```
-
-   Note down the sentry hostname and respective node id. You will need this next.
+   Note down the sentry IP address and respective id, for each such gateway sentry. You will need this information next.
 
 6. If you are ONLY setting up a validator, do the following. Otherwise, if you are setting up both a validator AND a sentry, ONLY do the following on the sentry.
 
