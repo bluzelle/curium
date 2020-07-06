@@ -1,4 +1,4 @@
-# Building a Public Testnet Validator + Sentry
+# Building a Public TestNet Validator + Sentry
 
 [Back](../)
 
@@ -12,7 +12,7 @@ For the following instructions, we will describe the steps to setup a validator 
 
    Open incoming TCP port 26656 \(P2P\). Optionally, if you have sufficient firewall and packet filtering security \(to protect against DoS and DDoS attacks\), you may opt to also open up 26657 \(RPC\), and 1317 \(RESTful\). These two ports are only for the purposes of serving clients. If you have no such interest and do not want to deal with the security considerations, keep them closed.
 
-   If you are running both, follow these directives:
+   If you are running both a sentry and a validator, follow these directives:
 
    * Sentry: P2P, RPC \(optional\), RESTful \(optional\)
    * Validator: Only P2P
@@ -28,11 +28,13 @@ For the following instructions, we will describe the steps to setup a validator 
 
 3. Initialize the daemon config. 
 
-   Please ensure you have the correct chain-id. We do change it whenever we restart a new network. Run the following command to find it:
+   Please ensure you have the correct chain-id. We do change it whenever we restart a new network. Run the following command to find the existing chain-id:
    
    ```text
-   curl --location --request GET 'http://a.client.sentry.testnet.public.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
+   curl --location --request GET 'http://client.sentry.testnet.public.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
    ```
+
+  Initialize your daemon config as follows:
 
    ```text
    blzd init <moniker> --chain-id <chain-id>  2>&1 | jq .node_id
@@ -44,13 +46,7 @@ For the following instructions, we will describe the steps to setup a validator 
 
    ```text
    sentryBob
-   validatorBob
-   ```
-
-   Use the chain-id used by the public testnet to identify the zone that this node will connect to. The chain-id is "bluzelle", typically, but to check, use the following command:
-
-   ```text
-   blzcli status --node tcp://dev.testnet.public.bluzelle.com:26657 | jq ".node_info.network" | tr -d '"'
+   validatorTesla
    ```
 
    Here is an example of initializing your local daemon config:
@@ -59,7 +55,7 @@ For the following instructions, we will describe the steps to setup a validator 
    blzd init sentryBob --chain-id bluzelle  2>&1 | jq .node_id
    ```
 
-   The JSON output will contain the node\_id. Note this value, so that it can be used to identify this node to other nodes in the zone. Keep in mind that for this document’s purposes, your validator and sentry will both only point at each other, and at other known public sentries. More on this later in this document.
+   The JSON output will contain the node\_id. Note this value, as it can be used to identify this node to other nodes in the zone. Keep in mind that for this document’s purposes, your validator and sentry will both only point at each other. Your sentry will also point at other known public sentries (if you know any) and to Bluzelle's own gateway sentries. More on this later in this document.
 
    There is no need to touch the genesis file, ".blzd/config/genesis.json" yet. It will be completely replaced with the genesis file already in use on the public TestNet. We will perform this step later in this document.
 
@@ -85,7 +81,7 @@ For the following instructions, we will describe the steps to setup a validator 
 
 6. If you are ONLY setting up a validator, do the following. Otherwise, if you are setting up both a validator AND a sentry, ONLY do the following on the sentry.
 
-   Edit ".blzd/config/config.toml". Add the hostnames and node id's and ports of each of the sentries found earlier, as a comma-separated list, to the "persistent\_peers" value \(replace the existing value, if any\), as follows:
+   Edit ".blzd/config/config.toml". Add the hostnames and node id's and ports of each of the gateway sentries found earlier, as a comma-separated list, to the "persistent\_peers" value \(replace the existing value, if any\), as follows:
 
    ```text
    # Comma separated list of nodes to keep persistent connections to
@@ -179,13 +175,13 @@ For the following instructions, we will describe the steps to setup a validator 
 16. Copy into your "~/.blzd/config/" directory the public testnet's existing genesis.json file. You can view it as follows, from our sentry nodes:
 
     ```text
-    curl http://dev.testnet.public.bluzelle.com:26657/genesis | jq -C '.result.genesis' | more -r
+    curl http://client.sentry.testnet.public.bluzelle.com:26657/genesis | jq -C '.result.genesis' | more -r
     ```
 
     A convenient example to download it to the current folder from our sentry nodes:
 
     ```text
-    curl http://dev.testnet.public.bluzelle.com:26657/genesis | jq '.result.genesis' > genesis.json
+    curl http://client.sentry.testnet.public.bluzelle.com:26657/genesis | jq '.result.genesis' > genesis.json
     ```
 
     Ensure to copy over and replace the existing genesis.json file in your "~/.blzd/config/" folder with the downloaded one from the testnet.
@@ -216,7 +212,7 @@ For the following instructions, we will describe the steps to setup a validator 
     blzcli q account $(blzcli keys show vuser -a) | jq ".value.coins"
     ```
 
-    At this point, the new "vuser" account will also have the BNT tokens you funded to it. We now need to add this node as a validator for the testnet, as follows:
+    At this point, the new "vuser" account will also have the BNT tokens you funded to it. We now need to add this node as a validator for the TestNet, as follows:
 
     ```text
     blzcli tx staking create-validator \
@@ -300,7 +296,7 @@ For the following instructions, we will describe the steps to setup a validator 
     Furthermore, within a few minutes, you should also see your validator listed listed at the Bluzelle Explorer:
 
     ```text
-    http://c.explorer.testnet.public.bluzelle.com/validators
+    <N/A>
     ```
 
 [Back](../)
