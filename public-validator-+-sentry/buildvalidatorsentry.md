@@ -34,7 +34,7 @@ For the following instructions, we will describe the steps to setup a validator 
    curl --location --request GET 'http://client.sentry.testnet.public.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
    ```
 
-  Initialize your daemon config as follows:
+   Initialize your daemon config as follows:
 
    ```text
    blzd init <moniker> --chain-id <chain-id>  2>&1 | jq .node_id
