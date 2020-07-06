@@ -25,8 +25,11 @@
 
    Use the following commands to check your hard and soft limits:
 
-   ulimit -Hn ulimit -Sn
-
+   ```text
+   ulimit -Hn 
+   ulimit -Sn
+   ```
+   
    Without going into great depth \(please do your own research\), the soft limit is capped at the hard limit.
 
    To change your limits, edit the following file:
