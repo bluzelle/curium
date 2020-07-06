@@ -295,10 +295,10 @@ For the following instructions, we will describe the steps to setup a validator 
 
     Look for your pubkey here, as confirmation.
 
-    Furthermore, within a few minutes, you should also see your validator listed listed at the Bluzelle Explorer and Bluzelle CENSUS:
+    Furthermore, within a few minutes, you should also see your validator listed listed at the Bluzelle Explorer:
 
     ```text
-    <N/A>
+    http://explorer.testnet.public.bluzelle.com/validators
     ```
 
 [Back](../)
