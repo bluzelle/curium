@@ -214,7 +214,7 @@ For the following instructions, we will describe the steps to setup a validator 
     
     If you get an error looking up your vuser account, where it does not appear to exist, it likely means your node is still catching up. Your local copy of the blockchain won't know about the existence of your account till the block that the tokens were sent to you on, gets synced to you locally.
 
-    At this point, the new "vuser" account will also have the BNT tokens you funded to it. We now need to add this node as a validator for the TestNet, as follows:
+19. At this point, the new "vuser" account will also reflect the BNT tokens that were funded to it. We now need to add this node as a validator for the TestNet, as follows:
 
     ```text
     blzcli tx staking create-validator \
