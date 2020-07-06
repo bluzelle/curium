@@ -81,7 +81,7 @@ For the following instructions, we will describe the steps to setup a validator 
 
 6. If you are ONLY setting up a validator, do the following. Otherwise, if you are setting up both a validator AND a sentry, ONLY do the following on the sentry.
 
-   Edit ".blzd/config/config.toml". Add the hostnames and node id's and ports of each of the gateway sentries found earlier, as a comma-separated list, to the "persistent\_peers" value \(replace the existing value, if any\), as follows:
+   Edit ".blzd/config/config.toml". Add the hostnames/IPs and node id's and ports of each of the gateway sentries found earlier, as a comma-separated list, to the "persistent\_peers" value \(replace the existing value, if any\), as follows:
 
    ```text
    # Comma separated list of nodes to keep persistent connections to
