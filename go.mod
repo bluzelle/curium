@@ -3,7 +3,7 @@ module github.com/bluzelle/curium
 go 1.14
 
 require (
-	github.com/cosmos/cosmos-sdk v0.39.1-0.20200729014427-e82246e855c6
+	github.com/cosmos/cosmos-sdk v0.39.1-rc1
 	github.com/cosmos/modules/incubator/faucet v0.0.0-20200315124306-c86f71ae76a0
 	github.com/golang/mock v1.4.0
 	github.com/gorilla/mux v1.7.4
