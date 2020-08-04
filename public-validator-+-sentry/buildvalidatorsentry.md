@@ -57,7 +57,7 @@ For the following instructions, we will describe the steps to setup a validator 
 
    The JSON output will contain the node\_id. Note this value, as it can be used to identify this node to other nodes in the zone. Keep in mind that for this document’s purposes, your validator and sentry will both only point at each other. Your sentry will also point at other known public sentries (if you know any) and to Bluzelle's own gateway sentries. More on this later in this document.
 
-   There is no need to touch the genesis file, ".blzd/config/genesis.json" yet. It will be completely replaced with the genesis file already in use on the public TestNet. We will perform this step later in this document.
+   There is no need to touch the genesis file, ".blzd/config/genesis.json" yet. The one that was generated just now is generic and not needed. It will be completely replaced with the genesis file already in use on the public TestNet. We will perform this step later in this document.
 
 4. Set the client configuration, and remember to use the chain id of the network \(found above\) that this node will be joining:
 
