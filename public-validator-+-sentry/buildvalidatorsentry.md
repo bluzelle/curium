@@ -248,7 +248,7 @@ For the following instructions, we will describe the steps to setup a validator 
 
     ```text
     blzcli tx staking create-validator \
-      --amount=1000000000ubnt \
+      --amount=1500000000ubnt \
       --pubkey=$(blzd tendermint show-validator) \
       --website="https://bluzelle.com" \
       --details="To infinity and beyond" \
