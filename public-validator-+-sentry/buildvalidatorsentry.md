@@ -1,14 +1,18 @@
-# Building a Public TestNet Validator + Sentry
+# Building a Public Validator + Sentry
 
 [Back](../)
 
-## Building a Public TestNet Validator + Sentry
+## Building a Public Validator + Sentry
 
-For the following instructions, we will describe the steps to setup a validator or a sentry for the existing Public TestNet. Unless otherwise stated, the instruction step applies to both sentries and validators.
+For the following instructions, we will describe the steps to setup a validator or a sentry for the existing Public MainNet or TestNet. Unless otherwise stated, the instruction steps apply to both sentries and validators.
 
 1. Refer to previous documents for initializing the server, dev environments, and building the Bluzelle Curium applications.
 
-   **CRITICAL**: Ensure you have built curium using the "**testnet**" target.
+   **CRITICAL**: If you are building for the **MAIN NET**, ensure you have built curium using the "**mainnet**" target.
+   
+   OR
+
+   **CRITICAL**: If you are building for the **TEST NET**, ensure you have built curium using the "**testnet**" target.
 
    Open incoming TCP port 26656 \(P2P\). Optionally, if you have sufficient firewall and packet filtering security \(to protect against DoS and DDoS attacks\), you may opt to also open up 26657 \(RPC\), and 1317 \(RESTful\). These two ports are only for the purposes of serving clients. If you have no such interest and do not want to deal with the security considerations, keep them closed.
 
@@ -29,6 +33,14 @@ For the following instructions, we will describe the steps to setup a validator 
 3. Initialize the daemon config. 
 
    Please ensure you have the correct chain-id. We do change it whenever we restart a new network. Run the following command to find the existing chain-id:
+   
+   **MAIN NET**:
+   
+   ```text
+   curl --location --request GET 'http://client.sentry.bluzellenet.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
+   ```
+
+   **TEST NET**:
    
    ```text
    curl --location --request GET 'http://client.sentry.testnet.public.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
@@ -57,7 +69,7 @@ For the following instructions, we will describe the steps to setup a validator 
 
    The JSON output will contain the node\_id. Note this value, as it can be used to identify this node to other nodes in the zone. Keep in mind that for this document’s purposes, your validator and sentry will both only point at each other. Your sentry will also point at other known public sentries (if you know any) and to Bluzelle's own gateway sentries. More on this later in this document.
 
-   There is no need to touch the genesis file, ".blzd/config/genesis.json" yet. The one that was generated just now is generic and not needed. It will be completely replaced with the genesis file already in use on the public TestNet. We will perform this step later in this document.
+   There is no need to touch the genesis file, ".blzd/config/genesis.json" yet. The one that was generated just now is generic and not needed. It will be completely replaced with the genesis file already in use. We will perform this step later in this document.
 
 4. Set the client configuration, and remember to use the chain id of the network \(found above\) that this node will be joining:
 
@@ -69,10 +81,18 @@ For the following instructions, we will describe the steps to setup a validator 
    blzcli config keyring-backend test
    ```
 
-5. Collect the node id's of the gateway sentries on the TestNet. 
+5. Collect the node id's of the gateway sentries. 
 
    Use the following command, to get a list of all the gateway sentries, including their IP addresses and node id's:
 
+   **MAIN NET**:
+   
+   ```text
+   curl -s http://client.sentry.bluzellenet.bluzelle.com:26657/net_info | jq -C '[.result.peers[] | select(.node_info.moniker | startswith("daemon-sentry-gateway")) | {moniker: .node_info.moniker, id: .node_info.id, ip_address: .remote_ip}] | sort_by(.moniker)'
+   ```
+
+   **TEST NET**:
+   
    ```text
    curl -s http://client.sentry.testnet.public.bluzelle.com:26657/net_info | jq -C '[.result.peers[] | select(.node_info.moniker | startswith("daemon-sentry-gateway")) | {moniker: .node_info.moniker, id: .node_info.id, ip_address: .remote_ip}] | sort_by(.moniker)'
    ```
@@ -92,7 +112,7 @@ For the following instructions, we will describe the steps to setup a validator 
 
    ```text
    # Comma separated list of nodes to keep persistent connections to
-   persistent_peers = "ae3b71b8bb09ebeb4a5e373a00aab6f98cebb545@dev.testnet.public.bluzelle.com:26656"
+   persistent_peers = "ae3b71b8bb09ebeb4a5e373a00aab6f98cebb545@1.2.3.4:26656"
    ```
 
    Next, OPTIONALLY \(if you want to provide RPC services as are needed for your own REST proxy, for example\), ensure you have opened up RPC to the public in config.toml, by specifying the "laddr" value in the \[rpc\] section as follows \(the default is only to listen on localhost\):
@@ -149,14 +169,43 @@ For the following instructions, we will describe the steps to setup a validator 
     ```text
     bluzelle_crud = true
     ```
+    
+14. If you are creating a validator, you will now need to acquire BNT tokens. Following are instructions depending on if you are targeting the MAIN NET or TEST NET.
 
-14. If you are creating a validator, add a new local keypair for the account that will be the self-delegator to the validator on this node:
+    **MAIN NET**:
+   
+    i) Be sure you have Metamask installed. It needs to be installed properly and connected to your ETH MainNet account that has access to the BLZ tokens you wish to use for your validator. You can use Metamask with Ledger and Trezor hardware wallets as well.
+   
+    ii) Goto the following URL to sign into the staking wallet:
+    ```
+    http://staking.bluzelle.com/
+    ```
+   
+    iii) Create a new BNT mnemonic for our MAIN NET, and store and secure this BNT mnemonic securely. **If you lose this mnemonic, you will lose ALL your funds.** Bluzelle is not responsible and there is no policy to "refund" anything. Note that this web wallet is **100% client side**. Your BNT mnemonic is generated on the local browser only and is never transmitted over the network. You are 100% responsible for storing and securing this mnemonic. 
+    
+    iv) Add a new local keypair for the account that will be the self-delegator to the validator on this node:
+
+    ```text
+    blzcli keys add vuser --recover
+    ```
+
+    Provide the menemonic generated above from the web staking wallet, when asked for the bip39 mnemonic. 
+    
+    You will then see the following output:
+
+    * name: vuser type: local address: bluzelle1z&lt;...&gt; pubkey: bluzellepub1&lt;...&gt;
+   
+    **TEST NET**:
+   
+    Get some tokens to stake your validator from our FAUCET. Note that you can only use the faucet once every FIVE minutes. 
+
+    i) Add a new local keypair for the account that will be the self-delegator to the validator on this node:
 
     ```text
     blzcli keys add vuser
     ```
 
-    which will produce the following output
+    which will produce the following output:
 
     * name: vuser type: local address: bluzelle1z&lt;...&gt; pubkey: bluzellepub1&lt;...&gt; mnemonic: "" threshold: 0 pubkeys: \[\]
 
@@ -166,27 +215,60 @@ For the following instructions, we will describe the steps to setup a validator 
 
     CRITICAL: Note the address and mnemonic phrase values. You will need these on a long term basis.
 
-15. If you are creating a validator, you will now need to acquire BNT tokens from the public testnet and send them to the address of the acccount just created for your validator.
+    ii) Add a local key for the "faucet" account. Its mnemonic: 
+    ```
+    endless clog price asthma lottery various innocent base radio discover measure cushion account oval enable shove cost private hood immune unhappy once spell million
+    ```
+    
+    You can add it with:
+    ```
+    blzcli keys add faucet --recover
+    ```
+    
+    Once added, you will have a new local address:
+    ```
+    bluzelle135am3hulweusuu7qlgemwejxpf2nsr0423t8sx
+    ```
+    
+    iii) Run the faucet and fund yourself. Use the following command (this example assumes your validator user account is "vuser" from above steps):
+    ```
+    blzcli tx faucet mintfor $(blzcli keys show vuser -a) --node tcp://client.sentry.testnet.public.bluzelle.com:26657 --gas-prices 10.0ubnt --chain-id <chain id> --from faucet
+    ```
+    
+    iv) Verify you have tokens. If the above command gives an error that the account it not found, it likely means the faucet has not yet completed (takes a few seconds) or has failed for some reason: 
+    ```
+    blzcli q account $(blzcli keys show vuser -a) --node tcp://client.sentry.testnet.public.bluzelle.com:26657
+    ```
+    
+    **Please do NOT take tokens from the faucet address. It is there as a convenience for the community. If you really want more tokens, just use the faucet.**
 
-    There are various ways you may be able to do this, but this step is beyond the scope of this document.
+15. Copy into your "~/.blzd/config/" directory the network's existing genesis.json file. You can view it as follows, from our sentry nodes:
 
-    Please refer to community documentation and forums to acquire testnet BNT, as needed. Any amount is sufficient, for the time being.
+    **MAIN NET**:
+    ```text
+    curl http://client.sentry.bluzellenet.bluzelle.com:26657/genesis | jq -C '.result.genesis' | more -r
+    ```
 
-16. Copy into your "~/.blzd/config/" directory the public testnet's existing genesis.json file. You can view it as follows, from our sentry nodes:
-
+    **TEST NET**:
     ```text
     curl http://client.sentry.testnet.public.bluzelle.com:26657/genesis | jq -C '.result.genesis' | more -r
     ```
 
     A convenient example to download it to the current folder from our sentry nodes:
 
+    **MAIN NET**:
+    ```text
+    curl http://client.sentry.bluzellenet.bluzelle.com:26657/genesis | jq '.result.genesis' > genesis.json
+    ```
+
+    **TEST NET**:
     ```text
     curl http://client.sentry.testnet.public.bluzelle.com:26657/genesis | jq '.result.genesis' > genesis.json
     ```
 
     Ensure to copy over and replace the existing genesis.json file in your "~/.blzd/config/" folder with the downloaded one from the testnet.
 
-17. Start the Bluzelle daemon
+16. Start the Bluzelle daemon
 
     ```text
     blzd start
@@ -200,7 +282,7 @@ For the following instructions, we will describe the steps to setup a validator 
 
     and then retry the start command.
 
-18. If you are creating a validator, wait till your new node catches up to the rest of the zone. It will be obvious as the node will slow down output and be getting blocks every 4-5 seconds. To be sure, run the following command in another terminal on the validator and look for false:
+17. If you are creating a validator, wait till your new node catches up to the rest of the zone. It will be obvious as the node will slow down output and be getting blocks every 4-5 seconds. To be sure, run the following command in another terminal on the validator and look for false:
 
     ```text
     blzcli status | jq ".sync_info.catching_up"
@@ -214,7 +296,7 @@ For the following instructions, we will describe the steps to setup a validator 
     
     If you get an error looking up your vuser account, where it does not appear to exist, it likely means your node is still catching up. Your local copy of the blockchain won't know about the existence of your account till the block that the tokens were sent to you on, gets synced to you locally.
 
-19. At this point, the new "vuser" account will also reflect the BNT tokens that were funded to it. We now need to add this node as a validator for the TestNet, as follows:
+18. At this point, the new "vuser" account will also reflect the BNT tokens that were funded to it. We now need to add this node as a validator, as follows:
 
     ```text
     blzcli tx staking create-validator \
@@ -297,9 +379,12 @@ For the following instructions, we will describe the steps to setup a validator 
 
     Furthermore, within a few minutes, you should also see your validator listed listed at the Bluzelle Explorer:
 
-    ```text
+    **MAIN NET**:
+
+    http://bigdipper.bluzellenet.bluzelle.com/validators
+    
+    **TEST NET**:
+
     http://bigdipper.testnet.public.bluzelle.com/validators
-    ```
 
 [Back](../)
-
