@@ -112,7 +112,7 @@ For the following instructions, we will describe the steps to setup a validator 
 
    ```text
    # Comma separated list of nodes to keep persistent connections to
-   persistent_peers = "ae3b71b8bb09ebeb4a5e373a00aab6f98cebb545@dev.testnet.public.bluzelle.com:26656"
+   persistent_peers = "ae3b71b8bb09ebeb4a5e373a00aab6f98cebb545@1.2.3.4:26656"
    ```
 
    Next, OPTIONALLY \(if you want to provide RPC services as are needed for your own REST proxy, for example\), ensure you have opened up RPC to the public in config.toml, by specifying the "laddr" value in the \[rpc\] section as follows \(the default is only to listen on localhost\):
@@ -242,7 +242,7 @@ For the following instructions, we will describe the steps to setup a validator 
     
     **Please do NOT take tokens from the faucet address. It is there as a convenience for the community. If you really want more tokens, just use the faucet.**
 
-15. Copy into your "~/.blzd/config/" directory the public testnet's existing genesis.json file. You can view it as follows, from our sentry nodes:
+15. Copy into your "~/.blzd/config/" directory the network's existing genesis.json file. You can view it as follows, from our sentry nodes:
 
     **MAIN NET**:
     ```text
