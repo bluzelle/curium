@@ -69,7 +69,7 @@ For the following instructions, we will describe the steps to setup a validator 
 
    The JSON output will contain the node\_id. Note this value, as it can be used to identify this node to other nodes in the zone. Keep in mind that for this document’s purposes, your validator and sentry will both only point at each other. Your sentry will also point at other known public sentries (if you know any) and to Bluzelle's own gateway sentries. More on this later in this document.
 
-   There is no need to touch the genesis file, ".blzd/config/genesis.json" yet. The one that was generated just now is generic and not needed. It will be completely replaced with the genesis file already in use on the public TestNet. We will perform this step later in this document.
+   There is no need to touch the genesis file, ".blzd/config/genesis.json" yet. The one that was generated just now is generic and not needed. It will be completely replaced with the genesis file already in use. We will perform this step later in this document.
 
 4. Set the client configuration, and remember to use the chain id of the network \(found above\) that this node will be joining:
 
@@ -81,7 +81,7 @@ For the following instructions, we will describe the steps to setup a validator 
    blzcli config keyring-backend test
    ```
 
-5. Collect the node id's of the gateway sentries on the TestNet. 
+5. Collect the node id's of the gateway sentries. 
 
    Use the following command, to get a list of all the gateway sentries, including their IP addresses and node id's:
 
