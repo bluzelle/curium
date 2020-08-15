@@ -380,13 +380,11 @@ For the following instructions, we will describe the steps to setup a validator 
     Furthermore, within a few minutes, you should also see your validator listed listed at the Bluzelle Explorer:
 
     **MAIN NET**:
-    ```text
+
     http://bigdipper.bluzellenet.bluzelle.com/validators
-    ```
     
     **TEST NET**:
-    ```text
-    http://bigdipper.testnet.public.bluzelle.com/validators
-    ```
-[Back](../)
 
+    http://bigdipper.testnet.public.bluzelle.com/validators
+
+[Back](../)
