@@ -381,12 +381,12 @@ For the following instructions, we will describe the steps to setup a validator 
 
     **MAIN NET**:
     ```text
-    http://bigdipper.testnet.public.bluzelle.com/validators
+    http://bigdipper.bluzellenet.bluzelle.com/validators
     ```
     
     **TEST NET**:
     ```text
-    http://bigdipper.bluzellenet.bluzelle.com/validators
+    http://bigdipper.testnet.public.bluzelle.com/validators
     ```
 [Back](../)
 
