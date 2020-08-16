@@ -176,10 +176,9 @@ For the following instructions, we will describe the steps to setup a validator 
    
     i) Be sure you have Metamask installed. It needs to be installed properly and connected to your ETH MainNet account that has access to the BLZ tokens you wish to use for your validator. You can use Metamask with Ledger and Trezor hardware wallets as well.
    
-    ii) Goto the following URL to sign into the staking wallet:
+    ii) Goto the following URL to sign into the staking application:
     
-    http://staking.bluzelle.com/
-    
+    http://staking.bluzelle.com/ 
    
     iii) Create a new BNT mnemonic for our MAIN NET, and store and secure this BNT mnemonic securely. **If you lose this mnemonic, you will lose ALL your funds.** Bluzelle is not responsible and there is no policy to "refund" anything. Note that this web wallet is **100% client side**. Your BNT mnemonic is generated on the local browser only and is never transmitted over the network. You are 100% responsible for storing and securing this mnemonic. 
     
