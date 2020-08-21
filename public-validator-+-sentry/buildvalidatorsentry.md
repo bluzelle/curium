@@ -189,11 +189,9 @@ For the following instructions, we will describe the steps to setup a validator 
     ```
 
     Provide the menemonic generated above from the web staking wallet, when asked for the bip39 mnemonic. 
-    
-    You will then see the following output:
+        
+    v) Convert the desired amount of BLZ tokens to BNT tokens by using the "Convert to BNT" button. Please be patient, as we run the conversion relayer manually for now, and it runs a few times every day. Please join and follow our Telegram group to keep updated.
 
-    * name: vuser type: local address: bluzelle1z&lt;...&gt; pubkey: bluzellepub1&lt;...&gt;
-   
     **TEST NET**:
    
     Get some tokens to stake your validator from our FAUCET. Note that you can only use the faucet once every FIVE minutes. 
