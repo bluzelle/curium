@@ -42,9 +42,33 @@ func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 		GetCmdQCount(storeKey, cdc),
 		GetCmdQGetLease(storeKey, cdc),
 		GetCmdQGetNShortestLeases(storeKey, cdc),
+		GetCmdQOwner(storeKey, cdc),
 	)...)
 
 	return crudQueryCmd
+}
+
+func GetCmdQOwner(queryRoute string, cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "owner [UUID] [key]",
+		Short: "owner UUID key",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			UUID := args[0]
+			key := args[1]
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/owner/%s/%s", queryRoute, UUID, key), nil)
+
+			if err != nil {
+				fmt.Printf("could get owner for key - %s : %s\n", UUID, key)
+				return nil
+			}
+
+			var out types.QueryResultOwner
+			cdc.MustUnmarshalJSON(res, &out)
+			return cliCtx.PrintOutput(out)
+		},
+	}
 }
 
 func GetCmdQRead(queryRoute string, cdc *codec.Codec) *cobra.Command {

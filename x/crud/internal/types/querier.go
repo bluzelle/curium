@@ -20,6 +20,12 @@ type QueryResultRead struct {
 	Value string `json:"value"`
 }
 
+type QueryResultOwner struct {
+	UUID  string `json:"uuid"`
+	Key   string `json:"key"`
+	Owner string `json:"owner"`
+}
+
 // for fmt.Stringer
 func (r QueryResultRead) String() string {
 	return r.Value
