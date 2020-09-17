@@ -24,18 +24,21 @@ import (
 )
 
 const (
-	QueryRead              = "read"
-	QueryHas               = "has"
-	QueryKeys              = "keys"
-	QueryKeyValues         = "keyvalues"
-	QueryCount             = "count"
-	QueryGetLease          = "getlease"
+	QueryRead               = "read"
+	QueryHas                = "has"
+	QueryKeys               = "keys"
+	QueryKeyValues          = "keyvalues"
+	QueryCount              = "count"
+	QueryGetLease           = "getlease"
 	QueryGetNShortestLeases = "getnshortestleases"
+	QueryOwner              = "owner"
 )
 
 func NewQuerier(keeper IKeeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err error) {
 		switch path[0] {
+		case QueryOwner:
+			return queryOwner(ctx, path[1:], req, keeper, keeper.GetCdc())
 		case QueryRead:
 			return queryRead(ctx, path[1:], req, keeper, keeper.GetCdc())
 		case QueryHas:
@@ -69,6 +72,22 @@ func queryRead(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeep
 	}
 
 	return res, nil
+}
+
+func queryOwner(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, error) {
+	owner := keeper.GetOwner(ctx, keeper.GetKVStore(ctx), path[0], path[1])
+
+	if owner == nil {
+		return []byte{}, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "key not found")
+	}
+
+	res, err := codec.MarshalJSONIndent(cdc, types.QueryResultOwner{UUID: path[0], Key: path[1], Owner: owner.String()})
+	if err != nil {
+		panic("could not marshal result to JSON")
+	}
+
+	return res, nil
+
 }
 
 func queryHas(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, error) {
