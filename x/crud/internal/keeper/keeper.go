@@ -24,6 +24,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"sort"
 	"strconv"
+	cosmosTypes "github.com/cosmos/cosmos-sdk/store/types"
 )
 
 type MaxKeeperSizes struct {
@@ -40,6 +41,7 @@ type IKeeper interface {
 	GetCount(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultCount
 	GetDefaultLeaseBlocks() int64
 	GetKVStore(ctx sdk.Context) sdk.KVStore
+	Search(ctx sdk.Context, store sdk.KVStore, UUID string, prefix string, page, limit uint, direction string, owner sdk.AccAddress) types.QueryResultKeyValues
 	GetKeyValues(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultKeyValues
 	GetKeys(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultKeys
 	GetLeaseStore(ctx sdk.Context) sdk.KVStore
@@ -189,6 +191,49 @@ func (k Keeper) RenameKey(ctx sdk.Context, store sdk.KVStore, UUID string, key s
 func (k Keeper) GetCdc() *codec.Codec {
 	return k.cdc
 }
+
+func (k Keeper) Search(ctx sdk.Context, store sdk.KVStore, UUID string, searchPrefix string, page, limit uint, direction string, owner sdk.AccAddress) types.QueryResultKeyValues {
+	prefix := UUID + "\x00" + searchPrefix
+	var iterator sdk.Iterator
+
+	if direction == "desc" {
+		// TODO: change this to be sdk instead of cosmosTypes after cosmos-sdk is fixed
+		iterator = cosmosTypes.KVStoreReversePrefixIteratorPaginated(store, []byte(prefix), page, limit)
+	} else {
+		iterator = sdk.KVStorePrefixIteratorPaginated(store, []byte(prefix), page, limit)
+	}
+	defer iterator.Close()
+
+	keyValues := types.QueryResultKeyValues{UUID: UUID, KeyValues: make([]types.KeyValue, 0)}
+
+	keyValuesSize := uint64(0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		var bz = store.Get(iterator.Key())
+		var value types.BLZValue
+		k.cdc.MustUnmarshalBinaryBare(bz, &value)
+
+		if owner == nil || value.Owner.Equals(owner) {
+			key := string(iterator.Key())[len(UUID) + 1:]
+			keyValuesSize = keyValuesSize + uint64(len(key)) + uint64(len(value.Value))
+
+			if ctx.GasMeter().IsPastLimit() {
+				return types.QueryResultKeyValues{UUID: UUID, KeyValues: make([]types.KeyValue, 0)}
+			}
+
+			if keyValuesSize < k.mks.MaxKeyValuesSize {
+				keyValues.KeyValues = append(keyValues.KeyValues, types.KeyValue{
+					Key:   key,
+					Value: value.Value,
+				})
+			} else {
+				return keyValues
+			}
+		}
+	}
+	return keyValues
+}
+
 
 func (k Keeper) GetKeyValues(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultKeyValues {
 	prefix := UUID + "\x00"
