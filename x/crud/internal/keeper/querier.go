@@ -27,6 +27,7 @@ const (
 	QueryRead               = "read"
 	QueryHas                = "has"
 	QueryKeys               = "keys"
+	QuerySearch             = "search"
 	QueryKeyValues          = "keyvalues"
 	QueryCount              = "count"
 	QueryGetLease           = "getlease"
@@ -45,6 +46,8 @@ func NewQuerier(keeper IKeeper) sdk.Querier {
 			return queryHas(ctx, path[1:], req, keeper, keeper.GetCdc())
 		case QueryKeys:
 			return queryKeys(ctx, path[1:], req, keeper, keeper.GetCdc())
+		case QuerySearch:
+			return querySearch(ctx, path[1:], req, keeper, keeper.GetCdc())
 		case QueryKeyValues:
 			return queryKeyValues(ctx, path[1:], req, keeper, keeper.GetCdc())
 		case QueryCount:
@@ -103,6 +106,18 @@ func queryHas(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeepe
 
 func queryKeys(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, error) {
 	res, err := codec.MarshalJSONIndent(cdc, keeper.GetKeys(ctx, keeper.GetKVStore(ctx), path[0], nil))
+	if err != nil {
+		panic("could not marshal result to JSON")
+	}
+
+	return res, nil
+}
+
+func querySearch(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, error) {
+	page, _  :=  strconv.ParseUint(path[2], 10, 64)
+	limit, _ := strconv.ParseUint(path[3], 10, 64)
+
+	res, err := codec.MarshalJSONIndent(cdc, keeper.Search(ctx, keeper.GetKVStore(ctx), path[0], path[1], uint(page), uint(limit), path[4], nil))
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}

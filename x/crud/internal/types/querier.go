@@ -56,6 +56,11 @@ type QueryResultKeyValues struct {
 	KeyValues []KeyValue `json:"keyvalues"`
 }
 
+type QueryResultSearch struct {
+	UUID      string     `json:"uuid"`
+	KeyValues []KeyValue `json:"keyvalues"`
+}
+
 type QueryResultCount struct {
 	UUID  string `json:"uuid"`
 	Count uint64 `json:"count,string"`
