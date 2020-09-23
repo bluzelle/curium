@@ -31,7 +31,9 @@ const DefaultLeaseBlockHeight = int64(10 * 86400 / 5) // (10 days of blocks * se
 
 func initTest(t *testing.T) (*gomock.Controller, *mocks.MockIKeeper, sdk.Context, []byte) {
 	mockCtrl := gomock.NewController(t)
-	return mockCtrl, mocks.NewMockIKeeper(mockCtrl), sdk.Context{}, []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
+	ctx := sdk.Context{}
+	ctx = ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
+	return mockCtrl, mocks.NewMockIKeeper(mockCtrl), ctx, []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
 }
 
 type BadMsg struct {

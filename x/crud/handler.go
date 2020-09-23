@@ -396,7 +396,8 @@ func updateLease(ctx sdk.Context, keeper keeper.IKeeper, UUID string, key string
 	// charge for lease if applicable
 	if lease > blzValue.Lease {
 		// TODO: Verify this math
-		gasRate := LeaseGasRate(lease) - LeaseGasRate(blzValue.Lease)
+		gasRate := LeaseGasRate(lease - blzValue.Lease)
+//		gasRate := LeaseGasRate(lease) - LeaseGasRate(blzValue.Lease)
 		valueSize := float64(len(UUID) + len(key) + len(blzValue.Value))
 		ctx.GasMeter().ConsumeGas(uint64(gasRate*valueSize), "lease")
 	}
