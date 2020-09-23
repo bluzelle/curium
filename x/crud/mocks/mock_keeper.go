@@ -20,10 +20,25 @@ type MockIKeeper struct {
 	recorder *MockIKeeperMockRecorder
 }
 
+
 // MockIKeeperMockRecorder is the mock recorder for MockIKeeper
 type MockIKeeperMockRecorder struct {
 	mock *MockIKeeper
 }
+
+func (m *MockIKeeper) Search(arg0 types1.Context, arg1 types1.KVStore, arg2 string, arg3 string, arg4, arg5 uint, arg6 string, arg7 types1.AccAddress) types.QueryResultKeyValues {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Search", arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+	return types.QueryResultKeyValues{}
+}
+
+
+// Search indicates an expected call of Search
+func (mr *MockIKeeperMockRecorder) Search(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Search", reflect.TypeOf((*MockIKeeper)(nil).Search), arg0, arg1, arg2, arg3)
+}
+
 
 // NewMockIKeeper creates a new mock instance
 func NewMockIKeeper(ctrl *gomock.Controller) *MockIKeeper {
