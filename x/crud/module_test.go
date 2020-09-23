@@ -75,10 +75,10 @@ func TestAppModuleBasic_GetQueryCmd_CrudQueries(t *testing.T) {
 	command := AppModuleBasic{}.GetQueryCmd(&cdc)
 
 	commands := command.Commands()
-	assert.Len(t, command.Commands(), 7)
+	assert.Len(t, command.Commands(), 9)
 
-	expectedUses := [...]string{"count [UUID]", "getlease [UUID] [key]", "getnshortestleases [UUID] [N]", "has [UUID] [key]", "keys [UUID]", "keyvalues [UUID]", "read [UUID] [key]"}
-	expectedNames := [...]string{"count", "getlease", "getnshortestleases", "has", "keys", "keyvalues", "read"}
+	expectedUses := [...]string{"count [UUID]", "getlease [UUID] [key]", "getnshortestleases [UUID] [N]", "has [UUID] [key]", "keys [UUID]", "keyvalues [UUID]", "owner [UUID] [key]", "read [UUID] [key]", "search [UUID] [prefix] [page] [limit]"}
+	expectedNames := [...]string{"count", "getlease", "getnshortestleases", "has", "keys", "keyvalues", "owner", "read", "search"}
 
 	for i := 0; i < len(command.Commands()); i++ {
 		expectedUse := expectedUses[i]

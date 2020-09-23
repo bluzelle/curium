@@ -24,14 +24,18 @@ import (
 	"github.com/stretchr/testify/assert"
 	"math"
 	"reflect"
+	"strings"
 	"testing"
 )
 
-const DefaultLeaseBlockHeight = int64(10 * 86400 / 5) // (10 days of blocks * seconds/day) / 5
+
+var DefaultLeaseBlockHeight = int64(math.Ceil(10 * 86400 / 5.5)) // (10 days of blocks * seconds/day) / 5
 
 func initTest(t *testing.T) (*gomock.Controller, *mocks.MockIKeeper, sdk.Context, []byte) {
 	mockCtrl := gomock.NewController(t)
-	return mockCtrl, mocks.NewMockIKeeper(mockCtrl), sdk.Context{}, []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
+	ctx := sdk.Context{}
+	ctx = ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
+	return mockCtrl, mocks.NewMockIKeeper(mockCtrl), ctx, []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
 }
 
 type BadMsg struct {
@@ -44,13 +48,19 @@ func (msg BadMsg) GetSignBytes() []byte         { return sdk.MustSortJSON(Module
 func (msg BadMsg) GetSigners() []sdk.AccAddress { return []sdk.AccAddress{} }
 
 func Test_handleMsgCreate(t *testing.T) {
-	mockCtrl, mockKeeper, ctx, owner := initTest(t)
-	defer mockCtrl.Finish()
+	setup := func(t *testing.T) (*gomock.Controller, *mocks.MockIKeeper, sdk.Context, []byte) {
+		mockCtrl, mockKeeper, ctx, owner := initTest(t)
+		defer mockCtrl.Finish()
+		mockKeeper.EXPECT().GetDefaultLeaseBlocks().AnyTimes().Return(DefaultLeaseBlockHeight)
+		// always return nil for a store...
+		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
+		mockKeeper.EXPECT().GetLeaseStore(gomock.Any()).AnyTimes().Return(nil)
 
-	mockKeeper.EXPECT().GetDefaultLeaseBlocks().AnyTimes().Return(DefaultLeaseBlockHeight)
+		return mockCtrl, mockKeeper, ctx, owner
+	}
 
-	// Simple Unit
-	{
+	t.Run("simple unit test", func(t *testing.T) {
+		_, mockKeeper, ctx, owner := setup(t)
 		createMsg := types.MsgCreate{
 			UUID:  "uuid",
 			Key:   "key",
@@ -60,11 +70,6 @@ func Test_handleMsgCreate(t *testing.T) {
 		}
 
 		assert.Equal(t, createMsg.Type(), "create")
-
-		// always return nil for a store...
-		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
-
-		mockKeeper.EXPECT().GetLeaseStore(gomock.Any()).AnyTimes().Return(nil)
 
 		// testing key already exists
 		mockKeeper.EXPECT().GetValue(ctx, nil, createMsg.UUID, createMsg.Key).Return(types.BLZValue{Value: createMsg.Value, Owner: owner})
@@ -83,10 +88,11 @@ func Test_handleMsgCreate(t *testing.T) {
 		// test bad message
 		_, err = NewHandler(mockKeeper)(ctx, BadMsg{})
 		assert.NotNil(t, err)
-	}
+	})
 
-	// Test for empty message parameters
-	{
+	t.Run("should be able to handle empty params", func(t *testing.T) {
+		_, mockKeeper, ctx, _ := setup(t)
+
 		_, err := handleMsgCreate(ctx, mockKeeper, types.MsgCreate{})
 		assert.NotNil(t, err)
 
@@ -95,7 +101,35 @@ func Test_handleMsgCreate(t *testing.T) {
 
 		_, err = handleMsgCreate(ctx, mockKeeper, types.MsgCreate{UUID: "uuid", Key: "key"})
 		assert.NotNil(t, err)
-	}
+	})
+
+	t.Run("should charge gas for the lease time", func(t *testing.T) {
+
+		testCreate := func(leaseDays int64, valueLength int) {
+			value := strings.Repeat("a", valueLength)
+			bytes := len("uuid") + len("key") + len(value)
+
+			_, mockKeeper, ctx, owner := setup(t)
+
+			mockKeeper.EXPECT().GetValue(ctx, nil, "uuid", "key")
+			mockKeeper.EXPECT().SetValue(ctx, nil, "uuid", "key", types.BLZValue{Value: value, Owner: owner, Lease: daysToLease(leaseDays)})
+			mockKeeper.EXPECT().SetLease(nil, "uuid", "key", int64(0), daysToLease(leaseDays))
+
+			handleMsgCreate(ctx, mockKeeper, types.MsgCreate{
+				UUID:  "uuid",
+				Key:   "key",
+				Value: value,
+				Lease: daysToLease(leaseDays),
+				Owner: owner,
+			})
+			assert.Equal(t, ctx.GasMeter().GasConsumed(), CalculateGasForLease(daysToLease(leaseDays), bytes))
+
+		}
+
+		testCreate(10, 1)
+		testCreate(20, 300000)
+
+	})
 }
 
 func Test_handleMsgRead(t *testing.T) {
@@ -819,13 +853,64 @@ func Test_handleMsgGetNShortestLeases(t *testing.T) {
 
 func Test_handleMsgRenewLease(t *testing.T) {
 
-	mockCtrl, mockKeeper, ctx, owner := initTest(t)
-	defer mockCtrl.Finish()
+	setup := func(t *testing.T) (*gomock.Controller, *mocks.MockIKeeper, sdk.Context, []byte) {
+		mockCtrl, mockKeeper, ctx, owner := initTest(t)
+		defer mockCtrl.Finish()
 
-	mockKeeper.EXPECT().GetDefaultLeaseBlocks().AnyTimes().Return(DefaultLeaseBlockHeight)
+		mockKeeper.EXPECT().GetDefaultLeaseBlocks().AnyTimes().Return(DefaultLeaseBlockHeight)
 
-	// renew the lease to the default and update height
-	{
+		// always return nil for a store...
+		ctx = ctx.WithBlockHeight(DefaultLeaseBlockHeight)
+		mockKeeper.EXPECT().GetKVStore(gomock.Any()).AnyTimes().Return(nil)
+		mockKeeper.EXPECT().GetLeaseStore(gomock.Any()).AnyTimes()
+
+		return mockCtrl, mockKeeper, ctx, owner
+	}
+
+	t.Run("Should charge properly for a renew lease if the lease has not quite expired", func(t *testing.T) {
+		_, mockKeeper, ctx, owner := setup(t)
+		nowBlockHeight := daysToLease(40)
+		value := strings.Repeat("a", 30000)
+		bytes := int(len("uuid") + len("key") + len(value))
+
+		ctx = ctx.WithBlockHeight(nowBlockHeight)
+
+		renewMsg := types.MsgRenewLease{
+			UUID:  "uuid",
+			Key:   "key",
+			Lease: daysToLease(20),
+			Owner: owner,
+		}
+
+		mockKeeper.EXPECT().GetOwner(ctx, nil, renewMsg.UUID, renewMsg.Key).Return(owner)
+		mockKeeper.EXPECT().SetLease(gomock.Any(), renewMsg.UUID, renewMsg.Key, nowBlockHeight, daysToLease(20))
+		mockKeeper.EXPECT().GetValue(ctx, nil, renewMsg.UUID, renewMsg.Key).Return(types.BLZValue{
+			Value:  value,
+			Lease:  daysToLease(20),
+			Owner:  owner,
+			Height: nowBlockHeight - daysToLease(10),
+		})
+		mockKeeper.EXPECT().DeleteLease(nil, renewMsg.UUID, renewMsg.Key, nowBlockHeight-daysToLease(10), daysToLease(20))
+		mockKeeper.EXPECT().SetValue(ctx, nil, renewMsg.UUID, renewMsg.Key, types.BLZValue{
+			Value:  value,
+			Lease:  daysToLease(20),
+			Owner:  owner,
+			Height: nowBlockHeight,
+		})
+
+		NewHandler(mockKeeper)(ctx, renewMsg)
+
+		assert.InDelta(t,
+			CalculateGasForLease(daysToLease(20), bytes) -
+			CalculateGasForLease(daysToLease(20), bytes) / 2,
+			ctx.GasMeter().GasConsumed(),
+			17,
+		)
+	})
+
+	t.Run("Should handle renewLease", func(t *testing.T) {
+		_, mockKeeper, ctx, owner := setup(t)
+
 		renewMsg := types.MsgRenewLease{
 			UUID:  "uuid",
 			Key:   "key",
@@ -833,42 +918,62 @@ func Test_handleMsgRenewLease(t *testing.T) {
 			Owner: owner,
 		}
 
-		// always return nil for a store...
-		ctx := ctx.WithBlockHeight(1100)
-		mockKeeper.EXPECT().GetKVStore(gomock.Any()).AnyTimes().Return(nil)
-		mockKeeper.EXPECT().GetLeaseStore(gomock.Any()).AnyTimes()
 		mockKeeper.EXPECT().GetOwner(ctx, nil, renewMsg.UUID, renewMsg.Key).Return(owner)
+		mockKeeper.EXPECT().SetLease(gomock.Any(), renewMsg.UUID, renewMsg.Key, DefaultLeaseBlockHeight, DefaultLeaseBlockHeight)
 		mockKeeper.EXPECT().GetValue(ctx, nil, renewMsg.UUID, renewMsg.Key).Return(types.BLZValue{
 			Value:  "value",
 			Lease:  100,
 			Owner:  owner,
 			Height: 1000,
 		})
-
 		mockKeeper.EXPECT().DeleteLease(nil, renewMsg.UUID, renewMsg.Key, int64(1000), int64(100))
 		mockKeeper.EXPECT().SetValue(ctx, nil, renewMsg.UUID, renewMsg.Key, types.BLZValue{
 			Value:  "value",
-			Lease:  DefaultLeaseBlockHeight,
+			Lease:  daysToLease(10),
 			Owner:  owner,
-			Height: 1100,
+			Height: DefaultLeaseBlockHeight,
 		})
 
-		mockKeeper.EXPECT().SetLease(gomock.Any(), renewMsg.UUID, renewMsg.Key, int64(1100), DefaultLeaseBlockHeight)
 		_, err := NewHandler(mockKeeper)(ctx, renewMsg)
 		assert.Nil(t, err)
+	})
 
-		renewMsg.Owner = []byte("BADOWNER1t0helpusuldf6h4wqrnnpyp9wr6law2u5jwa23")
-		mockKeeper.EXPECT().GetOwner(ctx, nil, renewMsg.UUID, renewMsg.Key).Return(owner)
-		_, err = NewHandler(mockKeeper)(ctx, renewMsg)
-		assert.NotNil(t, err)
+	t.Run("Should return key does not exist if key not found", func(t *testing.T) {
+		_, mockKeeper, ctx, owner := setup(t)
+
+		renewMsg := types.MsgRenewLease{
+			UUID:  "uuid",
+			Key:   "key",
+			Lease: 0,
+			Owner: owner,
+		}
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, renewMsg.UUID, renewMsg.Key)
-		_, err = NewHandler(mockKeeper)(ctx, renewMsg)
+		_, err := NewHandler(mockKeeper)(ctx, renewMsg)
 		assert.NotNil(t, err)
-	}
+		errMsg := reflect.ValueOf(err).Elem().FieldByName("msg")
+		assert.Equal(t, errMsg.String(), "Key does not exist")
+	})
 
-	// Test for empty message parameters
-	{
+	t.Run("Should return error if provided bad owner", func(t *testing.T) {
+		_, mockKeeper, ctx, owner := setup(t)
+
+		renewMsg := types.MsgRenewLease{
+			UUID:  "uuid",
+			Key:   "key",
+			Lease: 0,
+			Owner: owner,
+		}
+
+		badOwner := []byte("BADOWNER1t0helpusuldf6h4wqrnnpyp9wr6law2u5jwa23")
+		mockKeeper.EXPECT().GetOwner(ctx, nil, renewMsg.UUID, renewMsg.Key).Return(badOwner)
+		_, err := NewHandler(mockKeeper)(ctx, renewMsg)
+		assert.NotNil(t, err)
+	})
+
+	t.Run("renewlease should allow empty params", func(t *testing.T) {
+		_, mockKeeper, ctx, _ := setup(t)
+
 		_, err := handleMsgRenewLease(ctx, mockKeeper, types.MsgRenewLease{})
 		assert.NotNil(t, err)
 
@@ -877,7 +982,7 @@ func Test_handleMsgRenewLease(t *testing.T) {
 
 		_, err = handleMsgRenewLease(ctx, mockKeeper, types.MsgRenewLease{UUID: "uuid", Key: "key"})
 		assert.NotNil(t, err)
-	}
+	})
 }
 
 func Test_handleMsgRenewLeaseAll(t *testing.T) {
@@ -954,21 +1059,4 @@ func Test_handleMsgRenewLeaseAll(t *testing.T) {
 		_, err = handleMsgRenewLeaseAll(ctx, mockKeeper, types.MsgRenewLeaseAll{UUID: "uuid", Lease: 0})
 		assert.NotNil(t, err)
 	}
-}
-
-func TestLeaseGasRate(t *testing.T) {
-	DEFAULT_BLOCKS := int64(10 * 24 * 60 * 60 / 5)
-	var expected map[int64]float64
-	expected = make(map[int64]float64)
-	expected[0] = 30.0
-	expected[DEFAULT_BLOCKS/5] = 29.0
-	expected[3.0*DEFAULT_BLOCKS/5.0] = 20.0
-	expected[DEFAULT_BLOCKS] = 10.0 + 1.0
-	expected[20.0*DEFAULT_BLOCKS] = 10.0
-
-	totalError := 0.0
-	for blocks, leaseRate := range expected {
-		totalError += math.Abs(leaseRate-LeaseGasRate(blocks)) / leaseRate
-	}
-	assert.True(t, totalError < 0.1)
 }

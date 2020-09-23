@@ -48,7 +48,7 @@ const (
 	crudModuleEntry         = "bluzelle_crud"
 	maxKeysSize             = uint64(102400)
 	maxKeyValuesSize        = uint64(102400)
-	DefaultLeaseBlockHeight = int64(10 * 86400 / 5) // (10 days of blocks * seconds/day) / 5
+	DefaultLeaseBlockHeight = int64(float64(10 * 86400 / 5.5)) // (10 days of blocks * seconds/day) / seconds per block
 )
 
 var (
