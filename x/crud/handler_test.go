@@ -16,7 +16,6 @@ package crud
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/bluzelle/curium/x/crud/internal/types"
 	"github.com/bluzelle/curium/x/crud/mocks"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -24,8 +23,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"reflect"
-	"strconv"
-	"strings"
 	"testing"
 )
 
