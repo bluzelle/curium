@@ -3,26 +3,24 @@ package crud
 import "math"
 
 const (
-	LeaseGasRateDefaultValue float64 = 10.0
-	LeaseGasRateMaximumValue float64 = 30.0
+	LeaseGasRateDefaultValue float64 = .0002
+	LeaseGasRateMaximumValue float64 = .0006
 	LeaseGasRateParamB       float64 = 2.5
-	LeaseGasRateParamC       float64 = 30
-	LeaseGasRateParamG       float64 = 3.8925
-	Scaler					 float64 = .01
+	LeaseGasRateParamC       float64 = 75
+	LeaseGasRateParamG       float64 = 3
 )
 
 
-func CalculateGasForLease(prevLease int64, lease int64, UUID string, key string, value string) uint64 {
-	if lease > prevLease {
-		leaseDays := leaseTimeInDays(lease - prevLease)
+func CalculateGasForLease(prevLease int64, lease int64, prevBytes int, bytes int) uint64 {
+	if lease > prevLease && bytes > prevBytes {
+		leaseDays := LeaseInDays(lease - prevLease)
 		gasRate := LeaseGasRate(leaseDays)
-		dataSize := len(UUID) + len(key) + len(value)
-		return uint64(gasRate * float64(leaseDays) * float64(dataSize) * Scaler)
+		return uint64(math.Max(1, gasRate * float64(leaseDays) * float64(bytes - prevBytes)))
 	}
 	return 0
 }
 
-func leaseTimeInDays(lease int64) int64 {
+func LeaseInDays(lease int64) int64 {
 	return int64(math.Ceil((float64(lease) / 24 / 60 / 60) * 5))
 }
 

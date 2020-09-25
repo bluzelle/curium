@@ -23,6 +23,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -50,7 +51,7 @@ func Test_handleMsgCreate(t *testing.T) {
 
 	mockKeeper.EXPECT().GetDefaultLeaseBlocks().AnyTimes().Return(DefaultLeaseBlockHeight)
 
-	// Simple Unit
+	//Simple Unit
 	{
 		createMsg := types.MsgCreate{
 			UUID:  "uuid",
@@ -96,6 +97,22 @@ func Test_handleMsgCreate(t *testing.T) {
 
 		_, err = handleMsgCreate(ctx, mockKeeper, types.MsgCreate{UUID: "uuid", Key: "key"})
 		assert.NotNil(t, err)
+	}
+
+	{
+		v := strings.Repeat("a", 5000)
+		mockKeeper.EXPECT().GetValue(ctx, nil, "uuid", "key")
+		mockKeeper.EXPECT().SetValue(ctx, nil, "uuid", "key", types.BLZValue{Value: v, Owner: owner, Lease:  LeaseInDays(116)})
+		mockKeeper.EXPECT().SetLease(nil, "uuid", "key", int64(0), int64(1))
+		handleMsgCreate(ctx, mockKeeper, types.MsgCreate{
+			UUID:  "uuid",
+			Key:   "key",
+			Value: v,
+			Lease: LeaseInDays(116),
+			Owner: owner,
+		})
+
+		assert.Equal(t, ctx.GasMeter().GasConsumed(), uint64(4))
 	}
 }
 
@@ -956,5 +973,3 @@ func Test_handleMsgRenewLeaseAll(t *testing.T) {
 		assert.NotNil(t, err)
 	}
 }
-
-

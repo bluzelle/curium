@@ -194,6 +194,8 @@ github.com/google/gofuzz v0.0.0-20170612174753-24818f796faf h1:+RRA9JqSOZFfKrOeq
 github.com/google/gofuzz v0.0.0-20170612174753-24818f796faf/go.mod h1:HP5RmnzzSNb993RKQDq4+1A4ia9nllfqcQFTQJedwGI=
 github.com/google/gofuzz v1.0.0 h1:A8PeW59pxE9IoFRqBp37U+mSNaQoZ46F1f0f863XSXw=
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
+github.com/google/gxui v0.0.0-20151028112939-f85e0a97b3a4 h1:OL2d27ueTKnlQJoqLW2fc9pWYulFnJYLWzomGV7HqZo=
+github.com/google/gxui v0.0.0-20151028112939-f85e0a97b3a4/go.mod h1:Pw1H1OjSNHiqeuxAduB1BKYXIwFtsyrY47nEqSgEiCM=
 github.com/google/renameio v0.1.0/go.mod h1:KWCgfxg9yswjAJkECMjeO8J8rahYeXnNhOm40UhjYkI=
 github.com/google/uuid v1.0.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1 h1:EGx4pi6eqNxGaHF6qqu48+N2wcFQ5qg5FXgOdqsJ5d8=
@@ -507,6 +509,8 @@ github.com/urfave/cli v1.20.0/go.mod h1:70zkFmudgCuE/ngEzBv17Jvp/497gISqfk5gWijb
 github.com/urfave/cli v1.22.1/go.mod h1:Gos4lmkARVdJ6EkW0WaNv/tZAAMe9V7XWyB60NtXRu0=
 github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2/go.mod h1:UETIi67q53MR2AWcXfiuqkDkRtnGDLqkBTpCHuJHxtU=
 github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77/go.mod h1:aYKd//L2LvnjZzWKhF00oedf4jCCReLcmhLdhm1A27Q=
+github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea h1:CyhwejzVGvZ3Q2PSbQ4NRRYn+ZWv5eS1vlaEusT+bAI=
+github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea/go.mod h1:eNr558nEUjP8acGw8FFjTeWvSgU1stO7FAO6eknhHe4=
 github.com/zondax/hid v0.9.0 h1:eiT3P6vNxAEVxXMw66eZUAAnU2zD33JBkfG/EnfAKl8=
 github.com/zondax/hid v0.9.0/go.mod h1:l5wttcP0jwtdLjqjMMWFVEE7d1zO0jvSPA9OPZxWpEM=
 go.etcd.io/bbolt v1.3.2/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
