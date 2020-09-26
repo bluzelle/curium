@@ -6,24 +6,24 @@ import (
 )
 
 func daysToLease(days int64) int64 {
-	return (days * 24 * 60 * 60) / 5
+	return days * (24 * 60 * 60 / 5)
 }
 
 
 func TestLeaseGasRate(t *testing.T) {
-	assert.Equal(t, LeaseGasRate(0), 0.0006)
-	assert.Equal(t, LeaseGasRate(1), 0.0005999753673998382)
-	assert.Equal(t, LeaseGasRate(10), 0.0005923102202225553)
-	assert.Equal(t, LeaseGasRate(128), 0.00020360528150588527)
+	assert.Equal(t, LeaseGasRate(0), 3.0)
+	assert.Equal(t, LeaseGasRate(1), 2.999876836999191)
+	assert.Equal(t, LeaseGasRate(10), 2.961551101112777)
+	assert.Equal(t, LeaseGasRate(120), 1.0262720621151311)
 }
 
 func TestCalculateGasForLease(t *testing.T) {
 
 	// Check that the gas is the right amount
-	assert.Equal(t, CalculateGasForLease(0, daysToLease(1), 0, 20), uint64(1) )
-	assert.Equal(t, CalculateGasForLease(0, 20000, 0, 20), uint64(1) )
-	assert.Equal(t, CalculateGasForLease(0, daysToLease(1), 0, 1000 * 1000 * 1000), uint64(599975) )
-	assert.Equal(t, CalculateGasForLease(0, daysToLease(77), 0, 1000 * 1000 * 1000), uint64(18882534) )
+	assert.Equal(t, CalculateGasForLease(0, daysToLease(1), 0, 20), uint64(60) )
+	assert.Equal(t, CalculateGasForLease(0, 20000, 0, 20), uint64(120) )
+	assert.Equal(t, CalculateGasForLease(0, daysToLease(1), 0, 1000 * 1000 * 1000), uint64(2999876837) )
+	assert.Equal(t, CalculateGasForLease(0, daysToLease(77), 0, 1000 * 1000 * 1000), uint64(94412671082) )
 
 	// Should subtract the previous lease time when calculating the gas
 	gas := CalculateGasForLease(0, 100, 0, 1000)

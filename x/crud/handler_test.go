@@ -99,21 +99,21 @@ func Test_handleMsgCreate(t *testing.T) {
 		assert.NotNil(t, err)
 	}
 
-	{
+	t.Run("should charge gas for the lease time", func(t *testing.T) {
 		v := strings.Repeat("a", 5000)
 		mockKeeper.EXPECT().GetValue(ctx, nil, "uuid", "key")
-		mockKeeper.EXPECT().SetValue(ctx, nil, "uuid", "key", types.BLZValue{Value: v, Owner: owner, Lease:  LeaseInDays(116)})
-		mockKeeper.EXPECT().SetLease(nil, "uuid", "key", int64(0), int64(1))
+		mockKeeper.EXPECT().SetValue(ctx, nil, "uuid", "key", types.BLZValue{Value: v, Owner: owner, Lease:  daysToLease(116)})
+		mockKeeper.EXPECT().SetLease(nil, "uuid", "key", int64(0), int64(2004480))
 		handleMsgCreate(ctx, mockKeeper, types.MsgCreate{
 			UUID:  "uuid",
 			Key:   "key",
 			Value: v,
-			Lease: LeaseInDays(116),
+			Lease: daysToLease(116),
 			Owner: owner,
 		})
 
-		assert.Equal(t, ctx.GasMeter().GasConsumed(), uint64(4))
-	}
+		assert.Equal(t, ctx.GasMeter().GasConsumed(), uint64(599662))
+	})
 }
 
 func Test_handleMsgRead(t *testing.T) {

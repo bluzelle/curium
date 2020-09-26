@@ -3,8 +3,8 @@ package crud
 import "math"
 
 const (
-	LeaseGasRateDefaultValue float64 = .0002
-	LeaseGasRateMaximumValue float64 = .0006
+	LeaseGasRateDefaultValue float64 = 1
+	LeaseGasRateMaximumValue float64 = 3
 	LeaseGasRateParamB       float64 = 2.5
 	LeaseGasRateParamC       float64 = 75
 	LeaseGasRateParamG       float64 = 3
@@ -15,7 +15,7 @@ func CalculateGasForLease(prevLease int64, lease int64, prevBytes int, bytes int
 	if lease > prevLease && bytes > prevBytes {
 		leaseDays := LeaseInDays(lease - prevLease)
 		gasRate := LeaseGasRate(leaseDays)
-		return uint64(math.Max(1, gasRate * float64(leaseDays) * float64(bytes - prevBytes)))
+		return uint64(math.Round(gasRate * float64(leaseDays) * float64(bytes - prevBytes)))
 	}
 	return 0
 }
