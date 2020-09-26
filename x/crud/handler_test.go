@@ -51,6 +51,7 @@ func Test_handleMsgCreate(t *testing.T) {
 
 	mockKeeper.EXPECT().GetDefaultLeaseBlocks().AnyTimes().Return(DefaultLeaseBlockHeight)
 
+
 	t.Run("simple unit test", func(t *testing.T) {
 
 		createMsg := types.MsgCreate{
