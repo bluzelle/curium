@@ -51,8 +51,8 @@ func Test_handleMsgCreate(t *testing.T) {
 
 	mockKeeper.EXPECT().GetDefaultLeaseBlocks().AnyTimes().Return(DefaultLeaseBlockHeight)
 
-	//Simple Unit
-	{
+	t.Run("simple unit test", func(t *testing.T) {
+
 		createMsg := types.MsgCreate{
 			UUID:  "uuid",
 			Key:   "key",
@@ -85,10 +85,9 @@ func Test_handleMsgCreate(t *testing.T) {
 		// test bad message
 		_, err = NewHandler(mockKeeper)(ctx, BadMsg{})
 		assert.NotNil(t, err)
-	}
+	})
 
-	// Test for empty message parameters
-	{
+	t.Run("should be able to handle empty params", func(t *testing.T) {
 		_, err := handleMsgCreate(ctx, mockKeeper, types.MsgCreate{})
 		assert.NotNil(t, err)
 
@@ -97,12 +96,12 @@ func Test_handleMsgCreate(t *testing.T) {
 
 		_, err = handleMsgCreate(ctx, mockKeeper, types.MsgCreate{UUID: "uuid", Key: "key"})
 		assert.NotNil(t, err)
-	}
+	})
 
 	t.Run("should charge gas for the lease time", func(t *testing.T) {
 		v := strings.Repeat("a", 5000)
 		mockKeeper.EXPECT().GetValue(ctx, nil, "uuid", "key")
-		mockKeeper.EXPECT().SetValue(ctx, nil, "uuid", "key", types.BLZValue{Value: v, Owner: owner, Lease:  daysToLease(116)})
+		mockKeeper.EXPECT().SetValue(ctx, nil, "uuid", "key", types.BLZValue{Value: v, Owner: owner, Lease: daysToLease(116)})
 		mockKeeper.EXPECT().SetLease(nil, "uuid", "key", int64(0), int64(2004480))
 		handleMsgCreate(ctx, mockKeeper, types.MsgCreate{
 			UUID:  "uuid",
