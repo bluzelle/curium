@@ -88,7 +88,7 @@ func handleMsgCreate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgCreate
 	keeper.SetLease(keeper.GetLeaseStore(leaseCtx), msg.UUID, msg.Key, ctx.BlockHeight(), msg.Lease)
 
 	// charge for lease
-	gasForLease := CalculateGasForLease(0, msg.Lease, 0, len(msg.UUID) + len(msg.Key) + len(msg.Value))
+	gasForLease := CalculateGasForLease( msg.Lease, len(msg.UUID) + len(msg.Key) + len(msg.Value))
 	ctx.GasMeter().ConsumeGas(gasForLease, "lease")
 
 	return &sdk.Result{}, nil
@@ -146,7 +146,7 @@ func handleMsgUpdate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgUpdate
 		keeper.DeleteLease(keeper.GetLeaseStore(leaseCtx), msg.UUID, msg.Key, oldBlzValue.Height, oldBlzValue.Lease)
 		keeper.SetLease(keeper.GetLeaseStore(leaseCtx), msg.UUID, msg.Key, oldBlzValue.Height, newLease)
 
-		gasForLease := CalculateGasForLease(oldBlzValue.Lease, msg.Lease, len(msg.UUID) + len(msg.Key) + len(oldBlzValue.Value), len(msg.UUID) + len(msg.Key) + len(msg.Value))
+		gasForLease := CalculateGasForLease(msg.Lease, len(msg.UUID) + len(msg.Key) + len(msg.Value)) - CalculateGasForLease(oldBlzValue.Lease, len(msg.UUID) + len(msg.Key) + len(oldBlzValue.Value))
 		ctx.GasMeter().ConsumeGas(gasForLease, "lease")
 	} else {
 		keeper.SetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key, types.BLZValue{Value: msg.Value, Lease: oldBlzValue.Lease,
@@ -375,7 +375,7 @@ func updateLease(ctx sdk.Context, keeper keeper.IKeeper, UUID string, key string
 	leaseCtx := ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 	keeper.DeleteLease(keeper.GetLeaseStore(leaseCtx), UUID, key, blzValue.Height, blzValue.Lease)
 
-	gasForLease := CalculateGasForLease(blzValue.Lease, lease, 0, len(UUID) + len(key) + len(blzValue.Value))
+	gasForLease := CalculateGasForLease(lease, len(UUID) + len(key) + len(blzValue.Value)) - CalculateGasForLease(blzValue.Lease, len(UUID) + len(key) + len(blzValue.Value))
 	ctx.GasMeter().ConsumeGas(gasForLease, "lease")
 
 	blzValue.Height = ctx.BlockHeight()
