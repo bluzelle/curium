@@ -861,7 +861,7 @@ func Test_handleMsgRenewLease(t *testing.T) {
 		mockKeeper.EXPECT().GetDefaultLeaseBlocks().AnyTimes().Return(DefaultLeaseBlockHeight)
 
 		// always return nil for a store...
-		ctx = ctx.WithBlockHeight(1100)
+		ctx = ctx.WithBlockHeight(DefaultLeaseBlockHeight)
 		mockKeeper.EXPECT().GetKVStore(gomock.Any()).AnyTimes().Return(nil)
 		mockKeeper.EXPECT().GetLeaseStore(gomock.Any()).AnyTimes()
 
@@ -869,6 +869,43 @@ func Test_handleMsgRenewLease(t *testing.T) {
 	}
 
 
+	t.Run("Should charge properly for a renew lease if the lease has not quite expired", func(t *testing.T) {
+		_, mockKeeper, ctx, owner := setup(t)
+		nowBlockHeight := daysToLease(40)
+		value := strings.Repeat("a", 30000)
+		bytes := int(len("uuid") + len("key") + len(value))
+
+
+		ctx = ctx.WithBlockHeight(nowBlockHeight)
+
+		renewMsg := types.MsgRenewLease{
+			UUID:  "uuid",
+			Key:   "key",
+			Lease: daysToLease(20),
+			Owner: owner,
+		}
+
+		mockKeeper.EXPECT().GetOwner(ctx, nil, renewMsg.UUID, renewMsg.Key).Return(owner)
+		mockKeeper.EXPECT().SetLease(gomock.Any(), renewMsg.UUID, renewMsg.Key, nowBlockHeight, daysToLease(20))
+		mockKeeper.EXPECT().GetValue(ctx, nil, renewMsg.UUID, renewMsg.Key).Return(types.BLZValue{
+			Value:  value,
+			Lease:  daysToLease(20),
+			Owner:  owner,
+			Height: nowBlockHeight - daysToLease(10),
+		})
+		mockKeeper.EXPECT().DeleteLease(nil, renewMsg.UUID, renewMsg.Key, nowBlockHeight - daysToLease(10), daysToLease(20))
+		mockKeeper.EXPECT().SetValue(ctx, nil, renewMsg.UUID, renewMsg.Key, types.BLZValue{
+			Value:  value,
+			Lease:  daysToLease(20),
+			Owner:  owner,
+			Height: nowBlockHeight,
+		})
+
+
+		NewHandler(mockKeeper)(ctx, renewMsg)
+
+		assert.Equal(t, ctx.GasMeter().GasConsumed(), CalculateGasForLease(daysToLease(10), bytes))
+	})
 
 	t.Run("Should handle renewLease", func(t *testing.T) {
 		_, mockKeeper, ctx, owner := setup(t)
@@ -881,7 +918,7 @@ func Test_handleMsgRenewLease(t *testing.T) {
 		}
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, renewMsg.UUID, renewMsg.Key).Return(owner)
-		mockKeeper.EXPECT().SetLease(gomock.Any(), renewMsg.UUID, renewMsg.Key, int64(1100), DefaultLeaseBlockHeight)
+		mockKeeper.EXPECT().SetLease(gomock.Any(), renewMsg.UUID, renewMsg.Key, DefaultLeaseBlockHeight, DefaultLeaseBlockHeight)
 		mockKeeper.EXPECT().GetValue(ctx, nil, renewMsg.UUID, renewMsg.Key).Return(types.BLZValue{
 			Value:  "value",
 			Lease:  100,
@@ -891,9 +928,9 @@ func Test_handleMsgRenewLease(t *testing.T) {
 		mockKeeper.EXPECT().DeleteLease(nil, renewMsg.UUID, renewMsg.Key, int64(1000), int64(100))
 		mockKeeper.EXPECT().SetValue(ctx, nil, renewMsg.UUID, renewMsg.Key, types.BLZValue{
 			Value:  "value",
-			Lease:  DefaultLeaseBlockHeight,
+			Lease:  daysToLease(10),
 			Owner:  owner,
-			Height: 1100,
+			Height: DefaultLeaseBlockHeight,
 		})
 
 
