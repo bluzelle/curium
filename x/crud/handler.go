@@ -370,17 +370,31 @@ func handleMsgRenewLeaseAll(ctx sdk.Context, keeper keeper.IKeeper, msg types.Ms
 func updateLease(ctx sdk.Context, keeper keeper.IKeeper, UUID string, key string, lease int64) {
 	blzValue := keeper.GetValue(ctx, keeper.GetKVStore(ctx), UUID, key)
 
+
 	leaseCtx := ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 	keeper.DeleteLease(keeper.GetLeaseStore(leaseCtx), UUID, key, blzValue.Height, blzValue.Lease)
 
-	unusedOriginalLease := blzValue.Height + blzValue.Lease - ctx.BlockHeight()
-	if unusedOriginalLease < 0 {
-		unusedOriginalLease = 0
+	calculateLeaseRefund := func() uint64 {
+		bytes := len(UUID) + len(key) + len(blzValue.Value)
+		unusedOriginalLease := blzValue.Height + blzValue.Lease - ctx.BlockHeight()
+
+		if unusedOriginalLease <= 0 {
+			return 0
+		}
+
+		percentUnused := float64(unusedOriginalLease) / float64(blzValue.Lease)
+		originalLeaseCost := CalculateGasForLease(blzValue.Lease, bytes)
+		return uint64(float64(originalLeaseCost) * percentUnused)
 	}
 
-	gasForLease := CalculateGasForLease(lease - unusedOriginalLease, len(UUID) + len(key) + len(blzValue.Value))
 
-	ctx.GasMeter().ConsumeGas(gasForLease, "lease")
+	// Charge for lease gas
+    func() {
+		gasForLease := CalculateGasForLease(lease, len(UUID) + len(key) + len(blzValue.Value)) - calculateLeaseRefund()
+		if gasForLease > 0 {
+			ctx.GasMeter().ConsumeGas(gasForLease, "lease")
+		}
+	}()
 
 	blzValue.Height = ctx.BlockHeight()
 	blzValue.Lease = lease
