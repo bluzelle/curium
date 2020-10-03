@@ -360,11 +360,9 @@ func handleMsgRenewLeaseAll(ctx sdk.Context, keeper keeper.IKeeper, msg types.Ms
 		msg.Lease = keeper.GetDefaultLeaseBlocks()
 	}
 
-	fmt.Println(ctx.GasMeter().GasConsumed())
 	for i := range value.Keys[:] {
 		updateLease(ctx, keeper, msg.UUID, value.Keys[i], msg.Lease)
 	}
-	fmt.Println(ctx.GasMeter().GasConsumed())
 
 	return &sdk.Result{}, nil
 }
@@ -375,7 +373,10 @@ func updateLease(ctx sdk.Context, keeper keeper.IKeeper, UUID string, key string
 	leaseCtx := ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 	keeper.DeleteLease(keeper.GetLeaseStore(leaseCtx), UUID, key, blzValue.Height, blzValue.Lease)
 
-	gasForLease := CalculateGasForLease(lease, len(UUID) + len(key) + len(blzValue.Value)) - CalculateGasForLease(blzValue.Lease, len(UUID) + len(key) + len(blzValue.Value))
+	newLeaseCalculation := CalculateGasForLease(lease, len(UUID) + len(key) + len(blzValue.Value))
+	oldLeaseCalculation := CalculateGasForLease(blzValue.Lease, len(UUID) + len(key) + len(blzValue.Value))
+
+	gasForLease := newLeaseCalculation - oldLeaseCalculation
 	ctx.GasMeter().ConsumeGas(gasForLease, "lease")
 
 	blzValue.Height = ctx.BlockHeight()

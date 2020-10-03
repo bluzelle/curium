@@ -19,10 +19,23 @@ func TestLeaseGasRate(t *testing.T) {
 
 func TestCalculateGasForLease(t *testing.T) {
 
-	// Check that the gas is the right amount
-	assert.Equal(t, CalculateGasForLease(daysToLease(1), 20), uint64(60) )
-	assert.Equal(t, CalculateGasForLease( 20000, 20), uint64(120) )
-	assert.Equal(t, CalculateGasForLease( daysToLease(1),  1000 * 1000 * 1000), uint64(2999876837) )
-	assert.Equal(t, CalculateGasForLease(daysToLease(77), 1000 * 1000 * 1000), uint64(94412671082) )
+	t.Run("Smaller amounts should default to 200000 bytes", func(t *testing.T) {
+		assert.Equal(t, CalculateGasForLease(daysToLease(1), 20), uint64(599975))
+		assert.Equal(t, CalculateGasForLease(daysToLease(1), 150000), uint64(599975))
+
+		defaultBytesGas := CalculateGasForLease(daysToLease(100), 200000)
+		assert.Equal(t, CalculateGasForLease(daysToLease(100), 100), defaultBytesGas)
+	})
+
+
+	t.Run("Larger data should calculate the correct gas", func(t *testing.T) {
+		assert.Equal(t, CalculateGasForLease( daysToLease(1),  1000 * 1000 * 1000), uint64(2999876837) )
+		assert.Equal(t, CalculateGasForLease(daysToLease(77), 1000 * 1000 * 1000), uint64(94412671082) )
+	})
+
+	t.Run("Larger number of days should calculate correct gas", func(t *testing.T) {
+		assert.Equal(t, CalculateGasForLease(daysToLease(50), 1), uint64(17900418))
+		assert.Equal(t, CalculateGasForLease(daysToLease(50), 1000000000), uint64(89502092347))
+	})
 }
 
