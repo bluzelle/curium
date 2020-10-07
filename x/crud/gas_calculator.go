@@ -17,7 +17,7 @@ func CalculateGasForLease(lease int64, bytes int) uint64 {
 }
 
 func LeaseInDays(lease int64) float64 {
-	return math.Ceil((float64(lease) / 24 / 60 / 60) * 5)
+	return (float64(lease) / 24 / 60 / 60) * 5.5
 }
 
 func LeaseGasRate(days float64) float64 {

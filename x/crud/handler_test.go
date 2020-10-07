@@ -22,12 +22,14 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"math"
 	"reflect"
 	"strings"
 	"testing"
 )
 
-const DefaultLeaseBlockHeight = int64(10 * 86400 / 5) // (10 days of blocks * seconds/day) / 5
+
+var DefaultLeaseBlockHeight = int64(math.Ceil(10 * 86400 / 5.5)) // (10 days of blocks * seconds/day) / 5
 
 func initTest(t *testing.T) (*gomock.Controller, *mocks.MockIKeeper, sdk.Context, []byte) {
 	mockCtrl := gomock.NewController(t)
@@ -898,10 +900,11 @@ func Test_handleMsgRenewLease(t *testing.T) {
 
 		NewHandler(mockKeeper)(ctx, renewMsg)
 
-		assert.Equal(t,
-			ctx.GasMeter().GasConsumed(),
+		assert.InDelta(t,
 			CalculateGasForLease(daysToLease(20), bytes) -
 			CalculateGasForLease(daysToLease(20), bytes) / 2,
+			ctx.GasMeter().GasConsumed(),
+			17,
 		)
 	})
 
