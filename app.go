@@ -40,15 +40,16 @@ import (
 	tmos "github.com/tendermint/tendermint/libs/os"
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
+	"math"
 	"os"
 	"time"
 )
 
-const (
+var (
 	crudModuleEntry         = "bluzelle_crud"
 	maxKeysSize             = uint64(102400)
 	maxKeyValuesSize        = uint64(102400)
-	DefaultLeaseBlockHeight = int64(float64(10 * 86400 / 5.5)) // (10 days of blocks * seconds/day) / seconds per block
+	DefaultLeaseBlockHeight = int64(math.Floor(10 * 86400 / 5.5)) // (10 days of blocks * seconds/day) / seconds per block
 )
 
 var (
