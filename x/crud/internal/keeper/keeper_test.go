@@ -76,10 +76,11 @@ func TestKeeper_SetValue(t *testing.T) {
 
 	acceptedValue = types.BLZValue{
 		Owner: owner,
+		Value: "",
 	}
 
 	keeper.SetValue(ctx, testStore, "uuid", "key00", acceptedValue)
-	assert.False(t, testStore.Has([]byte(MakeMetaKey("uuid", "key00"))))
+	assert.True(t, testStore.Has([]byte(MakeMetaKey("uuid", "key00"))))
 }
 
 func TestKeeper_GetValue(t *testing.T) {
