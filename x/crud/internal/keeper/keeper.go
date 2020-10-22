@@ -96,10 +96,6 @@ func (k Keeper) GetLeaseStore(ctx sdk.Context) sdk.KVStore {
 }
 
 func (k Keeper) SetValue(_ sdk.Context, store sdk.KVStore, UUID string, key string, value types.BLZValue) {
-	// TODO: Remove this after testing
-	//if len(value.Value) == 0 {
-	//	return
-	//}
 	store.Set([]byte(MakeMetaKey(UUID, key)), k.cdc.MustMarshalBinaryBare(value))
 }
 
