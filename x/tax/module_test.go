@@ -55,15 +55,15 @@ func TestAppModuleBasic_GetQueryCmd(t *testing.T) {
 	}
 }
 
-func TestAppModuleBasic_GetQueryCmd_taxQueries(t *testing.T) {
+func TestAppModuleBasic_GetQueryCmd_TaxQueries(t *testing.T) {
 	cdc := codec.Codec{}
 	command := AppModuleBasic{}.GetQueryCmd(&cdc)
 
 	commands := command.Commands()
 	assert.Len(t, command.Commands(), 7)
 
-	expectedUses := [...]string{"count [UUID]", "getlease [UUID] [key]", "getnshortestleases [UUID] [N]", "has [UUID] [key]", "keys [UUID]", "keyvalues [UUID]", "read [UUID] [key]"}
-	expectedNames := [...]string{"count", "getlease", "getnshortestleases", "has", "keys", "keyvalues", "read"}
+	expectedUses := [...]string{"info"}
+	expectedNames := [...]string{"info"}
 
 	for i := 0; i < len(command.Commands()); i++ {
 		expectedUse := expectedUses[i]
@@ -108,29 +108,12 @@ func TestAppModule_Name(t *testing.T) {
 }
 
 func TestAppModule_Route(t *testing.T) {
-	sut := AppModule{}
-	assert.Equal(t, "tax", sut.Route())
 
-	// When tax disabled, no route is returned
-	{
-		k := Keeper{}
-		var bankkeeper bank.Keeper
-		sut := NewAppModule(true, k, bankkeeper)
-		assert.Equal(t, "", sut.Route())
-	}
 }
 
 func TestAppModule_QuerierRoute(t *testing.T) {
 	sut := AppModule{}
 	assert.Equal(t, "tax", sut.QuerierRoute())
-
-	// When tax disabled, no route is returned
-	{
-		k := Keeper{}
-		var bankkeeper bank.Keeper
-		sut := NewAppModule(true, k, bankkeeper)
-		assert.Equal(t, "", sut.QuerierRoute())
-	}
 }
 
 func TestAppModule_NewQuerierHandler(t *testing.T) {

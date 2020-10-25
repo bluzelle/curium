@@ -40,7 +40,6 @@ func (AppModuleBasic) ValidateGenesis(bz json.RawMessage) error {
 	if err != nil {
 		return err
 	}
-	// Once json successfully marshalled, passes along to genesis.go
 	return ValidateGenesis(data)
 }
 
@@ -94,9 +93,6 @@ func (am AppModule) NewQuerierHandler() sdk.Querier {
 func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
 
 func (am AppModule) EndBlock(sdk.Context, abci.RequestEndBlock) []abci.ValidatorUpdate {
-
-	// this is where we lease the data
-
 	return []abci.ValidatorUpdate{}
 }
 
