@@ -7,7 +7,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -93,16 +92,14 @@ func TestAppModuleBasic_GetTxCmd(t *testing.T) {
 
 func TestNewAppModule(t *testing.T) {
 	k := Keeper{}
-	var bankkeeper bank.Keeper
-	sut := NewAppModule(false, k, bankkeeper)
+	sut := NewAppModule(k)
 
 	assert.Equal(t, "tax", sut.Route())
 }
 
 func TestAppModule_Name(t *testing.T) {
 	k := Keeper{}
-	var bankkeeper bank.Keeper
-	sut := NewAppModule(false, k, bankkeeper)
+	sut := NewAppModule(k)
 
 	assert.Equal(t, "tax", sut.Name())
 }
