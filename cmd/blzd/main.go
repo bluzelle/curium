@@ -40,7 +40,7 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	app "github.com/bluzelle/curium"
+	"github.com/bluzelle/curium/app"
 )
 
 func main() {
