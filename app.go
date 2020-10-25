@@ -16,8 +16,16 @@ package app
 
 import (
 	"encoding/json"
+	"os"
+	"time"
+
+	"math"
+	"os"
+	"time"
+
 	bluzellechain "github.com/bluzelle/curium/types"
 	"github.com/bluzelle/curium/x/crud"
+	"github.com/bluzelle/curium/x/tax"
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -40,11 +48,7 @@ import (
 	tmos "github.com/tendermint/tendermint/libs/os"
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
-	"math"
-	"os"
-	"time"
 )
-
 
 var (
 	crudModuleEntry         = "bluzelle_crud"
@@ -53,6 +57,7 @@ var (
 	DefaultLeaseBlockHeight = int64(math.Floor(10 * 86400 / 5.5)) // (10 days of blocks * seconds/day) / seconds per block
 )
 
+// constants
 var (
 	// default home directories for the application CLI
 	DefaultCLIHome = os.ExpandEnv("$HOME/.blzcli")
@@ -72,6 +77,7 @@ var (
 		slashing.AppModuleBasic{},
 		supply.AppModuleBasic{},
 		crud.AppModuleBasic{},
+		tax.AppModuleBasic{},
 		faucet.AppModuleBasic{},
 	)
 
@@ -127,6 +133,7 @@ type CRUDApp struct {
 	supplyKeeper   supply.Keeper
 	paramsKeeper   params.Keeper
 	crudKeeper     crud.Keeper
+	taxKeeper      tax.Keeper
 	faucetKeeper   faucet.Keeper
 
 	// Module Manager
@@ -254,6 +261,11 @@ func NewCRUDApp(
 		crud.MaxKeeperSizes{MaxKeysSize: maxKeysSize, MaxKeyValuesSize: maxKeyValuesSize, MaxDefaultLeaseBlocks: DefaultLeaseBlockHeight},
 	)
 
+	app.taxKeeper = tax.NewKeeper(
+		keys[tax.StoreKey],
+		app.cdc,
+	)
+
 	app.faucetKeeper = faucet.NewKeeper(
 		app.supplyKeeper,
 		app.stakingKeeper,
@@ -271,6 +283,7 @@ func NewCRUDApp(
 		auth.NewAppModule(app.accountKeeper),
 		bank.NewAppModule(app.bankKeeper, app.accountKeeper),
 		crud.NewAppModule(!bluzelleCrud, app.crudKeeper, app.bankKeeper),
+		tax.NewAppModule(app.taxKeeper),
 		faucet.NewAppModule(app.faucetKeeper), // faucet module
 		supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
 		gov.NewAppModule(app.govKeeper, app.accountKeeper, app.supplyKeeper),
@@ -293,6 +306,7 @@ func NewCRUDApp(
 		slashing.ModuleName,
 		gov.ModuleName,
 		crud.ModuleName,
+		tax.ModuleName,
 		supply.ModuleName,
 		genutil.ModuleName,
 	)
