@@ -19,9 +19,7 @@ func TestAppModuleBasic_Name(t *testing.T) {
 func TestAppModuleBasic_DefaultGenesis(t *testing.T) {
 	genesis := AppModuleBasic{}.DefaultGenesis()
 	assert.NotNil(t, genesis)
-
-	// Note: see tax/genesis.go func DefaultGenesisState() GenesisState
-	assert.Equal(t, string(genesis), "{\"BlzValues\":null}")
+	assert.Equal(t, string(genesis), "")
 }
 
 func TestAppModuleBasic_ValidateGenesis(t *testing.T) {

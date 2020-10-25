@@ -9,11 +9,8 @@ import (
 )
 
 func GetTestAddresses(t *testing.T) []sdk.AccAddress {
-	addr1, err := sdk.AccAddressFromBech32("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
-	True(t, err == nil)
-
-	addr2, err := sdk.AccAddressFromBech32("bluzelle1nnpyp9wr6law2u5jwa23t0ywtmrduldf6h4wqr")
-	True(t, err == nil)
+	addr1 := sdk.AccAddress([]byte("my----------address1"))
+	addr2 := sdk.AccAddress([]byte("my----------address2"))
 	return []sdk.AccAddress{addr1, addr2}
 }
 
