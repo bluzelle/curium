@@ -15,11 +15,12 @@
 package main
 
 import (
-	"github.com/cosmos/cosmos-sdk/client/flags"
 	"os"
 	"path"
 
-	app "github.com/bluzelle/curium"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+
+	"github.com/bluzelle/curium/app"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/client/lcd"
