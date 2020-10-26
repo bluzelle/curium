@@ -156,6 +156,46 @@ func (msg MsgUpdate) GetSigners() []sdk.AccAddress {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Upsert
+type MsgUpsert struct {
+	UUID  string
+	Key   string
+	Value string
+	Lease int64
+	Owner sdk.AccAddress
+}
+
+func (msg MsgUpsert) Route() string { return RouterKey }
+
+func (msg MsgUpsert) Type() string { return "update" }
+
+func (msg MsgUpsert) ValidateBasic() error {
+	if msg.Owner.Empty() {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
+	}
+
+	if len(msg.UUID) == 0 || len(msg.Key) == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID or key Empty")
+	}
+
+	if len(msg.Value) > MaxValueSize {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Value too large")
+	}
+
+	return nil
+}
+
+func (msg MsgUpsert) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
+
+func (msg MsgUpsert) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Owner}
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Delete
 type MsgDelete struct {
 	UUID  string

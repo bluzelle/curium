@@ -23,7 +23,6 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-
 func NewHandler(keeper keeper.IKeeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		switch msg := msg.(type) {
@@ -33,6 +32,8 @@ func NewHandler(keeper keeper.IKeeper) sdk.Handler {
 			return handleMsgRead(ctx, keeper, msg)
 		case types.MsgUpdate:
 			return handleMsgUpdate(ctx, keeper, msg)
+		case types.MsgUpsert:
+			return handleMsgUpsert(ctx, keeper, msg)
 		case types.MsgDelete:
 			return handleMsgDelete(ctx, keeper, msg)
 		case types.MsgKeys:
@@ -88,7 +89,7 @@ func handleMsgCreate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgCreate
 	keeper.SetLease(keeper.GetLeaseStore(leaseCtx), msg.UUID, msg.Key, ctx.BlockHeight(), msg.Lease)
 
 	// charge for lease
-	gasForLease := CalculateGasForLease( msg.Lease, len(msg.UUID) + len(msg.Key) + len(msg.Value))
+	gasForLease := CalculateGasForLease(msg.Lease, len(msg.UUID)+len(msg.Key)+len(msg.Value))
 	ctx.GasMeter().ConsumeGas(gasForLease, "lease")
 
 	return &sdk.Result{}, nil
@@ -113,6 +114,33 @@ func handleMsgRead(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgRead) (*
 	return &sdk.Result{Data: jsonData}, nil
 }
 
+func handleMsgUpsert(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgUpsert) (*sdk.Result, error) {
+	if len(msg.UUID) == 0 || len(msg.Key) == 0 || msg.Owner.Empty() {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
+	}
+
+	owner := keeper.GetOwner(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key)
+	if owner.Empty() {
+		createMsg := types.MsgCreate{
+			UUID:  msg.UUID,
+			Key:   msg.Key,
+			Value: msg.Value,
+			Lease: msg.Lease,
+			Owner: msg.Owner,
+		}
+		return handleMsgCreate(ctx, keeper, createMsg)
+	} else {
+		updateMsg := types.MsgUpdate{
+			UUID:  msg.UUID,
+			Key:   msg.Key,
+			Value: msg.Value,
+			Lease: msg.Lease,
+			Owner: msg.Owner,
+		}
+		return handleMsgUpdate(ctx, keeper, updateMsg)
+	}
+}
+
 func handleMsgUpdate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgUpdate) (*sdk.Result, error) {
 	if len(msg.UUID) == 0 || len(msg.Key) == 0 || msg.Owner.Empty() {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
@@ -128,7 +156,6 @@ func handleMsgUpdate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgUpdate
 	}
 
 	oldBlzValue := keeper.GetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key)
-
 
 	if msg.Lease != 0 { // 0 means no change to lease
 		newLease := oldBlzValue.Lease + msg.Lease
@@ -146,7 +173,7 @@ func handleMsgUpdate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgUpdate
 		keeper.DeleteLease(keeper.GetLeaseStore(leaseCtx), msg.UUID, msg.Key, oldBlzValue.Height, oldBlzValue.Lease)
 		keeper.SetLease(keeper.GetLeaseStore(leaseCtx), msg.UUID, msg.Key, oldBlzValue.Height, newLease)
 
-		gasForLease := CalculateGasForLease(msg.Lease, len(msg.UUID) + len(msg.Key) + len(msg.Value)) - CalculateGasForLease(oldBlzValue.Lease, len(msg.UUID) + len(msg.Key) + len(oldBlzValue.Value))
+		gasForLease := CalculateGasForLease(msg.Lease, len(msg.UUID)+len(msg.Key)+len(msg.Value)) - CalculateGasForLease(oldBlzValue.Lease, len(msg.UUID)+len(msg.Key)+len(oldBlzValue.Value))
 		ctx.GasMeter().ConsumeGas(gasForLease, "lease")
 	} else {
 		keeper.SetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key, types.BLZValue{Value: msg.Value, Lease: oldBlzValue.Lease,
@@ -370,7 +397,6 @@ func handleMsgRenewLeaseAll(ctx sdk.Context, keeper keeper.IKeeper, msg types.Ms
 func updateLease(ctx sdk.Context, keeper keeper.IKeeper, UUID string, key string, lease int64) {
 	blzValue := keeper.GetValue(ctx, keeper.GetKVStore(ctx), UUID, key)
 
-
 	leaseCtx := ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 	keeper.DeleteLease(keeper.GetLeaseStore(leaseCtx), UUID, key, blzValue.Height, blzValue.Lease)
 
@@ -387,11 +413,12 @@ func updateLease(ctx sdk.Context, keeper keeper.IKeeper, UUID string, key string
 		return uint64(float64(originalLeaseCost) * percentUnused)
 	}
 
-
 	// Charge for lease gas
-    func() {
-		gasForLease := CalculateGasForLease(lease, len(UUID) + len(key) + len(blzValue.Value)) - calculateLeaseRefund()
-		if gasForLease > 0 {
+	func() {
+		gasForNewLease := CalculateGasForLease(lease, len(UUID)+len(key)+len(blzValue.Value))
+		gasRefund := calculateLeaseRefund()
+		if gasForNewLease > gasRefund {
+			gasForLease := gasForNewLease - gasRefund
 			ctx.GasMeter().ConsumeGas(gasForLease, "lease")
 		}
 	}()
