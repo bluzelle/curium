@@ -40,4 +40,5 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgRenewLease{}, "crud/renewlease", nil)
 	cdc.RegisterConcrete(MsgRenewLeaseAll{}, "crud/renewleaseall", nil)
 	cdc.RegisterConcrete(MsgUpdate{}, "crud/update", nil)
+	cdc.RegisterConcrete(MsgUpsert{}, "crud/upsert", nil)
 }

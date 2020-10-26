@@ -33,6 +33,8 @@ func NewHandler(keeper keeper.IKeeper) sdk.Handler {
 			return handleMsgRead(ctx, keeper, msg)
 		case types.MsgUpdate:
 			return handleMsgUpdate(ctx, keeper, msg)
+		case types.MsgUpsert:
+			return handleMsgUpsert(ctx, keeper, msg)
 		case types.MsgDelete:
 			return handleMsgDelete(ctx, keeper, msg)
 		case types.MsgKeys:
@@ -111,6 +113,33 @@ func handleMsgRead(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgRead) (*
 	}
 
 	return &sdk.Result{Data: jsonData}, nil
+}
+
+func handleMsgUpsert(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgUpsert) (*sdk.Result, error) {
+	if len(msg.UUID) == 0 || len(msg.Key) == 0 || msg.Owner.Empty() {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
+	}
+
+	owner := keeper.GetOwner(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key)
+	if owner.Empty() {
+		createMsg := types.MsgCreate{
+			UUID:  msg.UUID,
+			Key:   msg.Key,
+			Value: msg.Value,
+			Lease: msg.Lease,
+			Owner: msg.Owner,
+		}
+		return handleMsgCreate(ctx, keeper, createMsg)
+	} else {
+		updateMsg := types.MsgUpdate{
+			UUID:  msg.UUID,
+			Key:   msg.Key,
+			Value: msg.Value,
+			Lease: msg.Lease,
+			Owner: msg.Owner,
+		}
+		return handleMsgUpdate(ctx, keeper, updateMsg)
+	}
 }
 
 func handleMsgUpdate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgUpdate) (*sdk.Result, error) {
