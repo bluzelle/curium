@@ -149,6 +149,49 @@ func BlzUpdateHandler(cliCtx context.CLIContext) http.HandlerFunc {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Upsert
+type upsertReq struct {
+	BaseReq rest.BaseReq
+	UUID    string
+	Key     string
+	Value   string
+	Lease   int64
+	Owner   string
+}
+
+func BlzUpsertHandler(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req upsertReq
+
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
+			return
+		}
+
+		baseReq := req.BaseReq.Sanitize()
+		if !baseReq.ValidateBasic(w) {
+			return
+		}
+
+		addr, err := sdk.AccAddressFromBech32(req.Owner)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		msg := types.MsgUpsert{UUID: req.UUID, Key: req.Key, Value: req.Value, Lease: req.Lease, Owner: addr}
+		err = msg.ValidateBasic()
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		utils.WriteGenerateStdTxResponse(w, cliCtx, baseReq, []sdk.Msg{msg})
+	}
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Delete
 type deleteReq struct {
 	BaseReq rest.BaseReq

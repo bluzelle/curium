@@ -908,6 +908,37 @@ func Test_handleMsgRenewLease(t *testing.T) {
 		)
 	})
 
+	t.Run("Should handle a large reduction in lease renewLease", func(t *testing.T) {
+		_, mockKeeper, ctx, owner := setup(t)
+
+		renewMsg := types.MsgRenewLease{
+			UUID:  "uuid",
+			Key:   "key",
+			Lease: 2,
+			Owner: owner,
+		}
+
+		mockKeeper.EXPECT().GetOwner(ctx, nil, renewMsg.UUID, renewMsg.Key).Return(owner)
+		mockKeeper.EXPECT().SetLease(gomock.Any(), renewMsg.UUID, renewMsg.Key, DefaultLeaseBlockHeight, int64(2))
+		mockKeeper.EXPECT().GetValue(ctx, nil, renewMsg.UUID, renewMsg.Key).Return(types.BLZValue{
+			Value:  "value",
+			Lease:  1818,
+			Owner:  owner,
+			Height: 1000,
+		})
+		mockKeeper.EXPECT().DeleteLease(nil, renewMsg.UUID, renewMsg.Key, int64(1000), int64(1818))
+		mockKeeper.EXPECT().SetValue(ctx, nil, renewMsg.UUID, renewMsg.Key, types.BLZValue{
+			Value:  "value",
+			Lease:  2,
+			Owner:  owner,
+			Height: DefaultLeaseBlockHeight,
+		})
+
+		_, err := NewHandler(mockKeeper)(ctx, renewMsg)
+		assert.Nil(t, err)
+	})
+
+
 	t.Run("Should handle renewLease", func(t *testing.T) {
 		_, mockKeeper, ctx, owner := setup(t)
 
