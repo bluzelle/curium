@@ -10,7 +10,7 @@ import (
 
 type GenesisState struct {
 	Collector  sdk.AccAddress
-	Percentage int
+	Percentage int64
 }
 
 func NewGenesisState() GenesisState {

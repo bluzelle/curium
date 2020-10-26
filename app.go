@@ -26,6 +26,7 @@ import (
 	bluzellechain "github.com/bluzelle/curium/types"
 	"github.com/bluzelle/curium/x/crud"
 	"github.com/bluzelle/curium/x/tax"
+	"github.com/bluzelle/curium/x/tax/ante"
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -321,9 +322,10 @@ func NewCRUDApp(
 
 	// The AnteHandler handles signature verification and transaction pre-processing
 	app.SetAnteHandler(
-		auth.NewAnteHandler(
+		ante.NewAnteHandler(
 			app.accountKeeper,
 			app.supplyKeeper,
+			app.taxKeeper,
 			auth.DefaultSigVerificationGasConsumer,
 		),
 	)

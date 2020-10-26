@@ -10,9 +10,9 @@ import (
 type IKeeper interface {
 	GetCodec() *codec.Codec
 	SetCollector(ctx sdk.Context, collector sdk.AccAddress)
-	SetPercentage(ctx sdk.Context, percentage int)
+	SetPercentage(ctx sdk.Context, percentage int64)
 	GetCollector(ctx sdk.Context) sdk.AccAddress
-	GetPercentage(ctx sdk.Context) int
+	GetPercentage(ctx sdk.Context) int64
 	GetTaxInfo(ctx sdk.Context) types.TaxInfo
 }
 
@@ -62,15 +62,15 @@ func (k Keeper) GetCollector(ctx sdk.Context) sdk.AccAddress {
 }
 
 // SetPercentage set collector
-func (k Keeper) SetPercentage(ctx sdk.Context, percentage int) {
+func (k Keeper) SetPercentage(ctx sdk.Context, percentage int64) {
 	store := k.GetKVStore(ctx)
 	store.Set(KeyCollector, k.cdc.MustMarshalBinaryBare(percentage))
 }
 
 // GetPercentage returns collector
-func (k Keeper) GetPercentage(ctx sdk.Context) int {
+func (k Keeper) GetPercentage(ctx sdk.Context) int64 {
 	store := k.GetKVStore(ctx)
-	var percentage int
+	var percentage int64
 	bz := store.Get(KeyCollector)
 	k.cdc.MustUnmarshalBinaryBare(bz, &percentage)
 	return percentage
