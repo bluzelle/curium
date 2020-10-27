@@ -64,14 +64,14 @@ func (k Keeper) GetCollector(ctx sdk.Context) sdk.AccAddress {
 // SetPercentage set collector
 func (k Keeper) SetPercentage(ctx sdk.Context, percentage int64) {
 	store := k.GetKVStore(ctx)
-	store.Set(KeyCollector, k.cdc.MustMarshalBinaryBare(percentage))
+	store.Set(KeyPercentage, k.cdc.MustMarshalBinaryBare(percentage))
 }
 
 // GetPercentage returns collector
 func (k Keeper) GetPercentage(ctx sdk.Context) int64 {
 	store := k.GetKVStore(ctx)
 	var percentage int64
-	bz := store.Get(KeyCollector)
+	bz := store.Get(KeyPercentage)
 	k.cdc.MustUnmarshalBinaryBare(bz, &percentage)
 	return percentage
 }

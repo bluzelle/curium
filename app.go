@@ -159,6 +159,7 @@ func NewCRUDApp(
 		bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
 		supply.StoreKey, distr.StoreKey, slashing.StoreKey,
 		gov.StoreKey, params.StoreKey, crud.StoreKey,
+		tax.StoreKey,
 		faucet.StoreKey, crud.LeaseKey, crud.OwnerKey)
 
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)

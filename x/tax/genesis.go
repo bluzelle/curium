@@ -25,8 +25,13 @@ func ValidateGenesis(data GenesisState) error {
 }
 
 func DefaultGenesisState() GenesisState {
+	// $ blzcli keys add tax_owner
+	// address: bluzelle1wjkdcz4hl4gcarnqtupu7vkftal6h34qxjh6rw
+	// pubkey: bluzellepub1addwnpepq0r59990s6ljrucwnsf085p2lkugecf87gljr45cgalkfk623f88sr7re7n
+	// mnemonic: day rabbit mom clown bleak brown large lobster reduce accuse violin where address click dynamic myself buyer daughter situate today wheel thumb sudden drill
+	collector, _ := sdk.AccAddressFromBech32("bluzelle1wjkdcz4hl4gcarnqtupu7vkftal6h34qxjh6rw")
 	return GenesisState{
-		Collector:  sdk.AccAddress("tax-address"),
+		Collector:  collector,
 		Percentage: 1,
 	}
 }
