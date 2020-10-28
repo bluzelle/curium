@@ -1,6 +1,7 @@
 package tax
 
 import (
+	"bytes"
 	"fmt"
 
 	"github.com/bluzelle/curium/x/tax/internal/keeper"
@@ -23,9 +24,25 @@ func NewHandler(keeper keeper.IKeeper) sdk.Handler {
 }
 
 func handleMsgSetCollector(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgSetCollector) (*sdk.Result, error) {
+	if err := msg.ValidateBasic(); err != nil {
+		return &sdk.Result{}, err
+	}
+	oldCollector := keeper.GetCollector(ctx)
+	if !bytes.Equal(msg.Proposer, oldCollector) {
+		return &sdk.Result{}, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "proposer should be equal to original tax collector")
+	}
+	keeper.SetCollector(ctx, msg.NewCollector)
 	return &sdk.Result{}, nil
 }
 
 func handleMsgSetPercentage(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgSetPercentage) (*sdk.Result, error) {
+	if err := msg.ValidateBasic(); err != nil {
+		return &sdk.Result{}, err
+	}
+	oldCollector := keeper.GetCollector(ctx)
+	if !bytes.Equal(msg.Proposer, oldCollector) {
+		return &sdk.Result{}, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "proposer should be equal to original tax collector")
+	}
+	keeper.SetPercentage(ctx, msg.NewPercentage)
 	return &sdk.Result{}, nil
 }

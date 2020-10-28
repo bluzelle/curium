@@ -82,7 +82,7 @@ func SetPercentageHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		percentage := req.Percentage
 
 		// create the message
-		msg := types.NewMsgSetPercentage(percentage, proposer)
+		msg := types.NewMsgSetPercentage(int64(percentage), proposer)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

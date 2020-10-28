@@ -25,7 +25,7 @@ func ValidateGenesis(data GenesisState) error {
 }
 
 func DefaultGenesisState() GenesisState {
-	// $ blzcli keys add tax_owner
+	// $ blzcli keys add tax_owner --recover --keyring-backend=test
 	// address: bluzelle1wjkdcz4hl4gcarnqtupu7vkftal6h34qxjh6rw
 	// pubkey: bluzellepub1addwnpepq0r59990s6ljrucwnsf085p2lkugecf87gljr45cgalkfk623f88sr7re7n
 	// mnemonic: day rabbit mom clown bleak brown large lobster reduce accuse violin where address click dynamic myself buyer daughter situate today wheel thumb sudden drill

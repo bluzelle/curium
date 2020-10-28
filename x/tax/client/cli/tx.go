@@ -35,7 +35,7 @@ func GetCmdSetCollector(cdc *codec.Codec) *cobra.Command {
 	cc := cobra.Command{
 		Use:   "collector [address]",
 		Short: "set collector of tax module",
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			inBuf := bufio.NewReader(cmd.InOrStdin())
@@ -63,7 +63,7 @@ func GetCmdSetPercentage(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "percentage [integer]",
 		Short: "set percentage of tax",
-		Args:  cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			inBuf := bufio.NewReader(cmd.InOrStdin())
@@ -74,7 +74,7 @@ func GetCmdSetPercentage(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgSetPercentage(percentage, cliCtx.GetFromAddress())
+			msg := types.NewMsgSetPercentage(int64(percentage), cliCtx.GetFromAddress())
 
 			err = msg.ValidateBasic()
 			if err != nil {

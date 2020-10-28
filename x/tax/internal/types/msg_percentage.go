@@ -7,13 +7,12 @@ import (
 
 // MsgSetPercentage defines a message to modify collector
 type MsgSetPercentage struct {
-	NewPercentage int
+	NewPercentage int64
 	Proposer      sdk.AccAddress
 }
 
 // NewMsgSetPercentage returns a new instance of MsgSetPercentage
-func NewMsgSetPercentage(newPercentage int, proposer sdk.AccAddress) MsgSetPercentage {
-
+func NewMsgSetPercentage(newPercentage int64, proposer sdk.AccAddress) MsgSetPercentage {
 	return MsgSetPercentage{
 		NewPercentage: newPercentage,
 		Proposer:      proposer,
