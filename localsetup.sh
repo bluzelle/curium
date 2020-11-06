@@ -22,13 +22,13 @@ blzd start
 # blzcli query tax info 
 # blzcli keys add tax_owner --recover --keyring-backend=test
 # day rabbit mom clown bleak brown large lobster reduce accuse violin where address click dynamic myself buyer daughter situate today wheel thumb sudden drill
-# blzcli tx tax percentage 10 --from node0 --keyring-backend=test
+# blzcli tx tax set-percentage 10 --from node0 --keyring-backend=test
 # blzcli query tax info 
-# blzcli tx tax collector $(blzcli keys show -a user1 --keyring-backend=test) --from node0 --keyring-backend=test
+# blzcli tx tax set-collector $(blzcli keys show -a user1 --keyring-backend=test) --from node0 --keyring-backend=test
 # blzcli query tax info 
-# blzcli tx tax percentage 10 --from tax_owner --keyring-backend=test
+# blzcli tx tax set-percentage 10 --from tax_owner --keyring-backend=test
 # blzcli query tax info 
-# blzcli tx tax collector $(blzcli keys show -a user1 --keyring-backend=test) --from tax_owner --keyring-backend=test
+# blzcli tx tax set-collector $(blzcli keys show -a user1 --keyring-backend=test) --from tax_owner --keyring-backend=test
 # blzcli query tax info 
-# blzcli tx tax collector $(blzcli keys show -a tax_owner --keyring-backend=test) --from user1 --keyring-backend=test
+# blzcli tx tax set-collector $(blzcli keys show -a tax_owner --keyring-backend=test) --from user1 --keyring-backend=test
 # blzcli query tax info 

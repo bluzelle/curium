@@ -33,7 +33,7 @@ func GetTxCmd(_ string, cdc *codec.Codec) *cobra.Command {
 
 func GetCmdSetCollector(cdc *codec.Codec) *cobra.Command {
 	cc := cobra.Command{
-		Use:   "collector [address]",
+		Use:   "set-collector [address]",
 		Short: "set collector of tax module",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -61,7 +61,7 @@ func GetCmdSetCollector(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdSetPercentage(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "percentage [integer]",
+		Use:   "set-percentage [integer]",
 		Short: "set percentage of tax",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
