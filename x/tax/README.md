@@ -8,3 +8,7 @@ And rest of them are sent to fee collector module as it was doing.
 # Queries
 
 # Transactions
+
+# Command to run test
+
+Go to root directory of project and run `make test-tax`.
