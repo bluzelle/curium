@@ -22,7 +22,7 @@ func TestAppModuleBasic_DefaultGenesis(t *testing.T) {
 	config.SetBech32PrefixForAccount(bluzellechain.Bech32PrefixAccAddr, bluzellechain.Bech32PrefixAccPub)
 	genesis := AppModuleBasic{}.DefaultGenesis()
 	assert.NotNil(t, genesis)
-	assert.Equal(t, string(genesis), `{"Collector":"bluzelle1wjkdcz4hl4gcarnqtupu7vkftal6h34qxjh6rw","Percentage":"1"}`)
+	assert.Equal(t, string(genesis), `{"Collector":"bluzelle1wjkdcz4hl4gcarnqtupu7vkftal6h34qxjh6rw","Bp":"100"}`)
 }
 
 func TestAppModuleBasic_ValidateGenesis(t *testing.T) {

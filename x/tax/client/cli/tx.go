@@ -25,7 +25,7 @@ func GetTxCmd(_ string, cdc *codec.Codec) *cobra.Command {
 	}
 	taxTxCmd.AddCommand(flags.PostCommands(
 		GetCmdSetCollector(cdc),
-		GetCmdSetPercentage(cdc),
+		GetCmdSetBp(cdc),
 	)...)
 
 	return taxTxCmd
@@ -59,22 +59,22 @@ func GetCmdSetCollector(cdc *codec.Codec) *cobra.Command {
 	return &cc
 }
 
-func GetCmdSetPercentage(cdc *codec.Codec) *cobra.Command {
+func GetCmdSetBp(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "set-percentage [integer]",
-		Short: "set percentage of tax",
+		Use:   "set-bp [integer]",
+		Short: "set basis point (0.0001 unit) of tax",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
 
-			percentage, err := strconv.Atoi(args[0])
+			bp, err := strconv.Atoi(args[0])
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgSetPercentage(int64(percentage), cliCtx.GetFromAddress())
+			msg := types.NewMsgSetBp(int64(bp), cliCtx.GetFromAddress())
 
 			err = msg.ValidateBasic()
 			if err != nil {

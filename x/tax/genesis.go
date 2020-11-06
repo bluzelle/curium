@@ -9,8 +9,8 @@ import (
 )
 
 type GenesisState struct {
-	Collector  sdk.AccAddress
-	Percentage int64
+	Collector sdk.AccAddress
+	Bp        int64
 }
 
 func NewGenesisState() GenesisState {
@@ -18,8 +18,8 @@ func NewGenesisState() GenesisState {
 }
 
 func ValidateGenesis(data GenesisState) error {
-	if data.Collector.Empty() && data.Percentage > 0 {
-		return errors.New("tax collector is empty but tax percentage is not zero")
+	if data.Collector.Empty() && data.Bp > 0 {
+		return errors.New("tax collector is empty but tax bp is not zero")
 	}
 	return nil
 }
@@ -34,22 +34,22 @@ func DefaultGenesisState() GenesisState {
 		panic(err)
 	}
 	return GenesisState{
-		Collector:  collector,
-		Percentage: 1,
+		Collector: collector,
+		Bp:        100,
 	}
 }
 
 func InitGenesis(ctx sdk.Context, k keeper.IKeeper, data GenesisState) []abci.ValidatorUpdate {
 	k.SetCollector(ctx, data.Collector)
-	k.SetPercentage(ctx, data.Percentage)
+	k.SetBp(ctx, data.Bp)
 	return []abci.ValidatorUpdate{}
 }
 
 func ExportGenesis(ctx sdk.Context, k keeper.IKeeper) GenesisState {
 	collector := k.GetCollector(ctx)
-	percentage := k.GetPercentage(ctx)
+	bp := k.GetBp(ctx)
 	return GenesisState{
-		Collector:  collector,
-		Percentage: percentage,
+		Collector: collector,
+		Bp:        bp,
 	}
 }

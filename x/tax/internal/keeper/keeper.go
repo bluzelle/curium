@@ -10,16 +10,16 @@ import (
 type IKeeper interface {
 	GetCodec() *codec.Codec
 	SetCollector(ctx sdk.Context, collector sdk.AccAddress)
-	SetPercentage(ctx sdk.Context, percentage int64)
+	SetBp(ctx sdk.Context, bp int64)
 	GetCollector(ctx sdk.Context) sdk.AccAddress
-	GetPercentage(ctx sdk.Context) int64
+	GetBp(ctx sdk.Context) int64
 	GetTaxInfo(ctx sdk.Context) types.TaxInfo
 }
 
 // constants
 var (
-	KeyCollector  = []byte("collector")
-	KeyPercentage = []byte("percentage")
+	KeyCollector = []byte("collector")
+	KeyBp        = []byte("bp")
 )
 
 // Keeper manage storage for this module
@@ -61,25 +61,25 @@ func (k Keeper) GetCollector(ctx sdk.Context) sdk.AccAddress {
 	return collector
 }
 
-// SetPercentage set collector
-func (k Keeper) SetPercentage(ctx sdk.Context, percentage int64) {
+// SetBp set collector
+func (k Keeper) SetBp(ctx sdk.Context, bp int64) {
 	store := k.GetKVStore(ctx)
-	store.Set(KeyPercentage, k.cdc.MustMarshalBinaryBare(percentage))
+	store.Set(KeyBp, k.cdc.MustMarshalBinaryBare(bp))
 }
 
-// GetPercentage returns collector
-func (k Keeper) GetPercentage(ctx sdk.Context) int64 {
+// GetBp returns collector
+func (k Keeper) GetBp(ctx sdk.Context) int64 {
 	store := k.GetKVStore(ctx)
-	var percentage int64
-	bz := store.Get(KeyPercentage)
-	k.cdc.MustUnmarshalBinaryBare(bz, &percentage)
-	return percentage
+	var bp int64
+	bz := store.Get(KeyBp)
+	k.cdc.MustUnmarshalBinaryBare(bz, &bp)
+	return bp
 }
 
 // GetTaxInfo return tax info in a struct
 func (k Keeper) GetTaxInfo(ctx sdk.Context) types.TaxInfo {
 	return types.TaxInfo{
-		Collector:  k.GetCollector(ctx),
-		Percentage: k.GetPercentage(ctx),
+		Collector: k.GetCollector(ctx),
+		Bp:        k.GetBp(ctx),
 	}
 }

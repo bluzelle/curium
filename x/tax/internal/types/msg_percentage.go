@@ -5,35 +5,35 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// MsgSetPercentage defines a message to modify collector
-type MsgSetPercentage struct {
-	NewPercentage int64
-	Proposer      sdk.AccAddress
+// MsgSetBp defines a message to modify collector
+type MsgSetBp struct {
+	NewBp    int64
+	Proposer sdk.AccAddress
 }
 
-// NewMsgSetPercentage returns a new instance of MsgSetPercentage
-func NewMsgSetPercentage(newPercentage int64, proposer sdk.AccAddress) MsgSetPercentage {
-	return MsgSetPercentage{
-		NewPercentage: newPercentage,
-		Proposer:      proposer,
+// NewMsgSetBp returns a new instance of MsgSetBp
+func NewMsgSetBp(newBp int64, proposer sdk.AccAddress) MsgSetBp {
+	return MsgSetBp{
+		NewBp:    newBp,
+		Proposer: proposer,
 	}
 }
 
-// Route returns MsgSetPercentage message route
-func (msg MsgSetPercentage) Route() string { return RouterKey }
+// Route returns MsgSetBp message route
+func (msg MsgSetBp) Route() string { return RouterKey }
 
-// Type returns MsgSetPercentage message type
-func (msg MsgSetPercentage) Type() string { return "set_percentage" }
+// Type returns MsgSetBp message type
+func (msg MsgSetBp) Type() string { return "set_bp" }
 
-// ValidateBasic do basic validation for MsgSetPercentage
-func (msg MsgSetPercentage) ValidateBasic() error {
+// ValidateBasic do basic validation for MsgSetBp
+func (msg MsgSetBp) ValidateBasic() error {
 	if msg.Proposer.Empty() {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "proposer should not be empty address")
 	}
-	if msg.NewPercentage < 0 {
+	if msg.NewBp < 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "tax should not be negative")
 	}
-	if msg.NewPercentage > 100 {
+	if msg.NewBp > 100 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "tax should not exceed 100%")
 	}
 
@@ -41,11 +41,11 @@ func (msg MsgSetPercentage) ValidateBasic() error {
 }
 
 // GetSignBytes collect sign bytes from message
-func (msg MsgSetPercentage) GetSignBytes() []byte {
+func (msg MsgSetBp) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 // GetSigners return signers of this message
-func (msg MsgSetPercentage) GetSigners() []sdk.AccAddress {
+func (msg MsgSetBp) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Proposer}
 }

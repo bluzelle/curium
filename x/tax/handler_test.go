@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func Test_handleMsgSetPercentage(t *testing.T) {
+func Test_handleMsgSetBp(t *testing.T) {
 
 }
 

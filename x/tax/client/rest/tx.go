@@ -53,15 +53,15 @@ func SetCollectorHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
-type setPercentageReq struct {
-	BaseReq    rest.BaseReq
-	Percentage int
-	Proposer   string
+type setBpReq struct {
+	BaseReq  rest.BaseReq
+	Bp       int
+	Proposer string
 }
 
-func SetPercentageHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func SetBpHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req setPercentageReq
+		var req setBpReq
 
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
@@ -79,10 +79,10 @@ func SetPercentageHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		percentage := req.Percentage
+		bp := req.Bp
 
 		// create the message
-		msg := types.NewMsgSetPercentage(int64(percentage), proposer)
+		msg := types.NewMsgSetBp(int64(bp), proposer)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
