@@ -51,6 +51,9 @@ go.sum: go.mod
 test:
 	@go test -mod=readonly $(PACKAGES)
 
+test-tax:
+	@go test -mod=readonly ./x/tax/...
+
 coverage:
 	@go test -v -coverprofile=$(coverage) ./x/...
 	@go tool cover -html=$(coverage)

@@ -5,8 +5,10 @@ import (
 	"reflect"
 	"testing"
 
+	bluzellechain "github.com/bluzelle/curium/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,14 +18,18 @@ func TestAppModuleBasic_Name(t *testing.T) {
 }
 
 func TestAppModuleBasic_DefaultGenesis(t *testing.T) {
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(bluzellechain.Bech32PrefixAccAddr, bluzellechain.Bech32PrefixAccPub)
 	genesis := AppModuleBasic{}.DefaultGenesis()
 	assert.NotNil(t, genesis)
-	assert.Equal(t, string(genesis), "")
+	assert.Equal(t, string(genesis), `{"Collector":"bluzelle1wjkdcz4hl4gcarnqtupu7vkftal6h34qxjh6rw","Percentage":"1"}`)
 }
 
 func TestAppModuleBasic_ValidateGenesis(t *testing.T) {
-	bz := json.RawMessage{}
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(bluzellechain.Bech32PrefixAccAddr, bluzellechain.Bech32PrefixAccPub)
 
+	bz := json.RawMessage{}
 	err := AppModuleBasic.ValidateGenesis(AppModuleBasic{}, bz)
 	if err == nil {
 		t.Error("ValidateGenesis did not return an error for an empty genesis file")
@@ -46,7 +52,7 @@ func TestAppModuleBasic_GetQueryCmd(t *testing.T) {
 		assert.Equal(t, command.Use, "tax")
 		assert.Equal(t, command.Short, "Querying commands for the tax module")
 		assert.True(t, command.DisableFlagParsing)
-		assert.Equal(t, command.SuggestionsMinimumDistance, 2)
+		assert.Equal(t, command.SuggestionsMinimumDistance, 0)
 
 		sf1 := reflect.ValueOf(command.RunE)
 		sf2 := reflect.ValueOf(client.ValidateCmd)
@@ -59,7 +65,7 @@ func TestAppModuleBasic_GetQueryCmd_TaxQueries(t *testing.T) {
 	command := AppModuleBasic{}.GetQueryCmd(&cdc)
 
 	commands := command.Commands()
-	assert.Len(t, command.Commands(), 7)
+	assert.Len(t, command.Commands(), 1)
 
 	expectedUses := [...]string{"info"}
 	expectedNames := [...]string{"info"}
@@ -86,7 +92,7 @@ func TestAppModuleBasic_GetTxCmd(t *testing.T) {
 		assert.Equal(t, 2, cmd.SuggestionsMinimumDistance)
 
 		commands := cmd.Commands()
-		assert.Len(t, commands, 15)
+		assert.Len(t, commands, 2)
 	}
 }
 

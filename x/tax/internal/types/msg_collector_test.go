@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"testing"
 
+	bluzellechain "github.com/bluzelle/curium/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	. "github.com/stretchr/testify/assert"
 )
@@ -42,19 +43,22 @@ func TestMsgSetCollector_ValidateBasic(t *testing.T) {
 	msg = NewMsgSetCollector(sdk.AccAddress{}, proposer)
 	err = msg.ValidateBasic()
 	True(t, err != nil)
-	True(t, err.Error() == "proposer should not be empty address")
+	Equal(t, err.Error(), "invalid address: tax collector should not be empty address")
 
 	msg = NewMsgSetCollector(newCollector, sdk.AccAddress{})
 	err = msg.ValidateBasic()
 	True(t, err != nil)
-	True(t, err.Error() == "tax collector should not be empty address")
+	Equal(t, err.Error(), "invalid address: proposer should not be empty address")
 }
 
 func TestMsgSetCollector_GetSignBytes(t *testing.T) {
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(bluzellechain.Bech32PrefixAccAddr, bluzellechain.Bech32PrefixAccPub)
+
 	addrs := GetTestAddresses(t)
 	proposer, newCollector := addrs[0], addrs[1]
 	msg := NewMsgSetCollector(newCollector, proposer)
-	Equal(t, string(msg.GetSignBytes()), ``)
+	Equal(t, string(msg.GetSignBytes()), `{"type":"tax/collector","value":{"NewCollector":"bluzelle1d4uj6tfd95kj6tfd95kkzerywfjhxuejgs5ltx","Proposer":"bluzelle1d4uj6tfd95kj6tfd95kkzerywfjhxue3xrpf9e"}}`)
 }
 
 func TestMsgSetCollector_GetSigners(t *testing.T) {
