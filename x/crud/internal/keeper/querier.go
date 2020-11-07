@@ -33,6 +33,7 @@ const (
 	QueryGetLease           = "getlease"
 	QueryGetNShortestLeases = "getnshortestleases"
 	QueryOwner              = "owner"
+	QueryMyKeys				= "mykeys"
 )
 
 func NewQuerier(keeper IKeeper) sdk.Querier {
@@ -40,6 +41,8 @@ func NewQuerier(keeper IKeeper) sdk.Querier {
 		switch path[0] {
 		case QueryOwner:
 			return queryOwner(ctx, path[1:], req, keeper, keeper.GetCdc())
+		case QueryMyKeys:
+			return queryMyKeys(ctx, path[1:], req, keeper, keeper.GetCdc())
 		case QueryRead:
 			return queryRead(ctx, path[1:], req, keeper, keeper.GetCdc())
 		case QueryHas:
@@ -102,6 +105,13 @@ func queryHas(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeepe
 	}
 
 	return res, nil
+}
+
+func queryMyKeys(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, error) {
+	owner, _ := sdk.AccAddressFromBech32(path[0])
+	ownerStore := keeper.GetOwnerStore(ctx)
+	res, err := codec.MarshalJSONIndent(cdc, keeper.GetMyKeys(ctx, ownerStore, path[1], owner))
+	return res, err
 }
 
 func queryKeys(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper IKeeper, cdc *codec.Codec) ([]byte, error) {

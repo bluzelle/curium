@@ -48,4 +48,5 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, storeName string) 
 	r.HandleFunc(fmt.Sprintf("/%s/upsert", storeName), BlzUpsertHandler(cliCtx)).Methods("POST")
 	r.HandleFunc(fmt.Sprintf("/%s/renewlease", storeName), BlzRenewLease(cliCtx)).Methods("POST")
 	r.HandleFunc(fmt.Sprintf("/%s/renewleaseall", storeName), BlzRenewLeaseAll(cliCtx)).Methods("POST")
+	r.HandleFunc(fmt.Sprintf("/%s/mykeys/{owner}/{UUID}", storeName), BlzQMyKeysHandler(cliCtx, storeName)).Methods("GET")
 }
