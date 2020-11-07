@@ -36,6 +36,7 @@ type MaxKeeperSizes struct {
 type IKeeper interface {
 	DeleteAll(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress)
 	DeleteLease(leaseStore sdk.KVStore, UUID string, key string, blockHeight int64, leaseBlocks int64)
+	DeleteOwner(store sdk.KVStore, ownerStore sdk.KVStore, UUID string, key string)
 	DeleteValue(ctx sdk.Context, store sdk.KVStore, leaseStore sdk.KVStore, UUID string, key string)
 	GetCdc() *codec.Codec
 	GetCount(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultCount
@@ -56,7 +57,7 @@ type IKeeper interface {
 	RenameKey(ctx sdk.Context, store sdk.KVStore, UUID string, key string, newkey string) bool
 	SetLease(leaseStore sdk.KVStore, UUID string, key string, blockHeight int64, lease int64)
 	SetValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string, value types.BLZValue)
-	SetOwner(ownerStore sdk.KVStore, UUID string, key string, owner sdk.AccAddress)
+	SetOwner(store sdk.KVStore, ownerStore sdk.KVStore, UUID string, key string, owner sdk.AccAddress)
 
 }
 
@@ -339,8 +340,18 @@ func (k Keeper) DeleteAll(_ sdk.Context, store sdk.KVStore, UUID string, owner s
 	}
 }
 
-func (k Keeper) SetOwner(ownerStore sdk.KVStore, UUID string, key string, owner sdk.AccAddress) {
+func (k Keeper) SetOwner(store sdk.KVStore, ownerStore sdk.KVStore, UUID string, key string, owner sdk.AccAddress) {
+
 	ownerStore.Set([]byte(MakeOwnerKey(owner, UUID, key)), make([]byte, 0))
+}
+
+func (k Keeper) DeleteOwner(store sdk.KVStore, ownerStore sdk.KVStore, UUID string, key string) {
+	metaKey := MakeMetaKey(UUID, key)
+	var bz = store.Get([]byte(metaKey))
+	var value types.BLZValue
+	k.cdc.MustUnmarshalBinaryBare(bz, &value)
+
+	ownerStore.Delete([]byte(MakeOwnerKey(value.Owner, UUID, key)))
 }
 
 func (k Keeper) SetLease(leaseStore sdk.KVStore, UUID string, key string, blockHeight int64, leaseBlocks int64) {

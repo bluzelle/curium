@@ -94,7 +94,7 @@ func handleMsgCreate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgCreate
 	gasForLease := CalculateGasForLease(msg.Lease, len(msg.UUID)+len(msg.Key)+len(msg.Value))
 	ctx.GasMeter().ConsumeGas(gasForLease, "lease")
 
-	keeper.SetOwner(keeper.GetOwnerStore(ctx), msg.UUID, msg.Key, msg.Owner)
+	keeper.SetOwner(keeper.GetKVStore(ctx), keeper.GetOwnerStore(ctx), msg.UUID, msg.Key, msg.Owner)
 
 	return &sdk.Result{}, nil
 }
@@ -202,6 +202,7 @@ func handleMsgDelete(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgDelete
 
 	newCtx := ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 	keeper.DeleteValue(ctx, keeper.GetKVStore(ctx), keeper.GetLeaseStore(newCtx), msg.UUID, msg.Key)
+	keeper.DeleteOwner(keeper.GetKVStore(ctx), keeper.GetOwnerStore(ctx), msg.UUID, msg.Key)
 
 	return &sdk.Result{}, nil
 }
