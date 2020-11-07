@@ -267,6 +267,42 @@ func (msg MsgKeys) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner}
 }
 
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// MyKeys
+type MsgMyKeys struct {
+	UUID  string
+	Owner sdk.AccAddress
+}
+
+func NewMsgMyKeys(UUID string, owner sdk.AccAddress) MsgMyKeys {
+	return MsgMyKeys{UUID: UUID, Owner: owner}
+}
+
+func (msg MsgMyKeys) Route() string { return RouterKey }
+
+func (msg MsgMyKeys) Type() string { return "mykeys" }
+
+func (msg MsgMyKeys) ValidateBasic() error {
+	if msg.Owner.Empty() {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
+	}
+
+	if len(msg.UUID) == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID empty")
+	}
+	return nil
+}
+
+func (msg MsgMyKeys) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
+
+func (msg MsgMyKeys) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Owner}
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Has
 type MsgHas struct {
