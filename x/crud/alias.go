@@ -24,6 +24,7 @@ const (
 	RouterKey  = types.RouterKey
 	StoreKey   = types.StoreKey
 	LeaseKey   = types.LeaseKey
+	OwnerKey   = types.OwnerKey
 )
 
 var (

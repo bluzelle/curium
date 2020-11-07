@@ -44,7 +44,9 @@ type IKeeper interface {
 	Search(ctx sdk.Context, store sdk.KVStore, UUID string, prefix string, page, limit uint, direction string, owner sdk.AccAddress) types.QueryResultKeyValues
 	GetKeyValues(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultKeyValues
 	GetKeys(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultKeys
+	GetMyKeys(ctx sdk.Context, ownerStore sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultMyKeys
 	GetLeaseStore(ctx sdk.Context) sdk.KVStore
+	GetOwnerStore(ctx sdk.Context) sdk.KVStore
 	GetNShortestLeases(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress, n uint64) types.QueryResultNShortestLeaseKeys
 	GetOwner(ctx sdk.Context, store sdk.KVStore, UUID string, key string) sdk.AccAddress
 	GetValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string) types.BLZValue
@@ -60,6 +62,7 @@ type Keeper struct {
 	CoinKeeper bank.Keeper
 	storeKey   sdk.StoreKey
 	leaseKey   sdk.StoreKey
+	ownerKey   sdk.StoreKey
 	cdc        *codec.Codec
 	mks        MaxKeeperSizes
 }
@@ -73,11 +76,16 @@ func MakeLeaseKey(blockHeight int64, UUID string, key string) string {
 	return strconv.FormatInt(blockHeight, 10) + "\x00" + MakeMetaKey(UUID, key)
 }
 
-func NewKeeper(coinKeeper bank.Keeper, storeKey sdk.StoreKey, leaseKey sdk.StoreKey, cdc *codec.Codec, mks MaxKeeperSizes) Keeper {
+func MakeOwnerKey(owner sdk.AccAddress, UUID string, key string) string {
+	return owner.String() + "\x00" + MakeMetaKey(UUID, key)
+}
+
+func NewKeeper(coinKeeper bank.Keeper, storeKey sdk.StoreKey, leaseKey sdk.StoreKey, ownerKey sdk.StoreKey, cdc *codec.Codec, mks MaxKeeperSizes) Keeper {
 	return Keeper{
 		CoinKeeper: coinKeeper,
 		storeKey:   storeKey,
 		leaseKey:   leaseKey,
+		ownerKey:   ownerKey,
 		cdc:        cdc,
 		mks:        mks,
 	}
@@ -93,6 +101,10 @@ func (k Keeper) GetKVStore(ctx sdk.Context) sdk.KVStore {
 
 func (k Keeper) GetLeaseStore(ctx sdk.Context) sdk.KVStore {
 	return ctx.KVStore(k.leaseKey)
+}
+
+func (k Keeper) GetOwnerStore(ctx sdk.Context) sdk.KVStore {
+	return ctx.KVStore(k.ownerKey)
 }
 
 func (k Keeper) SetValue(_ sdk.Context, store sdk.KVStore, UUID string, key string, value types.BLZValue) {
@@ -132,6 +144,29 @@ func (k Keeper) isUUIDKeyPresent(store sdk.KVStore, key string) bool {
 
 func (k Keeper) GetValuesIterator(_ sdk.Context, store sdk.KVStore) sdk.Iterator {
 	return sdk.KVStorePrefixIterator(store, []byte{})
+}
+
+func (k Keeper) GetMyKeys(ctx sdk.Context, ownerStore sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultMyKeys {
+	prefix := owner.String() + "\x00" + UUID + "\x00"
+	iterator := sdk.KVStorePrefixIterator(ownerStore, []byte(prefix))
+	defer iterator.Close()
+	keys := types.QueryResultMyKeys{UUID: UUID, Keys: make([]string, 0)}
+
+	keysSize := uint64(0)
+	for ; iterator.Valid(); iterator.Next() {
+		key := string(iterator.Key())[len(prefix):]
+		keysSize = uint64(len(key)) + keysSize
+		if ctx.GasMeter().IsPastLimit() {
+			return types.QueryResultMyKeys{UUID: UUID, Keys: make([]string, 0)}
+		}
+
+		if keysSize < k.mks.MaxKeysSize {
+			keys.Keys = append(keys.Keys, key)
+		} else {
+			return keys
+		}
+	}
+	return keys
 }
 
 func (k Keeper) GetKeys(ctx sdk.Context, store sdk.KVStore, UUID string, owner sdk.AccAddress) types.QueryResultKeys {
@@ -300,6 +335,10 @@ func (k Keeper) DeleteAll(_ sdk.Context, store sdk.KVStore, UUID string, owner s
 			store.Delete(iterator.Key())
 		}
 	}
+}
+
+func (k Keeper) SetOwner(ownerStore sdk.KVStore, UUID string, key string, owner sdk.AccAddress) {
+	ownerStore.Set([]byte(MakeOwnerKey(owner, UUID, key)), make([]byte, 0))
 }
 
 func (k Keeper) SetLease(leaseStore sdk.KVStore, UUID string, key string, blockHeight int64, leaseBlocks int64) {

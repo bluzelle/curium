@@ -45,6 +45,7 @@ import (
 	"time"
 )
 
+
 var (
 	crudModuleEntry         = "bluzelle_crud"
 	maxKeysSize             = uint64(102400)
@@ -150,7 +151,7 @@ func NewCRUDApp(
 		bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
 		supply.StoreKey, distr.StoreKey, slashing.StoreKey,
 		gov.StoreKey, params.StoreKey, crud.StoreKey,
-		faucet.StoreKey, crud.LeaseKey)
+		faucet.StoreKey, crud.LeaseKey, crud.OwnerKey)
 
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -248,6 +249,7 @@ func NewCRUDApp(
 		app.bankKeeper,
 		keys[crud.StoreKey],
 		keys[crud.LeaseKey],
+		keys[crud.OwnerKey],
 		app.cdc,
 		crud.MaxKeeperSizes{MaxKeysSize: maxKeysSize, MaxKeyValuesSize: maxKeyValuesSize, MaxDefaultLeaseBlocks: DefaultLeaseBlockHeight},
 	)

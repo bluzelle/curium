@@ -38,6 +38,8 @@ func NewHandler(keeper keeper.IKeeper) sdk.Handler {
 			return handleMsgDelete(ctx, keeper, msg)
 		case types.MsgKeys:
 			return handleMsgKeys(ctx, keeper, msg)
+		case types.MsgMyKeys:
+			return handleMsgMyKeys(ctx, keeper, msg)
 		case types.MsgHas:
 			return handleMsgHas(ctx, keeper, msg)
 		case types.MsgRename:
@@ -213,6 +215,10 @@ func handleMsgKeys(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgKeys) (*
 	}
 
 	return &sdk.Result{Data: jsonData}, nil
+}
+
+func handleMsgMyKeys(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgMyKeys) (*sdk.Result, error) {
+	return &sdk.Result{Data: []byte("")}, nil
 }
 
 func handleMsgHas(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgHas) (*sdk.Result, error) {
