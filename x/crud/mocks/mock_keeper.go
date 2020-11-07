@@ -59,6 +59,18 @@ func (mr *MockIKeeperMockRecorder) DeleteLease(leaseStore, UUID, key, blockHeigh
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteLease", reflect.TypeOf((*MockIKeeper)(nil).DeleteLease), leaseStore, UUID, key, blockHeight, leaseBlocks)
 }
 
+// DeleteOwner mocks base method
+func (m *MockIKeeper) DeleteOwner(store, ownerStore types0.KVStore, UUID, key string) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "DeleteOwner", store, ownerStore, UUID, key)
+}
+
+// DeleteOwner indicates an expected call of DeleteOwner
+func (mr *MockIKeeperMockRecorder) DeleteOwner(store, ownerStore, UUID, key interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteOwner", reflect.TypeOf((*MockIKeeper)(nil).DeleteOwner), store, ownerStore, UUID, key)
+}
+
 // DeleteValue mocks base method
 func (m *MockIKeeper) DeleteValue(ctx types0.Context, store, leaseStore types0.KVStore, UUID, key string) {
 	m.ctrl.T.Helper()
@@ -329,4 +341,16 @@ func (m *MockIKeeper) SetValue(ctx types0.Context, store types0.KVStore, UUID, k
 func (mr *MockIKeeperMockRecorder) SetValue(ctx, store, UUID, key, value interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetValue", reflect.TypeOf((*MockIKeeper)(nil).SetValue), ctx, store, UUID, key, value)
+}
+
+// SetOwner mocks base method
+func (m *MockIKeeper) SetOwner(store, ownerStore types0.KVStore, UUID, key string, owner types0.AccAddress) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "SetOwner", store, ownerStore, UUID, key, owner)
+}
+
+// SetOwner indicates an expected call of SetOwner
+func (mr *MockIKeeperMockRecorder) SetOwner(store, ownerStore, UUID, key, owner interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetOwner", reflect.TypeOf((*MockIKeeper)(nil).SetOwner), store, ownerStore, UUID, key, owner)
 }

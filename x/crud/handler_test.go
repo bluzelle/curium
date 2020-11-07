@@ -16,6 +16,7 @@ package crud
 
 import (
 	"encoding/json"
+	bluzellechain "github.com/bluzelle/curium/types"
 	"github.com/bluzelle/curium/x/crud/internal/types"
 	"github.com/bluzelle/curium/x/crud/mocks"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -32,6 +33,11 @@ import (
 var DefaultLeaseBlockHeight = int64(math.Ceil(10 * 86400 / 5.5)) // (10 days of blocks * seconds/day) / 5
 
 func initTest(t *testing.T) (*gomock.Controller, *mocks.MockIKeeper, sdk.Context, []byte) {
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(bluzellechain.Bech32PrefixAccAddr, bluzellechain.Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(bluzellechain.Bech32PrefixValAddr, bluzellechain.Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(bluzellechain.Bech32PrefixConsAddr, bluzellechain.Bech32PrefixConsPub)
+
 	mockCtrl := gomock.NewController(t)
 	ctx := sdk.Context{}
 	ctx = ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
@@ -51,10 +57,13 @@ func Test_handleMsgCreate(t *testing.T) {
 	setup := func(t *testing.T) (*gomock.Controller, *mocks.MockIKeeper, sdk.Context, []byte) {
 		mockCtrl, mockKeeper, ctx, owner := initTest(t)
 		defer mockCtrl.Finish()
+
+		mockKeeper.EXPECT().GetOwnerStore(ctx).AnyTimes().Return(nil)
 		mockKeeper.EXPECT().GetDefaultLeaseBlocks().AnyTimes().Return(DefaultLeaseBlockHeight)
 		// always return nil for a store...
 		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
 		mockKeeper.EXPECT().GetLeaseStore(gomock.Any()).AnyTimes().Return(nil)
+		mockKeeper.EXPECT().SetOwner(mockKeeper.GetKVStore(ctx), mockKeeper.GetOwnerStore(ctx), "uuid", "key", gomock.Any()).AnyTimes()
 
 		return mockCtrl, mockKeeper, ctx, owner
 	}
@@ -395,11 +404,13 @@ func Test_handleMsgDelete(t *testing.T) {
 		assert.Equal(t, deleteMsg.Type(), "delete")
 
 		// always return nil for a store...
+		mockKeeper.EXPECT().GetOwnerStore(ctx)
 		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
 
 		mockKeeper.EXPECT().GetLeaseStore(gomock.Any()).AnyTimes().Return(nil)
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, deleteMsg.UUID, deleteMsg.Key)
+		mockKeeper.EXPECT().DeleteOwner(gomock.Any(), gomock.Any(), "uuid", "key")
 
 		_, err := NewHandler(mockKeeper)(ctx, deleteMsg)
 		assert.NotNil(t, err)

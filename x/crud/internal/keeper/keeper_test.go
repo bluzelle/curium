@@ -70,9 +70,11 @@ func Test_MakeOwnerKey(t *testing.T) {
 
 func TestKeeper_SetOwner(t *testing.T) {
 	_, testStore, _, cdc := initKeeperTest()
-	keeper := NewKeeper(nil, nil, nil,nil, cdc, MaxKeeperSizes{MaxDefaultLeaseBlocks: DefaultLeaseBlockHeight})
+
+	keeper := NewKeeper(nil, nil, nil, nil, cdc, MaxKeeperSizes{MaxDefaultLeaseBlocks: DefaultLeaseBlockHeight})
 	owner, _ := sdk.AccAddressFromBech32("bluzelle1rnnpyp9wr6law2u5jwa23t0ywtmrduldhcp079")
-	keeper.SetOwner(testStore,  "uuid", "key", owner)
+	keeper.SetOwner(testStore, testStore, "uuid", "key", owner)
+
 
 	ownerKey := "bluzelle1rnnpyp9wr6law2u5jwa23t0ywtmrduldhcp079\x00uuid\x00key"
 
