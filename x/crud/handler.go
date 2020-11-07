@@ -94,6 +94,8 @@ func handleMsgCreate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgCreate
 	gasForLease := CalculateGasForLease(msg.Lease, len(msg.UUID)+len(msg.Key)+len(msg.Value))
 	ctx.GasMeter().ConsumeGas(gasForLease, "lease")
 
+	keeper.SetOwner(keeper.GetOwnerStore(ctx), msg.UUID, msg.Key, msg.Owner)
+
 	return &sdk.Result{}, nil
 }
 

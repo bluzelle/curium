@@ -56,6 +56,8 @@ type IKeeper interface {
 	RenameKey(ctx sdk.Context, store sdk.KVStore, UUID string, key string, newkey string) bool
 	SetLease(leaseStore sdk.KVStore, UUID string, key string, blockHeight int64, lease int64)
 	SetValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string, value types.BLZValue)
+	SetOwner(ownerStore sdk.KVStore, UUID string, key string, owner sdk.AccAddress)
+
 }
 
 type Keeper struct {
