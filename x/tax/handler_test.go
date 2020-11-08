@@ -24,22 +24,23 @@ func Test_handleMsgSetBp(t *testing.T) {
 
 	addr1 := sdk.AccAddress([]byte("my----------address1"))
 
-	// t.Log("tApp.GetTaxKeeper()", tApp.GetTaxKeeper())
-	// t.Log("tApp.GetTaxKeeper()", tApp.GetTaxKeeper().GetBp(ctx))
-
 	// try setting Bp with correct owner
-	msg1 := types.NewMsgSetBp(11, collector)
+	msg1 := types.NewMsgSetBp(11, 11, collector)
 	_, err = tax.HandleMsgSetBp(ctx, tApp.GetTaxKeeper(), msg1)
 	require.NoError(t, err)
-	bp1 := tApp.GetTaxKeeper().GetBp(ctx)
-	require.True(t, bp1 == 11)
+	feebp1 := tApp.GetTaxKeeper().GetFeeBp(ctx)
+	require.True(t, feebp1 == 11)
+	trfbp1 := tApp.GetTaxKeeper().GetTrfBp(ctx)
+	require.True(t, trfbp1 == 11)
 
 	// try setting Bp with incorrect owner
-	msg2 := types.NewMsgSetBp(12, addr1)
+	msg2 := types.NewMsgSetBp(12, 12, addr1)
 	_, err = tax.HandleMsgSetBp(ctx, tApp.GetTaxKeeper(), msg2)
 	require.Error(t, err)
-	bp2 := tApp.GetTaxKeeper().GetBp(ctx)
-	require.True(t, bp2 == 11) // not changed
+	feebp2 := tApp.GetTaxKeeper().GetFeeBp(ctx)
+	require.True(t, feebp2 == 11) // not changed
+	trfbp2 := tApp.GetTaxKeeper().GetTrfBp(ctx)
+	require.True(t, trfbp2 == 11) // not changed
 }
 
 func Test_handleMsgSetCollector(t *testing.T) {

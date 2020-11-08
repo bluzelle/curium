@@ -43,6 +43,7 @@ func HandleMsgSetBp(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgSetBp) 
 	if !bytes.Equal(msg.Proposer, oldCollector) {
 		return &sdk.Result{}, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "proposer should be equal to original tax collector")
 	}
-	keeper.SetBp(ctx, msg.NewBp)
+	keeper.SetFeeBp(ctx, msg.NewFeeBp)
+	keeper.SetTrfBp(ctx, msg.NewTrfBp)
 	return &sdk.Result{}, nil
 }

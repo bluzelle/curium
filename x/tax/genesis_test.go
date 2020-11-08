@@ -9,12 +9,13 @@ import (
 func TestNewGenesisState(t *testing.T) {
 	newGenesis := NewGenesisState()
 	require.True(t, newGenesis.Collector.Empty())
-	require.True(t, newGenesis.Bp == 0)
+	require.True(t, newGenesis.FeeBp == 0)
+	require.True(t, newGenesis.TrfBp == 0)
 }
 
 func TestValidateGenesis(t *testing.T) {
 	genesis := GenesisState{
-		Bp: 100, // 1.00%
+		FeeBp: 100, // 1.00%
 	}
 	require.Error(t, ValidateGenesis(genesis))
 }

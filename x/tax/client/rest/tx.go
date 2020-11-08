@@ -55,7 +55,8 @@ func SetCollectorHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 type setBpReq struct {
 	BaseReq  rest.BaseReq
-	Bp       int
+	FeeBp    int
+	TrfBp    int
 	Proposer string
 }
 
@@ -79,10 +80,8 @@ func SetBpHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		bp := req.Bp
-
 		// create the message
-		msg := types.NewMsgSetBp(int64(bp), proposer)
+		msg := types.NewMsgSetBp(int64(req.FeeBp), int64(req.TrfBp), proposer)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

@@ -10,16 +10,19 @@ import (
 type IKeeper interface {
 	GetCodec() *codec.Codec
 	SetCollector(ctx sdk.Context, collector sdk.AccAddress)
-	SetBp(ctx sdk.Context, bp int64)
+	SetFeeBp(ctx sdk.Context, bp int64)
+	SetTrfBp(ctx sdk.Context, bp int64)
 	GetCollector(ctx sdk.Context) sdk.AccAddress
-	GetBp(ctx sdk.Context) int64
+	GetFeeBp(ctx sdk.Context) int64
+	GetTrfBp(ctx sdk.Context) int64
 	GetTaxInfo(ctx sdk.Context) types.TaxInfo
 }
 
 // constants
 var (
 	KeyCollector = []byte("collector")
-	KeyBp        = []byte("bp")
+	KeyFeeBp     = []byte("fee_bp")
+	KeyTrfBp     = []byte("transfer_bp")
 )
 
 // Keeper manage storage for this module
@@ -61,17 +64,32 @@ func (k Keeper) GetCollector(ctx sdk.Context) sdk.AccAddress {
 	return collector
 }
 
-// SetBp set collector
-func (k Keeper) SetBp(ctx sdk.Context, bp int64) {
+// SetFeeBp set fee basis point
+func (k Keeper) SetFeeBp(ctx sdk.Context, bp int64) {
 	store := k.GetKVStore(ctx)
-	store.Set(KeyBp, k.cdc.MustMarshalBinaryBare(bp))
+	store.Set(KeyFeeBp, k.cdc.MustMarshalBinaryBare(bp))
 }
 
-// GetBp returns collector
-func (k Keeper) GetBp(ctx sdk.Context) int64 {
+// GetFeeBp returns fee basis point
+func (k Keeper) GetFeeBp(ctx sdk.Context) int64 {
 	store := k.GetKVStore(ctx)
 	var bp int64
-	bz := store.Get(KeyBp)
+	bz := store.Get(KeyFeeBp)
+	k.cdc.MustUnmarshalBinaryBare(bz, &bp)
+	return bp
+}
+
+// SetTrfBp set fee basis point
+func (k Keeper) SetTrfBp(ctx sdk.Context, bp int64) {
+	store := k.GetKVStore(ctx)
+	store.Set(KeyTrfBp, k.cdc.MustMarshalBinaryBare(bp))
+}
+
+// GetTrfBp returns fee basis point
+func (k Keeper) GetTrfBp(ctx sdk.Context) int64 {
+	store := k.GetKVStore(ctx)
+	var bp int64
+	bz := store.Get(KeyTrfBp)
 	k.cdc.MustUnmarshalBinaryBare(bz, &bp)
 	return bp
 }
@@ -80,6 +98,7 @@ func (k Keeper) GetBp(ctx sdk.Context) int64 {
 func (k Keeper) GetTaxInfo(ctx sdk.Context) types.TaxInfo {
 	return types.TaxInfo{
 		Collector: k.GetCollector(ctx),
-		Bp:        k.GetBp(ctx),
+		FeeBp:     k.GetFeeBp(ctx),
+		TrfBp:     k.GetTrfBp(ctx),
 	}
 }

@@ -61,7 +61,7 @@ func GetCmdSetCollector(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdSetBp(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "set-bp [integer]",
+		Use:   "set-bp [fee_bp] [transfer_bp]",
 		Short: "set basis point (0.0001 unit) of tax",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -69,12 +69,17 @@ func GetCmdSetBp(cdc *codec.Codec) *cobra.Command {
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
 
-			bp, err := strconv.Atoi(args[0])
+			feebp, err := strconv.Atoi(args[0])
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgSetBp(int64(bp), cliCtx.GetFromAddress())
+			trfbp, err := strconv.Atoi(args[1])
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgSetBp(int64(feebp), int64(trfbp), cliCtx.GetFromAddress())
 
 			err = msg.ValidateBasic()
 			if err != nil {
