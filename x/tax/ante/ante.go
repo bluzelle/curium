@@ -83,7 +83,7 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 				bankmsg := msg.(bank.MsgSend)
 				trfFees := sdk.Coins{}
 				for _, fee := range bankmsg.Amount {
-					feeAmt := fee.Amount.Int64() * taxInfo.TrfBp / 10000
+					feeAmt := fee.Amount.Int64() * taxInfo.TransferBp / 10000
 					if feeAmt < 1 {
 						feeAmt = 1
 					}

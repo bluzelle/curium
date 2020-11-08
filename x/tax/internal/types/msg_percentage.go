@@ -7,17 +7,17 @@ import (
 
 // MsgSetBp defines a message to modify collector
 type MsgSetBp struct {
-	NewFeeBp int64
-	NewTrfBp int64
-	Proposer sdk.AccAddress
+	NewFeeBp      int64
+	NewTransferBp int64
+	Proposer      sdk.AccAddress
 }
 
 // NewMsgSetBp returns a new instance of MsgSetBp
-func NewMsgSetBp(newFeeBp int64, newTrfBp int64, proposer sdk.AccAddress) MsgSetBp {
+func NewMsgSetBp(newFeeBp int64, newTransferBp int64, proposer sdk.AccAddress) MsgSetBp {
 	return MsgSetBp{
-		NewTrfBp: newTrfBp,
-		NewFeeBp: newFeeBp,
-		Proposer: proposer,
+		NewTransferBp: newTransferBp,
+		NewFeeBp:      newFeeBp,
+		Proposer:      proposer,
 	}
 }
 
@@ -38,10 +38,10 @@ func (msg MsgSetBp) ValidateBasic() error {
 	if msg.NewFeeBp > 10000 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "tax should not exceed 10000 bp")
 	}
-	if msg.NewTrfBp < 0 {
+	if msg.NewTransferBp < 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "tax should not be negative")
 	}
-	if msg.NewTrfBp > 10000 {
+	if msg.NewTransferBp > 10000 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "tax should not exceed 10000 bp")
 	}
 

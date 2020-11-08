@@ -30,7 +30,7 @@ func Test_handleMsgSetBp(t *testing.T) {
 	require.NoError(t, err)
 	feebp1 := tApp.GetTaxKeeper().GetFeeBp(ctx)
 	require.True(t, feebp1 == 11)
-	trfbp1 := tApp.GetTaxKeeper().GetTrfBp(ctx)
+	trfbp1 := tApp.GetTaxKeeper().GetTransferBp(ctx)
 	require.True(t, trfbp1 == 11)
 
 	// try setting Bp with incorrect owner
@@ -39,7 +39,7 @@ func Test_handleMsgSetBp(t *testing.T) {
 	require.Error(t, err)
 	feebp2 := tApp.GetTaxKeeper().GetFeeBp(ctx)
 	require.True(t, feebp2 == 11) // not changed
-	trfbp2 := tApp.GetTaxKeeper().GetTrfBp(ctx)
+	trfbp2 := tApp.GetTaxKeeper().GetTransferBp(ctx)
 	require.True(t, trfbp2 == 11) // not changed
 }
 

@@ -10,7 +10,7 @@ func TestNewGenesisState(t *testing.T) {
 	newGenesis := NewGenesisState()
 	require.True(t, newGenesis.Collector.Empty())
 	require.True(t, newGenesis.FeeBp == 0)
-	require.True(t, newGenesis.TrfBp == 0)
+	require.True(t, newGenesis.TransferBp == 0)
 }
 
 func TestValidateGenesis(t *testing.T) {

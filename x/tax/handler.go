@@ -44,6 +44,6 @@ func HandleMsgSetBp(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgSetBp) 
 		return &sdk.Result{}, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "proposer should be equal to original tax collector")
 	}
 	keeper.SetFeeBp(ctx, msg.NewFeeBp)
-	keeper.SetTrfBp(ctx, msg.NewTrfBp)
+	keeper.SetTransferBp(ctx, msg.NewTransferBp)
 	return &sdk.Result{}, nil
 }

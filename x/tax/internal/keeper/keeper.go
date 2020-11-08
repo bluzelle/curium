@@ -11,18 +11,18 @@ type IKeeper interface {
 	GetCodec() *codec.Codec
 	SetCollector(ctx sdk.Context, collector sdk.AccAddress)
 	SetFeeBp(ctx sdk.Context, bp int64)
-	SetTrfBp(ctx sdk.Context, bp int64)
+	SetTransferBp(ctx sdk.Context, bp int64)
 	GetCollector(ctx sdk.Context) sdk.AccAddress
 	GetFeeBp(ctx sdk.Context) int64
-	GetTrfBp(ctx sdk.Context) int64
+	GetTransferBp(ctx sdk.Context) int64
 	GetTaxInfo(ctx sdk.Context) types.TaxInfo
 }
 
 // constants
 var (
-	KeyCollector = []byte("collector")
-	KeyFeeBp     = []byte("fee_bp")
-	KeyTrfBp     = []byte("transfer_bp")
+	KeyCollector  = []byte("collector")
+	KeyFeeBp      = []byte("fee_bp")
+	KeyTransferBp = []byte("transfer_bp")
 )
 
 // Keeper manage storage for this module
@@ -79,17 +79,17 @@ func (k Keeper) GetFeeBp(ctx sdk.Context) int64 {
 	return bp
 }
 
-// SetTrfBp set fee basis point
-func (k Keeper) SetTrfBp(ctx sdk.Context, bp int64) {
+// SetTransferBp set fee basis point
+func (k Keeper) SetTransferBp(ctx sdk.Context, bp int64) {
 	store := k.GetKVStore(ctx)
-	store.Set(KeyTrfBp, k.cdc.MustMarshalBinaryBare(bp))
+	store.Set(KeyTransferBp, k.cdc.MustMarshalBinaryBare(bp))
 }
 
-// GetTrfBp returns fee basis point
-func (k Keeper) GetTrfBp(ctx sdk.Context) int64 {
+// GetTransferBp returns fee basis point
+func (k Keeper) GetTransferBp(ctx sdk.Context) int64 {
 	store := k.GetKVStore(ctx)
 	var bp int64
-	bz := store.Get(KeyTrfBp)
+	bz := store.Get(KeyTransferBp)
 	k.cdc.MustUnmarshalBinaryBare(bz, &bp)
 	return bp
 }
@@ -97,8 +97,8 @@ func (k Keeper) GetTrfBp(ctx sdk.Context) int64 {
 // GetTaxInfo return tax info in a struct
 func (k Keeper) GetTaxInfo(ctx sdk.Context) types.TaxInfo {
 	return types.TaxInfo{
-		Collector: k.GetCollector(ctx),
-		FeeBp:     k.GetFeeBp(ctx),
-		TrfBp:     k.GetTrfBp(ctx),
+		Collector:  k.GetCollector(ctx),
+		FeeBp:      k.GetFeeBp(ctx),
+		TransferBp: k.GetTransferBp(ctx),
 	}
 }

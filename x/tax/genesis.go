@@ -9,9 +9,9 @@ import (
 )
 
 type GenesisState struct {
-	Collector sdk.AccAddress
-	FeeBp     int64
-	TrfBp     int64
+	Collector  sdk.AccAddress
+	FeeBp      int64
+	TransferBp int64
 }
 
 func NewGenesisState() GenesisState {
@@ -22,7 +22,7 @@ func ValidateGenesis(data GenesisState) error {
 	if data.Collector.Empty() && data.FeeBp > 0 {
 		return errors.New("tax collector is empty but fee tax bp is not zero")
 	}
-	if data.Collector.Empty() && data.TrfBp > 0 {
+	if data.Collector.Empty() && data.TransferBp > 0 {
 		return errors.New("tax collector is empty but transfer tax bp is not zero")
 	}
 	return nil
@@ -38,26 +38,26 @@ func DefaultGenesisState() GenesisState {
 		panic(err)
 	}
 	return GenesisState{
-		Collector: collector,
-		FeeBp:     100,
-		TrfBp:     100,
+		Collector:  collector,
+		FeeBp:      100,
+		TransferBp: 1,
 	}
 }
 
 func InitGenesis(ctx sdk.Context, k keeper.IKeeper, data GenesisState) []abci.ValidatorUpdate {
 	k.SetCollector(ctx, data.Collector)
 	k.SetFeeBp(ctx, data.FeeBp)
-	k.SetTrfBp(ctx, data.TrfBp)
+	k.SetTransferBp(ctx, data.TransferBp)
 	return []abci.ValidatorUpdate{}
 }
 
 func ExportGenesis(ctx sdk.Context, k keeper.IKeeper) GenesisState {
 	collector := k.GetCollector(ctx)
 	feebp := k.GetFeeBp(ctx)
-	trfbp := k.GetTrfBp(ctx)
+	trfbp := k.GetTransferBp(ctx)
 	return GenesisState{
-		Collector: collector,
-		FeeBp:     feebp,
-		TrfBp:     trfbp,
+		Collector:  collector,
+		FeeBp:      feebp,
+		TransferBp: trfbp,
 	}
 }
