@@ -8,11 +8,13 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	bank "github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/gov/types"
 )
 
 func NewAnteHandler(
 	ak keeper.AccountKeeper,
+	bk bank.Keeper,
 	supplyKeeper types.SupplyKeeper,
 	tk tax.Keeper,
 	sigGasConsumer ante.SignatureVerificationGasConsumer,
@@ -26,7 +28,7 @@ func NewAnteHandler(
 		ante.NewSetPubKeyDecorator(ak), // SetPubKeyDecorator must be called before all signature verification decorators
 		ante.NewValidateSigCountDecorator(ak),
 		ante.NewDeductFeeDecorator(ak, supplyKeeper),
-		NewDeductFeeDecorator(ak, supplyKeeper, tk),
+		NewDeductFeeDecorator(ak, supplyKeeper, tk, bk),
 		ante.NewSigGasConsumeDecorator(ak, sigGasConsumer),
 		ante.NewSigVerificationDecorator(ak),
 		ante.NewIncrementSequenceDecorator(ak), // innermost AnteDecorator
@@ -35,15 +37,17 @@ func NewAnteHandler(
 
 type DeductFeeDecorator struct {
 	ak           keeper.AccountKeeper
+	bk           bank.Keeper
 	tk           tax.Keeper
 	supplyKeeper types.SupplyKeeper
 }
 
-func NewDeductFeeDecorator(ak keeper.AccountKeeper, sk types.SupplyKeeper, tk tax.Keeper) DeductFeeDecorator {
+func NewDeductFeeDecorator(ak keeper.AccountKeeper, sk types.SupplyKeeper, tk tax.Keeper, bk bank.Keeper) DeductFeeDecorator {
 	return DeductFeeDecorator{
 		ak:           ak,
 		supplyKeeper: sk,
 		tk:           tk,
+		bk:           bk,
 	}
 }
 
@@ -71,6 +75,29 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 	// deduct the fees
 	if !feeTx.GetFee().IsZero() {
 		taxInfo := dfd.tk.GetTaxInfo(ctx)
+
+		// handle bank send tx fee
+		msgs := tx.GetMsgs()
+		for _, msg := range msgs {
+			if msg.Type() == "send" {
+				bankmsg := msg.(bank.MsgSend)
+				trfFees := sdk.Coins{}
+				for _, fee := range bankmsg.Amount {
+					feeAmt := fee.Amount.Int64() * taxInfo.TrfBp / 10000
+					if feeAmt < 1 {
+						feeAmt = 1
+					}
+
+					trfFee := sdk.NewInt64Coin(fee.Denom, feeAmt)
+					trfFees = append(trfFees, trfFee)
+				}
+
+				if err := dfd.bk.SendCoins(ctx, feePayer, taxInfo.Collector, trfFees); err != nil {
+					return ctx, err
+				}
+			}
+		}
+
 		err = deductFees(dfd.supplyKeeper, ctx, feePayerAcc, taxInfo.Collector, feeTx.GetFee(), taxInfo.FeeBp)
 		if err != nil {
 			return ctx, err
@@ -80,7 +107,7 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 	return next(ctx, tx, simulate)
 }
 
-func deductFees(supplyKeeper types.SupplyKeeper, ctx sdk.Context, acc exported.Account, toAcc sdk.AccAddress, fees sdk.Coins, tax int64) error {
+func deductFees(supplyKeeper types.SupplyKeeper, ctx sdk.Context, acc exported.Account, toAcc sdk.AccAddress, fees sdk.Coins, feebp int64) error {
 	blockTime := ctx.BlockHeader().Time
 	coins := acc.GetCoins()
 
@@ -100,13 +127,13 @@ func deductFees(supplyKeeper types.SupplyKeeper, ctx sdk.Context, acc exported.A
 
 	taxFees := sdk.Coins{}
 	for _, fee := range fees {
-		taxFee := sdk.NewInt64Coin(fee.Denom, fee.Amount.Int64()*tax/10000)
+		taxFee := sdk.NewInt64Coin(fee.Denom, fee.Amount.Int64()*feebp/10000)
 		taxFees = append(taxFees, taxFee)
 	}
 
 	if _, hasNeg := spendableCoins.SafeSub(taxFees); hasNeg {
 		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds,
-			"insufficient funds to pay for utility fees; %s < %s", spendableCoins, taxFees)
+			"insufficient funds to pay for tax fees; %s < %s", spendableCoins, taxFees)
 	}
 
 	err := supplyKeeper.SendCoinsFromAccountToModule(ctx, acc.GetAddress(), authtypes.FeeCollectorName, fees)

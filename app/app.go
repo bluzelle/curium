@@ -325,6 +325,7 @@ func NewCRUDApp(
 	app.SetAnteHandler(
 		ante.NewAnteHandler(
 			app.accountKeeper,
+			app.bankKeeper,
 			app.supplyKeeper,
 			app.taxKeeper,
 			auth.DefaultSigVerificationGasConsumer,

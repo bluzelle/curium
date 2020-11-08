@@ -63,7 +63,7 @@ func GetCmdSetBp(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "set-bp [fee_bp] [transfer_bp]",
 		Short: "set basis point (0.0001 unit) of tax",
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			inBuf := bufio.NewReader(cmd.InOrStdin())

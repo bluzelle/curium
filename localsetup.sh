@@ -16,19 +16,34 @@ blzd gentx --name node0 --keyring-backend=test
 blzd collect-gentxs
 blzd start
 
+## try sending with genesis configuration ##
 # blzcli keys add user1 --keyring-backend=test
 # blzcli tx bank send node0 $(blzcli keys show -a user1  --keyring-backend=test) 10000stake --keyring-backend=test --fees=1000stake
 # blzcli query account bluzelle1wjkdcz4hl4gcarnqtupu7vkftal6h34qxjh6rw
-# blzcli query tax info 
+# expected result: 110stake
+# blzcli query tax info
+
+## create tax_owner key on local ##
 # blzcli keys add tax_owner --recover --keyring-backend=test
 # day rabbit mom clown bleak brown large lobster reduce accuse violin where address click dynamic myself buyer daughter situate today wheel thumb sudden drill
-# blzcli tx tax set-bp 10 --from node0 --keyring-backend=test
+
+## try tax param change with wrong account ##
+# blzcli tx tax set-bp 10 20 --from node0 --keyring-backend=test
 # blzcli query tax info 
 # blzcli tx tax set-collector $(blzcli keys show -a user1 --keyring-backend=test) --from node0 --keyring-backend=test
 # blzcli query tax info 
-# blzcli tx tax set-bp 10 --from tax_owner --keyring-backend=test
+
+## try tax param change with correct account ##
+# blzcli tx tax set-bp 30 40 --from tax_owner --keyring-backend=test
 # blzcli query tax info 
 # blzcli tx tax set-collector $(blzcli keys show -a user1 --keyring-backend=test) --from tax_owner --keyring-backend=test
 # blzcli query tax info 
+
+## try bank send with modified params ##
+# blzcli tx bank send node0 $(blzcli keys show -a user1  --keyring-backend=test) 10000stake --keyring-backend=test --fees=1000stake
+# blzcli query account $(blzcli keys show -a user1 --keyring-backend=test)
+# expected result: 20043stake
+
+## set tax owner back to original ##
 # blzcli tx tax set-collector $(blzcli keys show -a tax_owner --keyring-backend=test) --from user1 --keyring-backend=test
 # blzcli query tax info 
