@@ -14,16 +14,16 @@ func NewHandler(keeper keeper.IKeeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		switch msg := msg.(type) {
 		case types.MsgSetCollector:
-			return handleMsgSetCollector(ctx, keeper, msg)
+			return HandleMsgSetCollector(ctx, keeper, msg)
 		case types.MsgSetBp:
-			return handleMsgSetBp(ctx, keeper, msg)
+			return HandleMsgSetBp(ctx, keeper, msg)
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, fmt.Sprintf("Unrecognized tax msg type: %v", msg.Type()))
 		}
 	}
 }
 
-func handleMsgSetCollector(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgSetCollector) (*sdk.Result, error) {
+func HandleMsgSetCollector(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgSetCollector) (*sdk.Result, error) {
 	if err := msg.ValidateBasic(); err != nil {
 		return &sdk.Result{}, err
 	}
@@ -35,7 +35,7 @@ func handleMsgSetCollector(ctx sdk.Context, keeper keeper.IKeeper, msg types.Msg
 	return &sdk.Result{}, nil
 }
 
-func handleMsgSetBp(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgSetBp) (*sdk.Result, error) {
+func HandleMsgSetBp(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgSetBp) (*sdk.Result, error) {
 	if err := msg.ValidateBasic(); err != nil {
 		return &sdk.Result{}, err
 	}
