@@ -347,17 +347,12 @@ func (k Keeper) SetOwner(store sdk.KVStore, ownerStore sdk.KVStore, UUID string,
 }
 
 func (k Keeper) DeleteOwner(store sdk.KVStore, ownerStore sdk.KVStore, UUID string, key string) {
-
 	metaKey := MakeMetaKey(UUID, key)
 	var bz = store.Get([]byte(metaKey))
 	var value types.BLZValue
 	k.cdc.MustUnmarshalBinaryBare(bz, &value)
 
-	ownerKey := MakeOwnerKey(value.Owner, UUID, key)
-	oldKey := ownerStore.Get([]byte(ownerKey))
-	fmt.Println(oldKey)
-
-	ownerStore.Delete([]byte(ownerKey))
+	ownerStore.Delete([]byte(MakeOwnerKey(value.Owner, UUID, key)))
 }
 
 func (k Keeper) SetLease(leaseStore sdk.KVStore, UUID string, key string, blockHeight int64, leaseBlocks int64) {
