@@ -17,14 +17,15 @@
 package keeper
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/bluzelle/curium/x/crud/internal/types"
 	"github.com/cosmos/cosmos-sdk/codec"
+	cosmosTypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"sort"
 	"strconv"
-	cosmosTypes "github.com/cosmos/cosmos-sdk/store/types"
 )
 
 type MaxKeeperSizes struct {
@@ -53,7 +54,7 @@ type IKeeper interface {
 	GetValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string) types.BLZValue
 	GetValuesIterator(ctx sdk.Context, store sdk.KVStore) sdk.Iterator
 	IsKeyPresent(ctx sdk.Context, store sdk.KVStore, UUID string, key string) bool
-	ProcessLeasesAtBlockHeight(ctx sdk.Context, store sdk.KVStore, leaseStore sdk.KVStore, lease int64)
+	ProcessLeasesAtBlockHeight(ctx sdk.Context, store sdk.KVStore, leaseStore sdk.KVStore, ownerStore sdk.KVStore, lease int64)
 	RenameKey(ctx sdk.Context, store sdk.KVStore, UUID string, key string, newkey string) bool
 	SetLease(leaseStore sdk.KVStore, UUID string, key string, blockHeight int64, lease int64)
 	SetValue(ctx sdk.Context, store sdk.KVStore, UUID string, key string, value types.BLZValue)
@@ -346,12 +347,17 @@ func (k Keeper) SetOwner(store sdk.KVStore, ownerStore sdk.KVStore, UUID string,
 }
 
 func (k Keeper) DeleteOwner(store sdk.KVStore, ownerStore sdk.KVStore, UUID string, key string) {
+
 	metaKey := MakeMetaKey(UUID, key)
 	var bz = store.Get([]byte(metaKey))
 	var value types.BLZValue
 	k.cdc.MustUnmarshalBinaryBare(bz, &value)
 
-	ownerStore.Delete([]byte(MakeOwnerKey(value.Owner, UUID, key)))
+	ownerKey := MakeOwnerKey(value.Owner, UUID, key)
+	oldKey := ownerStore.Get([]byte(ownerKey))
+	fmt.Println(oldKey)
+
+	ownerStore.Delete([]byte(ownerKey))
 }
 
 func (k Keeper) SetLease(leaseStore sdk.KVStore, UUID string, key string, blockHeight int64, leaseBlocks int64) {
@@ -366,12 +372,22 @@ func (k Keeper) DeleteLease(leaseStore sdk.KVStore, UUID string, key string, blo
 	leaseStore.Delete([]byte(MakeLeaseKey(blockHeight+leaseBlocks, UUID, key)))
 }
 
-func (k Keeper) ProcessLeasesAtBlockHeight(_ sdk.Context, store sdk.KVStore, leaseStore sdk.KVStore, lease int64) {
+func (k Keeper) ProcessLeasesAtBlockHeight(ctx sdk.Context, store sdk.KVStore, leaseStore sdk.KVStore, ownerStore sdk.KVStore, lease int64) {
 	prefix := strconv.FormatInt(lease, 10) + "\x00"
 	iterator := sdk.KVStorePrefixIterator(leaseStore, []byte(prefix))
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
+
+		// Delete from owner index
+		parts := bytes.Split(iterator.Key()[len(prefix):], []byte("\x00"))
+		uuid := string(parts[0])
+		key := string(parts[1])
+
+		k.DeleteOwner(store, ownerStore, uuid, key)
+
+
+		// Delete lease
 		fmt.Printf("\n\tdeleting %s, %s\n", prefix, string(iterator.Key()))
 		store.Delete(iterator.Key()[len(prefix):])
 		leaseStore.Delete(iterator.Key())

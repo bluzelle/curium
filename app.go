@@ -350,7 +350,7 @@ func (app *CRUDApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) ab
 
 func (app *CRUDApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	r := app.mm.EndBlock(ctx, req)
-	app.crudKeeper.ProcessLeasesAtBlockHeight(ctx, app.crudKeeper.GetKVStore(ctx), app.crudKeeper.GetLeaseStore(ctx), ctx.BlockHeight())
+	app.crudKeeper.ProcessLeasesAtBlockHeight(ctx, app.crudKeeper.GetKVStore(ctx), app.crudKeeper.GetLeaseStore(ctx), app.crudKeeper.GetOwnerStore(ctx), ctx.BlockHeight())
 	return r
 }
 
