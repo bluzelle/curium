@@ -294,15 +294,15 @@ func (mr *MockIKeeperMockRecorder) IsKeyPresent(ctx, store, UUID, key interface{
 }
 
 // ProcessLeasesAtBlockHeight mocks base method
-func (m *MockIKeeper) ProcessLeasesAtBlockHeight(ctx types0.Context, store, leaseStore types0.KVStore, lease int64) {
+func (m *MockIKeeper) ProcessLeasesAtBlockHeight(ctx types0.Context, store, leaseStore, ownerStore types0.KVStore, lease int64) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "ProcessLeasesAtBlockHeight", ctx, store, leaseStore, lease)
+	m.ctrl.Call(m, "ProcessLeasesAtBlockHeight", ctx, store, leaseStore, ownerStore, lease)
 }
 
 // ProcessLeasesAtBlockHeight indicates an expected call of ProcessLeasesAtBlockHeight
-func (mr *MockIKeeperMockRecorder) ProcessLeasesAtBlockHeight(ctx, store, leaseStore, lease interface{}) *gomock.Call {
+func (mr *MockIKeeperMockRecorder) ProcessLeasesAtBlockHeight(ctx, store, leaseStore, ownerStore, lease interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessLeasesAtBlockHeight", reflect.TypeOf((*MockIKeeper)(nil).ProcessLeasesAtBlockHeight), ctx, store, leaseStore, lease)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessLeasesAtBlockHeight", reflect.TypeOf((*MockIKeeper)(nil).ProcessLeasesAtBlockHeight), ctx, store, leaseStore, ownerStore, lease)
 }
 
 // RenameKey mocks base method

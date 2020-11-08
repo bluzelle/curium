@@ -495,12 +495,12 @@ func TestKeeper_ProcessLeasesAtBlockHeight(t *testing.T) {
 	keeper.SetValue(ctx, testStore, "uuid", "key01", types.BLZValue{Value: "value", Owner: owner})
 	keeper.SetLease(testStore, "uuid", "key01", 0, 2000)
 
-	keeper.ProcessLeasesAtBlockHeight(ctx, testStore, testStore, 2000)
+	keeper.ProcessLeasesAtBlockHeight(ctx, testStore, testStore, testStore, 2000)
 
 	assert.True(t, testStore.Has([]byte(MakeLeaseKey(1, "uuid", "key00"))))
 	assert.False(t, testStore.Has([]byte(MakeLeaseKey(2000, "uuid", "key01"))))
 
-	keeper.ProcessLeasesAtBlockHeight(ctx, testStore, testStore, 1)
+	keeper.ProcessLeasesAtBlockHeight(ctx, testStore, testStore, testStore,1)
 	assert.False(t, testStore.Has([]byte(MakeLeaseKey(1, "uuid", "key00"))))
 }
 

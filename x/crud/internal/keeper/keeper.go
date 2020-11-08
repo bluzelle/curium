@@ -336,6 +336,7 @@ func (k Keeper) DeleteAll(_ sdk.Context, store sdk.KVStore, UUID string, owner s
 			k.cdc.MustUnmarshalBinaryBare(bz, &value)
 			return value.Owner.Equals(owner)
 		}() {
+
 			store.Delete(iterator.Key())
 		}
 	}
