@@ -142,7 +142,7 @@ func TestKeeper_DeleteValue(t *testing.T) {
 
 	assert.True(t, testStore.Has([]byte(MakeLeaseKey(0, "uuid", "key"))))
 
-	keeper.DeleteValue(ctx, testStore, testStore, "uuid", "key")
+	keeper.DeleteValue(ctx, testStore, testStore, testStore,"uuid", "key")
 
 	assert.False(t, testStore.Has([]byte(MakeLeaseKey(0, "uuid", "key"))))
 
@@ -300,11 +300,11 @@ func TestKeeper_RenameKey(t *testing.T) {
 		Owner: owner,
 	})
 
-	assert.False(t, keeper.RenameKey(ctx, testStore, "uuid", "badkey", "newkey"))
+	assert.False(t, keeper.RenameKey(ctx, testStore, testStore,"uuid", "badkey", "newkey"))
 
-	assert.True(t, keeper.RenameKey(ctx, testStore, "uuid", "key", "newkey"))
+	assert.True(t, keeper.RenameKey(ctx, testStore, testStore,"uuid", "key", "newkey"))
 
-	assert.False(t, keeper.RenameKey(ctx, testStore, "uuid", "key", "newkey"))
+	assert.False(t, keeper.RenameKey(ctx, testStore, testStore,"uuid", "key", "newkey"))
 
 	assert.True(t, reflect.DeepEqual(keeper.GetValue(ctx, testStore, "uuid", "newkey"), types.BLZValue{
 		Value: "a value",
@@ -445,7 +445,7 @@ func TestKeeper_DeleteAll(t *testing.T) {
 	keeper.SetValue(ctx, testStore, "uuid", "key3", types.BLZValue{Value: "value", Owner: owner})
 	keeper.SetValue(ctx, testStore, "uuid", "key", types.BLZValue{Value: "value", Owner: []byte("bluzelle1nnpyp9wr6law2u5jwa23t0ywtmrduldf6h4wqr")})
 
-	keeper.DeleteAll(ctx, testStore, "uuid", owner)
+	keeper.DeleteAll(ctx, testStore, testStore, testStore,"uuid", owner)
 
 	count := keeper.GetCount(ctx, testStore, "uuid", owner)
 	assert.Equal(t, "uuid", count.UUID)

@@ -201,8 +201,7 @@ func handleMsgDelete(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgDelete
 	}
 
 	newCtx := ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
-	keeper.DeleteOwner(keeper.GetKVStore(ctx), keeper.GetOwnerStore(ctx), msg.UUID, msg.Key)
-	keeper.DeleteValue(ctx, keeper.GetKVStore(ctx), keeper.GetLeaseStore(newCtx), msg.UUID, msg.Key)
+	keeper.DeleteValue(ctx, keeper.GetKVStore(ctx), keeper.GetLeaseStore(newCtx), keeper.GetOwnerStore(ctx), msg.UUID, msg.Key)
 
 	return &sdk.Result{}, nil
 }
@@ -251,7 +250,7 @@ func handleMsgRename(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgRename
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "Incorrect Owner")
 	}
 
-	if !keeper.RenameKey(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key, msg.NewKey) {
+	if !keeper.RenameKey(ctx, keeper.GetKVStore(ctx), keeper.GetOwnerStore(ctx), msg.UUID, msg.Key, msg.NewKey) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Rename failed")
 	}
 
@@ -289,7 +288,7 @@ func handleMsgDeleteAll(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgDel
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
 	}
 
-	keeper.DeleteAll(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Owner)
+	keeper.DeleteAll(ctx, keeper.GetKVStore(ctx), keeper.GetLeaseStore(ctx), keeper.GetOwnerStore(ctx), msg.UUID, msg.Owner)
 
 	return &sdk.Result{}, nil
 }

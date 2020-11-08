@@ -36,15 +36,15 @@ func (m *MockIKeeper) EXPECT() *MockIKeeperMockRecorder {
 }
 
 // DeleteAll mocks base method
-func (m *MockIKeeper) DeleteAll(ctx types0.Context, store types0.KVStore, UUID string, owner types0.AccAddress) {
+func (m *MockIKeeper) DeleteAll(ctx types0.Context, store, leaseStore, ownerStore types0.KVStore, UUID string, owner types0.AccAddress) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "DeleteAll", ctx, store, UUID, owner)
+	m.ctrl.Call(m, "DeleteAll", ctx, store, leaseStore, ownerStore, UUID, owner)
 }
 
 // DeleteAll indicates an expected call of DeleteAll
-func (mr *MockIKeeperMockRecorder) DeleteAll(ctx, store, UUID, owner interface{}) *gomock.Call {
+func (mr *MockIKeeperMockRecorder) DeleteAll(ctx, store, leaseStore, ownerStore, UUID, owner interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAll", reflect.TypeOf((*MockIKeeper)(nil).DeleteAll), ctx, store, UUID, owner)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAll", reflect.TypeOf((*MockIKeeper)(nil).DeleteAll), ctx, store, leaseStore, ownerStore, UUID, owner)
 }
 
 // DeleteLease mocks base method
@@ -72,15 +72,15 @@ func (mr *MockIKeeperMockRecorder) DeleteOwner(store, ownerStore, UUID, key inte
 }
 
 // DeleteValue mocks base method
-func (m *MockIKeeper) DeleteValue(ctx types0.Context, store, leaseStore types0.KVStore, UUID, key string) {
+func (m *MockIKeeper) DeleteValue(ctx types0.Context, store, leaseStore, ownerStore types0.KVStore, UUID, key string) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "DeleteValue", ctx, store, leaseStore, UUID, key)
+	m.ctrl.Call(m, "DeleteValue", ctx, store, leaseStore, ownerStore, UUID, key)
 }
 
 // DeleteValue indicates an expected call of DeleteValue
-func (mr *MockIKeeperMockRecorder) DeleteValue(ctx, store, leaseStore, UUID, key interface{}) *gomock.Call {
+func (mr *MockIKeeperMockRecorder) DeleteValue(ctx, store, leaseStore, ownerStore, UUID, key interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteValue", reflect.TypeOf((*MockIKeeper)(nil).DeleteValue), ctx, store, leaseStore, UUID, key)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteValue", reflect.TypeOf((*MockIKeeper)(nil).DeleteValue), ctx, store, leaseStore, ownerStore, UUID, key)
 }
 
 // GetCdc mocks base method
@@ -306,17 +306,17 @@ func (mr *MockIKeeperMockRecorder) ProcessLeasesAtBlockHeight(ctx, store, leaseS
 }
 
 // RenameKey mocks base method
-func (m *MockIKeeper) RenameKey(ctx types0.Context, store types0.KVStore, UUID, key, newkey string) bool {
+func (m *MockIKeeper) RenameKey(ctx types0.Context, store, ownerStore types0.KVStore, UUID, key, newkey string) bool {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RenameKey", ctx, store, UUID, key, newkey)
+	ret := m.ctrl.Call(m, "RenameKey", ctx, store, ownerStore, UUID, key, newkey)
 	ret0, _ := ret[0].(bool)
 	return ret0
 }
 
 // RenameKey indicates an expected call of RenameKey
-func (mr *MockIKeeperMockRecorder) RenameKey(ctx, store, UUID, key, newkey interface{}) *gomock.Call {
+func (mr *MockIKeeperMockRecorder) RenameKey(ctx, store, ownerStore, UUID, key, newkey interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RenameKey", reflect.TypeOf((*MockIKeeper)(nil).RenameKey), ctx, store, UUID, key, newkey)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RenameKey", reflect.TypeOf((*MockIKeeper)(nil).RenameKey), ctx, store, ownerStore, UUID, key, newkey)
 }
 
 // SetLease mocks base method

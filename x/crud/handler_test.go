@@ -410,7 +410,6 @@ func Test_handleMsgDelete(t *testing.T) {
 		mockKeeper.EXPECT().GetLeaseStore(gomock.Any()).AnyTimes().Return(nil)
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, deleteMsg.UUID, deleteMsg.Key)
-		mockKeeper.EXPECT().DeleteOwner(gomock.Any(), gomock.Any(), "uuid", "key")
 
 		_, err := NewHandler(mockKeeper)(ctx, deleteMsg)
 		assert.NotNil(t, err)
@@ -422,7 +421,7 @@ func Test_handleMsgDelete(t *testing.T) {
 		assert.NotNil(t, err)
 
 		mockKeeper.EXPECT().GetOwner(ctx, nil, deleteMsg.UUID, deleteMsg.Key).Return(owner)
-		mockKeeper.EXPECT().DeleteValue(ctx, nil, nil, deleteMsg.UUID, deleteMsg.Key)
+		mockKeeper.EXPECT().DeleteValue(ctx, nil, nil, nil, deleteMsg.UUID, deleteMsg.Key)
 		_, err = handleMsgDelete(ctx, mockKeeper, deleteMsg)
 		assert.Nil(t, err)
 	}
@@ -546,8 +545,9 @@ func Test_handleMsgRename(t *testing.T) {
 
 		// always return nil for a store...
 		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
+		mockKeeper.EXPECT().GetOwnerStore(ctx).AnyTimes().Return(nil)
 		mockKeeper.EXPECT().GetOwner(ctx, nil, renameMsg.UUID, renameMsg.Key).Return(owner)
-		mockKeeper.EXPECT().RenameKey(ctx, gomock.Any(), renameMsg.UUID, renameMsg.Key, renameMsg.NewKey).Return(true)
+		mockKeeper.EXPECT().RenameKey(ctx, gomock.Any(), gomock.Any(), renameMsg.UUID, renameMsg.Key, renameMsg.NewKey).Return(true)
 
 		_, err := NewHandler(mockKeeper)(ctx, renameMsg)
 		assert.Nil(t, err)
@@ -564,7 +564,7 @@ func Test_handleMsgRename(t *testing.T) {
 		// Rename failed
 		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
 		mockKeeper.EXPECT().GetOwner(ctx, nil, renameMsg.UUID, renameMsg.Key).Return(renameMsg.Owner)
-		mockKeeper.EXPECT().RenameKey(ctx, gomock.Any(), renameMsg.UUID, renameMsg.Key, renameMsg.NewKey).Return(false)
+		mockKeeper.EXPECT().RenameKey(ctx, gomock.Any(), gomock.Any(), renameMsg.UUID, renameMsg.Key, renameMsg.NewKey).Return(false)
 
 		_, err = NewHandler(mockKeeper)(ctx, renameMsg)
 		assert.NotNil(t, err)
@@ -672,7 +672,9 @@ func Test_handleMsgDeleteAll(t *testing.T) {
 
 		// always return nil for a store...
 		mockKeeper.EXPECT().GetKVStore(ctx).AnyTimes().Return(nil)
-		mockKeeper.EXPECT().DeleteAll(ctx, nil, deleteAllMsg.UUID, gomock.Any())
+		mockKeeper.EXPECT().GetLeaseStore(ctx).AnyTimes().Return(nil)
+		mockKeeper.EXPECT().GetOwnerStore(ctx).AnyTimes().Return(nil)
+		mockKeeper.EXPECT().DeleteAll(ctx, nil, nil, nil, deleteAllMsg.UUID, gomock.Any())
 
 		_, err := NewHandler(mockKeeper)(ctx, deleteAllMsg)
 		assert.Nil(t, err)
