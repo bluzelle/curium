@@ -19,9 +19,11 @@ blzd start
 ## try sending with genesis configuration ##
 # blzcli keys add user1 --keyring-backend=test
 # blzcli tx bank send node0 $(blzcli keys show -a user1  --keyring-backend=test) 10000stake --keyring-backend=test --fees=1000stake
-# blzcli tx send node0 $(blzcli keys show -a user1  --keyring-backend=test) 10000stake  --keyring-backend=test --fees=1000stake
 # blzcli query account bluzelle1wjkdcz4hl4gcarnqtupu7vkftal6h34qxjh6rw
 # expected result: 11stake
+# blzcli tx send node0 $(blzcli keys show -a user1  --keyring-backend=test) 10000stake  --keyring-backend=test --fees=1000stake
+# blzcli query account bluzelle1wjkdcz4hl4gcarnqtupu7vkftal6h34qxjh6rw
+# expected result: 22stake
 # blzcli query tax info
 
 ## create tax_owner key on local ##
