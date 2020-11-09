@@ -386,7 +386,7 @@ func handleMsgRenewLeaseAll(ctx sdk.Context, keeper keeper.IKeeper, msg types.Ms
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
 	}
 
-	value := keeper.GetKeys(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Owner)
+	value := keeper.GetMyKeys(ctx, keeper.GetOwnerStore(ctx), msg.UUID, msg.Owner)
 	if len(value.Keys) == 0 {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID does not exist")
 	}

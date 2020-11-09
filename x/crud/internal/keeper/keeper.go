@@ -182,12 +182,6 @@ func (k Keeper) GetKeys(ctx sdk.Context, store sdk.KVStore, UUID string, owner s
 
 	keysSize := uint64(0)
 	for ; iterator.Valid(); iterator.Next() {
-		if (owner == nil) || func() bool {
-			var bz = store.Get(iterator.Key())
-			var value types.BLZValue
-			k.cdc.MustUnmarshalBinaryBare(bz, &value)
-			return value.Owner.Equals(owner)
-		}() {
 			key := string(iterator.Key())[len(prefix):]
 			keysSize = uint64(len(key)) + keysSize
 			if ctx.GasMeter().IsPastLimit() {
@@ -200,7 +194,6 @@ func (k Keeper) GetKeys(ctx sdk.Context, store sdk.KVStore, UUID string, owner s
 				return keys
 			}
 		}
-	}
 	return keys
 }
 
