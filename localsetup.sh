@@ -50,3 +50,29 @@ blzd start
 ## set tax owner back to original ##
 # blzcli tx tax set-collector $(blzcli keys show -a tax_owner --keyring-backend=test) --from user1 --keyring-backend=test
 # blzcli query tax info 
+
+############ negatives testing #################
+
+## Transfer taxes are not being charged on create-validator (you bond an amount as part of this) ## $(blzd tendermint show-validator)
+# blzcli keys add nval --keyring-backend=test
+# blzcli tx bank send node0 $(blzcli keys show -a nval --keyring-backend=test) 1000000stake --keyring-backend=test --fees=1000stake
+# blzcli query account bluzelle1wjkdcz4hl4gcarnqtupu7vkftal6h34qxjh6rw
+# blzcli tx staking create-validator --amount=10000stake --moniker="nval" --pubkey=bluzellevalconspub1zcjduepqladdfp8vrmpjwm7e0pcvxg34qk0uh0fd9sqtakduzm6dhqd5zmhsv285xk --commission-rate="0.10" --commission-max-rate="0.20" --commission-max-change-rate="0.01" --min-self-delegation="1" --gas="auto" --gas-prices="0.025stake" --from nval --keyring-backend=test
+# blzcli query account bluzelle1wjkdcz4hl4gcarnqtupu7vkftal6h34qxjh6rw
+
+## Transfer taxes are not being charged on delegations (self or not) ## $(blzcli q staking validators)
+# VALADDR=$(blzcli query staking validators | sed -n 's/\"operator_address\": \"\(bluzellevaloper.*\)\".*/\1/p')
+# echo $VALADDR
+# blzcli query account bluzelle1wjkdcz4hl4gcarnqtupu7vkftal6h34qxjh6rw
+# blzcli tx staking delegate $VALADDR 10000stake --from nval --keyring-backend=test --yes
+# blzcli query account bluzelle1wjkdcz4hl4gcarnqtupu7vkftal6h34qxjh6rw
+
+## Transfer taxes are not being charged on governance submit-proposal (that also takes an initial deposit) ##
+# blzcli query account bluzelle1wjkdcz4hl4gcarnqtupu7vkftal6h34qxjh6rw
+# blzcli tx gov submit-proposal --title="Test Proposal" --description="My awesome proposal" --type="Text" --deposit="10000stake" --from nval --keyring-backend=test
+# blzcli query account bluzelle1wjkdcz4hl4gcarnqtupu7vkftal6h34qxjh6rw
+
+## Transfer taxes are not being charged on governance deposits ##
+# blzcli query account bluzelle1wjkdcz4hl4gcarnqtupu7vkftal6h34qxjh6rw
+# blzcli tx gov deposit 1 10000stake --from node0 --keyring-backend=test --yes
+# blzcli query account bluzelle1wjkdcz4hl4gcarnqtupu7vkftal6h34qxjh6rw
