@@ -82,13 +82,13 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 			if msg.Type() == "send" {
 				bankmsg := msg.(bank.MsgSend)
 				trfFees := sdk.Coins{}
-				for _, fee := range bankmsg.Amount {
-					feeAmt := fee.Amount.Int64() * taxInfo.TransferBp / 10000
+				for _, coin := range bankmsg.Amount {
+					feeAmt := coin.Amount.Int64() * taxInfo.TransferBp / 10000
 					if feeAmt < 1 {
 						feeAmt = 1
 					}
 
-					trfFee := sdk.NewInt64Coin(fee.Denom, feeAmt)
+					trfFee := sdk.NewInt64Coin(coin.Denom, feeAmt)
 					trfFees = append(trfFees, trfFee)
 				}
 
@@ -127,7 +127,11 @@ func deductFees(supplyKeeper types.SupplyKeeper, ctx sdk.Context, acc exported.A
 
 	taxFees := sdk.Coins{}
 	for _, fee := range fees {
-		taxFee := sdk.NewInt64Coin(fee.Denom, fee.Amount.Int64()*feebp/10000)
+		feeAmt := fee.Amount.Int64() * feebp / 10000
+		if feeAmt < 1 {
+			feeAmt = 1
+		}
+		taxFee := sdk.NewInt64Coin(fee.Denom, feeAmt)
 		taxFees = append(taxFees, taxFee)
 	}
 

@@ -47,6 +47,9 @@ blzd start
 # blzcli query account $(blzcli keys show -a user1 --keyring-backend=test)
 # expected result: 20043stake
 
+# blzcli keys add user1 --keyring-backend=test
+# blzcli tx send node0 $(blzcli keys show -a user1 --keyring-backend=test) 10000000stake --gas-prices 1.0stake --keyring-backend=test --yes
+
 ## set tax owner back to original ##
 # blzcli tx tax set-collector $(blzcli keys show -a tax_owner --keyring-backend=test) --from user1 --keyring-backend=test
 # blzcli query tax info 
