@@ -15,7 +15,7 @@
 
    so that when we use apt to install the tools we need we will get the most recent versions.
 
-3. Install the build-essential tools and jq for easy JSON parsing and pretty printing
+3. Install the build-essential tools and jq for easy JSON parsing and pretty printing (you might have to use apt instead of apt-get, if the latter fails. If so, do the update with apt as well).
 
    ```text
    sudo apt-get install build-essential jq
