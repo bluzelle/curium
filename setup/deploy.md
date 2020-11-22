@@ -113,7 +113,7 @@ mnemonic will be used by the Bluzelle javascript client to send
 transactions to the node.
 ```
 
-1. Add the first account to the blockchain using the vuser key as the account identifier
+9. Add the first account to the blockchain using the vuser key as the account identifier
 
    ```text
    blzd add-genesis-account $(blzcli keys show vuser -a) 500000000000000ubnt
@@ -121,7 +121,7 @@ transactions to the node.
 
    this command is an alias for “tx staking create-validator”. The amount given for the ubnt tokens here will be the total amount of tokens available to the zone.
 
-2. As this is the first node in the zone, it needs an initial transaction for the blockchain.
+10. As this is the first node in the zone, it needs an initial transaction for the blockchain.
 
    blzd gentx --name vuser --amount 10000000000000ubnt --keyring-backend test
 
@@ -139,7 +139,7 @@ transactions to the node.
 
    "bluzellevaloper1&lt;...&gt;"
 
-3. Create the genesis file from the first transaction:
+11. Create the genesis file from the first transaction:
 
    ```text
    blzd collect-gentxs
@@ -149,13 +149,13 @@ transactions to the node.
 
    This command creates the signed genesis.json file ".blzd/config/genesis.json\)" that will be copied to the rest of the nodes in the zone.
 
-4. The node can be started with the Bluzelle daemon:
+12. The node can be started with the Bluzelle daemon:
 
    ```text
    blzd start
    ```
 
-5. On a second terminal the http server can be started with the Bluzelle client
+13. On a second terminal the http server can be started with the Bluzelle client
 
    ```text
    blzcli rest-server
