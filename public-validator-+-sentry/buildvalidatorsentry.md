@@ -37,13 +37,13 @@ For the following instructions, we will describe the steps to setup a validator 
    **MAIN NET**:
    
    ```text
-   curl --location --request GET 'http://client.sentry.bluzellenet.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
+   curl --location --request GET 'https://client.sentry.bluzellenet.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
    ```
 
    **TEST NET**:
    
    ```text
-   curl --location --request GET 'http://client.sentry.testnet.public.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
+   curl --location --request GET 'https://client.sentry.testnet.public.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
    ```
 
    Initialize your daemon config as follows:
@@ -88,13 +88,13 @@ For the following instructions, we will describe the steps to setup a validator 
    **MAIN NET**:
    
    ```text
-   curl -s http://client.sentry.bluzellenet.bluzelle.com:26657/net_info | jq -C '[.result.peers[] | select(.node_info.moniker | startswith("daemon-sentry-gateway")) | {moniker: .node_info.moniker, id: .node_info.id, ip_address: .remote_ip}] | sort_by(.moniker)'
+   curl -s https://client.sentry.bluzellenet.bluzelle.com:26657/net_info | jq -C '[.result.peers[] | select(.node_info.moniker | startswith("daemon-sentry-gateway")) | {moniker: .node_info.moniker, id: .node_info.id, ip_address: .remote_ip}] | sort_by(.moniker)'
    ```
 
    **TEST NET**:
    
    ```text
-   curl -s http://client.sentry.testnet.public.bluzelle.com:26657/net_info | jq -C '[.result.peers[] | select(.node_info.moniker | startswith("daemon-sentry-gateway")) | {moniker: .node_info.moniker, id: .node_info.id, ip_address: .remote_ip}] | sort_by(.moniker)'
+   curl -s https://client.sentry.testnet.public.bluzelle.com:26657/net_info | jq -C '[.result.peers[] | select(.node_info.moniker | startswith("daemon-sentry-gateway")) | {moniker: .node_info.moniker, id: .node_info.id, ip_address: .remote_ip}] | sort_by(.moniker)'
    ```
 
    Note down the sentry IP address and respective id, for each such gateway sentry. You will need this information next.
@@ -178,7 +178,7 @@ For the following instructions, we will describe the steps to setup a validator 
    
     ii) Goto the following URL to sign into the staking application:
     
-    http://staking.bluzelle.com/ 
+    https://staking.bluzelle.com/ 
    
     iii) Create a new BNT mnemonic for our MAIN NET, and store and secure this BNT mnemonic securely. **If you lose this mnemonic, you will lose ALL your funds.** Bluzelle is not responsible and there is no policy to "refund" anything. Note that this web wallet is **100% client side**. Your BNT mnemonic is generated on the local browser only and is never transmitted over the network. You are 100% responsible for storing and securing this mnemonic. 
     
@@ -243,24 +243,24 @@ For the following instructions, we will describe the steps to setup a validator 
 
     **MAIN NET**:
     ```text
-    curl http://client.sentry.bluzellenet.bluzelle.com:26657/genesis | jq -C '.result.genesis' | more -r
+    curl https://client.sentry.bluzellenet.bluzelle.com:26657/genesis | jq -C '.result.genesis' | more -r
     ```
 
     **TEST NET**:
     ```text
-    curl http://client.sentry.testnet.public.bluzelle.com:26657/genesis | jq -C '.result.genesis' | more -r
+    curl https://client.sentry.testnet.public.bluzelle.com:26657/genesis | jq -C '.result.genesis' | more -r
     ```
 
     A convenient example to download it to the current folder from our sentry nodes:
 
     **MAIN NET**:
     ```text
-    curl http://client.sentry.bluzellenet.bluzelle.com:26657/genesis | jq '.result.genesis' > genesis.json
+    curl https://client.sentry.bluzellenet.bluzelle.com:26657/genesis | jq '.result.genesis' > genesis.json
     ```
 
     **TEST NET**:
     ```text
-    curl http://client.sentry.testnet.public.bluzelle.com:26657/genesis | jq '.result.genesis' > genesis.json
+    curl https://client.sentry.testnet.public.bluzelle.com:26657/genesis | jq '.result.genesis' > genesis.json
     ```
 
     Ensure to copy over and replace the existing genesis.json file in your "~/.blzd/config/" folder with the downloaded one from the testnet.
@@ -382,6 +382,6 @@ For the following instructions, we will describe the steps to setup a validator 
     
     **TEST NET**:
 
-    http://bigdipper.testnet.public.bluzelle.com/validators
+    https://bigdipper.testnet.public.bluzelle.com/validators
 
 [Back](../)
