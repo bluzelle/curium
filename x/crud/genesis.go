@@ -27,11 +27,17 @@ type StoreExport struct {
 }
 
 type GenesisState struct {
-	Crud []StoreExport
+	CrudStore []StoreExport
+	LeaseStore []StoreExport
+	OwnerStore []StoreExport
 }
 
 func NewGenesisState(_ []types.BLZValue) GenesisState {
-	return GenesisState{Crud: nil}
+	return GenesisState{
+		CrudStore: nil,
+		LeaseStore: nil,
+		OwnerStore: nil,
+	}
 }
 
 func ValidateGenesis(data GenesisState) error {
@@ -45,34 +51,43 @@ func ValidateGenesis(data GenesisState) error {
 
 func DefaultGenesisState() GenesisState {
 	return GenesisState{
-		Crud: nil,
+		CrudStore: nil,
+		LeaseStore: nil,
+		OwnerStore: nil,
 	}
 }
 
 func InitGenesis(ctx sdk.Context, keeper keeper.IKeeper, data GenesisState) []abci.ValidatorUpdate {
-	for _, record := range data.Crud {
-		store := keeper.GetKVStore(ctx)
-		store.Set(record.Key, record.Value)
-//		keeper.SetValue(ctx, keeper.GetKVStore(ctx), "UUID-Genesis", "Key-Genesis", record)
-	}
+	importStore(keeper.GetKVStore(ctx), data.CrudStore)
+	importStore(keeper.GetLeaseStore(ctx), data.LeaseStore)
+	importStore(keeper.GetOwnerStore(ctx), data.OwnerStore)
 	return []abci.ValidatorUpdate{}
+}
+
+func importStore(store sdk.KVStore, records []StoreExport) {
+	for _, record := range records {
+		 value := record.Value
+		 if value == nil {
+		 	value = make([]byte, 0)
+		 }
+		store.Set(record.Key, value)
+	}
 }
 
 
 func ExportGenesis(ctx sdk.Context, k keeper.IKeeper) GenesisState {
-
 	return GenesisState{
-		exportCrud(ctx, k),
+		exportStore(ctx, k.GetKVStore(ctx)),
+		exportStore(ctx, k.GetLeaseStore(ctx)),
+		exportStore(ctx, k.GetOwnerStore(ctx)),
 	}
 }
 
-func exportCrud(ctx sdk.Context, k keeper.IKeeper) []StoreExport {
+func exportStore(ctx sdk.Context, store sdk.KVStore) []StoreExport {
 	var records []StoreExport
-	iterator := k.GetValuesIterator(ctx, k.GetKVStore(ctx))
+	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 	for ; iterator.Valid(); iterator.Next() {
-		key := iterator.Key()
-		value := iterator.Value()
-		records = append(records, StoreExport{key, value})
+		records = append(records, StoreExport{iterator.Key(), iterator.Value()})
 	}
 	return records
 }
