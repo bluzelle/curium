@@ -15,51 +15,64 @@
 package crud
 
 import (
-	"fmt"
 	"github.com/bluzelle/curium/x/crud/internal/keeper"
 	"github.com/bluzelle/curium/x/crud/internal/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
+type StoreExport struct {
+	Key []byte
+	Value []byte
+}
+
 type GenesisState struct {
-	BlzValues []types.BLZValue
+	Crud []StoreExport
 }
 
 func NewGenesisState(_ []types.BLZValue) GenesisState {
-	return GenesisState{BlzValues: nil}
+	return GenesisState{Crud: nil}
 }
 
 func ValidateGenesis(data GenesisState) error {
-	for _, record := range data.BlzValues {
-		if record.Owner == nil {
-			return fmt.Errorf("invalid BlzValue: Value: %s. Error: Missing Owner", record.Value)
-		}
-	}
+	//for _, record := range data.BlzValues {
+	//	if record.Owner == nil {
+	//		return fmt.Errorf("invalid BlzValue: Value: %s. Error: Missing Owner", record.Value)
+	//	}
+	//}
 	return nil
 }
 
 func DefaultGenesisState() GenesisState {
 	return GenesisState{
-		BlzValues: nil,
+		Crud: nil,
 	}
 }
 
 func InitGenesis(ctx sdk.Context, keeper keeper.IKeeper, data GenesisState) []abci.ValidatorUpdate {
-	for _, record := range data.BlzValues {
-		keeper.SetValue(ctx, keeper.GetKVStore(ctx), "UUID-Genesis", "Key-Genesis", record)
+	for _, record := range data.Crud {
+		store := keeper.GetKVStore(ctx)
+		store.Set(record.Key, record.Value)
+//		keeper.SetValue(ctx, keeper.GetKVStore(ctx), "UUID-Genesis", "Key-Genesis", record)
 	}
 	return []abci.ValidatorUpdate{}
 }
 
-// TODO - fix key value issues
+
 func ExportGenesis(ctx sdk.Context, k keeper.IKeeper) GenesisState {
-	var records []types.BLZValue
+
+	return GenesisState{
+		exportCrud(ctx, k),
+	}
+}
+
+func exportCrud(ctx sdk.Context, k keeper.IKeeper) []StoreExport {
+	var records []StoreExport
 	iterator := k.GetValuesIterator(ctx, k.GetKVStore(ctx))
 	for ; iterator.Valid(); iterator.Next() {
-		key := string(iterator.Key())
-		value := k.GetValue(ctx, k.GetKVStore(ctx), "UUID-Genesis", key)
-		records = append(records, value)
+		key := iterator.Key()
+		value := iterator.Value()
+		records = append(records, StoreExport{key, value})
 	}
-	return GenesisState{records}
+	return records
 }
