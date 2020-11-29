@@ -123,13 +123,15 @@ transactions to the node.
 
 10. As this is the first node in the zone, it needs an initial transaction for the blockchain.
 
+   ```text
    blzd gentx --name vuser --amount 10000000000000ubnt --keyring-backend test
-
+   ```
+   
    which will produce the output:
 
    Genesis transaction written to "/home/rich/.blzd/config/gentx/gentx-&lt;...&gt;.json"
 
-   remember to specify the amount of coins to bond using the --amount parameter so that _ubnt_ is used as stake, if this is neglected the bonding denomination will be stake.
+   Remember to specify the amount of coins to bond using the --amount parameter so that _ubnt_ is used as stake, if this is neglected the bonding denomination will be stake.
 
    Open the genesis transaction JSON file and note the value for the validator\_address, it will have the prefix “bluzellevaloper”, this id will be used to get account info later. Alternatively, use jq to extract the value directly:
 
@@ -145,7 +147,7 @@ transactions to the node.
    blzd collect-gentxs
    ```
 
-   the output of this command will also contain the validator\_address, prefixed with bluzellevaloper. If you have not done so in the previous step, note the validator\_address.
+   The output of this command will also contain the validator\_address, prefixed with bluzellevaloper. If you have not done so in the previous step, note the validator\_address.
 
    This command creates the signed genesis.json file ".blzd/config/genesis.json\)" that will be copied to the rest of the nodes in the zone.
 
