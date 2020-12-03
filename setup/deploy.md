@@ -113,14 +113,14 @@ mnemonic will be used by the Bluzelle javascript client to send
 transactions to the node.
 ```
 
-9. Add the first account to the blockchain using the vuser key as the account identifier
+9. Add the first account to the blockchain. In this example, we call that first account "vuser".
 
    ```text
    blzd add-genesis-account $(blzcli keys show vuser -a) 500000000000000ubnt
    ```
 
-   this command is an alias for “tx staking create-validator”. The amount given for the ubnt tokens here will be the total amount of tokens available to the zone.
-
+   This creates an initial account called "vuser" that will have the entire supply of tokens for the new chain.
+   
 10. As this is the first node in the zone, it needs an initial transaction for the blockchain.
 
    ```text
@@ -130,6 +130,10 @@ transactions to the node.
    which will produce the output:
 
    Genesis transaction written to "/home/rich/.blzd/config/gentx/gentx-&lt;...&gt;.json"
+
+   This command is an alias for “tx staking create-validator”. It creates the very first validator, that is a requirement to bootstrap and start the new network. 
+   
+   The amount given here will be the total number of tokens to stake from the initial account (last step) to the initial validator. 
 
    Remember to specify the amount of coins to bond using the --amount parameter so that _ubnt_ is used as stake, if this is neglected the bonding denomination will be stake.
 
