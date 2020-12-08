@@ -159,30 +159,11 @@ func handleMsgUpdate(ctx sdk.Context, keeper keeper.IKeeper, msg types.MsgUpdate
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Incorrect Owner")
 	}
 
-	oldBlzValue := keeper.GetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key)
+	oldValue := keeper.GetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key)
+	oldValue.Value = msg.Value
+	keeper.SetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key, oldValue)
+	updateLease(ctx, keeper, msg.UUID, msg.Key, msg.Lease)
 
-	if msg.Lease != 0 { // 0 means no change to lease
-		newLease := oldBlzValue.Lease + msg.Lease
-		if newLease <= 0 {
-			return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid lease")
-		}
-
-		if (oldBlzValue.Height + newLease) <= ctx.BlockHeight() {
-			return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid lease")
-		}
-
-		keeper.SetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key, types.BLZValue{Value: msg.Value, Lease: newLease, Height: oldBlzValue.Height, Owner: msg.Owner})
-
-		leaseCtx := ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
-		keeper.DeleteLease(keeper.GetLeaseStore(leaseCtx), msg.UUID, msg.Key, oldBlzValue.Height, oldBlzValue.Lease)
-		keeper.SetLease(keeper.GetLeaseStore(leaseCtx), msg.UUID, msg.Key, oldBlzValue.Height, newLease)
-
-		gasForLease := CalculateGasForLease(msg.Lease, len(msg.UUID)+len(msg.Key)+len(msg.Value)) - CalculateGasForLease(oldBlzValue.Lease, len(msg.UUID)+len(msg.Key)+len(oldBlzValue.Value))
-		ctx.GasMeter().ConsumeGas(gasForLease, "lease")
-	} else {
-		keeper.SetValue(ctx, keeper.GetKVStore(ctx), msg.UUID, msg.Key, types.BLZValue{Value: msg.Value, Lease: oldBlzValue.Lease,
-			Owner: msg.Owner, Height: oldBlzValue.Height})
-	}
 	return &sdk.Result{}, nil
 }
 
