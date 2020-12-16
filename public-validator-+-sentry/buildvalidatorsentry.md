@@ -141,7 +141,9 @@ For the following instructions, we will describe the steps to setup a validator 
 
 14. If you are adding a sentry, add your validator's node id \(only the node id\) to the "private\_peer\_ids" comma-separated list, in your sentry's config.toml. For example:
 
-   "d229f73ac8de82fa788e495c181c7e0aaa72375e"
+    ```
+    "d229f73ac8de82fa788e495c181c7e0aaa72375e"
+    ```
 
 15. In config.toml, set the following:
 
@@ -236,7 +238,7 @@ For the following instructions, we will describe the steps to setup a validator 
    
     iii) Create a new BNT mnemonic for our MAIN NET, and store and secure this BNT mnemonic securely. **If you lose this mnemonic, you will lose ALL your funds.** Bluzelle is not responsible and there is no policy to "refund" anything. Note that this web wallet is **100% client side**. Your BNT mnemonic is generated on the local browser only and is never transmitted over the network. You are 100% responsible for storing and securing this mnemonic. 
     
-    iv) Add a new local keypair for the account that will be the self-delegator to the validator on this node:
+    iv) Add a new local keypair for the account that will be the operator for the validator on this node:
 
     ```text
     blzcli keys add vuser --recover
@@ -250,7 +252,7 @@ For the following instructions, we will describe the steps to setup a validator 
    
     Get some tokens to stake your validator from our FAUCET. Note that you can only use the faucet once every FIVE minutes. 
 
-    i) Add a new local keypair for the account that will be the self-delegator to the validator on this node:
+    i) Add a new local keypair for the account that will be the operator for the validator on this node:
 
     ```text
     blzcli keys add vuser
@@ -292,6 +294,46 @@ For the following instructions, we will describe the steps to setup a validator 
     ```
     
     **Please do NOT take tokens from the faucet address. It is there as a convenience for the community. If you really want more tokens, just use the faucet.**
+
+23. ONLY do this step if you are following the **REHEARSAL** PATH. 
+
+    Export your existing validator's operator wallet from the existing validator machine and import it to the new validator machine. We will assume that the existing wallet account is called `vuser` and will call the new imported wallet account the same name. 
+
+    i. On the existing validator machine: 
+    
+    ```
+    blzcli keys export vuser 
+    ```
+    
+    Note that the `passphrase to encrypt the exported key` that you provide is required when you import the key in the next step. Copy the output of the above command (it will display the output to your screen) and store it into a file. We will assume this file is called `export.txt`.
+    
+    ii. On the new validator machine:
+    
+    ```
+    blzcli keys import vuser export.txt
+    ```
+
+    Notes:
+    
+    i. If you have the mnemonic handy for your original vuser, you can opt to simply add the vuser to the new validator with the following:
+    
+    ```
+    blzcli keys add vuser --recover
+    ```
+    
+    Just paste in the mnemonic, when asked.
+    
+    ii. If your vuser for your original vuser is secured with a Ledger device, add it to the new validator machine as follows:
+    
+    ```
+    blzcli keys add vuser --ledger --account <i>
+    ```
+    
+    Typically, the value of i will be 0, unless you have multiple HD-derived accounts. 
+
+
+If you're recovering the wallet using secretcli keys add "$YOUR_KEY_NAME" --recover you should also use --hd-path "44'/118'/0'/0/0".
+If the wallet is stored on a Ledger device, use --legacy-hd-path when importing it with secretcli keys add.
 
 
 21. Once completed, also, verify your vuser account has the tokens you funded it with, by asking the local node:
