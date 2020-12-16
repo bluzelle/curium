@@ -8,7 +8,7 @@ The intention here is to run ADDITIONAL node(s) as a REHEARSAL for the Final Mai
 
 All coordination efforts will be done in the <Yingyao please fill in this link> channel in the Bluzelle Discord Channel.
 
-:warning: Don't delete your `soft mainnet` validator and sentry machine(s). You are rehearsing here for the actual Final MainNet Launch, which is to occur soon.
+:warning: Do not delete your `Soft MainNet` validator and sentry machine(s). You are rehearsing here for the actual Final MainNet Launch, which is to occur soon.
 
 :warning: If your Final TestNet machines have a previous installation on them, you will need to remove those, before you continue:
 
