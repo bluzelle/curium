@@ -375,7 +375,9 @@ For the following instructions, we will describe the steps to setup a validator 
 
     You can experiment with different values for the amount, commission rate, and gas price, although the latter should match whatever you put into app.toml.
 
-    Be sure to not use 100% of the amount of BNT in your vuser account, as you need some BNT to pay for gas.
+    Be sure to not use 100% of the amount of BNT in your vuser account, as you need some BNT to pay for gas. 
+    
+    We HIGHLY recommend including your Discord account and/or Email address in the "security contact" field, along with your name, as the primary contact.
 
     For example:
 
