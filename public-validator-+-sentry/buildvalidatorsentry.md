@@ -392,24 +392,12 @@ For the following instructions, we will describe the steps to setup a validator 
     ```
 
 26. ONLY do this step if you are following the **REHEARSAL** PATH. 
-
-    As part of the process of forking the old network over to the new TestNet, we **pre-jail** all validators. This means that your validator, while already existing in the new TestNet, is in a jailed state. You have not been slashed. The validator is effectively "frozen", safe from being slashed as it is not yet running. 
-    
-    You typically have 21 days from the start of the new network to unjail your validator. After this time, your validator will unbond and all delegators (including your operator account) will get back their delegated tokens and the validator will cease to exist. Use the command in the notes below to determine the number of days.
     
     You will now unjail your validator to bring it back into the active validator set. Once you do this, the network will expect your validator to be running and it will once again be subject to all the requirements of being a validator, including slashing penalties, etc. Note that once unjailed, you CANNOT "re-jail" your validator. 
 
     ```
     blzcli tx slashing unjail --gas-prices 0.002ubnt --gas=auto --gas-adjustment=2.0 --from vuser --chain-id <chain id>
-    ```
-    
-    Note. 
-    
-    You can determine the number of days of unbonding for the network with the following:
-    
-    ```
-    blzcli q staking params | jq '.unbonding_time = (.unbonding_time | tonumber)/1000000000/3600/24' | jq '.unbonding_time'
-    ```
+    ```   
 
 27. Verify that your validator is now active and running with the following command, and look for your validator's moniker:
 
