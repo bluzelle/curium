@@ -6,7 +6,7 @@
 
 For the following instructions, we will describe the steps to setup a validator or a sentry for an existing Public MainNet or TestNet. Unless otherwise stated, the instruction steps apply to both sentries and validators.
 
-1. Refer to previous documents for initializing the server, dev environments, and building the Bluzelle Curium applications. Refer to steps a-c listed below.
+1. Refer to previous documents for initializing the server, dev environments, and building the Bluzelle Curium applications. Refer to steps `a-c` listed below.
 
    **CRITICAL**: If you are building for the **MAIN NET**, ensure you have built curium using the "**mainnet**" target.
    
@@ -22,7 +22,7 @@ For the following instructions, we will describe the steps to setup a validator 
     
     c. [Build the Curium Project](setup/build.md)
 
-   Open incoming TCP port 26656 \(P2P\). Optionally, if you have sufficient firewall and packet filtering security \(to protect against DoS and DDoS attacks\), you may opt to also open up 26657 \(RPC\), and 1317 \(RESTful\). These two ports are only for the purposes of serving clients. If you have no such interest and do not want to deal with the security considerations, keep them closed.
+2. Open incoming TCP port 26656 \(P2P\). Optionally, if you have sufficient firewall and packet filtering security \(to protect against DoS and DDoS attacks\), you may opt to also open up 26657 \(RPC\), and 1317 \(RESTful\). These two ports are only for the purposes of serving clients. If you have no such interest and do not want to deal with the security considerations, keep them closed.
 
    If you are running both a sentry and a validator, follow these directives:
 
@@ -31,16 +31,14 @@ For the following instructions, we will describe the steps to setup a validator 
 
    Furthermore, if you are running both, be sure to set your validator to ONLY allow incoming 26656 from your sentry's IP.
 
-2. If required, remove existing .blz\* folders from the user directory \(only necessary if you had a pre-existing install\).
+3. If required, remove existing .blz\* folders from the user directory \(only necessary if you had a pre-existing install\).
 
    ```text
    cd
    rm -rf .blz*
    ```
 
-3. Initialize the daemon config. 
-
-   Please ensure you have the correct chain-id. We change it whenever we restart a new network. 
+4. Please ensure you have the correct chain-id. We change it whenever we restart a new network. 
    
    Run the following command to find the existing chain-id:
    
@@ -56,13 +54,13 @@ For the following instructions, we will describe the steps to setup a validator 
    curl --location --request GET 'http://client.sentry.testnet.public.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
    ```
 
-   Initialize your daemon config as follows:
+5. Initialize your daemon config as follows using the chain-id found above:
 
    ```text
    blzd init <moniker> --chain-id <chain-id>  2>&1 | jq .node_id
    ```
 
-   Use a unique moniker string that uniquely identifies your validator/sentry. Please start the moniker with "validator" or "sentry", depending on what you are adding, and use camel case. Try to include your own or company name, if applicable.
+   Use a unique moniker string that uniquely identifies your validator/sentry. Please start the moniker with "validator" or "sentry", depending on what you are adding, and use camel case. Try to include your own or company name, if applicable. If doing a REHEARSAL, please use the same moniker as for your existing node(s), to ease contest procedures.
    
    Examples:
 
@@ -81,7 +79,7 @@ For the following instructions, we will describe the steps to setup a validator 
 
    There is no need to touch the genesis file, ".blzd/config/genesis.json" yet. The one that was generated just now is generic and not needed. It will be completely replaced with the genesis file already in use. We will perform this step later in this document.
 
-4. Set the client configuration, and remember to use the chain id of the network \(found above\) that this node will be joining:
+6. Set the client configuration, and remember to use the chain id of the network \(found above\) that this node will be joining:
 
    ```text
    blzcli config chain-id <chain-id>
@@ -91,7 +89,7 @@ For the following instructions, we will describe the steps to setup a validator 
    blzcli config keyring-backend test
    ```
 
-5. Collect the node id's of the gateway sentries. 
+7. Collect the node id's of the gateway sentries. 
 
    Use the following command, to get a list of all the gateway sentries, including their IP addresses and node id's:
 
@@ -109,7 +107,7 @@ For the following instructions, we will describe the steps to setup a validator 
 
    Note down the sentry IP address and respective id, for each such gateway sentry. You will need this information next.
 
-6. If you are ONLY setting up a validator, do the following. Otherwise, if you are setting up both a validator AND a sentry, ONLY do the following on the sentry.
+8. If you are ONLY setting up a validator, do the following. Otherwise, if you are setting up both a validator AND a sentry, ONLY do the following on the sentry.
 
    Edit ".blzd/config/config.toml". Add the hostnames/IPs and node id's and ports of each of the gateway sentries found earlier, as a comma-separated list, to the "persistent\_peers" value \(replace the existing value, if any\), as follows:
 
@@ -125,7 +123,7 @@ For the following instructions, we will describe the steps to setup a validator 
    persistent_peers = "ae3b71b8bb09ebeb4a5e373a00aab6f98cebb545@1.2.3.4:26656"
    ```
 
-7. OPTIONALLY \(if you want to provide RPC services as are needed for your own REST proxy, for example\), ensure you have opened up RPC to the public in config.toml, by specifying the "laddr" value in the \[rpc\] section as follows \(the default is only to listen on localhost\):
+9. OPTIONALLY \(if you want to provide RPC services as are needed for your own REST proxy, for example\), ensure you have opened up RPC to the public in config.toml, by specifying the "laddr" value in the \[rpc\] section as follows \(the default is only to listen on localhost\):
 
    ```text
    laddr = "tcp://0.0.0.0:26657"
@@ -133,25 +131,25 @@ For the following instructions, we will describe the steps to setup a validator 
 
    Of course, this depends highly on your setup. If your REST proxy is local to blzd, you can opt to only open up RPC to 127.0.0.1 and restrict access to RPC.
 
-8. If you are adding a sentry, append your validator's "@:26656" entry to the persistent\_peers comma-separated list in your sentry, in config.toml. 
+10. If you are adding a sentry, append your validator's "@:26656" entry to the persistent\_peers comma-separated list in your sentry, in config.toml. 
 
-9. If you are adding a validator, append your sentry's "@:26656" entry to the persistent\_peers comma-separated list in your validator, in config.toml. Only applicable if you are also adding a sentry.
+11. If you are adding a validator, append your sentry's "@:26656" entry to the persistent\_peers comma-separated list in your validator, in config.toml. Only applicable if you are also adding a sentry.
 
-10. If you are adding a sentry, set "pex = true", in config.toml.
+12. If you are adding a sentry, set "pex = true", in config.toml.
 
-11. If you are adding a validator, set "pex = false", in config.toml.
+13. If you are adding a validator, set "pex = false", in config.toml.
 
-12. If you are adding a sentry, add your validator's node id \(only the node id\) to the "private\_peer\_ids" comma-separated list, in your sentry's config.toml. For example:
+14. If you are adding a sentry, add your validator's node id \(only the node id\) to the "private\_peer\_ids" comma-separated list, in your sentry's config.toml. For example:
 
    "d229f73ac8de82fa788e495c181c7e0aaa72375e"
 
-13. In config.toml, set the following:
+15. In config.toml, set the following:
 
     ```text
     addr_book_strict = false
     ```
 
-14. In config.toml, set a suitable maximum \# of allowed inbound and outbound peers in the \[p2p\] section. For example, with a node that might be very busy \(such as a sentry to a secure zone for validators\), you might want to increase from the defaults, to avoid a situation where peers start to get dropped. Following are the values we have used:
+16. In config.toml, set a suitable maximum \# of allowed inbound and outbound peers in the \[p2p\] section. For example, with a node that might be very busy \(such as a sentry to a secure zone for validators\), you might want to increase from the defaults, to avoid a situation where peers start to get dropped. Following are the values we have used:
 
     ```text
     # Maximum number of inbound peers
@@ -161,24 +159,24 @@ For the following instructions, we will describe the steps to setup a validator 
     max_num_outbound_peers = 100
     ```
 
-12. Edit ".blzd/config/app.toml" to set the minimum-gas-prices to “10.0ubnt”
+17. Edit ".blzd/config/app.toml" to set the minimum-gas-prices to “0.002ubnt”
 
     ```text
     # The minimum gas prices a validator is willing to accept for processing a
     # transaction. A transaction's fees must meet the minimum of any denomination
     # specified in this config (e.g. 0.25token1;0.0001token2).
-    minimum-gas-prices = "10.0ubnt"
+    minimum-gas-prices = "0.002ubnt"
     ```
 
     Remember that _every_ node should have _at least_ this minimum. Feel free to set it higher if you wish.
 
-13. Edit ".blzd/config/app.toml", to add the following:
+18. Edit ".blzd/config/app.toml", to add the following:
 
     ```text
     bluzelle_crud = true
     ```
     
-14. If you are creating a validator, you will now need to acquire BNT tokens. Following are instructions depending on if you are targeting the MAIN NET or TEST NET.
+19. If you are creating a validator, you will now need to acquire BNT tokens. Following are instructions depending on if you are targeting the MAIN NET or TEST NET.
 
     **MAIN NET**:
    
