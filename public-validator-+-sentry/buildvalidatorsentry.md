@@ -4,7 +4,7 @@
 
 ## Building a Public Validator + Sentry
 
-For the following instructions, we will describe the steps to setup a validator or a sentry for the existing Public MainNet or TestNet. Unless otherwise stated, the instruction steps apply to both sentries and validators.
+For the following instructions, we will describe the steps to setup a validator or a sentry for an existing Public MainNet or TestNet. Unless otherwise stated, the instruction steps apply to both sentries and validators.
 
 1. Refer to previous documents for initializing the server, dev environments, and building the Bluzelle Curium applications.
 
@@ -12,7 +12,7 @@ For the following instructions, we will describe the steps to setup a validator 
    
    OR
 
-   **CRITICAL**: If you are building for the **TEST NET**, ensure you have built curium using the "**testnet**" target.
+   **CRITICAL**: If you are building for the **TEST NET**, ensure you have built curium using the "**testnet**" target. Use this if you are doing a **REHEARSAL**.
 
    Open incoming TCP port 26656 \(P2P\). Optionally, if you have sufficient firewall and packet filtering security \(to protect against DoS and DDoS attacks\), you may opt to also open up 26657 \(RPC\), and 1317 \(RESTful\). These two ports are only for the purposes of serving clients. If you have no such interest and do not want to deal with the security considerations, keep them closed.
 
@@ -32,7 +32,9 @@ For the following instructions, we will describe the steps to setup a validator 
 
 3. Initialize the daemon config. 
 
-   Please ensure you have the correct chain-id. We do change it whenever we restart a new network. Run the following command to find the existing chain-id:
+   Please ensure you have the correct chain-id. We change it whenever we restart a new network. 
+   
+   Run the following command to find the existing chain-id:
    
    **MAIN NET**:
    
@@ -40,7 +42,7 @@ For the following instructions, we will describe the steps to setup a validator 
    curl --location --request GET 'http://client.sentry.bluzellenet.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
    ```
 
-   **TEST NET**:
+   **TEST NET** (do this if you are doing a REHEARSAL):
    
    ```text
    curl --location --request GET 'http://client.sentry.testnet.public.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
@@ -64,7 +66,7 @@ For the following instructions, we will describe the steps to setup a validator 
    Here is an example of initializing your local daemon config:
 
    ```text
-   blzd init sentryBob --chain-id bluzelle  2>&1 | jq .node_id
+   blzd init sentryBob --chain-id bluzelleSoftMainNet-1976  2>&1 | jq .node_id
    ```
 
    The JSON output will contain the node\_id. Note this value, as it can be used to identify this node to other nodes in the zone. Keep in mind that for this document’s purposes, your validator and sentry will both only point at each other. Your sentry will also point at other known public sentries (if you know any) and to Bluzelle's own gateway sentries. More on this later in this document.
