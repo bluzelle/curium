@@ -387,7 +387,7 @@ For the following instructions, we will describe the steps to setup a validator 
       --pubkey=$(blzd tendermint show-validator) \
       --website="https://bluzelle.com" \
       --details="To infinity and beyond" \
-      --security-contact="Neeraj Murarka, CTO @ Bluzelle Networks" \
+      --security-contact="neeraj#1234, a@b.com, Neeraj Murarka" \
       --identity=5615416F70265000 \
       --moniker=validatorNeeraj \
       --commission-rate=0.1 \
