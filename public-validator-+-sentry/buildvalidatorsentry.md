@@ -218,10 +218,12 @@ For the following instructions, we will describe the steps to setup a validator 
 
     and then retry the start command.
 
-21. If you are creating a validator, wait till your new node catches up to the rest of the zone. It will be obvious as the node will slow down output and be getting blocks every 4-5 seconds. To be sure, run the following command in another terminal on the validator and look for false:
+21. If you are creating a validator, wait till your new node catches up to the rest of the zone. It will be obvious as the node will slow down output and be getting blocks every 4-5 seconds. 
 
-    ```text
-    blzcli status | jq ".sync_info.catching_up"
+    To be sure, run the following command in another terminal on the validator and look for the output of `true`:
+
+    ```
+    watch 'blzcli status | jq ".sync_info.catching_up == false"'
     ```
 
 22. If you are following the **REHEARSAL** PATH, SKIP this step. 
