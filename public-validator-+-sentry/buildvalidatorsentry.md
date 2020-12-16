@@ -204,7 +204,13 @@ For the following instructions, we will describe the steps to setup a validator 
 
     Ensure to copy over and replace the existing genesis.json file in your "~/.blzd/config/" folder with the downloaded one from the existing network.
 
-20. Start the Bluzelle daemon
+20. ONLY do this step if you are following the **REHEARSAL** PATH. 
+
+    Migrate your validator's consensus signing key from the old machine (the validator on the Soft MainNet) to the new machine (the validator on the Final TestNet). 
+    
+    To do this, copy your ~/.blzd/config/priv_validator_key.json from the old machine to the new machine at the same location, overwriting the existing file on the new machine. 
+
+21. Start the Bluzelle daemon
 
     ```text
     blzd start
@@ -218,7 +224,7 @@ For the following instructions, we will describe the steps to setup a validator 
 
     and then retry the start command.
 
-21. If you are creating a validator, wait till your new node catches up to the rest of the zone. It will be obvious as the node will slow down output and be getting blocks every 4-5 seconds. 
+22. If you are creating a validator, wait till your new node catches up to the rest of the zone. It will be obvious as the node will slow down output and be getting blocks every 4-5 seconds. 
 
     To be sure, run the following command in another terminal on the validator and look for the output of `true`:
 
@@ -226,7 +232,7 @@ For the following instructions, we will describe the steps to setup a validator 
     watch 'blzcli status | jq ".sync_info.catching_up == false"'
     ```
 
-22. If you are following the **REHEARSAL** PATH, SKIP this step. 
+23. If you are following the **REHEARSAL** PATH, SKIP this step. 
 
     If you are creating a validator, you will now need to acquire BNT tokens. Following are instructions depending on if you are targeting the MAIN NET or TEST NET.
 
@@ -297,7 +303,7 @@ For the following instructions, we will describe the steps to setup a validator 
     
     **Please do NOT take tokens from the faucet address. It is there as a convenience for the community. If you really want more tokens, just use the faucet.**
 
-23. ONLY do this step if you are following the **REHEARSAL** PATH. 
+24. ONLY do this step if you are following the **REHEARSAL** PATH. 
 
     Export your existing validator's operator wallet from the existing validator machine and import it to the new validator machine. We will assume that the existing wallet account is called `vuser` and will call the new imported wallet account the same name. 
 
@@ -333,13 +339,13 @@ For the following instructions, we will describe the steps to setup a validator 
     
     Typically, the value of i will be 0, unless you have multiple HD-derived accounts. 
 
-24. Verify your vuser account has the tokens you expect, by asking the local node:
+25. Verify your vuser account has the tokens you expect, by asking the local node:
 
     ```text
     blzcli q account $(blzcli keys show vuser -a) | jq ".value.coins"
     ```  
 
-25. If you are following the **REHEARSAL** PATH, SKIP this step. 
+26. If you are following the **REHEARSAL** PATH, SKIP this step. 
 
     At this point, the new "vuser" account will also reflect the BNT tokens that were funded to it. We now need to add this node as a validator, as follows:
 
@@ -391,7 +397,7 @@ For the following instructions, we will describe the steps to setup a validator 
       --from vuser
     ```
 
-26. ONLY do this step if you are following the **REHEARSAL** PATH. 
+27. ONLY do this step if you are following the **REHEARSAL** PATH. 
     
     You will now unjail your validator to bring it back into the active validator set. Once you do this, the network will expect your validator to be running and it will once again be subject to all the requirements of being a validator, including slashing penalties, etc. Note that once unjailed, you CANNOT "re-jail" your validator. 
 
@@ -399,13 +405,13 @@ For the following instructions, we will describe the steps to setup a validator 
     blzcli tx slashing unjail --gas-prices 0.002ubnt --gas=auto --gas-adjustment=2.0 --from vuser --chain-id <chain id>
     ```   
 
-27. Verify that your validator is now active and running with the following command, and look for your validator's moniker:
+28. Verify that your validator is now active and running with the following command, and look for your validator's moniker:
 
     ```
     blzcli q staking validators | jq -r '.[] | select(.status == 2) | .description.moniker'
     ```
 
-28. Optionally, you can also get the current validator set with the commands \(be sure to check all available pages -- the limit cannot exceed 100\):
+29. Optionally, you can also get the current validator set with the commands \(be sure to check all available pages -- the limit cannot exceed 100\):
 
     ```text
     blzcli q tendermint-validator-set --limit 100 --page 1
@@ -436,7 +442,7 @@ For the following instructions, we will describe the steps to setup a validator 
 
     Look for your pubkey here, as confirmation.
 
-29. Furthermore, within a few minutes, you should also see your validator listed listed at the Bluzelle Explorer:
+30. Furthermore, within a few minutes, you should also see your validator listed listed at the Bluzelle Explorer:
 
     **MAIN NET**:
 
