@@ -202,7 +202,7 @@ For the following instructions, we will describe the steps to setup a validator 
 
     Ensure to copy over and replace the existing genesis.json file in your "~/.blzd/config/" folder with the downloaded one from the existing network.
 
-16. Start the Bluzelle daemon
+20. Start the Bluzelle daemon
 
     ```text
     blzd start
@@ -216,13 +216,15 @@ For the following instructions, we will describe the steps to setup a validator 
 
     and then retry the start command.
 
-17. If you are creating a validator, wait till your new node catches up to the rest of the zone. It will be obvious as the node will slow down output and be getting blocks every 4-5 seconds. To be sure, run the following command in another terminal on the validator and look for false:
+21. If you are creating a validator, wait till your new node catches up to the rest of the zone. It will be obvious as the node will slow down output and be getting blocks every 4-5 seconds. To be sure, run the following command in another terminal on the validator and look for false:
 
     ```text
     blzcli status | jq ".sync_info.catching_up"
     ```
 
-19. If you are creating a validator, you will now need to acquire BNT tokens. Following are instructions depending on if you are targeting the MAIN NET or TEST NET.
+22. If you are following the **REHEARSAL** PATH, SKIP this step. 
+
+    If you are creating a validator, you will now need to acquire BNT tokens. Following are instructions depending on if you are targeting the MAIN NET or TEST NET.
 
     **MAIN NET**:
    
