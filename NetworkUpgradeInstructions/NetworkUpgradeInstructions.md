@@ -16,4 +16,4 @@ You're probably familiar with the process of setting up a Bluzelle node by now:
 
 https://github.com/bluzelle/curium/blob/devel/public-validator-+-sentry/buildvalidatorsentry.md
 
-Please follow the instructions for the UPGRADE path. This is the very same path you will follow when you upgrade to the Final MainNet, once that is launched. The notable difference here, is it is expected you will keep your existing Soft MainNet node(s) running.
+Please follow the instructions for the REHEARSAL path. 
