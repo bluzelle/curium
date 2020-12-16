@@ -42,7 +42,7 @@ For the following instructions, we will describe the steps to setup a validator 
    curl --location --request GET 'http://client.sentry.bluzellenet.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
    ```
 
-   **TEST NET** (do this if you are doing a REHEARSAL):
+   **TEST NET** (including REHEARSAL path):
    
    ```text
    curl --location --request GET 'http://client.sentry.testnet.public.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
@@ -93,10 +93,10 @@ For the following instructions, we will describe the steps to setup a validator 
    curl -s http://client.sentry.bluzellenet.bluzelle.com:26657/net_info | jq -C '[.result.peers[] | select(.node_info.moniker | startswith("daemon-sentry-gateway")) | {moniker: .node_info.moniker, id: .node_info.id, ip_address: .remote_ip}] | sort_by(.moniker)'
    ```
 
-   **TEST NET**:
+   **TEST NET** (including REHEARSAL path):
    
    ```text
-   curl -s http://client.sentry.testnet.public.bluzelle.com:26657/net_info | jq -C '[.result.peers[] | select(.node_info.moniker | startswith("daemon-sentry-gateway")) | {moniker: .node_info.moniker, id: .node_info.id, ip_address: .remote_ip}] | sort_by(.moniker)'
+   curl -s https://client.sentry.testnet.public.bluzelle.com:26657/net_info | jq -C '[.result.peers[] | select(.node_info.moniker | startswith("daemon-sentry-gateway")) | {moniker: .node_info.moniker, id: .node_info.id, ip_address: .remote_ip}] | sort_by(.moniker)'
    ```
 
    Note down the sentry IP address and respective id, for each such gateway sentry. You will need this information next.
