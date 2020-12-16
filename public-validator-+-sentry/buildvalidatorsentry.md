@@ -287,7 +287,7 @@ For the following instructions, we will describe the steps to setup a validator 
     
     iii) Run the faucet and fund yourself. Use the following command (this example assumes your validator user account is "vuser" from above steps):
     ```
-    blzcli tx faucet mintfor $(blzcli keys show vuser -a) --node tcp://client.sentry.testnet.public.bluzelle.com:26657 --gas-prices 10.0ubnt --chain-id <chain id> --from faucet
+    blzcli tx faucet mintfor $(blzcli keys show vuser -a) --node tcp://client.sentry.testnet.public.bluzelle.com:26657 --gas-prices 0.002ubnt --gas=auto --gas-adjustment=2.0 --chain-id <chain id> --from faucet
     ```
     
     iv) Verify you have tokens. If the above command gives an error that the account it not found, it likely means the faucet has not yet completed (takes a few seconds) or has failed for some reason: 
@@ -333,15 +333,15 @@ For the following instructions, we will describe the steps to setup a validator 
     
     Typically, the value of i will be 0, unless you have multiple HD-derived accounts. 
 
-21. Once completed, also, verify your vuser account has the tokens you funded it with, by asking the local node:
+24. Verify your vuser account has the tokens you expect, by asking the local node:
 
     ```text
     blzcli q account $(blzcli keys show vuser -a) | jq ".value.coins"
-    ```
-    
-    If you get an error looking up your vuser account, where it does not appear to exist, it likely means your node is still catching up. Your local copy of the blockchain won't know about the existence of your account till the block that the tokens were sent to you on, gets synced to you locally.
+    ```  
 
-18. At this point, the new "vuser" account will also reflect the BNT tokens that were funded to it. We now need to add this node as a validator, as follows:
+25. If you are following the **REHEARSAL** PATH, SKIP this step. 
+
+    At this point, the new "vuser" account will also reflect the BNT tokens that were funded to it. We now need to add this node as a validator, as follows:
 
     ```text
     blzcli tx staking create-validator \
@@ -356,7 +356,7 @@ For the following instructions, we will describe the steps to setup a validator 
       --commission-max-rate=0.2 \
       --commission-max-change-rate=0.01 \
       --min-self-delegation=1 \
-      --gas=auto --gas-adjustment=1.2 \
+      --gas=auto --gas-adjustment=2.0 \
       --gas-prices=<minimum gas price> \
       --from vuser
     ```
@@ -386,12 +386,38 @@ For the following instructions, we will describe the steps to setup a validator 
       --commission-max-rate=0.2 \
       --commission-max-change-rate=0.01 \
       --min-self-delegation=1 \
-      --gas=auto --gas-adjustment=1.2 \
-      --gas-prices=10.0ubnt \
+      --gas=auto --gas-adjustment=2.0 \
+      --gas-prices=0.002ubnt \
       --from vuser
     ```
 
-19. You can get the current validator set with the commands \(be sure to check all available pages -- the limit cannot exceed 100\):
+26. ONLY do this step if you are following the **REHEARSAL** PATH. 
+
+    As part of the process of forking the old network over to the new TestNet, we **pre-jail** all validators. This means that your validator, while already existing in the new TestNet, is in a jailed state. You have not been slashed. The validator is effectively "frozen", safe from being slashed as it is not yet running. 
+    
+    You typically have 21 days from the start of the new network to unjail your validator. After this time, your validator will unbond and all delegators (including your operator account) will get back their delegated tokens and the validator will cease to exist. Use the command in the notes below to determine the number of days.
+    
+    You will now unjail your validator to bring it back into the active validator set. Once you do this, the network will expect your validator to be running and it will once again be subject to all the requirements of being a validator, including slashing penalties, etc. Note that once unjailed, you CANNOT "re-jail" your validator. 
+
+    ```
+    blzcli tx slashing unjail --gas-prices 0.002ubnt --gas=auto --gas-adjustment=2.0 --from vuser --chain-id <chain id>
+    ```
+    
+    Note. 
+    
+    You can determine the number of days of unbonding for the network with the following:
+    
+    ```
+    blzcli q staking params | jq '.unbonding_time = (.unbonding_time | tonumber)/1000000000/3600/24' | jq '.unbonding_time'
+    ```
+
+27. Verify that your validator is now active and running by running the following command and looking for your validator's moniker:
+
+    ```
+    blzcli q staking validators | jq -r '.[] | select(.status == 2) | .description.moniker'
+    ```
+
+28. Optionally, you can also get the current validator set with the commands \(be sure to check all available pages -- the limit cannot exceed 100\):
 
     ```text
     blzcli q tendermint-validator-set --limit 100 --page 1
@@ -422,14 +448,14 @@ For the following instructions, we will describe the steps to setup a validator 
 
     Look for your pubkey here, as confirmation.
 
-    Furthermore, within a few minutes, you should also see your validator listed listed at the Bluzelle Explorer:
+29. Furthermore, within a few minutes, you should also see your validator listed listed at the Bluzelle Explorer:
 
     **MAIN NET**:
 
     http://bigdipper.bluzellenet.bluzelle.com/validators
     
-    **TEST NET**:
+    **TEST NET** (including REHEARSAL path):
 
-    http://bigdipper.testnet.public.bluzelle.com/validators
+    https://bigdipper.testnet.public.bluzelle.com/validators
 
 [Back](../)
