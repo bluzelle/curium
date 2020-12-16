@@ -2,7 +2,7 @@
 
 :warning: Please read carefully before you begin the rehearsal. Also note. It is NOT INTENDED that you replace your existing SOFT MAINNET NODE with a Bluzelle Final TestNet node. The intention here is to run an ADDITIONAL node as a REHEARSAL for the final mainnet launch. Please be sure to keep your existing soft mainnet node running.
 
-# Validators
+# Validators and optional Sentries
 
 All coordination efforts will be done in the <Yingyao please fill in this link> channel in the Bluzelle Discord Channel.
 
