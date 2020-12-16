@@ -411,7 +411,7 @@ For the following instructions, we will describe the steps to setup a validator 
     blzcli q staking params | jq '.unbonding_time = (.unbonding_time | tonumber)/1000000000/3600/24' | jq '.unbonding_time'
     ```
 
-27. Verify that your validator is now active and running by running the following command and looking for your validator's moniker:
+27. Verify that your validator is now active and running with the following command, and look for your validator's moniker:
 
     ```
     blzcli q staking validators | jq -r '.[] | select(.status == 2) | .description.moniker'
