@@ -117,7 +117,7 @@ For the following instructions, we will describe the steps to setup a validator 
    persistent_peers = "ae3b71b8bb09ebeb4a5e373a00aab6f98cebb545@1.2.3.4:26656"
    ```
 
-   Next, OPTIONALLY \(if you want to provide RPC services as are needed for your own REST proxy, for example\), ensure you have opened up RPC to the public in config.toml, by specifying the "laddr" value in the \[rpc\] section as follows \(the default is only to listen on localhost\):
+7. OPTIONALLY \(if you want to provide RPC services as are needed for your own REST proxy, for example\), ensure you have opened up RPC to the public in config.toml, by specifying the "laddr" value in the \[rpc\] section as follows \(the default is only to listen on localhost\):
 
    ```text
    laddr = "tcp://0.0.0.0:26657"
@@ -125,27 +125,25 @@ For the following instructions, we will describe the steps to setup a validator 
 
    Of course, this depends highly on your setup. If your REST proxy is local to blzd, you can opt to only open up RPC to 127.0.0.1 and restrict access to RPC.
 
-7. If you are adding a sentry, append your validator's "@:26656" entry to the persistent\_peers comma-separated list in your sentry, in config.toml. Only applicable if you are also adding a validator.
+8. If you are adding a sentry, append your validator's "@:26656" entry to the persistent\_peers comma-separated list in your sentry, in config.toml. 
 
-   If you are adding a validator, append your sentry's "@:26656" entry to the persistent\_peers comma-separated list in your validator, in config.toml. Only applicable if you are also adding a sentry.
+9. If you are adding a validator, append your sentry's "@:26656" entry to the persistent\_peers comma-separated list in your validator, in config.toml. Only applicable if you are also adding a sentry.
 
-8. If you are adding a sentry, set "pex = true", in config.toml.
+10. If you are adding a sentry, set "pex = true", in config.toml.
 
-   If you are adding a validator, set "pex = false", in config.toml.
+11. If you are adding a validator, set "pex = false", in config.toml.
 
-9. If you are adding a sentry, add your validator's node id \(only the node id\) to the "private\_peer\_ids" comma-separated list, in your sentry's config.toml. For example:
+12. If you are adding a sentry, add your validator's node id \(only the node id\) to the "private\_peer\_ids" comma-separated list, in your sentry's config.toml. For example:
 
    "d229f73ac8de82fa788e495c181c7e0aaa72375e"
 
-   Note: You can skip this step if you are not adding any validators.
-
-10. In config.toml, set the following:
+13. In config.toml, set the following:
 
     ```text
     addr_book_strict = false
     ```
 
-11. In config.toml, set a suitable maximum \# of allowed inbound and outbound peers in the \[p2p\] section. For example, with a node that might be very busy \(such as a sentry to a secure zone for validators\), you might want to increase from the defaults, to avoid a situation where peers start to get dropped. Following are the values we have used:
+14. In config.toml, set a suitable maximum \# of allowed inbound and outbound peers in the \[p2p\] section. For example, with a node that might be very busy \(such as a sentry to a secure zone for validators\), you might want to increase from the defaults, to avoid a situation where peers start to get dropped. Following are the values we have used:
 
     ```text
     # Maximum number of inbound peers
