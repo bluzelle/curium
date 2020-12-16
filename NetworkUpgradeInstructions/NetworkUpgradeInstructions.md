@@ -10,7 +10,7 @@ All coordination efforts will be done in the <Yingyao please fill in this link> 
 
 :warning: Do not delete your `Soft MainNet` validator and sentry machine(s). You are rehearsing here for the actual Final MainNet Launch, which is to occur soon.
 
-:warning: If your Final TestNet machines have a previous installation on them, you will need to remove those, before you continue:
+:warning: If your Final TestNet machines have a previous installation on them, you will need to remove those, before you continue. Please do all necessary cleanup on them to remove existing installation files, binaries, etc. It is recommended to conduct the rehearsal on a fresh machine, if possible. 
 
 You're probably familiar with the process of setting up a Bluzelle node by now:
 
