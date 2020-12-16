@@ -307,7 +307,7 @@ For the following instructions, we will describe the steps to setup a validator 
     
     Note that the `passphrase to encrypt the exported key` that you provide is required when you import the key in the next step. Copy the output of the above command (it will display the output to your screen) and store it into a file. We will assume this file is called `export.txt`.
     
-    ii. On the new validator machine:
+    ii. On the new validator machine (provide the second password entered when doing the export):
     
     ```
     blzcli keys import vuser export.txt
@@ -315,26 +315,21 @@ For the following instructions, we will describe the steps to setup a validator 
 
     Notes:
     
-    i. If you have the mnemonic handy for your original vuser, you can opt to simply add the vuser to the new validator with the following:
+    i. If you have the mnemonic handy for your original vuser, you can just add the vuser to the new validator with the following:
     
     ```
     blzcli keys add vuser --recover
     ```
     
-    Just paste in the mnemonic, when asked.
+    Paste in the mnemonic, when asked.
     
-    ii. If your vuser for your original vuser is secured with a Ledger device, add it to the new validator machine as follows:
+    ii. If your vuser for your original vuser is secured with a Ledger device, add it to the new validator machine as follows (ensure your Ledger device is plugged in and running the COSMOS app):
     
     ```
     blzcli keys add vuser --ledger --account <i>
     ```
     
     Typically, the value of i will be 0, unless you have multiple HD-derived accounts. 
-
-
-If you're recovering the wallet using secretcli keys add "$YOUR_KEY_NAME" --recover you should also use --hd-path "44'/118'/0'/0/0".
-If the wallet is stored on a Ledger device, use --legacy-hd-path when importing it with secretcli keys add.
-
 
 21. Once completed, also, verify your vuser account has the tokens you funded it with, by asking the local node:
 
