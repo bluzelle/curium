@@ -1,8 +1,8 @@
-# Network Upgrade Instructions from `Bluzelle Soft MainNet` to `Bluzelle Final TestNet`
+# Network REHEARSAL Instructions from `Bluzelle Soft MainNet` to `Bluzelle Final TestNet`
 
-:warning: Please read carefully before you begin the upgrade. Also note. It is NOT INTENDED that you replace your existing SOFT MAINNET NODE with a Bluzelle Final TestNet node. The intention here is to run an ADDITIONAL node as a REHEARSAL for the final mainnet launch. Please be sure to keep your existing soft mainnet node running.
+:warning: Please read carefully before you begin the rehearsal. Also note. It is NOT INTENDED that you replace your existing SOFT MAINNET NODE with a Bluzelle Final TestNet node. The intention here is to run an ADDITIONAL node as a REHEARSAL for the final mainnet launch. Please be sure to keep your existing soft mainnet node running.
 
-- [Network Upgrade Instructions from `Bluzelle Soft Mainnet` to `Bluzelle Final TestNet`]
+- [Network Rehearsal Instructions from `Bluzelle Soft Mainnet` to `Bluzelle Final TestNet`]
 - [Validators](#validators)
   - [1. Install the new binaries on your NEW Final TestNet validator and sentry machines]
   - [2. Migrate your validator's signing key]
@@ -17,34 +17,11 @@ All coordination efforts will be done in the <Yingyao please fill in this link> 
 
 :warning: If your Final TestNet machines have a previous installation on them, you will need to remove those, before you continue:
 
-```bash
-cd ~
-sudo systemctl stop secret-node
-secretd unsafe-reset-all
-secretd reset-enclave
-secretd init-enclave --reset
-sudo apt purge -y secretnetwork
-rm -rf ~/.secretcli/*
-rm -rf ~/.secretd/*
-rm -rf ~/.sgx_secrets/*
-```
+You're probably familiar with the process of setting up a Bluzelle node by now:
 
-You're probably familiar with SGX by now:
+https://github.com/bluzelle/curium/blob/devel/public-validator-+-sentry/buildvalidatorsentry.md
 
-- [Setup SGX](validators-and-full-nodes/setup-sgx.md)
-- [Verify SGX](validators-and-full-nodes/verify-sgx.md)
-
-## 1. Prepare your `secret-1` validator to halt after block #1,246,400
-
-On the old machine (`secret-1`):
-
-```bash
-perl -i -pe 's/^halt-height =.*/halt-height = 1246400/' ~/.secretd/config/app.toml
-
-sudo systemctl restart secret-node
-```
-
-## 2. Install the new binaries on your SGX machine
+## 1. Install the new binaries on your SGX machine
 
 On the new SGX machine (`secret-2`):
 
@@ -60,11 +37,11 @@ sudo apt install -y ./secretnetwork_1.0.0_amd64.deb
 secretd init "$MONIKER" --chain-id secret-2
 ```
 
-## 3. Migrate your validator's signing key
+## 2. Migrate your validator's signing key
 
 Copy your `~/.secretd/config/priv_validator_key.json` from the old machine (`secret-1`) to the new SGX machine (`secret-2`) at the same location.
 
-## 4. Migrate your validator's wallet
+## 3. Migrate your validator's wallet
 
 Export the self-delegator wallet from the old machine (`secret-1`) and import to the new SGX machine (`secret-2`).
 
@@ -76,7 +53,7 @@ Notes:
 1. If you're recovering the wallet using `secretcli keys add "$YOUR_KEY_NAME" --recover` you should also use `--hd-path "44'/118'/0'/0/0"`.
 2. If the wallet is stored on a Ledger device, use `--legacy-hd-path` when importing it with `secretcli keys add`.
 
-## 5. Set up your SGX machine and become a `secret-2` validator
+## 4. Set up your SGX machine and become a `secret-2` validator
 
 On the new SGX machine (`secret-2`):
 
@@ -144,17 +121,3 @@ secretcli q staking validators | jq -r '.[] | select(.status == 2) | .descriptio
 ```
 
 ([Ref for testnet instructions](testnet/run-full-node-testnet.md))
-
-# In case of an upgrade failure
-
-If after a few hours the Enigma team announces on the chat that the upgrade failed, we will relaunch `secret-1`.
-
-1. On the old machine (`secret-1`):
-
-   ```bash
-   perl -i -pe 's/^halt-height =.*/halt-height = 0/' ~/.secretd/config/app.toml
-
-   sudo systemctl restart secret-node
-   ```
-
-2. Wait for 67% of voting power to come back online.
