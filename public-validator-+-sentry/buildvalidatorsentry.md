@@ -202,13 +202,13 @@ For the following instructions, we will describe the steps to setup a validator 
     curl https://client.sentry.testnet.public.bluzelle.com:26657/genesis | jq '.result.genesis' > genesis.json
     ```
 
-    Ensure to copy over and replace the existing genesis.json file in your "~/.blzd/config/" folder with the downloaded one from the existing network.
+    Ensure to copy over and replace the existing genesis.json file in your `~/.blzd/config/` folder with the downloaded one from the existing network.
 
 20. ONLY do this step if you are following the **REHEARSAL** PATH. 
 
     Migrate your validator's consensus signing key from the old machine (the validator on the Soft MainNet) to the new machine (the validator on the Final TestNet). 
     
-    To do this, copy your ~/.blzd/config/priv_validator_key.json from the old machine to the new machine at the same location, overwriting the existing file on the new machine. 
+    To do this, copy your `~/.blzd/config/priv_validator_key.json` from the old machine to the new machine at the same location, overwriting the existing file on the new machine. 
 
 21. Start the Bluzelle daemon
 
