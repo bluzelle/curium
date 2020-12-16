@@ -6,13 +6,21 @@
 
 For the following instructions, we will describe the steps to setup a validator or a sentry for an existing Public MainNet or TestNet. Unless otherwise stated, the instruction steps apply to both sentries and validators.
 
-1. Refer to previous documents for initializing the server, dev environments, and building the Bluzelle Curium applications.
+1. Refer to previous documents for initializing the server, dev environments, and building the Bluzelle Curium applications. Refer to steps a-c listed below.
 
    **CRITICAL**: If you are building for the **MAIN NET**, ensure you have built curium using the "**mainnet**" target.
    
    OR
 
    **CRITICAL**: If you are building for the **TEST NET**, ensure you have built curium using the "**testnet**" target. Use this if you are doing a **REHEARSAL**.
+   
+   These are steps involved in setting up the OS, Dev Environment, and building and deploying a multi-node Curium Zone.
+
+    a. [OS Setup for Curium](setup/os.md)
+    
+    b. [Development Environment Setup](setup/devenv.md)
+    
+    c. [Build the Curium Project](setup/build.md)
 
    Open incoming TCP port 26656 \(P2P\). Optionally, if you have sufficient firewall and packet filtering security \(to protect against DoS and DDoS attacks\), you may opt to also open up 26657 \(RPC\), and 1317 \(RESTful\). These two ports are only for the purposes of serving clients. If you have no such interest and do not want to deal with the security considerations, keep them closed.
 
