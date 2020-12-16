@@ -1,8 +1,8 @@
-# Network Upgrade Instructions from `secret-1` to `secret-2`
+# Network Upgrade Instructions from `Bluzelle Soft MainNet` to `Bluzelle Final TestNet`
 
-:warning: Please read carefully before you begin the upgrade.
+:warning: Please read carefully before you begin the upgrade. Also note. It is NOT INTENDED that you replace your existing SOFT MAINNET NODE with a Bluzelle Final TestNet node. The intention here is to run an ADDITIONAL node as a REHEARSAL for the final mainnet launch. Please be sure to keep your existing soft mainnet node running.
 
-- [Network Upgrade Instructions from `secret-1` to `secret-2`](#network-upgrade-instructions-from-secret-1-to-secret-2)
+- [Network Upgrade Instructions from `Bluzelle Soft Mainnet` to `Bluzelle Final TestNet`]
 - [Validators](#validators)
   - [1. Prepare your `secret-1` validator to halt after block #1,246,400](#1-prepare-your-secret-1-validator-to-halt-after-block-1246400)
   - [2. Install the new binaries on your SGX machine](#2-install-the-new-binaries-on-your-sgx-machine)
