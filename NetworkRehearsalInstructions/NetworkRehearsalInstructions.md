@@ -2,7 +2,7 @@
 
 :warning: Please read carefully before you begin the rehearsal. Also note. It is NOT INTENDED that you replace your existing SOFT MAINNET NODE(s) with Bluzelle Final TestNet node(s). 
 
-The intention here is to run ADDITIONAL node(s) as a REHEARSAL for the Final MainNet launch. Please be sure to keep your existing Soft MainNet node(s) running.
+The intention here is to run NEW node(s) as a REHEARSAL for the Final MainNet launch. Ideally, you run these new nodes in the same architectural configuration as on the Soft MainNet (ie: same # of sentries, etc). Please be sure to keep your existing Soft MainNet node(s) running.
 
 All coordination efforts will be done in the [Discord server](https://discord.gg/KRhcKE6qS6).
 
