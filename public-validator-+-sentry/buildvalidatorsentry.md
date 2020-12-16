@@ -6,7 +6,7 @@
 
 For the following instructions, we will describe the steps to setup a validator or a sentry for an existing Public MainNet or TestNet. Unless otherwise stated, the instruction steps apply to both sentries and validators.
 
-1. Refer to previous documents for initializing the server, dev environments, and building the Bluzelle Curium applications. Refer to steps `a-c` listed below.
+1. Refer to previous documents for initializing the server, dev environments, and building the Bluzelle Curium applications. Refer to steps `i-iii` listed below.
 
    **CRITICAL**: If you are building for the **MAIN NET**, ensure you have built curium using the "**mainnet**" target.
    
@@ -16,11 +16,11 @@ For the following instructions, we will describe the steps to setup a validator 
    
    These are steps involved in setting up the OS, Dev Environment, and building and deploying a multi-node Curium Zone.
 
-    a. [OS Setup for Curium](/setup/os.md)
+    i. [OS Setup for Curium](/setup/os.md)
     
-    b. [Development Environment Setup](/setup/devenv.md)
+    ii. [Development Environment Setup](/setup/devenv.md)
     
-    c. [Build the Curium Project](/setup/build.md)
+    iii. [Build the Curium Project](/setup/build.md)
 
 2. Open incoming TCP port 26656 \(P2P\). Optionally, if you have sufficient firewall and packet filtering security \(to protect against DoS and DDoS attacks\), you may opt to also open up 26657 \(RPC\), and 1317 \(RESTful\). These two ports are only for the purposes of serving clients. If you have no such interest and do not want to deal with the security considerations, keep them closed.
 
@@ -176,6 +176,52 @@ For the following instructions, we will describe the steps to setup a validator 
     bluzelle_crud = true
     ```
     
+19. Copy into your "~/.blzd/config/" directory the network's existing genesis.json file. You can interactively view it as follows, from our sentry nodes:
+
+    **MAIN NET**:
+    ```text
+    curl http://client.sentry.bluzellenet.bluzelle.com:26657/genesis | jq -C '.result.genesis' | more -r
+    ```
+
+    **TEST NET** (including REHEARSAL path):
+    ```text
+    curl https://client.sentry.testnet.public.bluzelle.com:26657/genesis | jq -C '.result.genesis' | more -r
+    ```
+
+    A convenient example to download it to the current folder from our sentry nodes:
+
+    **MAIN NET**:
+    ```text
+    curl http://client.sentry.bluzellenet.bluzelle.com:26657/genesis | jq '.result.genesis' > genesis.json
+    ```
+
+    **TEST NET** (including REHEARSAL path):
+    ```text
+    curl https://client.sentry.testnet.public.bluzelle.com:26657/genesis | jq '.result.genesis' > genesis.json
+    ```
+
+    Ensure to copy over and replace the existing genesis.json file in your "~/.blzd/config/" folder with the downloaded one from the existing network.
+
+16. Start the Bluzelle daemon
+
+    ```text
+    blzd start
+    ```
+
+    the node will start and catch up to the rest of the zone. Occasionally, this command will fail, in that case run the following command first
+
+    ```text
+    blzd unsafe-reset-all
+    ```
+
+    and then retry the start command.
+
+17. If you are creating a validator, wait till your new node catches up to the rest of the zone. It will be obvious as the node will slow down output and be getting blocks every 4-5 seconds. To be sure, run the following command in another terminal on the validator and look for false:
+
+    ```text
+    blzcli status | jq ".sync_info.catching_up"
+    ```
+
 19. If you are creating a validator, you will now need to acquire BNT tokens. Following are instructions depending on if you are targeting the MAIN NET or TEST NET.
 
     **MAIN NET**:
@@ -194,9 +240,9 @@ For the following instructions, we will describe the steps to setup a validator 
     blzcli keys add vuser --recover
     ```
 
-    Provide the menemonic generated above from the web staking wallet, when asked for the bip39 mnemonic. 
+    Provide the menemonic generated above from the web staking wallet, when asked for the BIP39 mnemonic. 
         
-    v) Convert the desired amount of BLZ tokens to BNT tokens by using the "Convert to BNT" button. Please be patient, as we run the conversion relayer manually for now, and it runs a few times every day. Please join and follow our Telegram group to keep updated.
+    v) Convert the desired amount of BLZ tokens to BNT tokens by using the "Convert to BNT" button. Please be patient, as we run the conversion relayer manually for now, and it runs a few times every day. Please join and follow our Telegram and Discord groups to keep updated.
 
     **TEST NET**:
    
@@ -245,53 +291,8 @@ For the following instructions, we will describe the steps to setup a validator 
     
     **Please do NOT take tokens from the faucet address. It is there as a convenience for the community. If you really want more tokens, just use the faucet.**
 
-15. Copy into your "~/.blzd/config/" directory the network's existing genesis.json file. You can view it as follows, from our sentry nodes:
 
-    **MAIN NET**:
-    ```text
-    curl http://client.sentry.bluzellenet.bluzelle.com:26657/genesis | jq -C '.result.genesis' | more -r
-    ```
-
-    **TEST NET**:
-    ```text
-    curl http://client.sentry.testnet.public.bluzelle.com:26657/genesis | jq -C '.result.genesis' | more -r
-    ```
-
-    A convenient example to download it to the current folder from our sentry nodes:
-
-    **MAIN NET**:
-    ```text
-    curl http://client.sentry.bluzellenet.bluzelle.com:26657/genesis | jq '.result.genesis' > genesis.json
-    ```
-
-    **TEST NET**:
-    ```text
-    curl http://client.sentry.testnet.public.bluzelle.com:26657/genesis | jq '.result.genesis' > genesis.json
-    ```
-
-    Ensure to copy over and replace the existing genesis.json file in your "~/.blzd/config/" folder with the downloaded one from the testnet.
-
-16. Start the Bluzelle daemon
-
-    ```text
-    blzd start
-    ```
-
-    the node will start and catch up to the rest of the zone. Occasionally, this command will fail, in that case run the following command first
-
-    ```text
-    blzd unsafe-reset-all
-    ```
-
-    and then retry the start command.
-
-17. If you are creating a validator, wait till your new node catches up to the rest of the zone. It will be obvious as the node will slow down output and be getting blocks every 4-5 seconds. To be sure, run the following command in another terminal on the validator and look for false:
-
-    ```text
-    blzcli status | jq ".sync_info.catching_up"
-    ```
-
-    Once completed, also, verify your vuser account has the tokens you funded it with, by asking the local node:
+21. Once completed, also, verify your vuser account has the tokens you funded it with, by asking the local node:
 
     ```text
     blzcli q account $(blzcli keys show vuser -a) | jq ".value.coins"
