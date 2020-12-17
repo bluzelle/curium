@@ -51,7 +51,7 @@ For the following instructions, we will describe the steps to setup a validator 
    **TEST NET** (including REHEARSAL path):
    
    ```text
-   curl --location --request GET 'http://client.sentry.testnet.public.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
+   curl --location --request GET 'https://client.sentry.testnet.public.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
    ```
 
 5. Initialize your daemon config as follows using the chain-id found above:
