@@ -293,12 +293,12 @@ For the following instructions, we will describe the steps to setup a validator 
     
     iii) Run the faucet and fund yourself. Use the following command (this example assumes your validator user account is "vuser" from above steps):
     ```
-    blzcli tx faucet mintfor $(blzcli keys show vuser -a) --node tcp://client.sentry.testnet.public.bluzelle.com:26657 --gas-prices 0.002ubnt --gas=auto --gas-adjustment=2.0 --chain-id <chain id> --from faucet
+    blzcli tx faucet mintfor $(blzcli keys show vuser -a) --node https://client.sentry.testnet.public.bluzelle.com:26657 --gas-prices 0.002ubnt --gas=auto --gas-adjustment=2.0 --chain-id <chain id> --from faucet
     ```
     
     iv) Verify you have tokens. If the above command gives an error that the account it not found, it likely means the faucet has not yet completed (takes a few seconds) or has failed for some reason: 
     ```
-    blzcli q account $(blzcli keys show vuser -a) --node tcp://client.sentry.testnet.public.bluzelle.com:26657
+    blzcli q account $(blzcli keys show vuser -a) --node https://client.sentry.testnet.public.bluzelle.com:26657
     ```
     
     **Please do NOT take tokens from the faucet address. It is there as a convenience for the community. If you really want more tokens, just use the faucet.**
