@@ -14,9 +14,7 @@ As part of the process of forking the old network over to the new TestNet, we **
     
 You typically have 21 days from the start of the new network to unjail your validator. After this time, your validator will unbond and all delegators (including your operator account) will get back their delegated tokens and the validator will cease to exist. You can determine the number of days of unbonding for the network with the following (assumes you already have a running network after following the steps below):
     
-    ```
     blzcli q staking params | jq '.unbonding_time = (.unbonding_time | tonumber)/1000000000/3600/24' | jq '.unbonding_time'
-    ```
 
 You're probably familiar with the process of setting up a Bluzelle node by now:
 
