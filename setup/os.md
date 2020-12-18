@@ -6,7 +6,7 @@
 
 ### Linux:
 
-1. Install Ubuntu, open incoming tcp ports 26656, 26657, and 1317. These are the ports that the daemon and http servers will use. This will vary depending on your setup. If you are setting up a validator+sentry configuration, the validator will typically only open up 26656. Sentries will open all three. If you are only setting up a validator that will talk directly to the world \(and other validators and sentries\), open up all three.
+1. Install Ubuntu, open incoming tcp ports 26656, 26657, and 1317. These are the ports that the daemon and http servers will use. This will vary depending on your setup. If you are setting up a validator+sentry configuration, the validator will typically only open up 26656. Sentries will open all three. If you are setting up a validator but want to have access to your RPC (26657) and REST (1317) services from outside, open these up according to your specific needs. Note that opening up these services may subject your server to more vectors for DoS/DDoS attack, something that is beyond the scope of this document and left to you. 
 2. Ensure that APT has the latest software packages:
 
    ```text
