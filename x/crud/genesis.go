@@ -15,51 +15,79 @@
 package crud
 
 import (
-	"fmt"
 	"github.com/bluzelle/curium/x/crud/internal/keeper"
 	"github.com/bluzelle/curium/x/crud/internal/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
+type StoreExport struct {
+	Key []byte
+	Value []byte
+}
+
 type GenesisState struct {
-	BlzValues []types.BLZValue
+	CrudStore []StoreExport
+	LeaseStore []StoreExport
+	OwnerStore []StoreExport
 }
 
 func NewGenesisState(_ []types.BLZValue) GenesisState {
-	return GenesisState{BlzValues: nil}
+	return GenesisState{
+		CrudStore: nil,
+		LeaseStore: nil,
+		OwnerStore: nil,
+	}
 }
 
 func ValidateGenesis(data GenesisState) error {
-	for _, record := range data.BlzValues {
-		if record.Owner == nil {
-			return fmt.Errorf("invalid BlzValue: Value: %s. Error: Missing Owner", record.Value)
-		}
-	}
+	//for _, record := range data.BlzValues {
+	//	if record.Owner == nil {
+	//		return fmt.Errorf("invalid BlzValue: Value: %s. Error: Missing Owner", record.Value)
+	//	}
+	//}
 	return nil
 }
 
 func DefaultGenesisState() GenesisState {
 	return GenesisState{
-		BlzValues: nil,
+		CrudStore: nil,
+		LeaseStore: nil,
+		OwnerStore: nil,
 	}
 }
 
 func InitGenesis(ctx sdk.Context, keeper keeper.IKeeper, data GenesisState) []abci.ValidatorUpdate {
-	for _, record := range data.BlzValues {
-		keeper.SetValue(ctx, keeper.GetKVStore(ctx), "UUID-Genesis", "Key-Genesis", record)
-	}
+	importStore(keeper.GetKVStore(ctx), data.CrudStore)
+	importStore(keeper.GetLeaseStore(ctx), data.LeaseStore)
+	importStore(keeper.GetOwnerStore(ctx), data.OwnerStore)
 	return []abci.ValidatorUpdate{}
 }
 
-// TODO - fix key value issues
-func ExportGenesis(ctx sdk.Context, k keeper.IKeeper) GenesisState {
-	var records []types.BLZValue
-	iterator := k.GetValuesIterator(ctx, k.GetKVStore(ctx))
-	for ; iterator.Valid(); iterator.Next() {
-		key := string(iterator.Key())
-		value := k.GetValue(ctx, k.GetKVStore(ctx), "UUID-Genesis", key)
-		records = append(records, value)
+func importStore(store sdk.KVStore, records []StoreExport) {
+	for _, record := range records {
+		 value := record.Value
+		 if value == nil {
+		 	value = make([]byte, 0)
+		 }
+		store.Set(record.Key, value)
 	}
-	return GenesisState{records}
+}
+
+
+func ExportGenesis(ctx sdk.Context, k keeper.IKeeper) GenesisState {
+	return GenesisState{
+		exportStore(ctx, k.GetKVStore(ctx)),
+		exportStore(ctx, k.GetLeaseStore(ctx)),
+		exportStore(ctx, k.GetOwnerStore(ctx)),
+	}
+}
+
+func exportStore(ctx sdk.Context, store sdk.KVStore) []StoreExport {
+	var records []StoreExport
+	iterator := sdk.KVStorePrefixIterator(store, []byte{})
+	for ; iterator.Valid(); iterator.Next() {
+		records = append(records, StoreExport{iterator.Key(), iterator.Value()})
+	}
+	return records
 }

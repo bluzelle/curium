@@ -45,7 +45,7 @@ For the following instructions, we will describe the steps to setup a validator 
    **MAIN NET**:
    
    ```text
-   curl --location --request GET 'http://client.sentry.bluzellenet.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
+   curl --location --request GET 'https://client.sentry.bluzellenet.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
    ```
 
    **TEST NET** (including REHEARSAL path):
@@ -96,7 +96,7 @@ For the following instructions, we will describe the steps to setup a validator 
    **MAIN NET**:
    
    ```text
-   curl -s http://client.sentry.bluzellenet.bluzelle.com:26657/net_info | jq -C '[.result.peers[] | select(.node_info.moniker | startswith("daemon-sentry-gateway")) | {moniker: .node_info.moniker, id: .node_info.id, ip_address: .remote_ip}] | sort_by(.moniker)'
+   curl -s https://client.sentry.bluzellenet.bluzelle.com:26657/net_info | jq -C '[.result.peers[] | select(.node_info.moniker | startswith("daemon-sentry-gateway")) | {moniker: .node_info.moniker, id: .node_info.id, ip_address: .remote_ip}] | sort_by(.moniker)'
    ```
 
    **TEST NET** (including REHEARSAL path):
@@ -248,7 +248,7 @@ For the following instructions, we will describe the steps to setup a validator 
    
     ii) Goto the following URL to sign into the staking application:
     
-    http://staking.bluzelle.com/ 
+    https://staking.bluzelle.com/ 
    
     iii) Create a new BNT mnemonic for our MAIN NET, and store and secure this BNT mnemonic securely. **If you lose this mnemonic, you will lose ALL your funds.** Bluzelle is not responsible and there is no policy to "refund" anything. Note that this web wallet is **100% client side**. Your BNT mnemonic is generated on the local browser only and is never transmitted over the network. You are 100% responsible for storing and securing this mnemonic. 
     
@@ -311,21 +311,29 @@ For the following instructions, we will describe the steps to setup a validator 
 
 24. ONLY do this step if you are following the **REHEARSAL** PATH. 
 
-    Export your existing validator's operator wallet from the existing validator machine and import it to the new validator machine. We will assume that the existing wallet account is called `vuser` and will call the new imported wallet account the same name. 
+    **MAIN NET**:
+    ```text
+    curl http://client.sentry.bluzellenet.bluzelle.com:26657/genesis | jq -C '.result.genesis' | more -r
+    ```
 
-    i. On the existing validator machine: 
-    
+    **TEST NET**:
+    ```text
+    curl http://client.sentry.testnet.public.bluzelle.com:26657/genesis | jq -C '.result.genesis' | more -r
     ```
-    blzcli keys export vuser 
+
+    A convenient example to download it to the current folder from our sentry nodes:
+
+    **MAIN NET**:
+    ```text
+    curl http://client.sentry.bluzellenet.bluzelle.com:26657/genesis | jq '.result.genesis' > genesis.json
     ```
-    
-    Note that the `passphrase to encrypt the exported key` that you provide is required when you import the key in the next step. Copy the output of the above command (it will display the output to your screen) and store it into a file. We will assume this file is called `export.txt`.
-    
-    ii. On the new validator machine (provide the second password entered when doing the export):
-    
+
+    **TEST NET**:
+    ```text
+    curl http://client.sentry.testnet.public.bluzelle.com:26657/genesis | jq '.result.genesis' > genesis.json
     ```
-    blzcli keys import vuser export.txt
-    ```
+
+    Ensure to copy over and replace the existing genesis.json file in your "~/.blzd/config/" folder with the downloaded one from the testnet.
 
     Notes:
     

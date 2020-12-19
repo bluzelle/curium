@@ -29,13 +29,6 @@ func TestAppModuleBasic_Name(t *testing.T) {
 	assert.Equal(t, sut.Name(), "crud")
 }
 
-func TestAppModuleBasic_DefaultGenesis(t *testing.T) {
-	genesis := AppModuleBasic{}.DefaultGenesis()
-	assert.NotNil(t, genesis)
-
-	// Note: see crud/genesis.go func DefaultGenesisState() GenesisState
-	assert.Equal(t, string(genesis), "{\"BlzValues\":null}")
-}
 
 func TestAppModuleBasic_ValidateGenesis(t *testing.T) {
 	bz := json.RawMessage{}

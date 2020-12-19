@@ -16,16 +16,10 @@ package crud
 
 import (
 	"github.com/bluzelle/curium/x/crud/internal/types"
-	"github.com/bluzelle/curium/x/crud/mocks"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-func TestNewGenesisState(t *testing.T) {
-	assert.Empty(t, NewGenesisState(nil).BlzValues)
-}
 
 func TestValidateGenesis(t *testing.T) {
 	var blzValues []types.BLZValue
@@ -43,20 +37,3 @@ func TestValidateGenesis(t *testing.T) {
 	assert.Nil(t, ValidateGenesis(genesisState))
 }
 
-func TestInitGenesis(t *testing.T) {
-	mockCtrl := gomock.NewController(t)
-	mockKeeper := mocks.NewMockIKeeper(mockCtrl)
-	data := DefaultGenesisState()
-	ctx := sdk.Context{}
-	owner := []byte("bluzelle1t0ywtmrduldf6h4wqrnnpyp9wr6law2u5jwa23")
-	data.BlzValues = append(data.BlzValues, types.BLZValue{Value: "test", Owner: owner})
-
-	mockKeeper.EXPECT().
-		SetValue(ctx, nil, "UUID-Genesis", "Key-Genesis",
-			types.BLZValue{Value: "test", Owner: owner})
-
-	mockKeeper.EXPECT().
-		GetKVStore(ctx).Return(nil)
-
-	InitGenesis(ctx, mockKeeper, data)
-}
