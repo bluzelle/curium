@@ -11,7 +11,7 @@ In this task, you are required to go through our instruction to set up a node of
 
 - The rehearsal will start at block height XXX (to be announced) and last for around 3 weeks. We will announce the ending block height in advance.
 - Your validator must be at "ACTIVE" state at the ending block height.
-- Your validator must achieve 98% voting participation (as shown on [CENSUS](https://census.testnet.public.bluzelle.com/validators).
+- Your validator must achieve 98% voting participation (as shown on [CENSUS](https://census.testnet.public.bluzelle.com/validators)).
 - In the case where more than 50 participants achieve 98% voting participation, only those with Top 50 voting participation will be rewarded
 - In the case where there is a tie in the contest, or a network halt that impacts the final results, the Bluzelle team reserves the rights to determine the top 50 winners based on other criteria with prior notice.
 - All existing soft mainnet nodes that participate in this contest will receive 30% additional reward.
@@ -29,7 +29,7 @@ Whenever you discover a bug or initiate a successful attack, it is important to 
 
 2. Follow the respective instruction below to set up a node on testnet:
 
-- **If you are an existing Soft Mainnet validator**, please follow [this guide](NetworkRehearsalInstructions/NetworkRehearsalInstructions.md) (rehearsal path). (⚠️Note: You need to create a new separate node on the testnet for this contest. This serves as a form of "rehearsal" for our real mainnet hard fork. Please DO NOT turn off your current node on the soft mainnet until we launch the production mainnet.)
+- **If you are an existing Soft Mainnet validator**, please follow [this guide](NetworkRehearsalInstructions/NetworkRehearsalInstructions.md) (rehearsal path). (⚠️Note: You need to create a new separate node on the testnet for this contest. This serves as a form of "rehearsal" for our real mainnet hard fork. Please **DO NOT** turn off your current node on the soft mainnet until we launch the production mainnet.)
 
 - **If you are a new validator**, please follow [this guide](public-validator-+-sentry/buildvalidatorsentry.md)
 
