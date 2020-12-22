@@ -27,7 +27,7 @@ Whenever you discover a bug or initiate a successful attack, it is important to 
 
 1. Signup through https://sod.bluzelle.com/sod2-signup
 
-2. Follow the respective instruction below to set up a node on testnet:
+2. Follow the respective instructions below, to set up a node on testnet:
 
 - **If you are an existing Soft Mainnet validator**, please follow [this guide](NetworkRehearsalInstructions/NetworkRehearsalInstructions.md) (rehearsal path). (⚠️Note: You need to create a new separate node on the testnet for this contest. This serves as a form of "rehearsal" for our real mainnet hard fork. Please **DO NOT** turn off your current node on the soft mainnet until we launch the production mainnet.)
 
