@@ -311,30 +311,22 @@ For the following instructions, we will describe the steps to setup a validator 
 
 24. ONLY do this step if you are following the **REHEARSAL** PATH. 
 
-    **MAIN NET**:
-    ```text
-    curl http://client.sentry.bluzellenet.bluzelle.com:26657/genesis | jq -C '.result.genesis' | more -r
+    Export your existing validator's operator wallet from the existing validator machine and import it to the new validator machine. We will assume that the existing wallet account is called `vuser` and will call the new imported wallet account the same name. 
+
+    i. On the existing validator machine: 
+    
     ```
-
-    **TEST NET**:
-    ```text
-    curl http://client.sentry.testnet.public.bluzelle.com:26657/genesis | jq -C '.result.genesis' | more -r
+    blzcli keys export vuser 
     ```
-
-    A convenient example to download it to the current folder from our sentry nodes:
-
-    **MAIN NET**:
-    ```text
-    curl http://client.sentry.bluzellenet.bluzelle.com:26657/genesis | jq '.result.genesis' > genesis.json
+    
+    Note that the `passphrase to encrypt the exported key` that you provide is required when you import the key in the next step. Copy the output of the above command (it will display the output to your screen) and store it into a file. We will assume this file is called `export.txt`.
+    
+    ii. On the new validator machine (provide the second password entered when doing the export):
+    
     ```
-
-    **TEST NET**:
-    ```text
-    curl http://client.sentry.testnet.public.bluzelle.com:26657/genesis | jq '.result.genesis' > genesis.json
+    blzcli keys import vuser export.txt
     ```
-
-    Ensure to copy over and replace the existing genesis.json file in your "~/.blzd/config/" folder with the downloaded one from the testnet.
-
+    
     Notes:
     
     i. If you have the mnemonic handy for your original vuser, you can just add the vuser to the new validator with the following:
