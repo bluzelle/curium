@@ -7,8 +7,8 @@
 1. Curium uses Golang, in \*nix, run these commands in a terminal
 
    ```text
-   wget https://dl.google.com/go/go1.14.linux-amd64.tar.gz 
-   sudo tar -C /usr/local -xzf go1.14.linux-amd64.tar.gz
+   wget https://golang.org/dl/go1.15.6.linux-amd64.tar.gz 
+   sudo tar -C /usr/local -xzf go1.15.6.linux-amd64.tar.gz
    ```
 
    on macOS install the latest package from here: [https://golang.org/doc/install](https://golang.org/doc/install)
