@@ -14,7 +14,7 @@ For the following instructions, we will describe the steps to setup a validator 
 
    **CRITICAL**: If you are building for the **TEST NET**, ensure you have built curium using the "**testnet**" target. Use this if you are doing a **REHEARSAL**.
    
-   These are steps involved in setting up the OS, development environment, and building the nodes that intend to run in one of our Curium zones. Please go through this process for your validator and each of your sentries.
+   These are steps involved in setting up the OS, development environment, and building the nodes that intend to run in one of our Curium zones. Please go through this process for your validator and each of your sentries. **ONLY** follow the three specific links listed below, please. **Do not** click through the "next" button at the bottom of the third link, as you only need to execute the steps on these three links specifically.
 
     i. [OS Setup for Curium](/setup/os.md)
     
