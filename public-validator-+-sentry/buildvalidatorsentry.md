@@ -45,7 +45,7 @@ For the following instructions, we will describe the steps to setup a validator 
    **MAIN NET**:
    
    ```text
-   curl --location --request GET 'https://client.sentry.bluzellenet.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
+   curl --location --request GET 'https://client.sentry.bluzellenet.bluzelle.com:1319/node_info' -s | jq '.node_info.network' | tr -d '"'
    ```
 
    **TEST NET** (including REHEARSAL path):
