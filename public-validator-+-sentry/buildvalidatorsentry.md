@@ -8,7 +8,7 @@ For the following instructions, we will describe the steps to setup a validator 
 
 1. Refer to previous documents for initializing the server, dev environments, and building the Bluzelle Curium applications. Refer to steps `i-iii` listed below.
 
-   **CRITICAL**: If you are building for the **MAIN NET**, ensure you have built curium using the "**mainnet**" target.
+   **CRITICAL**: If you are building for the **MAIN NET**, ensure you have built curium using the "**mainnet**" target. ALSO, in step iii below, after going to the "curium working directory", be sure to checkout the "SoftMainNet" branch with `git checkout SoftMainNet`.
    
    OR
 
