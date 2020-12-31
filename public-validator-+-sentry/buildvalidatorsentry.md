@@ -8,13 +8,13 @@ For the following instructions, we will describe the steps to setup a validator 
 
 1. Refer to previous documents for initializing the server, dev environments, and building the Bluzelle Curium applications. Refer to steps `i-iii` listed below.
 
-   **CRITICAL**: If you are building for the **MAIN NET**, ensure you have built curium using the "**mainnet**" target.
+   **CRITICAL**: If you are building for the **MAIN NET**, ensure you have built curium using the "**mainnet**" target. ALSO, in step iii below, after going to the "curium working directory", be sure to checkout the "SoftMainNet" branch with `git checkout SoftMainNet`.
    
    OR
 
    **CRITICAL**: If you are building for the **TEST NET**, ensure you have built curium using the "**testnet**" target. Use this if you are doing a **REHEARSAL**.
    
-   These are steps involved in setting up the OS, development environment, and building the nodes that intend to run in one of our Curium zones. Please go through this process for your validator and each of your sentries.
+   These are steps involved in setting up the OS, development environment, and building the nodes that intend to run in one of our Curium zones. Please go through this process for your validator and each of your sentries. **ONLY** follow the three specific links listed below, please. **Do not** click through the "next" button at the bottom of the third link, as you only need to execute the steps on these three links specifically.
 
     i. [OS Setup for Curium](/setup/os.md)
     
@@ -45,7 +45,7 @@ For the following instructions, we will describe the steps to setup a validator 
    **MAIN NET**:
    
    ```text
-   curl --location --request GET 'https://client.sentry.bluzellenet.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
+   curl --location --request GET 'https://client.sentry.bluzellenet.bluzelle.com:1319/node_info' -s | jq '.node_info.network' | tr -d '"'
    ```
 
    **TEST NET** (including REHEARSAL path):

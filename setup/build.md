@@ -100,7 +100,7 @@
    blzcli version --long
    ```
 
-   which provides the output
+   which provides output such as (these values can change and you should compare with what others have on the network):
 
    ```text
    name: BluzelleService
@@ -118,7 +118,7 @@
    blzd version --long
    ```
 
-   which has the output
+   which has the output (again -- can vary -- this is an example and you should compare with what others have on the network):
 
    ```text
    name: BluzelleService
