@@ -6,14 +6,20 @@ import (
 	"github.com/bluzelle/curium/x/crud"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"net/url"
+	"strconv"
 	"time"
+	"github.com/go-resty/resty/v2"
 )
 
 
 type source struct {
+	Name string
 	Url   string      `json:"url"`
 	Property string `json:"property"`
 }
+
+type JSONResponse map[string]interface{}
+
 
 var currCtx *sdk.Context
 
@@ -33,18 +39,45 @@ func StartFeeder(crudKeeper crud.Keeper) {
 func feederTick(crudKeeper crud.Keeper) {
 		result := crudKeeper.Search(*currCtx, crudKeeper.GetKVStore(*currCtx), "oracle", "source", 1, 100, "asc", nil)
 		keyValues := result.KeyValues
-		sources := make([]source, len(result.KeyValues))
 
-		for i, v := range keyValues {
+		for _, v := range keyValues {
 			res := source{}
 			json.Unmarshal([]byte(decodeSafe(v.Value)), &res)
-			sources[i] = res
+			res.Name = v.Key
+			value, err := fetchFromSource(res)
+			// TODO: SUBMIT PREFLIGHT AND VOTE HERE
+			fmt.Println(err)
+			fmt.Println(value)
 		}
+}
 
+func fetchFromSource(source source) (float64, error) {
+	fmt.Println("************** SOURCE **************")
+	fmt.Println(source)
 
+	client := resty.New()
 
-		fmt.Println("**********************************")
-		fmt.Println(sources)
+	resp, err := client.R().
+		EnableTrace().
+		Get(source.Url)
+
+	if err != nil {
+		return 0, err
+	}
+
+	var respBody JSONResponse
+
+	json.Unmarshal(resp.Body(), &respBody)
+
+	value  := respBody[source.Property]
+
+	switch i := value.(type) {
+	case string:
+		f, err := strconv.ParseFloat(i, 32)
+		return f, err
+	}
+	return 0, nil
+
 }
 
 func decodeSafe(str string) string {
