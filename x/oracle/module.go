@@ -2,22 +2,20 @@ package oracle
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/bluzelle/curium/x/crud"
-
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/bluzelle/curium/x/oracle/client/cli"
 	"github.com/bluzelle/curium/x/oracle/client/rest"
 	"github.com/bluzelle/curium/x/oracle/keeper"
 	"github.com/bluzelle/curium/x/oracle/types"
+	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/module"
 )
 
 // Type check to ensure the interface is properly implemented
@@ -135,16 +133,14 @@ func (am AppModule) ExportGenesis(ctx sdk.Context) json.RawMessage {
 
 // BeginBlock returns the begin blocker for the oracle module.
 func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
-	BeginBlocker(ctx, req, am.keeper)
+	BeginBlocker(ctx, req, am.keeper, am.crudKeeper)
 }
 
 // EndBlock returns the end blocker for the oracle module. It returns no validator
 // updates.
-func (AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
+func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
+	EndBlocker(ctx, am.keeper, am.crudKeeper)
 	return []abci.ValidatorUpdate{}
 }
 
-func StartFeeder() {
-//	ctx := sdk.Context{}
-	fmt.Println("***** XXX ****")
-}
+
