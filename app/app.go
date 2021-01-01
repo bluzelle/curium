@@ -17,6 +17,7 @@ package app
 import (
 	"encoding/json"
 	"github.com/bluzelle/curium/x/tax/ante"
+	"github.com/bluzelle/curium/x/oracle"
 	"math"
 	"os"
 	"time"
@@ -77,6 +78,7 @@ var (
 		crud.AppModuleBasic{},
 		tax.AppModuleBasic{},
 		faucet.AppModuleBasic{},
+		oracle.AppModuleBasic{},
 	)
 
 	// account permissions
@@ -132,6 +134,7 @@ type CRUDApp struct {
 	paramsKeeper   params.Keeper
 	crudKeeper     crud.Keeper
 	taxKeeper      tax.Keeper
+	oracleKeeper   oracle.Keeper
 	faucetKeeper   faucet.Keeper
 
 	// Module Manager
@@ -265,6 +268,12 @@ func NewCRUDApp(
 		app.cdc,
 	)
 
+	app.oracleKeeper = oracle.NewKeeper(
+		app.cdc,
+		keys[oracle.StoreKey],
+		nil,
+		)
+
 	app.faucetKeeper = faucet.NewKeeper(
 		app.supplyKeeper,
 		app.stakingKeeper,
@@ -289,6 +298,7 @@ func NewCRUDApp(
 		distr.NewAppModule(app.distrKeeper, app.accountKeeper, app.supplyKeeper, app.stakingKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.accountKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
+		oracle.NewAppModule(app.oracleKeeper, app.crudKeeper),
 	)
 
 	app.mm.SetOrderBeginBlockers(distr.ModuleName, slashing.ModuleName)
@@ -332,6 +342,8 @@ func NewCRUDApp(
 	if err != nil {
 		tmos.Exit(err.Error())
 	}
+
+	oracle.StartFeeder()
 
 	return app
 }
