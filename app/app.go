@@ -16,11 +16,13 @@ package app
 
 import (
 	"encoding/json"
-	"github.com/bluzelle/curium/x/tax/ante"
+	"github.com/bluzelle/curium/x/aggregator"
+	"github.com/bluzelle/curium/x/oracle"
 	"math"
 	"os"
 	"time"
 
+	appAnte "github.com/bluzelle/curium/app/ante"
 	bluzellechain "github.com/bluzelle/curium/types"
 	"github.com/bluzelle/curium/x/crud"
 	"github.com/bluzelle/curium/x/tax"
@@ -77,6 +79,8 @@ var (
 		crud.AppModuleBasic{},
 		tax.AppModuleBasic{},
 		faucet.AppModuleBasic{},
+		oracle.AppModuleBasic{},
+		aggregator.AppModuleBasic{},
 	)
 
 	// account permissions
@@ -132,7 +136,9 @@ type CRUDApp struct {
 	paramsKeeper   params.Keeper
 	crudKeeper     crud.Keeper
 	taxKeeper      tax.Keeper
+	oracleKeeper   oracle.Keeper
 	faucetKeeper   faucet.Keeper
+	aggKeeper      aggregator.Keeper
 
 	// Module Manager
 	mm *module.Manager
@@ -157,7 +163,9 @@ func NewCRUDApp(
 		supply.StoreKey, distr.StoreKey, slashing.StoreKey,
 		gov.StoreKey, params.StoreKey, crud.StoreKey,
 		tax.StoreKey,
-		faucet.StoreKey, crud.LeaseKey, crud.OwnerKey)
+		faucet.StoreKey, crud.LeaseKey, crud.OwnerKey,
+		oracle.StoreKey,aggregator.StoreKey,
+	)
 
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -265,6 +273,20 @@ func NewCRUDApp(
 		app.cdc,
 	)
 
+	app.oracleKeeper = oracle.NewKeeper(
+		app.cdc,
+		keys[oracle.StoreKey],
+		app.stakingKeeper,
+		nil,
+	)
+
+	app.aggKeeper = aggregator.NewKeeper(
+		app.cdc,
+		app.oracleKeeper,
+		keys[aggregator.StoreKey],
+		nil,
+	)
+
 	app.faucetKeeper = faucet.NewKeeper(
 		app.supplyKeeper,
 		app.stakingKeeper,
@@ -289,10 +311,12 @@ func NewCRUDApp(
 		distr.NewAppModule(app.distrKeeper, app.accountKeeper, app.supplyKeeper, app.stakingKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.accountKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
+		oracle.NewAppModule(app.oracleKeeper),
+		aggregator.NewAppModule(app.aggKeeper),
 	)
 
-	app.mm.SetOrderBeginBlockers(distr.ModuleName, slashing.ModuleName)
-	app.mm.SetOrderEndBlockers(gov.ModuleName, staking.ModuleName)
+	app.mm.SetOrderBeginBlockers(distr.ModuleName, slashing.ModuleName, oracle.ModuleName)
+	app.mm.SetOrderEndBlockers(gov.ModuleName, staking.ModuleName, aggregator.ModuleName)
 
 	// Sets the order of Genesis - Order matters, genutil is to always come last
 	// NOTE: The genutils moodule must occur after staking so that pools are
@@ -307,6 +331,8 @@ func NewCRUDApp(
 		crud.ModuleName,
 		tax.ModuleName,
 		supply.ModuleName,
+		oracle.ModuleName,
+		aggregator.ModuleName,
 		genutil.ModuleName,
 	)
 
@@ -318,11 +344,7 @@ func NewCRUDApp(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 
-
 	addAnteHandler(app)
-
-
-
 
 	// initialize stores
 	app.MountKVStores(keys)
@@ -333,40 +355,25 @@ func NewCRUDApp(
 		tmos.Exit(err.Error())
 	}
 
+	go oracle.StartFeeder(app.oracleKeeper, app.accountKeeper, cdc)
+
 	return app
 }
 
-
 func addAnteHandler(app *CRUDApp) {
-	authAnteHandler := auth.NewAnteHandler(
-		app.accountKeeper,
-		app.supplyKeeper,
-		auth.DefaultSigVerificationGasConsumer,
-	)
-
-	taxAnteHandler := sdk.ChainAnteDecorators(ante.NewTaxDecorator(
-		app.accountKeeper,
-		app.supplyKeeper,
-		app.taxKeeper,
-		app.bankKeeper,
-	))
-
-	comboAnteHandler := func(ctx sdk.Context, tx sdk.Tx, simulate bool) (newCtx sdk.Context, err error) {
-		ctx2, err := authAnteHandler(ctx, tx, simulate)
-		if err != nil {
-			return ctx2, err
-		}
-		return taxAnteHandler(ctx2, tx, simulate)
-
-	}
 
 	// The AnteHandler handles signature verification and transaction pre-processing
 	app.SetAnteHandler(
-		comboAnteHandler,
+		appAnte.NewAnteHandler(
+			app.accountKeeper,
+			app.supplyKeeper,
+			app.taxKeeper,
+			app.bankKeeper,
+			auth.DefaultSigVerificationGasConsumer,
+		),
 	)
 
 }
-
 
 // GenesisState represents chain state at the start of the chain. Any initial state (account balances) are stored here.
 type GenesisState map[string]json.RawMessage
@@ -410,7 +417,7 @@ func (app *CRUDApp) ModuleAccountAddrs() map[string]bool {
 	return modAccAddrs
 }
 
-func (app *CRUDApp) ExportAppStateAndValidators(forZeroHeight bool, jailWhiteList []string,) (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
+func (app *CRUDApp) ExportAppStateAndValidators(forZeroHeight bool, jailWhiteList []string, ) (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 
 	// as if they could withdraw from the start of the next block
 	ctx := app.NewContext(true, abci.Header{Height: app.LastBlockHeight()})

@@ -57,10 +57,10 @@ document.
             ~/.blzd/config/genesis.json
             
 6.  Edit .blzd/config/app.toml in a text editor and set the minimum-gas-prices 
-    to “10.0ubnt”. Every node should have at least this minimum. This can also 
+    to “0.002ubnt”. Every node should have at least this minimum. This can also 
     be done from the command line with sed: 
 
-        sed -i -e 's/minimum-gas-prices = ""/minimum-gas-prices = "10.0ubnt"/g' \
+        sed -i -e 's/minimum-gas-prices = ""/minimum-gas-prices = "0.002ubnt"/g' \
             ~/.blzd/config/app.toml
 
 7.  Set the client configuration settings:

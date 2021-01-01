@@ -1,6 +1,7 @@
 package ante
 
 import (
+	"github.com/bluzelle/curium/app/ante/feeCalculator"
 	"github.com/bluzelle/curium/x/tax"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -55,11 +56,11 @@ func (td TaxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, nex
 			return ctx, sdkerrors.Wrapf(sdkerrors.ErrUnknownAddress, "fee payer address: %s does not exist", feePayer)
 		}
 
-		if err := collectTransactionTax(ctx, td, tx, feeTx.GetFee(), feePayer); err != nil {
+		if err := collectTransactionTax(ctx, td, tx,  feeTx.GetFee(), feePayer); err != nil {
 			return ctx, err
 		}
 
-		if err := collectFeeTax(ctx, td.supplyKeeper, taxInfo.Collector, feeTx.GetFee(), taxInfo.FeeBp); err != nil {
+		if err := collectFeeTax(ctx, tx, td.supplyKeeper, taxInfo.Collector, taxInfo.FeeBp); err != nil {
 			return ctx, err
 		}
 	}
@@ -101,23 +102,12 @@ func collectTransactionTax(ctx sdk.Context, dfd TaxDecorator, tx sdk.Tx, fees sd
 }
 
 
-func collectFeeTax( ctx sdk.Context, supplyKeeper types.SupplyKeeper, taxCollectorAcc sdk.AccAddress, fees sdk.Coins, feebp int64) error {
+func collectFeeTax( ctx sdk.Context, tx sdk.Tx, supplyKeeper types.SupplyKeeper, taxCollectorAcc sdk.AccAddress, feebp int64) error {
 
-	if !fees.IsValid() {
-		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFee, "invalid fee amount: %s", fees)
-	}
+	gasFee := feeCalculator.CalculateGasFee(tx, ctx)
+	taxFees := sdk.NewCoins(sdk.NewInt64Coin("ubnt", gasFee.AmountOf("ubnt").Int64() * feebp / 10000))
 
-	taxFees := sdk.Coins{}
-	for _, fee := range fees {
-		feeAmt := fee.Amount.Int64() * feebp / 10000
-
-		if feeAmt > 0 {
-			taxFee := sdk.NewInt64Coin(fee.Denom, feeAmt)
-			taxFees = append(taxFees, taxFee)
-		}
-	}
-
-	if !taxFees.Empty() {
+	if !taxFees.IsZero() {
 		err := supplyKeeper.SendCoinsFromModuleToAccount(ctx, authtypes.FeeCollectorName, taxCollectorAcc, taxFees)
 		if err != nil {
 			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
@@ -126,3 +116,4 @@ func collectFeeTax( ctx sdk.Context, supplyKeeper types.SupplyKeeper, taxCollect
 
 	return nil
 }
+

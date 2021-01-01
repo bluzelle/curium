@@ -61,12 +61,12 @@ Deploy Additional Nodes
     of them. We just choose to point to the first one here, for the purposes of 
     the documentation.
 
-6.  Edit ".blzd/config/app.toml" to set the minimum-gas-prices  to “10.0ubnt”
+6.  Edit ".blzd/config/app.toml" to set the minimum-gas-prices  to “0.002ubnt”
 
         # The minimum gas prices a validator is willing to accept for processing a
         # transaction. A transaction's fees must meet the minimum of any denomination
         # specified in this config (e.g. 0.25token1;0.0001token2).
-        minimum-gas-prices = "10.0ubnt"
+        minimum-gas-prices = "0.002ubnt"
         
     Remember that *every* node should have *at least* this minimum. Feel free 
     to set it higher if you wish.
