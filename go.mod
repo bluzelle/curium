@@ -3,6 +3,7 @@ module github.com/bluzelle/curium
 go 1.14
 
 require (
+	github.com/Workiva/go-datastructures v1.0.52
 	github.com/cosmos/cosmos-sdk v0.39.1
 	github.com/cosmos/modules/incubator/faucet v0.0.0-20200315124306-c86f71ae76a0
 	github.com/go-resty/resty/v2 v2.3.0

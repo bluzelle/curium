@@ -1,15 +1,38 @@
 package oracle
 
 import (
+	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"github.com/bluzelle/curium/x/crud"
+	"github.com/bluzelle/curium/x/oracle/types"
+	"github.com/cosmos/cosmos-sdk/client/keys"
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
+	"github.com/go-resty/resty/v2"
+	"github.com/tendermint/tendermint/libs/log"
+	pvm "github.com/tendermint/tendermint/privval"
 	"net/url"
+	"os"
+	"os/user"
 	"strconv"
 	"time"
-	"github.com/go-resty/resty/v2"
 )
+
+var logger = log.NewTMLogger(log.NewSyncWriter(os.Stdout))
+
+
+var oracleUser = struct{
+	address  string
+	pubkey   string
+	mnemonic string
+}{
+	address: "bluzelle1ws42h2gjr6q8u5d2teexhrzz9xr9lqrxru50u2",
+	pubkey: "bluzellepub1addwnpepq0yg97vrptalxxwy6rykm85jdeam9eqcgy0v3s0reuzcsvsekzakgp8d7mc",
+	mnemonic: "bone soup garage safe hotel remove rebuild tumble usage marriage skin opinion banana scene focus obtain very soap vocal print symptom winter update hundred",
+}
 
 
 type source struct {
@@ -22,8 +45,12 @@ type JSONResponse map[string]interface{}
 
 
 var currCtx *sdk.Context
+var cdc codec.Codec
+var accountKeeper auth.AccountKeeper
 
-func StartFeeder(crudKeeper crud.Keeper) {
+func StartFeeder(crudKeeper crud.Keeper, accKeeper auth.AccountKeeper, appCdc codec.Codec ) {
+	accountKeeper = accKeeper
+	cdc = appCdc
 	time.AfterFunc(1000, func() {
 		for ; currCtx == nil; {
 			time.After(time.Second)
@@ -36,25 +63,78 @@ func StartFeeder(crudKeeper crud.Keeper) {
 	})
 }
 
+func getPrivateValidator() *pvm.FilePV {
+	usr, _ := user.Current()
+	homedir := usr.HomeDir
+	return pvm.LoadFilePV(homedir + "/.blzd/config/priv_validator_key.json", homedir + "/.blzd/data/priv_validator_state.json")
+}
+
+func getValconsAddress() string {
+	return (sdk.ConsAddress)(getPrivateValidator().GetAddress()).String()
+}
+
 func feederTick(crudKeeper crud.Keeper) {
-		result := crudKeeper.Search(*currCtx, crudKeeper.GetKVStore(*currCtx), "oracle", "source", 1, 100, "asc", nil)
+
+	result := crudKeeper.Search(*currCtx, crudKeeper.GetKVStore(*currCtx), "oracle", "source", 1, 100, "asc", nil)
 		keyValues := result.KeyValues
 
+
 		for _, v := range keyValues {
-			res := source{}
-			json.Unmarshal([]byte(decodeSafe(v.Value)), &res)
-			res.Name = v.Key
-			value, err := fetchFromSource(res)
-			// TODO: SUBMIT PREFLIGHT AND VOTE HERE
-			fmt.Println(err)
-			fmt.Println(value)
+			source := source{}
+			json.Unmarshal([]byte(decodeSafe(v.Value)), &source)
+			source.Name = v.Key
+
+			value, err := fetchFromSource(source)
+
+			if err == nil {
+				sendPreflightMsg(source, value)
+			} else {
+				logger.Info("Feeder: unable to fetch from source " + "(" + source.Url + ")" + err.Error())
+			}
+
 		}
 }
 
-func fetchFromSource(source source) (float64, error) {
-	fmt.Println("************** SOURCE **************")
-	fmt.Println(source)
+func sendPreflightMsg(source source, value float64) {
+	valConsAdd := getValconsAddress()
+//	ctx := context.NewCLIContext() //.WithFromAddress(valConsAdd)
 
+	proofStr := fmt.Sprintf("%s%f", valConsAdd, value)
+	proof := []byte(proofStr)
+	sum := sha256.Sum256(proof)
+	msg := types.NewMsgOracleVoteProof(valConsAdd, string(sum[:]))
+	err := msg.ValidateBasic()
+	msgs := []sdk.Msg{msg}
+
+
+	if err == nil {
+		address, _ := sdk.AccAddressFromBech32(oracleUser.address)
+		acc := accountKeeper.GetAccount(*currCtx, address)
+
+		keybase := keys.NewInMemoryKeyBase()
+		keybase.CreateAccount("oracle", oracleUser.mnemonic, "12345", "12345", "","secp256k1")
+
+		// TODO: make sure to dynamically get the chainID
+		txBldr := auth.NewTxBuilder(
+			utils.GetTxEncoder(&cdc), acc.GetAccountNumber(), acc.GetSequence(), 10000000, 2,
+			false, "bluzelle", "memo", nil, sdk.NewDecCoins(sdk.NewDecCoin("ubnt", sdk.NewInt(1000000))),
+		).WithKeybase(keybase)
+
+
+		stdSignMsg, err := txBldr.BuildSignMsg(msgs)
+		if err == nil {
+			signedMsg,  err := txBldr.Sign("oracle", "12345", stdSignMsg)
+			if err == nil  {
+
+				fmt.Println(signedMsg)
+			}
+		}
+
+
+	}
+}
+
+func fetchFromSource(source source) (float64, error) {
 	client := resty.New()
 
 	resp, err := client.R().

@@ -2,51 +2,54 @@ package types
 
 import (
 	_ "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	_ "github.com/cosmos/cosmos-sdk/types/errors"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// TODO: Describe your actions, these will implment the interface of `sdk.Msg`
+var _ sdk.Msg = &MsgOracleVoteProof{}
 
-// verify interface at compile time
-//var _ sdk.Msg = &Msg<Action>{}
+// MsgOracleVoteProof - struct for sending a vote preflight proof
 
-// Msg<Action> - struct for unjailing jailed validator
-/*
-type Msg<Action> struct {
-	ValidatorAddr sdk.ValAddress `json:"address" yaml:"address"` // address of the validator operator
+type MsgOracleVoteProof struct {
+	ValidatorAddr string `json:"address"` // address of the validator operator
+	VoteHash string `json:"voteHash"`
 }
-*/
 
-// NewMsg<Action> creates a new Msg<Action> instance
-/*
-func NewMsg<Action>(validatorAddr sdk.ValAddress) Msg<Action> {
-	return Msg<Action>{
+
+// NewMsgOracleVoteProof creates a new MsgOracleVoteProof instance
+
+func NewMsgOracleVoteProof(validatorAddr string, voteHash string) MsgOracleVoteProof {
+	return MsgOracleVoteProof{
 		ValidatorAddr: validatorAddr,
+		VoteHash: voteHash,
 	}
 }
-*/
 
-// const <action>Const = "<action>"
+
+ const OracleVoteProofConst = "OracleVoteProof"
 
 // nolint
-/*
-func (msg Msg<Action>) Route() string { return RouterKey }
-func (msg Msg<Action>) Type() string  { return <action>Const }
-func (msg Msg<Action>) GetSigners() []sdk.AccAddress {
+
+func (msg MsgOracleVoteProof) Route() string { return RouterKey }
+func (msg MsgOracleVoteProof) Type() string  { return OracleVoteProofConst }
+func (msg MsgOracleVoteProof) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{sdk.AccAddress(msg.ValidatorAddr)}
 }
 
 // GetSignBytes gets the bytes for the message signer to sign on
-func (msg Msg<Action>) GetSignBytes() []byte {
+func (msg MsgOracleVoteProof) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
 // ValidateBasic validity check for the AnteHandler
-func (msg Msg<Action>) ValidateBasic() error {
-	if msg.ValidatorAddr.Empty() {
+func (msg MsgOracleVoteProof) ValidateBasic() error {
+	if len(msg.ValidatorAddr) < 1 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "missing validator address")
+	}
+	if len(msg.VoteHash) < 1 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "missing validator address")
 	}
 	return nil
 }
-*/
