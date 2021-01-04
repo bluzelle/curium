@@ -6,14 +6,16 @@ import (
 	"fmt"
 	"github.com/bluzelle/curium/x/crud"
 	"github.com/bluzelle/curium/x/oracle/types"
-	"github.com/cosmos/cosmos-sdk/client/keys"
+	clientKeys "github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/codec"
+	cryptoKeys "github.com/cosmos/cosmos-sdk/crypto/keys"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/go-resty/resty/v2"
 	"github.com/tendermint/tendermint/libs/log"
 	pvm "github.com/tendermint/tendermint/privval"
+	"github.com/tendermint/tendermint/rpc/client/http"
 	"net/url"
 	"os"
 	"os/user"
@@ -97,7 +99,6 @@ func feederTick(crudKeeper crud.Keeper) {
 
 func sendPreflightMsg(source source, value float64) {
 	valConsAdd := getValconsAddress()
-//	ctx := context.NewCLIContext() //.WithFromAddress(valConsAdd)
 
 	proofStr := fmt.Sprintf("%s%f", valConsAdd, value)
 	proof := []byte(proofStr)
@@ -111,22 +112,28 @@ func sendPreflightMsg(source source, value float64) {
 		address, _ := sdk.AccAddressFromBech32(oracleUser.address)
 		acc := accountKeeper.GetAccount(*currCtx, address)
 
-		keybase := keys.NewInMemoryKeyBase()
-		keybase.CreateAccount("oracle", oracleUser.mnemonic, "12345", "12345", "","secp256k1")
+
+		keybase := clientKeys.NewInMemoryKeyBase()
+		keybase.CreateAccount("oracle", oracleUser.mnemonic, cryptoKeys.DefaultBIP39Passphrase, clientKeys.DefaultKeyPass, "",cryptoKeys.Secp256k1)
 
 		// TODO: make sure to dynamically get the chainID
 		txBldr := auth.NewTxBuilder(
 			utils.GetTxEncoder(&cdc), acc.GetAccountNumber(), acc.GetSequence(), 10000000, 2,
-			false, "bluzelle", "memo", nil, sdk.NewDecCoins(sdk.NewDecCoin("ubnt", sdk.NewInt(1000000))),
+			true, "bluzelle", "memo", nil, sdk.NewDecCoins(sdk.NewDecCoin("ubnt", sdk.NewInt(1000000))),
 		).WithKeybase(keybase)
 
 
 		stdSignMsg, err := txBldr.BuildSignMsg(msgs)
 		if err == nil {
-			signedMsg,  err := txBldr.Sign("oracle", "12345", stdSignMsg)
+			signedMsg,  err := txBldr.Sign("oracle", clientKeys.DefaultKeyPass, stdSignMsg)
 			if err == nil  {
-
-				fmt.Println(signedMsg)
+				rpcAddr := "http://127.0.0.1:26657"
+				c, err := http.New(rpcAddr, "/websocket")
+				if err != nil {
+					return
+				}
+				bres, err := c.BroadcastTxCommit(signedMsg)
+				fmt.Println(bres)
 			}
 		}
 

@@ -5,6 +5,7 @@ go 1.14
 require (
 	github.com/Workiva/go-datastructures v1.0.52
 	github.com/cosmos/cosmos-sdk v0.39.1
+	github.com/cosmos/go-bip39 v0.0.0-20180819234021-555e2067c45d
 	github.com/cosmos/modules/incubator/faucet v0.0.0-20200315124306-c86f71ae76a0
 	github.com/go-resty/resty/v2 v2.3.0
 	github.com/golang/mock v1.4.0
