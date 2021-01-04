@@ -111,13 +111,12 @@ func sendPreflightMsg(source source, value float64) {
 
 	if err == nil {
 		keybase := clientKeys.NewInMemoryKeyBase()
-		info, _ := keybase.CreateAccount("oracle", oracleUser.mnemonic, cryptoKeys.DefaultBIP39Passphrase, clientKeys.DefaultKeyPass, "", cryptoKeys.Secp256k1)
-//		info, mnemonic, _ := keybase.CreateMnemonic("oracle", cryptoKeys.English, clientKeys.DefaultKeyPass, cryptoKeys.Secp256k1)
+		info, err := keybase.CreateAccount("oracle", oracleUser.mnemonic, cryptoKeys.DefaultBIP39Passphrase, clientKeys.DefaultKeyPass, "44'/118'/0'/0/0", cryptoKeys.Secp256k1)
+		if(err != nil) {
+			logger.Info("Error creating keybase account", err)
+		}
 		address := info.GetAddress()
 		acc := accountKeeper.GetAccount(*currCtx, address)
-
-		fmt.Println(info)
-//		keybase.CreateAccount("oracle", oracleUser.mnemonic, cryptoKeys.DefaultBIP39Passphrase, clientKeys.DefaultKeyPass, "",cryptoKeys.Secp256k1)
 
 		// TODO: make sure to dynamically get the chainID
 		txBldr := auth.NewTxBuilder(
@@ -128,15 +127,11 @@ func sendPreflightMsg(source source, value float64) {
 
 		signedMsg, err := txBldr.BuildAndSign("oracle", clientKeys.DefaultKeyPass, msgs)
 		if err == nil {
-
 			rpcCtx := rpctypes.Context{}
-
 			bres, err := core.BroadcastTxSync(&rpcCtx, signedMsg)
 			fmt.Println(bres)
 			fmt.Println(err)
 		}
-
-
 	}
 }
 
