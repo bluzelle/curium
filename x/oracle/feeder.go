@@ -15,7 +15,8 @@ import (
 	"github.com/go-resty/resty/v2"
 	"github.com/tendermint/tendermint/libs/log"
 	pvm "github.com/tendermint/tendermint/privval"
-	"github.com/tendermint/tendermint/rpc/client/http"
+	"github.com/tendermint/tendermint/rpc/core"
+	rpctypes "github.com/tendermint/tendermint/rpc/jsonrpc/types"
 	"net/url"
 	"os"
 	"os/user"
@@ -109,12 +110,14 @@ func sendPreflightMsg(source source, value float64) {
 
 
 	if err == nil {
-		address, _ := sdk.AccAddressFromBech32(oracleUser.address)
+		keybase := clientKeys.NewInMemoryKeyBase()
+		info, _ := keybase.CreateAccount("oracle", oracleUser.mnemonic, cryptoKeys.DefaultBIP39Passphrase, clientKeys.DefaultKeyPass, "", cryptoKeys.Secp256k1)
+//		info, mnemonic, _ := keybase.CreateMnemonic("oracle", cryptoKeys.English, clientKeys.DefaultKeyPass, cryptoKeys.Secp256k1)
+		address := info.GetAddress()
 		acc := accountKeeper.GetAccount(*currCtx, address)
 
-
-		keybase := clientKeys.NewInMemoryKeyBase()
-		keybase.CreateAccount("oracle", oracleUser.mnemonic, cryptoKeys.DefaultBIP39Passphrase, clientKeys.DefaultKeyPass, "",cryptoKeys.Secp256k1)
+		fmt.Println(info)
+//		keybase.CreateAccount("oracle", oracleUser.mnemonic, cryptoKeys.DefaultBIP39Passphrase, clientKeys.DefaultKeyPass, "",cryptoKeys.Secp256k1)
 
 		// TODO: make sure to dynamically get the chainID
 		txBldr := auth.NewTxBuilder(
@@ -123,18 +126,14 @@ func sendPreflightMsg(source source, value float64) {
 		).WithKeybase(keybase)
 
 
-		stdSignMsg, err := txBldr.BuildSignMsg(msgs)
+		signedMsg, err := txBldr.BuildAndSign("oracle", clientKeys.DefaultKeyPass, msgs)
 		if err == nil {
-			signedMsg,  err := txBldr.Sign("oracle", clientKeys.DefaultKeyPass, stdSignMsg)
-			if err == nil  {
-				rpcAddr := "http://127.0.0.1:26657"
-				c, err := http.New(rpcAddr, "/websocket")
-				if err != nil {
-					return
-				}
-				bres, err := c.BroadcastTxCommit(signedMsg)
-				fmt.Println(bres)
-			}
+
+			rpcCtx := rpctypes.Context{}
+
+			bres, err := core.BroadcastTxSync(&rpcCtx, signedMsg)
+			fmt.Println(bres)
+			fmt.Println(err)
 		}
 
 
