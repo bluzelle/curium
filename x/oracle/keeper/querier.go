@@ -24,7 +24,7 @@ func NewQuerier(k Keeper) sdk.Querier {
 }
 
 func queryListSources(ctx sdk.Context, k Keeper) ([]byte, error) {
-	names, err := k.ListSourceNames(ctx)
+	names, err := k.ListSources(ctx)
 	result, err := codec.MarshalJSONIndent(types.ModuleCdc, names)
 	return result, err
 }

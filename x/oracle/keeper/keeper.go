@@ -48,15 +48,19 @@ func (k Keeper) GetSource(ctx sdk.Context, name string) (types.Source, error) {
 	return source, err
 }
 
-func (k Keeper) ListSourceNames(ctx sdk.Context) ([]string, error) {
+
+
+func (k Keeper) ListSources(ctx sdk.Context) ([]types.Source, error) {
 	store := k.GetSourceStore(ctx)
 	iterator := store.Iterator(nil, nil)
 	defer iterator.Close()
-	var names []string
+	var sources []types.Source
 	for ; iterator.Valid(); iterator.Next() {
-		name := string(iterator.Key())
-		names = append(names, name)
+		var source types.Source
+		value := iterator.Value()
+		k.cdc.UnmarshalBinaryLengthPrefixed(value, &source)
+		sources = append(sources, source)
 	}
-	return names, nil
+	return sources, nil
 }
 
