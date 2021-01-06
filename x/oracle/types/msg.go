@@ -14,15 +14,17 @@ var _ sdk.Msg = &MsgOracleVoteProof{}
 type MsgOracleVoteProof struct {
 	ValidatorAddr string `json:"address"` // address of the validator operator
 	VoteHash string `json:"voteHash"`
+	Owner sdk.AccAddress `json:"owner"`
 }
 
 
 // NewMsgOracleVoteProof creates a new MsgOracleVoteProof instance
 
-func NewMsgOracleVoteProof(validatorAddr string, voteHash string) MsgOracleVoteProof {
+func NewMsgOracleVoteProof(validatorAddr string, voteHash string, owner sdk.AccAddress) MsgOracleVoteProof {
 	return MsgOracleVoteProof{
 		ValidatorAddr: validatorAddr,
 		VoteHash: voteHash,
+		Owner: owner,
 	}
 }
 
@@ -34,7 +36,7 @@ func NewMsgOracleVoteProof(validatorAddr string, voteHash string) MsgOracleVoteP
 func (msg MsgOracleVoteProof) Route() string { return RouterKey }
 func (msg MsgOracleVoteProof) Type() string  { return OracleVoteProofConst }
 func (msg MsgOracleVoteProof) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{sdk.AccAddress(msg.ValidatorAddr)}
+	return []sdk.AccAddress{sdk.AccAddress(msg.Owner)}
 }
 
 // GetSignBytes gets the bytes for the message signer to sign on
