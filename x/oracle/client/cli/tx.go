@@ -33,6 +33,7 @@ func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 	oracleTxCmd.AddCommand(flags.PostCommands(
 		// this line is used by starport scaffolding # 1
 		GetCmdSourceAdd(cdc),
+		GetCmdSourceDelete(cdc),
 	)...)
 
 	return oracleTxCmd
@@ -56,6 +57,27 @@ func GetCmdSourceAdd(cdc *codec.Codec) *cobra.Command {
 
  			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
  		},
+	}
+}
+
+func GetCmdSourceDelete(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "delete-source <name> ",
+		Short: "Delete an oracle source",
+		Args:  cobra.ExactArgs(1), // Does your request require arguments
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
+
+			msg := types.NewMsgOracleDeleteSource(args[0], cliCtx.GetFromAddress())
+			err := msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+		},
 	}
 }
 

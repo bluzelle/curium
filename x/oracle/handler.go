@@ -19,11 +19,18 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		 	return handleMsgOracleVoteProof(ctx, k, msg)
 		case types.MsgOracleAddSource:
 			return handleMsgOracleAddSource(ctx, k, msg)
+		case types.MsgOracleDeleteSource:
+			return handleMsgOracleDeleteSource(ctx, k, msg)
 		default:
 			errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName,  msg)
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 		}
 	}
+}
+
+func handleMsgOracleDeleteSource(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleDeleteSource) (*sdk.Result, error) {
+	k.DeleteSource(ctx, msg.Name)
+	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }
 
 func handleMsgOracleAddSource(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleAddSource) (*sdk.Result, error) {

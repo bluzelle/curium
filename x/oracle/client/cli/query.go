@@ -50,6 +50,9 @@ func GetCmdQListSources(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 			var out types.QueryResultListSources
 			cdc.MustUnmarshalJSON(res, &out)
+			if out == nil {
+				out = make(types.QueryResultListSources, 0)
+			}
 			return cliCtx.PrintOutput(out)
 		},
 	}
