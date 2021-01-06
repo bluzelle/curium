@@ -2,21 +2,14 @@ package types
 
 // Query endpoints supported by the oracle querier
 const (
-	// TODO: Describe query parameters, update <action> with your query
-	// Query<Action>    = "<action>"
-	QueryParams = "queryParams"
+	QueryListSources = "listsources"
 )
 
-/* 
-Below you will be able how to set your own queries:
+//type QueryResultListSources = []struct{
+//	Name string `json:"name"`
+//	Url string `json:"url"`
+//	Property string `json:"property"`
+//	Owner types.AccAddress `json:"owner"`
+//}
 
-
-// QueryResList Queries Result Payload for a query
-type QueryResList []string
-
-// implement fmt.Stringer
-func (n QueryResList) String() string {
-	return strings.Join(n[:], "\n")
-}
-
-*/
+type QueryResultListSources = []string

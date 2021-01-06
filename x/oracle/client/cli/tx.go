@@ -1,7 +1,12 @@
 package cli
 
 import (
+	"bufio"
 	"fmt"
+	"github.com/cosmos/cosmos-sdk/client/context"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 
 	"github.com/spf13/cobra"
 
@@ -27,28 +32,24 @@ func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 
 	oracleTxCmd.AddCommand(flags.PostCommands(
 		// this line is used by starport scaffolding # 1
-		// TODO: Add tx based commands
-		// GetCmd<Action>(cdc)
+		GetCmdSourceAdd(cdc),
 	)...)
 
 	return oracleTxCmd
 }
 
-// Example:
-/*
-// GetCmd<Action> is the CLI command for doing <Action>
-func GetCmd<Action>(cdc *codec.Codec) *cobra.Command {
+func GetCmdSourceAdd(cdc *codec.Codec) *cobra.Command {
  	return &cobra.Command{
- 		Use:   "Describe your action cmd",
- 		Short: "Provide a short description on the cmd",
- 		Args:  cobra.ExactArgs(2), // Does your request require arguments
+ 		Use:   "add-source <name> <url> <property>",
+ 		Short: "Add an oracle source",
+ 		Args:  cobra.ExactArgs(3), // Does your request require arguments
  		RunE: func(cmd *cobra.Command, args []string) error {
  			cliCtx := context.NewCLIContext().WithCodec(cdc)
  			inBuf := bufio.NewReader(cmd.InOrStdin())
  			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
 
- 			msg := types.NewMsg<Action>(Action params)
- 			err = msg.ValidateBasic()
+ 			msg := types.NewMsgOracleAddSource(args[0], args[1], args[2], cliCtx.GetFromAddress())
+ 			err := msg.ValidateBasic()
  			if err != nil {
  				return err
  			}
@@ -57,4 +58,4 @@ func GetCmd<Action>(cdc *codec.Codec) *cobra.Command {
  		},
 	}
 }
-*/
+
