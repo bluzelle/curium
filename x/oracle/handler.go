@@ -24,9 +24,12 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 	}
 }
 
-// handle<Action> does x
+//func handleMsgOracleAddSource(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleAddSource) (*sdk.Result, error) {
+//}
+
 
 func handleMsgOracleVoteProof(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleVoteProof) (*sdk.Result, error) {
+
 	fmt.Printf("HERE")
 	//err := k.OracleVoteProof(ctx, msg.ValidatorAddr)
 	//if err != nil {

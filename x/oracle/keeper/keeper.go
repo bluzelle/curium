@@ -2,25 +2,24 @@ package keeper
 
 import (
 	"fmt"
-
 	"github.com/tendermint/tendermint/libs/log"
 
+	"github.com/bluzelle/curium/x/oracle/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/bluzelle/curium/x/oracle/types"
 )
 
 // Keeper of the oracle store
 type Keeper struct {
-	storeKey   sdk.StoreKey
+	sourceKey   sdk.StoreKey
 	cdc        *codec.Codec
 	paramspace types.ParamSubspace
 }
 
 // NewKeeper creates a oracle keeper
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, paramspace types.ParamSubspace) Keeper {
+func NewKeeper(cdc *codec.Codec, sourceKey sdk.StoreKey, paramspace types.ParamSubspace) Keeper {
 	keeper := Keeper{
-		storeKey:   key,
+		sourceKey:   sourceKey,
 		cdc:        cdc,
 //		paramspace: paramspace.WithKeyTable(types.ParamKeyTable()),
 	}
@@ -33,24 +32,31 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 }
 
 // Get returns the pubkey from the adddress-pubkey relation
-func (k Keeper) Get(ctx sdk.Context, key string) (interface{} /* TODO: Fill out this type */, error) {
-	store := ctx.KVStore(k.storeKey)
-	var item interface{} /* TODO: Fill out this type */
-	byteKey := []byte(key)
-	err := k.cdc.UnmarshalBinaryLengthPrefixed(store.Get(byteKey), &item)
-	if err != nil {
-		return nil, err
+func (k Keeper) GetSourceStore(ctx sdk.Context) (sdk.KVStore) {
+	return ctx.KVStore(k.sourceKey)
+}
+
+func (k Keeper) AddSource(ctx sdk.Context, name string, source types.Source) {
+	store := k.GetSourceStore(ctx)
+	store.Set([]byte(name), []byte(k.cdc.MustMarshalBinaryLengthPrefixed(source)))
+}
+
+func (k Keeper) GetSource(ctx sdk.Context, name string) (types.Source, error) {
+	store := k.GetSourceStore(ctx)
+	var source types.Source
+	err := k.cdc.UnmarshalBinaryLengthPrefixed(store.Get([]byte(name)), &source)
+	return source, err
+}
+
+func (k Keeper) ListSourceNames(ctx sdk.Context) ([]string, error) {
+	store := k.GetSourceStore(ctx)
+	iterator := store.Iterator(nil, nil)
+	defer iterator.Close()
+	var names []string
+	for ; iterator.Valid(); iterator.Next() {
+		name := string(iterator.Key())
+		names = append(names, name)
 	}
-	return item, nil
+	return names, nil
 }
 
-func (k Keeper) set(ctx sdk.Context, key string, value interface{} /* TODO: fill out this type */ ) {
-	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(value)
-	store.Set([]byte(key), bz)
-}
-
-func (k Keeper) delete(ctx sdk.Context, key string) {
-	store := ctx.KVStore(k.storeKey)
-	store.Delete([]byte(key))
-}
