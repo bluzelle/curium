@@ -8,6 +8,7 @@ import (
 func RegisterCodec(cdc *codec.Codec) {
 	// this line is used by starport scaffolding # 1
 	cdc.RegisterConcrete(MsgOracleAddSource{}, "oracle/addsource", nil)
+	cdc.RegisterConcrete(MsgOracleDeleteSource{}, "oracle/deletesource", nil)
 //	cdc.RegisterConcrete(MsgOracleVoteProof{}, "oracle/voteproof", nil)
 
 

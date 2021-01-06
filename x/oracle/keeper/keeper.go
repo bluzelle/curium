@@ -48,13 +48,18 @@ func (k Keeper) GetSource(ctx sdk.Context, name string) (types.Source, error) {
 	return source, err
 }
 
+func (k Keeper) DeleteSource(ctx sdk.Context, name string) error {
+	store := k.GetSourceStore(ctx)
+	store.Delete([]byte(name))
+	return nil
+}
 
 
 func (k Keeper) ListSources(ctx sdk.Context) ([]types.Source, error) {
 	store := k.GetSourceStore(ctx)
 	iterator := store.Iterator(nil, nil)
 	defer iterator.Close()
-	var sources []types.Source
+	var sources = make([]types.Source, 0)
 	for ; iterator.Valid(); iterator.Next() {
 		var source types.Source
 		value := iterator.Value()

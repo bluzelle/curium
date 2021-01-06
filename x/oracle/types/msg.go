@@ -7,6 +7,50 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
+/*********************************************************************
+** MsgOracleDeleteSource - struct for sending a vote preflight proof
+ ********************************************************************/
+type MsgOracleDeleteSource struct {
+	Name string `json:"name"`
+	Owner sdk.AccAddress `json:"owner"`
+}
+
+
+// NewMsgOracleDeleteSource creates a new MsgOracleDeleteSource instance
+func NewMsgOracleDeleteSource(name string, owner sdk.AccAddress) MsgOracleDeleteSource {
+	return MsgOracleDeleteSource{
+		Name: name,
+		Owner: owner,
+	}
+}
+
+// nolint
+func (msg MsgOracleDeleteSource) Route() string { return RouterKey }
+func (msg MsgOracleDeleteSource) Type() string  { return "OracleDeleteSource" }
+func (msg MsgOracleDeleteSource) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{sdk.AccAddress(msg.Owner)}
+}
+
+// GetSignBytes gets the bytes for the message signer to sign on
+func (msg MsgOracleDeleteSource) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
+}
+
+// ValidateBasic validity check for the AnteHandler
+func (msg MsgOracleDeleteSource) ValidateBasic() error {
+	if len(msg.Name) < 1 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "missing name")
+	}
+	return nil
+}
+
+
+
+
+
+
+
 
 /*********************************************************************
 ** MsgOracleAddSource - struct for sending a vote preflight proof
