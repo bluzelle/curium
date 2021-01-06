@@ -37,13 +37,6 @@ var oracleUser = struct{
 	mnemonic: "bone soup garage safe hotel remove rebuild tumble usage marriage skin opinion banana scene focus obtain very soap vocal print symptom winter update hundred",
 }
 
-
-type Source struct {
-	Name string
-	Url   string      `json:"url"`
-	Property string `json:"property"`
-}
-
 type JSONResponse map[string]interface{}
 
 
@@ -83,7 +76,7 @@ func feederTick(crudKeeper crud.Keeper) {
 
 
 		for _, v := range keyValues {
-			source := Source{}
+			source := types.Source{}
 			json.Unmarshal([]byte(decodeSafe(v.Value)), &source)
 			source.Name = v.Key
 
@@ -98,7 +91,7 @@ func feederTick(crudKeeper crud.Keeper) {
 		}
 }
 
-func sendPreflightMsg(source Source, value float64) {
+func sendPreflightMsg(source types.Source, value float64) {
 	keybase := clientKeys.NewInMemoryKeyBase()
 	account, err := keybase.CreateAccount("oracle", oracleUser.mnemonic, cryptoKeys.DefaultBIP39Passphrase, clientKeys.DefaultKeyPass, "44'/118'/0'/0/0", cryptoKeys.Secp256k1)
 
@@ -137,7 +130,7 @@ func sendPreflightMsg(source Source, value float64) {
 	}
 }
 
-func fetchFromSource(source Source) (float64, error) {
+func fetchFromSource(source types.Source) (float64, error) {
 	client := resty.New()
 
 	resp, err := client.R().
