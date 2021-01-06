@@ -17,6 +17,8 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 	// this line is used by starport scaffolding # 1
 		 case types.MsgOracleVoteProof:
 		 	return handleMsgOracleVoteProof(ctx, k, msg)
+		case types.MsgOracleAddSource:
+			return handleMsgOracleAddSource(ctx, k, msg)
 		default:
 			errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName,  msg)
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
@@ -24,8 +26,16 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 	}
 }
 
-//func handleMsgOracleAddSource(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleAddSource) (*sdk.Result, error) {
-//}
+func handleMsgOracleAddSource(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleAddSource) (*sdk.Result, error) {
+	source := types.Source{
+		Name: msg.Name,
+		Url: msg.Url,
+		Property: msg.Property,
+		Owner: msg.Owner,
+	}
+	k.AddSource(ctx, msg.Name, source)
+	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
+}
 
 
 func handleMsgOracleVoteProof(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleVoteProof) (*sdk.Result, error) {
