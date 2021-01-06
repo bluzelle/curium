@@ -160,7 +160,7 @@ func NewCRUDApp(
 		supply.StoreKey, distr.StoreKey, slashing.StoreKey,
 		gov.StoreKey, params.StoreKey, crud.StoreKey,
 		tax.StoreKey,
-		faucet.StoreKey, crud.LeaseKey, crud.OwnerKey)
+		faucet.StoreKey, crud.LeaseKey, crud.OwnerKey, oracle.StoreKey)
 
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -318,6 +318,7 @@ func NewCRUDApp(
 		tax.ModuleName,
 		supply.ModuleName,
 		genutil.ModuleName,
+		oracle.ModuleName,
 	)
 
 	// register all module routes and module queriers
@@ -343,7 +344,8 @@ func NewCRUDApp(
 		tmos.Exit(err.Error())
 	}
 
-	oracle.StartFeeder(app.crudKeeper, app.accountKeeper, *cdc)
+	// TODO: I added this delay for testing purposes.  Remove and see what happens after it is working
+	defer oracle.StartFeeder(app.crudKeeper, app.accountKeeper, *cdc)
 
 	return app
 }

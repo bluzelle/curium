@@ -28,17 +28,17 @@ var logger = log.NewTMLogger(log.NewSyncWriter(os.Stdout))
 
 
 var oracleUser = struct{
-	address  string
-	pubkey   string
+	//address  string
+	//pubkey   string
 	mnemonic string
 }{
-	address: "bluzelle1ws42h2gjr6q8u5d2teexhrzz9xr9lqrxru50u2",
-	pubkey: "bluzellepub1addwnpepq0yg97vrptalxxwy6rykm85jdeam9eqcgy0v3s0reuzcsvsekzakgp8d7mc",
+	//address: "bluzelle1ws42h2gjr6q8u5d2teexhrzz9xr9lqrxru50u2",
+	//pubkey: "bluzellepub1addwnpepq0yg97vrptalxxwy6rykm85jdeam9eqcgy0v3s0reuzcsvsekzakgp8d7mc",
 	mnemonic: "bone soup garage safe hotel remove rebuild tumble usage marriage skin opinion banana scene focus obtain very soap vocal print symptom winter update hundred",
 }
 
 
-type source struct {
+type Source struct {
 	Name string
 	Url   string      `json:"url"`
 	Property string `json:"property"`
@@ -83,7 +83,7 @@ func feederTick(crudKeeper crud.Keeper) {
 
 
 		for _, v := range keyValues {
-			source := source{}
+			source := Source{}
 			json.Unmarshal([]byte(decodeSafe(v.Value)), &source)
 			source.Name = v.Key
 
@@ -92,30 +92,33 @@ func feederTick(crudKeeper crud.Keeper) {
 			if err == nil {
 				sendPreflightMsg(source, value)
 			} else {
-				logger.Info("Feeder: unable to fetch from source " + "(" + source.Url + ")" + err.Error())
+				logger.Info("Feeder: unable to fetch from Source " + "(" + source.Url + ")" + err.Error())
 			}
 
 		}
 }
 
-func sendPreflightMsg(source source, value float64) {
+func sendPreflightMsg(source Source, value float64) {
+	keybase := clientKeys.NewInMemoryKeyBase()
+	account, err := keybase.CreateAccount("oracle", oracleUser.mnemonic, cryptoKeys.DefaultBIP39Passphrase, clientKeys.DefaultKeyPass, "44'/118'/0'/0/0", cryptoKeys.Secp256k1)
+
+	if(err != nil) {
+		logger.Info("Error creating keybase account", err)
+	}
+
 	valConsAdd := getValconsAddress()
 
 	proofStr := fmt.Sprintf("%s%f", valConsAdd, value)
 	proof := []byte(proofStr)
 	sum := sha256.Sum256(proof)
-	msg := types.NewMsgOracleVoteProof(valConsAdd, string(sum[:]))
-	err := msg.ValidateBasic()
-	msgs := []sdk.Msg{msg}
-
+	owner, _ := sdk.AccAddressFromBech32("bluzelle1ws42h2gjr6q8u5d2teexhrzz9xr9lqrxru50u2")
+	msg := types.NewMsgOracleVoteProof(valConsAdd, string(sum[:]), owner)
+	err = msg.ValidateBasic()
 
 	if err == nil {
-		keybase := clientKeys.NewInMemoryKeyBase()
-		info, err := keybase.CreateAccount("oracle", oracleUser.mnemonic, cryptoKeys.DefaultBIP39Passphrase, clientKeys.DefaultKeyPass, "44'/118'/0'/0/0", cryptoKeys.Secp256k1)
-		if(err != nil) {
-			logger.Info("Error creating keybase account", err)
-		}
-		address := info.GetAddress()
+		msgs := []sdk.Msg{msg}
+
+		address := account.GetAddress()
 		acc := accountKeeper.GetAccount(*currCtx, address)
 
 		// TODO: make sure to dynamically get the chainID
@@ -128,14 +131,13 @@ func sendPreflightMsg(source source, value float64) {
 		signedMsg, err := txBldr.BuildAndSign("oracle", clientKeys.DefaultKeyPass, msgs)
 		if err == nil {
 			rpcCtx := rpctypes.Context{}
-			bres, err := core.BroadcastTxSync(&rpcCtx, signedMsg)
-			fmt.Println(bres)
-			fmt.Println(err)
+			core.BroadcastTxCommit(&rpcCtx, signedMsg)
 		}
+
 	}
 }
 
-func fetchFromSource(source source) (float64, error) {
+func fetchFromSource(source Source) (float64, error) {
 	client := resty.New()
 
 	resp, err := client.R().
