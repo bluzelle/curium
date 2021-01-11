@@ -9,7 +9,7 @@ describe('add-source functions', () => {
             endpoint: 'http://localhost:1317',
             uuid: 'uuid'
         })
-    })
+    });
     it('should work', () => {
         const name = `source-${Date.now()}`
         return bz.sendMessage({
@@ -17,10 +17,19 @@ describe('add-source functions', () => {
             value: {
                 Name: name,
                 Url: 'my-url',
-                Property: 'my-property',
+//                Property: 'my-property',
                 Owner: bz.address
             }
         }, {gas_price: 0.002, max_gas: 10000000})
             .then(x => x)
     })
-})
+
+    it('should send a create', () => {
+        return bz.create('foo', 'bar', {gas_price: 0.002, max_gas: 10000000})
+            .then(x => x)
+            .then(() => bz.read('foo'))
+            .then(x => x)
+
+    })
+
+});
