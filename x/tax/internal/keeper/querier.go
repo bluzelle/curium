@@ -9,7 +9,7 @@ import (
 
 // constants
 const (
-	QueryTaxInfo = "tax_info"
+	QueryTaxInfo = "info"
 )
 
 // NewQuerier helps querying
