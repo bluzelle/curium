@@ -11,8 +11,8 @@ import (
 ** MsgOracleDeleteSource - struct for sending a vote preflight proof
  ********************************************************************/
 type MsgOracleDeleteSource struct {
-	Name string `json:"name"`
-	Owner sdk.AccAddress `json:"owner"`
+	Name string
+	Owner sdk.AccAddress
 }
 
 
@@ -56,10 +56,10 @@ func (msg MsgOracleDeleteSource) ValidateBasic() error {
 ** MsgOracleAddSource - struct for sending a vote preflight proof
  ********************************************************************/
 type MsgOracleAddSource struct {
-	Name string `json:"name"`
-	Url string `json:"url"`
-	Property string `json:"property"`
-	Owner sdk.AccAddress `json:"owner"`
+	Name string
+	Url string
+	Property string
+	Owner sdk.AccAddress
 }
 
 
