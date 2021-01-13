@@ -188,10 +188,10 @@ bitcoinjs-lib@^4.0.2:
     varuint-bitcoin "^1.0.4"
     wif "^2.0.1"
 
-bluzelle@^2.1.9:
-  version "2.1.9"
-  resolved "https://registry.yarnpkg.com/bluzelle/-/bluzelle-2.1.9.tgz#95b732f6bd97326916add0ef16ac4366139a5633"
-  integrity sha512-DdBvmIFJTEz3CQ1+Au5vV31B0p/qmitRSW1NU37iSbFs0ScnqwLea3fL5am3rD4YWcp5DoC2B1lOEZdet4UQfw==
+bluzelle@^2.1.10:
+  version "2.1.10"
+  resolved "https://registry.yarnpkg.com/bluzelle/-/bluzelle-2.1.10.tgz#e9202b94bb1e5696095bad598558d50bb1ffb4f8"
+  integrity sha512-UA+6UbiwjEJWMSqRittd+BcIz4fR9GwidRy5ki1hGRmVMD2PR33dm+k1GhI8brizZXoEoFPmPVnV32yZ8mIPSA==
   dependencies:
     "@cosmostation/cosmosjs" "^0.6.8"
     "@types/lodash" "^4.14.161"
