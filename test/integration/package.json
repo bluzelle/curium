@@ -6,8 +6,9 @@
   "dependencies": {
     "@types/mocha": "^8.2.0",
     "@types/node": "^14.14.20",
-    "bluzelle": "^2.1.9",
+    "bluzelle": "^2.1.10",
     "chai": "^4.2.0",
+    "lodash": "^4.17.20",
     "mocha": "^8.2.1",
     "ts-node": "^9.1.1",
     "typescript": "^4.1.3"
