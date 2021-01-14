@@ -65,6 +65,8 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a FeeTx")
 	}
 
+	taxInfo := dfd.tk.GetTaxInfo(ctx)
+
 	feePayer := feeTx.FeePayer()
 	feePayerAcc := dfd.ak.GetAccount(ctx, feePayer)
 
@@ -72,8 +74,22 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 		return ctx, sdkerrors.Wrapf(sdkerrors.ErrUnknownAddress, "fee payer address: %s does not exist", feePayer)
 	}
 
+	if err := collectTransactionTax(ctx, dfd, tx, feeTx.GetFee(), feePayer); err != nil {
+		return ctx, err
+	}
+
+	if err := collectFeeTax(ctx, dfd.supplyKeeper, feePayerAcc, taxInfo.Collector, feeTx.GetFee(), taxInfo.FeeBp); err != nil {
+		return ctx, err
+	}
+
+	return next(ctx, tx, simulate)
+}
+
+
+func collectTransactionTax(ctx sdk.Context, dfd DeductFeeDecorator, tx sdk.Tx, fees sdk.Coins, feePayer sdk.AccAddress) error {
+
 	// deduct the fees
-	if !feeTx.GetFee().IsZero() {
+	if !fees.IsZero() {
 		taxInfo := dfd.tk.GetTaxInfo(ctx)
 
 		// handle bank send tx fee
@@ -84,32 +100,29 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 				trfFees := sdk.Coins{}
 				for _, coin := range bankmsg.Amount {
 					feeAmt := coin.Amount.Int64() * taxInfo.TransferBp / 10000
-					if feeAmt < 1 {
-						feeAmt = 1
+					if feeAmt > 0 {
+						trfFee := sdk.NewInt64Coin(coin.Denom, feeAmt)
+						trfFees = append(trfFees, trfFee)
 					}
-
-					trfFee := sdk.NewInt64Coin(coin.Denom, feeAmt)
-					trfFees = append(trfFees, trfFee)
 				}
 
-				if err := dfd.bk.SendCoins(ctx, feePayer, taxInfo.Collector, trfFees); err != nil {
-					return ctx, err
+				if len(trfFees) > 0 {
+					if err := dfd.bk.SendCoins(ctx, feePayer, taxInfo.Collector, trfFees); err != nil {
+						return err
+					}
 				}
 			}
 		}
 
-		err = deductFees(dfd.supplyKeeper, ctx, feePayerAcc, taxInfo.Collector, feeTx.GetFee(), taxInfo.FeeBp)
-		if err != nil {
-			return ctx, err
-		}
 	}
+	return nil
 
-	return next(ctx, tx, simulate)
 }
 
-func deductFees(supplyKeeper types.SupplyKeeper, ctx sdk.Context, acc exported.Account, toAcc sdk.AccAddress, fees sdk.Coins, feebp int64) error {
+
+func collectFeeTax( ctx sdk.Context, supplyKeeper types.SupplyKeeper, fromAcc exported.Account, toAcc sdk.AccAddress, fees sdk.Coins, feebp int64) error {
 	blockTime := ctx.BlockHeader().Time
-	coins := acc.GetCoins()
+	coins := fromAcc.GetCoins()
 
 	if !fees.IsValid() {
 		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFee, "invalid fee amount: %s", fees)
@@ -123,33 +136,33 @@ func deductFees(supplyKeeper types.SupplyKeeper, ctx sdk.Context, acc exported.A
 	}
 
 	// Validate the account has enough "spendable" coins...
-	spendableCoins := acc.SpendableCoins(blockTime)
+	spendableCoins := fromAcc.SpendableCoins(blockTime)
 
 	taxFees := sdk.Coins{}
 	for _, fee := range fees {
 		feeAmt := fee.Amount.Int64() * feebp / 10000
-		if feeAmt < 1 {
-			feeAmt = 1
+
+		if feeAmt > 0 {
+			taxFee := sdk.NewInt64Coin(fee.Denom, feeAmt)
+			taxFees = append(taxFees, taxFee)
 		}
-		taxFee := sdk.NewInt64Coin(fee.Denom, feeAmt)
-		taxFees = append(taxFees, taxFee)
-	}
-
-	if _, hasNeg := spendableCoins.SafeSub(taxFees); hasNeg {
-		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds,
-			"insufficient funds to pay for tax fees; %s < %s", spendableCoins, taxFees)
-	}
-
-	err := supplyKeeper.SendCoinsFromAccountToModule(ctx, acc.GetAddress(), authtypes.FeeCollectorName, fees)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
 	}
 
 	if !taxFees.Empty() {
-		err = supplyKeeper.SendCoinsFromModuleToAccount(ctx, authtypes.FeeCollectorName, toAcc, taxFees)
+		if _, hasNeg := spendableCoins.SafeSub(taxFees); hasNeg {
+			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds,
+				"insufficient funds to pay for tax fees; %s < %s", spendableCoins, taxFees)
+		}
+
+		err := supplyKeeper.SendCoinsFromAccountToModule(ctx, fromAcc.GetAddress(), authtypes.FeeCollectorName, fees)
 		if err != nil {
 			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
 		}
+
+		//err = supplyKeeper.SendCoinsFromModuleToAccount(ctx, authtypes.FeeCollectorName, toAcc, taxFees)
+		//if err != nil {
+		//	return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
+		//}
 	}
 
 	return nil
