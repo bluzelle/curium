@@ -16,6 +16,7 @@ package app
 
 import (
 	"encoding/json"
+	"github.com/bluzelle/curium/x/tax/ante"
 	"math"
 	"os"
 	"time"
@@ -23,7 +24,6 @@ import (
 	bluzellechain "github.com/bluzelle/curium/types"
 	"github.com/bluzelle/curium/x/crud"
 	"github.com/bluzelle/curium/x/tax"
-	"github.com/bluzelle/curium/x/tax/ante"
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -318,16 +318,11 @@ func NewCRUDApp(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 
-	// The AnteHandler handles signature verification and transaction pre-processing
-	app.SetAnteHandler(
-		ante.NewAnteHandler(
-			app.accountKeeper,
-			app.bankKeeper,
-			app.supplyKeeper,
-			app.taxKeeper,
-			auth.DefaultSigVerificationGasConsumer,
-		),
-	)
+
+	addAnteHandler(app)
+
+
+
 
 	// initialize stores
 	app.MountKVStores(keys)
@@ -340,6 +335,38 @@ func NewCRUDApp(
 
 	return app
 }
+
+
+func addAnteHandler(app *CRUDApp) {
+	authAnteHandler := auth.NewAnteHandler(
+		app.accountKeeper,
+		app.supplyKeeper,
+		auth.DefaultSigVerificationGasConsumer,
+	)
+
+	taxAnteHandler := sdk.ChainAnteDecorators(ante.NewTaxDecorator(
+		app.accountKeeper,
+		app.supplyKeeper,
+		app.taxKeeper,
+		app.bankKeeper,
+	))
+
+	comboAnteHandler := func(ctx sdk.Context, tx sdk.Tx, simulate bool) (newCtx sdk.Context, err error) {
+		ctx2, err := authAnteHandler(ctx, tx, simulate)
+		if err != nil {
+			return ctx2, err
+		}
+		return taxAnteHandler(ctx2, tx, simulate)
+
+	}
+
+	// The AnteHandler handles signature verification and transaction pre-processing
+	app.SetAnteHandler(
+		comboAnteHandler,
+	)
+
+}
+
 
 // GenesisState represents chain state at the start of the chain. Any initial state (account balances) are stored here.
 type GenesisState map[string]json.RawMessage
