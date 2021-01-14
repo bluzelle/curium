@@ -159,10 +159,10 @@ func collectFeeTax( ctx sdk.Context, supplyKeeper types.SupplyKeeper, fromAcc ex
 			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
 		}
 
-		//err = supplyKeeper.SendCoinsFromModuleToAccount(ctx, authtypes.FeeCollectorName, toAcc, taxFees)
-		//if err != nil {
-		//	return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
-		//}
+		err = supplyKeeper.SendCoinsFromModuleToAccount(ctx, authtypes.FeeCollectorName, toAcc, taxFees)
+		if err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
+		}
 	}
 
 	return nil
