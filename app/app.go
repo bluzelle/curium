@@ -319,6 +319,25 @@ func NewCRUDApp(
 	app.SetEndBlocker(app.EndBlocker)
 
 
+	addAnteHandler(app)
+
+
+
+
+	// initialize stores
+	app.MountKVStores(keys)
+	app.MountTransientStores(tkeys)
+
+	err := app.LoadLatestVersion(app.keys[bam.MainStoreKey])
+	if err != nil {
+		tmos.Exit(err.Error())
+	}
+
+	return app
+}
+
+
+func addAnteHandler(app *CRUDApp) {
 	authAnteHandler := auth.NewAnteHandler(
 		app.accountKeeper,
 		app.supplyKeeper,
@@ -346,19 +365,6 @@ func NewCRUDApp(
 		comboAnteHandler,
 	)
 
-
-
-
-	// initialize stores
-	app.MountKVStores(keys)
-	app.MountTransientStores(tkeys)
-
-	err := app.LoadLatestVersion(app.keys[bam.MainStoreKey])
-	if err != nil {
-		tmos.Exit(err.Error())
-	}
-
-	return app
 }
 
 
