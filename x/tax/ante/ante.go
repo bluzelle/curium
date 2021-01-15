@@ -4,7 +4,6 @@ import (
 	"github.com/bluzelle/curium/x/tax"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -12,38 +11,18 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/gov/types"
 )
 
-func NewAnteHandler(
-	ak keeper.AccountKeeper,
-	bk bank.Keeper,
-	supplyKeeper types.SupplyKeeper,
-	tk tax.Keeper,
-	sigGasConsumer ante.SignatureVerificationGasConsumer,
-) sdk.AnteHandler {
-	return sdk.ChainAnteDecorators(
-		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
-		ante.NewMempoolFeeDecorator(),
-		ante.NewValidateBasicDecorator(),
-		ante.NewValidateMemoDecorator(ak),
-		ante.NewConsumeGasForTxSizeDecorator(ak),
-		ante.NewSetPubKeyDecorator(ak), // SetPubKeyDecorator must be called before all signature verification decorators
-		ante.NewValidateSigCountDecorator(ak),
-		ante.NewDeductFeeDecorator(ak, supplyKeeper),
-		NewDeductFeeDecorator(ak, supplyKeeper, tk, bk),
-		ante.NewSigGasConsumeDecorator(ak, sigGasConsumer),
-		ante.NewSigVerificationDecorator(ak),
-		ante.NewIncrementSequenceDecorator(ak), // innermost AnteDecorator
-	)
-}
 
-type DeductFeeDecorator struct {
+
+
+type TaxDecorator struct {
 	ak           keeper.AccountKeeper
 	bk           bank.Keeper
 	tk           tax.Keeper
 	supplyKeeper types.SupplyKeeper
 }
 
-func NewDeductFeeDecorator(ak keeper.AccountKeeper, sk types.SupplyKeeper, tk tax.Keeper, bk bank.Keeper) DeductFeeDecorator {
-	return DeductFeeDecorator{
+func NewTaxDecorator(ak keeper.AccountKeeper, sk types.SupplyKeeper, tk tax.Keeper, bk bank.Keeper) TaxDecorator {
+	return TaxDecorator{
 		ak:           ak,
 		supplyKeeper: sk,
 		tk:           tk,
@@ -59,26 +38,28 @@ type FeeTx interface {
 	FeePayer() sdk.AccAddress
 }
 
-func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
+func (td TaxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
+
 	feeTx, ok := tx.(FeeTx)
 	if !ok {
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a FeeTx")
 	}
 
-	taxInfo := dfd.tk.GetTaxInfo(ctx)
+	taxInfo := td.tk.GetTaxInfo(ctx)
 
 	feePayer := feeTx.FeePayer()
-	feePayerAcc := dfd.ak.GetAccount(ctx, feePayer)
+	feePayerAcc := td.ak.GetAccount(ctx, feePayer)
 
 	if feePayerAcc == nil {
 		return ctx, sdkerrors.Wrapf(sdkerrors.ErrUnknownAddress, "fee payer address: %s does not exist", feePayer)
 	}
 
-	if err := collectTransactionTax(ctx, dfd, tx, feeTx.GetFee(), feePayer); err != nil {
+	if err := collectTransactionTax(ctx, td, tx, feeTx.GetFee(), feePayer); err != nil {
 		return ctx, err
 	}
 
-	if err := collectFeeTax(ctx, dfd.supplyKeeper, feePayerAcc, taxInfo.Collector, feeTx.GetFee(), taxInfo.FeeBp); err != nil {
+
+	if err := collectFeeTax(ctx, td.supplyKeeper, feePayerAcc, taxInfo.Collector, feeTx.GetFee(), taxInfo.FeeBp); err != nil {
 		return ctx, err
 	}
 
@@ -86,7 +67,7 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 }
 
 
-func collectTransactionTax(ctx sdk.Context, dfd DeductFeeDecorator, tx sdk.Tx, fees sdk.Coins, feePayer sdk.AccAddress) error {
+func collectTransactionTax(ctx sdk.Context, dfd TaxDecorator, tx sdk.Tx, fees sdk.Coins, feePayer sdk.AccAddress) error {
 
 	// deduct the fees
 	if !fees.IsZero() {
@@ -154,12 +135,12 @@ func collectFeeTax( ctx sdk.Context, supplyKeeper types.SupplyKeeper, fromAcc ex
 				"insufficient funds to pay for tax fees; %s < %s", spendableCoins, taxFees)
 		}
 
-		err := supplyKeeper.SendCoinsFromAccountToModule(ctx, fromAcc.GetAddress(), authtypes.FeeCollectorName, fees)
-		if err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
-		}
+		//err := supplyKeeper.SendCoinsFromAccountToModule(ctx, fromAcc.GetAddress(), authtypes.FeeCollectorName, fees)
+		//if err != nil {
+		//	return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
+		//}
 
-		err = supplyKeeper.SendCoinsFromModuleToAccount(ctx, authtypes.FeeCollectorName, toAcc, taxFees)
+		err := supplyKeeper.SendCoinsFromModuleToAccount(ctx, authtypes.FeeCollectorName, toAcc, taxFees)
 		if err != nil {
 			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
 		}
