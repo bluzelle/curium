@@ -325,7 +325,6 @@ func NewCRUDApp(
 		auth.DefaultSigVerificationGasConsumer,
 	)
 
-
 	taxAnteHandler := sdk.ChainAnteDecorators(ante.NewTaxDecorator(
 		app.accountKeeper,
 		app.supplyKeeper,
@@ -349,16 +348,6 @@ func NewCRUDApp(
 
 
 
-	//// The AnteHandler handles signature verification and transaction pre-processing
-	//app.SetAnteHandler(
-	//	ante.NewAnteHandler(
-	//		app.accountKeeper,
-	//		app.bankKeeper,
-	//		app.supplyKeeper,
-	//		app.taxKeeper,
-	//		auth.DefaultSigVerificationGasConsumer,
-	//	),
-	//)
 
 	// initialize stores
 	app.MountKVStores(keys)
@@ -371,6 +360,7 @@ func NewCRUDApp(
 
 	return app
 }
+
 
 // GenesisState represents chain state at the start of the chain. Any initial state (account balances) are stored here.
 type GenesisState map[string]json.RawMessage

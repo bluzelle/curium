@@ -40,29 +40,30 @@ type FeeTx interface {
 
 func (td TaxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
 
-	feeTx, ok := tx.(FeeTx)
-	if !ok {
-		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a FeeTx")
+	if !simulate {
+
+		feeTx, ok := tx.(FeeTx)
+		if !ok {
+			return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a FeeTx")
+		}
+
+		taxInfo := td.tk.GetTaxInfo(ctx)
+
+		feePayer := feeTx.FeePayer()
+		feePayerAcc := td.ak.GetAccount(ctx, feePayer)
+
+		if feePayerAcc == nil {
+			return ctx, sdkerrors.Wrapf(sdkerrors.ErrUnknownAddress, "fee payer address: %s does not exist", feePayer)
+		}
+
+		if err := collectTransactionTax(ctx, td, tx, feeTx.GetFee(), feePayer); err != nil {
+			return ctx, err
+		}
+
+		if err := collectFeeTax(ctx, td.supplyKeeper, feePayerAcc, taxInfo.Collector, feeTx.GetFee(), taxInfo.FeeBp); err != nil {
+			return ctx, err
+		}
 	}
-
-	taxInfo := td.tk.GetTaxInfo(ctx)
-
-	feePayer := feeTx.FeePayer()
-	feePayerAcc := td.ak.GetAccount(ctx, feePayer)
-
-	if feePayerAcc == nil {
-		return ctx, sdkerrors.Wrapf(sdkerrors.ErrUnknownAddress, "fee payer address: %s does not exist", feePayer)
-	}
-
-	if err := collectTransactionTax(ctx, td, tx, feeTx.GetFee(), feePayer); err != nil {
-		return ctx, err
-	}
-
-
-	if err := collectFeeTax(ctx, td.supplyKeeper, feePayerAcc, taxInfo.Collector, feeTx.GetFee(), taxInfo.FeeBp); err != nil {
-		return ctx, err
-	}
-
 	return next(ctx, tx, simulate)
 }
 
