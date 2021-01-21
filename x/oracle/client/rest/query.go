@@ -1,40 +1,66 @@
 package rest
 
 import (
-	"fmt"
+	"encoding/hex"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/gorilla/mux"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	"github.com/bluzelle/curium/x/oracle/types"
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	r.HandleFunc(
-		"/oracle/listsources",
-		queryListSourcesHandlerFn(cliCtx),
-	).Methods("GET")
+		"/oracle/query",
+		abciQueryHandlerFn(cliCtx),
+		).Methods("POST")
 }
 
-func queryListSourcesHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
+type queryReq struct {
+	Path string
+	Data string
+}
+
+
+func abciQueryHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
 		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, cliCtx, r)
 		if !ok {
 			return
 		}
 
-		route := fmt.Sprintf("custom/%s/listsources", types.QuerierRoute)
+		var req queryReq
 
-		res, height, err := cliCtx.QueryWithData(route, nil)
+		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		}
+
+		err = cliCtx.Codec.UnmarshalJSON(body, &req)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		}
+
+		bytes, err := hex.DecodeString(req.Data)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		}
+		res, height, err := cliCtx.QueryWithData(req.Path, bytes)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 		}
 
 		cliCtx = cliCtx.WithHeight(height)
 		rest.PostProcessResponse(w, cliCtx, res)
 	}
 }
+
+
+
+
+
+
 
