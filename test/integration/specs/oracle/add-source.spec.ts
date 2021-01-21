@@ -21,7 +21,7 @@ describe('add-source functions', function()  {
                 Owner: bz.address
             }
         }, {gas_price: 0.002, max_gas: 10000000})
-            .then(() => bz.abciQuery<any>('oracle/query', 'custom/oracle/listsources'))
+            .then(() => bz.abciQuery<any>('custom/oracle/listsources'))
             .then(sources => {
                 expect(sources.result).to.have.length(1);
                 expect(sources.result[0].name).to.equal('my-source');
