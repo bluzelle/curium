@@ -1,7 +1,7 @@
 import {API} from "../../../../../blzjs/client";
 
 export const deleteSources = (bz: API) =>
-    bz.abciQuery<any>('oracle/query', 'custom/oracle/listsources')
+    bz.abciQuery<any>( 'custom/oracle/listsources')
         .then((sources: any) => bz.withTransaction(() =>
                 Promise.all(sources.result.map(source => deleteSource(bz, source.name)))
             )
