@@ -15,14 +15,57 @@
 package rest
 
 import (
+	"encoding/hex"
 	"fmt"
 	"github.com/bluzelle/curium/x/crud/internal/keeper"
 	"github.com/bluzelle/curium/x/crud/internal/types"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
+	"io/ioutil"
 	"net/http"
 )
+
+func AbciQueryHandler(cliCtx context.CLIContext) http.HandlerFunc {
+
+	type queryReq struct {
+		Path string
+		Data string
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, cliCtx, r)
+		if !ok {
+			return
+		}
+
+		var req queryReq
+
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		}
+
+		err = cliCtx.Codec.UnmarshalJSON(body, &req)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		}
+
+		bytes, err := hex.DecodeString(req.Data)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		}
+		res, height, err := cliCtx.QueryWithData(req.Path, bytes)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		}
+
+		cliCtx = cliCtx.WithHeight(height)
+		rest.PostProcessResponse(w, cliCtx, res)
+	}
+
+}
 
 func BlzQReadHandler(cliCtx context.CLIContext, storeName string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -103,7 +146,6 @@ func BlzQSearchHandler(cliCtx context.CLIContext, storeName string) http.Handler
 		rest.PostProcessResponse(w, cliCtx, res)
 	}
 }
-
 
 func BlzQKeyValuesHandler(cliCtx context.CLIContext, storeName string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
