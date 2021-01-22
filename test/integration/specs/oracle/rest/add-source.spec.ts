@@ -1,7 +1,7 @@
 import {expect} from 'chai'
 import {API, bluzelle} from "bluzelle";
-import {deleteSources} from "./source-utils";
-import {getBzClient} from "./bluzelle-client";
+import {deleteSources} from "../source-utils";
+import {getBzClient} from "../bluzelle-client";
 
 describe('add-source functions', function()  {
     this.timeout(10000);
