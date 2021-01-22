@@ -1,13 +1,13 @@
 import {deleteSources} from "../source-utils";
 import {getBzClient} from "../bluzelle-client";
-import {blzcli} from "../../../helpers/blzcli";
+import {BLOCK, blzcli, STANDARD_GAS} from "../../../helpers/blzcli";
 import {expect} from 'chai'
 
 describe('add-source', () => {
      beforeEach(() => deleteSources(getBzClient()))
 
     it('should add a source', () => {
-        return blzcli('tx oracle add-source my-name my-url my-property --from vuser --gas-prices 0.002ubnt --gas auto --gas-adjustment 2 -y --broadcast-mode block')
+        return blzcli('tx oracle add-source my-name my-url my-property --from vuser -y', STANDARD_GAS, BLOCK)
             .then(() => getBzClient().abciQuery('/custom/oracle/listsources'))
             .then(x => {
                 expect(x.result[0].name).to.equal('my-name');
