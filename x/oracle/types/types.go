@@ -9,3 +9,10 @@ type Source struct {
 	Owner	types.AccAddress `json:"owner"`
 }
 
+type Vote struct {
+	Name string
+	Batch string
+	Value float64
+	ValidatorAddress string
+}
+
