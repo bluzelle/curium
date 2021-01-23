@@ -22,6 +22,7 @@ import (
 	"os"
 	"os/user"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -38,7 +39,6 @@ var oracleUser = struct {
 	mnemonic: "bone soup garage safe hotel remove rebuild tumble usage marriage skin opinion banana scene focus obtain very soap vocal print symptom winter update hundred",
 }
 
-type JSONResponse map[string]interface{}
 
 var currCtx *sdk.Context
 var cdc codec.Codec
@@ -72,27 +72,40 @@ func getValconsAddress() string {
 }
 
 type SourceAndValue struct {
-	types.Source
+	source types.Source
 	value float64
 }
 
 func feederTick(oracleKeeper Keeper) {
 	sources, _ := oracleKeeper.ListSources(*currCtx)
-	mapSources(sources, vote)
-}
-
-func vote(source types.Source, value float64) {
-	sendPreflightMsg(source, value)
+	values := fetchValues(sources)
+	txhash := sendPreflightMsgs(values)
+	fmt.Println("=========== Preflight hash", txhash)
 	time.AfterFunc(time.Second * 20, func() {
-		sendVoteMsg(source, value)
+		txhash = sendVoteMsgs(values)
+		fmt.Println("========== vote hash", txhash)
 	})
 }
 
-func mapSources(sources []types.Source, fn func(types.Source, float64)) {
+
+func fetchValues(sources []types.Source) []SourceAndValue {
+	var results []SourceAndValue
+	wg := sync.WaitGroup{}
 	for _, source := range sources {
-		value, _ := fetchSource(source)
-		fn(source, value)
+		wg.Add(1)
+		go func(source types.Source) {
+			value, err := fetchSource(source)
+			if err == nil {
+				results = append(results, SourceAndValue{
+					source: source,
+					 value: value,
+				})
+			}
+			wg.Done()
+		}(source)
 	}
+	wg.Wait()
+	return results
 }
 
 func fetchSource(source types.Source) (float64, error) {
@@ -133,44 +146,58 @@ func readValueFromJson(jsonIn []byte, prop string) (float64, error) {
 	return out, nil
 }
 
-func sendPreflightMsg(source types.Source, value float64) {
+func sendPreflightMsgs(values []SourceAndValue) string {
+	var msgs []sdk.Msg
+	for _, value := range values {
+		msg, _ := generateVoteProofMsg(value)
+		msgs = append(msgs, msg)
+	}
+	result, _ := BroadcastOracleMessages(msgs)
+	return hex.EncodeToString(result.Hash)
+}
+
+func sendVoteMsgs(values []SourceAndValue) string {
+	var msgs []sdk.Msg
+	for _, value := range values {
+		msg, _ := generateVoteMsg(value)
+		msgs = append(msgs, msg)
+	}
+	result, _ := BroadcastOracleMessages(msgs)
+	return hex.EncodeToString(result.Hash)
+}
+
+func generateVoteMsg(source SourceAndValue) (types.MsgOracleVote, error) {
+		msg := types.NewMsgOracleVote(
+			getValconsAddress(),
+			fmt.Sprintf("%f", source.value),
+			getOracleUserAddress(),
+			source.source.Name,
+		)
+		err := msg.ValidateBasic()
+		return msg, err
+}
+
+func generateVoteProofMsg(source SourceAndValue) (types.MsgOracleVoteProof, error) {
 	valConsAdd := getValconsAddress()
-	proofStr := fmt.Sprintf("%s%f", valConsAdd, value)
+	proofStr := fmt.Sprintf("%s%f", valConsAdd, source.value)
 	proof := []byte(proofStr)
 	sum := sha256.Sum256(proof)
-	msg := types.NewMsgOracleVoteProof(valConsAdd, hex.EncodeToString(sum[:]), getOracleUserAddress(), source.Name)
+	msg := types.NewMsgOracleVoteProof(valConsAdd, hex.EncodeToString(sum[:]), getOracleUserAddress(), source.source.Name)
 	err := msg.ValidateBasic()
-	if err == nil {
-		result, _ := BroadcastOracleMessage(source, msg)
-		txhash := hex.EncodeToString(result.Hash)
-		fmt.Println("Proof hash:", txhash)
+	if err != nil {
+		logger.Info("Error generating vote proof message", source.source.Name)
+		return types.MsgOracleVoteProof{}, err
 	}
-
+	return msg, nil
 }
 
-func sendVoteMsg(source types.Source, value float64) {
-	msg := types.NewMsgOracleVote(
-		getValconsAddress(),
-		fmt.Sprintf("%f", value),
-		getOracleUserAddress(),
-		source.Name,
-	)
-	err := msg.ValidateBasic()
-	if err == nil {
-		result, _ := BroadcastOracleMessage(source, msg)
-		txhash := hex.EncodeToString(result.Hash)
-		fmt.Println("Vote hash:", txhash)
-	}
-}
-
-func BroadcastOracleMessage(source types.Source, msg sdk.Msg) (*coretypes.ResultBroadcastTxCommit, error) {
+func BroadcastOracleMessages(msgs []sdk.Msg) (*coretypes.ResultBroadcastTxCommit, error) {
 	keybase := clientKeys.NewInMemoryKeyBase()
 	account, err := keybase.CreateAccount("oracle", oracleUser.mnemonic, cryptoKeys.DefaultBIP39Passphrase, clientKeys.DefaultKeyPass, "44'/118'/0'/0/0", cryptoKeys.Secp256k1)
 
 	if err != nil {
 		logger.Info("Error creating keybase account", err)
 	}
-	msgs := []sdk.Msg{msg}
 
 	address := account.GetAddress()
 	acc := accountKeeper.GetAccount(*currCtx, address)
@@ -186,7 +213,7 @@ func BroadcastOracleMessage(source types.Source, msg sdk.Msg) (*coretypes.Result
 		rpcCtx := rpctypes.Context{}
 		result, err := core.BroadcastTxCommit(&rpcCtx, signedMsg)
 		if err != nil {
-			logger.Info(fmt.Sprintf("Error transmitting oracle preflight for %s"), source.Name)
+			logger.Info(fmt.Sprintf("Error transmitting oracle preflight messages"))
 		}
 		return result, nil
 	}
