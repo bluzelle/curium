@@ -13,7 +13,7 @@ describe('add-source functions', function()  {
 
     it('should add sources', () => {
         return bz.sendMessage({
-            type: 'oracle/addsource',
+            type: 'oracle/MsgOracleAddSource',
             value: {
                 Name: 'my-source',
                 Url: 'my-url',

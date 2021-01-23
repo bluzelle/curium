@@ -8,7 +8,7 @@ export const deleteSources = (bz: API) =>
         )
 const deleteSource = (bz: API, name: string): Promise<any> =>
     bz.sendMessage({
-        type: 'oracle/deletesource',
+        type: 'oracle/MsgOracleDeleteSource',
         value: {
             Name: name,
             Owner: bz.address
