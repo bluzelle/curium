@@ -3,11 +3,8 @@ module github.com/bluzelle/curium
 go 1.14
 
 require (
-	github.com/Workiva/go-datastructures v1.0.52
 	github.com/cosmos/cosmos-sdk v0.39.1
-	github.com/cosmos/go-bip39 v0.0.0-20180819234021-555e2067c45d
 	github.com/cosmos/modules/incubator/faucet v0.0.0-20200315124306-c86f71ae76a0
-	github.com/go-resty/resty/v2 v2.3.0
 	github.com/golang/mock v1.4.0
 	github.com/gorilla/mux v1.7.4
 	github.com/magiconair/properties v1.8.1
@@ -17,4 +14,6 @@ require (
 	github.com/tendermint/go-amino v0.15.1
 	github.com/tendermint/tendermint v0.33.9
 	github.com/tendermint/tm-db v0.5.1
+	github.com/wenxiang/go-nestedjson v0.0.0-20150910062500-11a6c4340577
+	golang.org/x/net v0.0.0-20200513185701-a91f0712d120 // indirect
 )

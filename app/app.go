@@ -344,8 +344,7 @@ func NewCRUDApp(
 		tmos.Exit(err.Error())
 	}
 
-	// TODO: I added this delay for testing purposes.  Remove and see what happens after it is working
-	defer oracle.StartFeeder(app.crudKeeper, app.accountKeeper, *cdc)
+	go oracle.StartFeeder(app.oracleKeeper, app.accountKeeper, *cdc)
 
 	return app
 }
