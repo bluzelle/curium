@@ -1,9 +1,9 @@
 package oracle
 
 import (
-	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"github.com/bluzelle/curium/x/oracle/keeper"
 	"github.com/bluzelle/curium/x/oracle/types"
 	clientKeys "github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -80,10 +80,8 @@ func feederTick(oracleKeeper Keeper) {
 	sources, _ := oracleKeeper.ListSources(*currCtx)
 	values := fetchValues(sources)
 	txhash := sendPreflightMsgs(values)
-	fmt.Println("=========== Preflight hash", txhash)
 	time.AfterFunc(time.Second * 20, func() {
 		txhash = sendVoteMsgs(values)
-		fmt.Println("========== vote hash", txhash)
 	})
 }
 
@@ -177,12 +175,11 @@ func generateVoteMsg(source SourceAndValue) (types.MsgOracleVote, error) {
 		return msg, err
 }
 
+
 func generateVoteProofMsg(source SourceAndValue) (types.MsgOracleVoteProof, error) {
-	valConsAdd := getValconsAddress()
-	proofStr := fmt.Sprintf("%s%f", valConsAdd, source.value)
-	proof := []byte(proofStr)
-	sum := sha256.Sum256(proof)
-	msg := types.NewMsgOracleVoteProof(valConsAdd, hex.EncodeToString(sum[:]), getOracleUserAddress(), source.source.Name)
+	valcons := getValconsAddress()
+	proof := keeper.CalculateProof(valcons, fmt.Sprintf("%f", source.value))
+	msg := types.NewMsgOracleVoteProof(valcons, proof, getOracleUserAddress(), source.source.Name)
 	err := msg.ValidateBasic()
 	if err != nil {
 		logger.Info("Error generating vote proof message", source.source.Name)

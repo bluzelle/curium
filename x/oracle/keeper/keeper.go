@@ -1,13 +1,18 @@
 package keeper
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"github.com/tendermint/tendermint/libs/log"
+	"time"
 
 	"github.com/bluzelle/curium/x/oracle/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+var voteProofs map[string]types.MsgOracleVoteProof
 
 // Keeper of the oracle store
 type Keeper struct {
@@ -24,6 +29,44 @@ func NewKeeper(cdc *codec.Codec, sourceKey sdk.StoreKey, paramspace types.ParamS
 //		paramspace: paramspace.WithKeyTable(types.ParamKeyTable()),
 	}
 	return keeper
+}
+
+func GetVoteProofs() map[string]types.MsgOracleVoteProof {
+	if voteProofs == nil {
+		voteProofs = make(map[string]types.MsgOracleVoteProof)
+	}
+	return voteProofs
+}
+
+func CalculateProof(valcons string, value string) string {
+	proofStr := fmt.Sprintf("%s%f", valcons, value)
+	proof := []byte(proofStr)
+	sum := sha256.Sum256(proof)
+	return hex.EncodeToString(sum[:])
+
+}
+
+
+func (k Keeper) StoreVoteProof(msg types.MsgOracleVoteProof) {
+	withinProofWindow := func() bool {
+		return time.Now().Second() <= 20
+	}
+
+	// TODO: This is temp for testing
+	withinProofWindow = func() bool {return true}
+
+	if withinProofWindow() {
+		GetVoteProofs()[msg.SourceName + msg.ValidatorAddr] = msg
+	}
+}
+
+func (k Keeper) IsVoteValid(source string, valcons string, value string) bool {
+	proof := CalculateProof(valcons, value)
+	b := GetVoteProofs()[source + valcons].VoteHash
+	fmt.Println(proof, b)
+	return proof == GetVoteProofs()[source + valcons].VoteHash
+
+
 }
 
 // Logger returns a module-specific logger.

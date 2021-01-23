@@ -21,6 +21,8 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 			return handleMsgOracleAddSource(ctx, k, msg)
 		case types.MsgOracleDeleteSource:
 			return handleMsgOracleDeleteSource(ctx, k, msg)
+		case types.MsgOracleVote:
+			return handleMsgOracleVote(ctx, k, msg)
 		default:
 			errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName,  msg)
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
@@ -44,23 +46,17 @@ func handleMsgOracleAddSource(ctx sdk.Context, k keeper.Keeper, msg types.MsgOra
 	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }
 
+func handleMsgOracleVote(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleVote) (*sdk.Result, error) {
+	voteGood := k.IsVoteValid(msg.SourceName, msg.ValidatorAddr, msg.Value);
+    fmt.Println("Value received", voteGood)
+// TODO: finish here
+
+
+	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
+}
 
 func handleMsgOracleVoteProof(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleVoteProof) (*sdk.Result, error) {
-
-	//err := k.OracleVoteProof(ctx, msg.ValidatorAddr)
-	//if err != nil {
-	//	return nil, err
-	//}
-
-	// TODO: Define your msg events
-	//ctx.EventManager().EmitEvent(
-	//	sdk.NewEvent(
-	//		sdk.EventTypeMessage,
-	//		sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
-	//		sdk.NewAttribute(sdk.AttributeKeySender, msg.ValidatorAddr.String()),
-	//	),
-	//)
-
+	k.StoreVoteProof(msg)
 	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }
 

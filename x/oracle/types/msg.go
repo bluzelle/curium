@@ -105,19 +105,19 @@ func (msg MsgOracleAddSource) ValidateBasic() error {
  ********************************************************************/
 type MsgOracleVote struct {
 	ValidatorAddr string
-	Vote string
-	Owner sdk.AccAddress
-	SourceName string
+	Value         string
+	Owner         sdk.AccAddress
+	SourceName    string
 }
 
 
 // NewMsgOracleVote creates a new MsgOracleVote instance
-func NewMsgOracleVote(validatorAddr string, vote string, owner sdk.AccAddress, sourceName string) MsgOracleVote {
+func NewMsgOracleVote(validatorAddr string, value string, owner sdk.AccAddress, sourceName string) MsgOracleVote {
 	return MsgOracleVote{
 		ValidatorAddr: validatorAddr,
-		Vote: vote,
-		Owner: owner,
-		SourceName: sourceName,
+		Value:         value,
+		Owner:         owner,
+		SourceName:    sourceName,
 	}
 }
 
