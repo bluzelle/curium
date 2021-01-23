@@ -117,18 +117,20 @@ func (msg MsgOracleAddSource) ValidateBasic() error {
 ** MsgOracleVoteProof - struct for sending a vote preflight proof
  ********************************************************************/
 type MsgOracleVoteProof struct {
-	ValidatorAddr string `json:"address"` // address of the validator operator
-	VoteHash string `json:"voteHash"`
-	Owner sdk.AccAddress `json:"owner"`
+	ValidatorAddr string
+	VoteHash string
+	Owner sdk.AccAddress
+	SourceName string
 }
 
 
 // NewMsgOracleVoteProof creates a new MsgOracleVoteProof instance
-func NewMsgOracleVoteProof(validatorAddr string, voteHash string, owner sdk.AccAddress) MsgOracleVoteProof {
+func NewMsgOracleVoteProof(validatorAddr string, voteHash string, owner sdk.AccAddress, sourceName string) MsgOracleVoteProof {
 	return MsgOracleVoteProof{
 		ValidatorAddr: validatorAddr,
 		VoteHash: voteHash,
 		Owner: owner,
+		SourceName: sourceName,
 	}
 }
 
