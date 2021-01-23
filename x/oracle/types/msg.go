@@ -179,7 +179,7 @@ func NewMsgOracleVoteProof(validatorAddr string, voteHash string, owner sdk.AccA
 
 // nolint
 func (msg MsgOracleVoteProof) Route() string { return RouterKey }
-func (msg MsgOracleVoteProof) Type() string  { return "OracleVoteProof" }
+func (msg MsgOracleVoteProof) Type() string  { return "oracle/MsgOracleVoteProof" }
 func (msg MsgOracleVoteProof) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{sdk.AccAddress(msg.Owner)}
 }
