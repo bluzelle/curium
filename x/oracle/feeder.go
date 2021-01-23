@@ -21,6 +21,7 @@ import (
 	"net/http"
 	"os"
 	"os/user"
+	"strconv"
 	"time"
 )
 
@@ -119,7 +120,14 @@ func readValueFromJson(jsonIn []byte, prop string) (float64, error) {
 
 	out, err := obj.Float(prop)
 	if err != nil {
-		return 0, err
+		outString, err := obj.String(prop)
+		if err != nil {
+			return 0, err
+		}
+		out, err = strconv.ParseFloat(outString, 64)
+		if err != nil {
+			return 0, err
+		}
 	}
 
 	return out, nil

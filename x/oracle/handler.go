@@ -47,7 +47,6 @@ func handleMsgOracleAddSource(ctx sdk.Context, k keeper.Keeper, msg types.MsgOra
 
 func handleMsgOracleVoteProof(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleVoteProof) (*sdk.Result, error) {
 
-	fmt.Printf("HERE")
 	//err := k.OracleVoteProof(ctx, msg.ValidatorAddr)
 	//if err != nil {
 	//	return nil, err
