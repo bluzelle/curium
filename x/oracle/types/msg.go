@@ -100,6 +100,49 @@ func (msg MsgOracleAddSource) ValidateBasic() error {
 	return nil
 }
 
+/*********************************************************************
+** MsgOracleVote - struct for sending a vote
+ ********************************************************************/
+type MsgOracleVote struct {
+	ValidatorAddr string
+	Vote string
+	Owner sdk.AccAddress
+	SourceName string
+}
+
+
+// NewMsgOracleVote creates a new MsgOracleVote instance
+func NewMsgOracleVote(validatorAddr string, vote string, owner sdk.AccAddress, sourceName string) MsgOracleVote {
+	return MsgOracleVote{
+		ValidatorAddr: validatorAddr,
+		Vote: vote,
+		Owner: owner,
+		SourceName: sourceName,
+	}
+}
+
+// nolint
+func (msg MsgOracleVote) Route() string { return RouterKey }
+func (msg MsgOracleVote) Type() string  { return "OracleVote" }
+func (msg MsgOracleVote) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{sdk.AccAddress(msg.Owner)}
+}
+
+// GetSignBytes gets the bytes for the message signer to sign on
+func (msg MsgOracleVote) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
+}
+
+// ValidateBasic validity check for the AnteHandler
+func (msg MsgOracleVote) ValidateBasic() error {
+	if len(msg.ValidatorAddr) < 1 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "missing validator address")
+	}
+	return nil
+}
+
+
 
 
 
