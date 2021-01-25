@@ -12,7 +12,7 @@ const (
 
 func CalculateGasForLease(lease int64, bytes int) uint64 {
 	leaseDays := LeaseInDays(lease)
-	gasRate := LeaseGasRate(leaseDays)
+	gasRate := leaseGasRatePerByte(leaseDays)
 	return uint64(math.Round(gasRate * leaseDays * math.Max(float64(bytes), 200000)))
 }
 
@@ -20,7 +20,7 @@ func LeaseInDays(lease int64) float64 {
 	return (float64(lease) / 24 / 60 / 60) * 5.5
 }
 
-func LeaseGasRate(days float64) float64 {
+func leaseGasRatePerByte(days float64) float64 {
 	return LeaseGasRateDefaultValue + (LeaseGasRateMaximumValue-LeaseGasRateDefaultValue)/
 		math.Pow(1.0+math.Pow(days/LeaseGasRateParamC, LeaseGasRateParamB), LeaseGasRateParamG)
 }

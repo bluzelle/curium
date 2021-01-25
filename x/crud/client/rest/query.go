@@ -20,11 +20,87 @@ import (
 	"github.com/bluzelle/curium/x/crud/internal/keeper"
 	"github.com/bluzelle/curium/x/crud/internal/types"
 	"github.com/cosmos/cosmos-sdk/client/context"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
+	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/gorilla/mux"
 	"io/ioutil"
 	"net/http"
+	"strconv"
+	"strings"
 )
+
+func AccountTxsHandler(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		const NUM_OF_BLOCKS = 100
+		const PAGE_SIZE = 100
+
+		err := r.ParseForm()
+		if err != nil {
+			rest.WriteErrorResponse(
+				w, http.StatusBadRequest,
+				fmt.Sprintf("failed to parse query parameters: %s", err),
+			)
+			return
+		}
+
+		trustNode := true
+		if r.FormValue("proof") == "true" {
+			trustNode = false
+		}
+		cliCtx = cliCtx.WithTrustNode(trustNode)
+		cliCtx = cliCtx.WithChainID(r.FormValue("chainId"))
+		if trustNode == false && cliCtx.Verifier == nil {
+			verifier, err := context.CreateVerifier(cliCtx, context.DefaultVerifierCacheSize)
+			if err != nil {
+				rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			}
+			cliCtx = cliCtx.WithVerifier(verifier)
+		}
+
+		vars := mux.Vars(r)
+		var response = make([]sdk.TxResponse, 0)
+
+		start, err := strconv.ParseInt(vars["start"], 10, 64)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		}
+
+		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, cliCtx, r)
+		if !ok {
+			return
+		}
+
+		events := []string{
+			fmt.Sprintf("tx.height>=%d", start),
+			fmt.Sprintf("tx.height<=%d", start+NUM_OF_BLOCKS),
+			"message.action='send'",
+			fmt.Sprintf("transfer.recipient='%s'", vars["address"]),
+		}
+
+		page := 1
+
+		for {
+			searchResult, err := utils.QueryTxsByEvents(cliCtx, events, page, PAGE_SIZE)
+			if err != nil {
+				if strings.Contains(err.Error(), "page should be within") {
+					break
+				}
+				rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+
+			response = append(response, searchResult.Txs...)
+
+			if len(searchResult.Txs) < PAGE_SIZE {
+				break
+			}
+			page = page + 1
+		}
+
+		rest.PostProcessResponseBare(w, cliCtx, response)
+	}
+}
 
 func AbciQueryHandler(cliCtx context.CLIContext) http.HandlerFunc {
 

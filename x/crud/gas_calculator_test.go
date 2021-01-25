@@ -11,11 +11,11 @@ func daysToLease(days int64) int64 {
 }
 
 
-func TestLeaseGasRate(t *testing.T) {
-	assert.Equal(t, LeaseGasRate(0), 3.0)
-	assert.Equal(t, LeaseGasRate(1), 2.999876836999191)
-	assert.Equal(t, LeaseGasRate(10), 2.961551101112777)
-	assert.Equal(t, LeaseGasRate(120), 1.0262720621151311)
+func TestLeaseGasRatePerByte(t *testing.T) {
+	assert.Equal(t, leaseGasRatePerByte(0), 3.0)
+	assert.Equal(t, leaseGasRatePerByte(1), 2.999876836999191)
+	assert.Equal(t, leaseGasRatePerByte(10), 2.961551101112777)
+	assert.Equal(t, leaseGasRatePerByte(120), 1.0262720621151311)
 
 
 }
