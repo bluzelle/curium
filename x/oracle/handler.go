@@ -47,9 +47,11 @@ func handleMsgOracleAddSource(ctx sdk.Context, k keeper.Keeper, msg types.MsgOra
 }
 
 func handleMsgOracleVote(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleVote) (*sdk.Result, error) {
-	voteGood := k.IsVoteValid(msg.SourceName, msg.ValidatorAddr, msg.Value);
+	voteGood := k.IsVoteValid(msg.SourceName, msg.ValidatorAddr, msg.Value)
+	if voteGood {
+		// TODO: finish here
+	}
     fmt.Println("Value received", voteGood)
-// TODO: finish here
 
 
 	return &sdk.Result{Events: ctx.EventManager().Events()}, nil

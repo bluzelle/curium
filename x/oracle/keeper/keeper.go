@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/tendermint/tendermint/libs/log"
+	"strings"
 	"time"
 
 	"github.com/bluzelle/curium/x/oracle/types"
@@ -13,10 +14,11 @@ import (
 )
 
 var voteProofs map[string]types.MsgOracleVoteProof
+var votes map[string][]types.Vote
 
 // Keeper of the oracle store
 type Keeper struct {
-	sourceKey   sdk.StoreKey
+	sourceKey  sdk.StoreKey
 	cdc        *codec.Codec
 	paramspace types.ParamSubspace
 }
@@ -24,9 +26,9 @@ type Keeper struct {
 // NewKeeper creates a oracle keeper
 func NewKeeper(cdc *codec.Codec, sourceKey sdk.StoreKey, paramspace types.ParamSubspace) Keeper {
 	keeper := Keeper{
-		sourceKey:   sourceKey,
-		cdc:        cdc,
-//		paramspace: paramspace.WithKeyTable(types.ParamKeyTable()),
+		sourceKey: sourceKey,
+		cdc:       cdc,
+		//		paramspace: paramspace.WithKeyTable(types.ParamKeyTable()),
 	}
 	return keeper
 }
@@ -38,14 +40,32 @@ func GetVoteProofs() map[string]types.MsgOracleVoteProof {
 	return voteProofs
 }
 
-func CalculateProof(valcons string, value string) string {
-	proofStr := fmt.Sprintf("%s%f", valcons, value)
+func CalculateProofHash(valcons string, value string) string {
+	proofStr := fmt.Sprintf("%s%s", valcons, value)
 	proof := []byte(proofStr)
 	sum := sha256.Sum256(proof)
 	return hex.EncodeToString(sum[:])
-
 }
 
+func (k Keeper) GetCurrentBatchId() string {
+	t := time.Date(
+		time.Now().Year(),
+		time.Now().Month(),
+		time.Now().Day(),
+		time.Now().Hour(),
+		time.Now().Minute(),
+		0,
+		0,
+		time.UTC,
+	).String()
+	t = strings.Replace(t, ":00 +0000 UTC", "", 1)
+	t = strings.Replace(t, " ", "-", -1)
+	return t
+}
+
+func (k Keeper) StoreVote(msg types.MsgOracleVote) {
+
+}
 
 func (k Keeper) StoreVoteProof(msg types.MsgOracleVoteProof) {
 	withinProofWindow := func() bool {
@@ -53,19 +73,18 @@ func (k Keeper) StoreVoteProof(msg types.MsgOracleVoteProof) {
 	}
 
 	// TODO: This is temp for testing
-	withinProofWindow = func() bool {return true}
+	withinProofWindow = func() bool { return true }
 
 	if withinProofWindow() {
-		GetVoteProofs()[msg.SourceName + msg.ValidatorAddr] = msg
+		GetVoteProofs()[msg.SourceName+msg.ValidatorAddr] = msg
 	}
 }
 
 func (k Keeper) IsVoteValid(source string, valcons string, value string) bool {
-	proof := CalculateProof(valcons, value)
-	b := GetVoteProofs()[source + valcons].VoteHash
+	proof := CalculateProofHash(valcons, value)
+	b := GetVoteProofs()[source+valcons].VoteHash
 	fmt.Println(proof, b)
-	return proof == GetVoteProofs()[source + valcons].VoteHash
-
+	return proof == GetVoteProofs()[source+valcons].VoteHash
 
 }
 
@@ -75,7 +94,7 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 }
 
 // Get returns the pubkey from the adddress-pubkey relation
-func (k Keeper) GetSourceStore(ctx sdk.Context) (sdk.KVStore) {
+func (k Keeper) GetSourceStore(ctx sdk.Context) sdk.KVStore {
 	return ctx.KVStore(k.sourceKey)
 }
 
@@ -97,7 +116,6 @@ func (k Keeper) DeleteSource(ctx sdk.Context, name string) error {
 	return nil
 }
 
-
 func (k Keeper) ListSources(ctx sdk.Context) ([]types.Source, error) {
 	store := k.GetSourceStore(ctx)
 	iterator := store.Iterator(nil, nil)
@@ -111,4 +129,3 @@ func (k Keeper) ListSources(ctx sdk.Context) ([]types.Source, error) {
 	}
 	return sources, nil
 }
-
