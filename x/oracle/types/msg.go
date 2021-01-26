@@ -104,20 +104,20 @@ func (msg MsgOracleAddSource) ValidateBasic() error {
 ** MsgOracleVote - struct for sending a vote
  ********************************************************************/
 type MsgOracleVote struct {
-	ValidatorAddr string
-	Value         string
-	Owner         sdk.AccAddress
-	SourceName    string
+	Valcons    string
+	Value      string
+	Owner      sdk.AccAddress
+	SourceName string
 }
 
 
 // NewMsgOracleVote creates a new MsgOracleVote instance
 func NewMsgOracleVote(validatorAddr string, value string, owner sdk.AccAddress, sourceName string) MsgOracleVote {
 	return MsgOracleVote{
-		ValidatorAddr: validatorAddr,
-		Value:         value,
-		Owner:         owner,
-		SourceName:    sourceName,
+		Valcons:    validatorAddr,
+		Value:      value,
+		Owner:      owner,
+		SourceName: sourceName,
 	}
 }
 
@@ -136,7 +136,7 @@ func (msg MsgOracleVote) GetSignBytes() []byte {
 
 // ValidateBasic validity check for the AnteHandler
 func (msg MsgOracleVote) ValidateBasic() error {
-	if len(msg.ValidatorAddr) < 1 {
+	if len(msg.Valcons) < 1 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "missing validator address")
 	}
 	return nil
