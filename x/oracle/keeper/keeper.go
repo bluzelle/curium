@@ -18,19 +18,32 @@ var votes map[string][]types.Vote
 
 // Keeper of the oracle store
 type Keeper struct {
-	sourceKey  sdk.StoreKey
+	sourceStoreKey  sdk.StoreKey
+	voteStoreKey    sdk.StoreKey
 	cdc        *codec.Codec
 	paramspace types.ParamSubspace
 }
 
 // NewKeeper creates a oracle keeper
-func NewKeeper(cdc *codec.Codec, sourceKey sdk.StoreKey, paramspace types.ParamSubspace) Keeper {
+func NewKeeper(cdc *codec.Codec, sourceStoreKey sdk.StoreKey, paramspace types.ParamSubspace) Keeper {
 	keeper := Keeper{
-		sourceKey: sourceKey,
+		sourceStoreKey: sourceStoreKey,
 		cdc:       cdc,
 		//		paramspace: paramspace.WithKeyTable(types.ParamKeyTable()),
 	}
 	return keeper
+}
+
+func (k Keeper) GetSourceStore(ctx sdk.Context) sdk.KVStore {
+	return ctx.KVStore(k.sourceStoreKey)
+}
+
+func (k Keeper) GetVoteStore(ctx sdk.Context) sdk.KVStore {
+	return ctx.KVStore(k.voteStoreKey)
+}
+
+func CreateVoteKey(valcons string, sourceName string) string {
+	return fmt.Sprintf("%s>%s>%s", GetCurrentBatchId(), sourceName, valcons)
 }
 
 func GetVoteProofs() map[string]types.MsgOracleVoteProof {
@@ -47,7 +60,7 @@ func CalculateProofHash(valcons string, value string) string {
 	return hex.EncodeToString(sum[:])
 }
 
-func (k Keeper) GetCurrentBatchId() string {
+func GetCurrentBatchId() string {
 	t := time.Date(
 		time.Now().Year(),
 		time.Now().Month(),
@@ -63,8 +76,13 @@ func (k Keeper) GetCurrentBatchId() string {
 	return t
 }
 
-func (k Keeper) StoreVote(msg types.MsgOracleVote) {
 
+
+func (k Keeper) StoreVote(ctx sdk.Context, msg types.MsgOracleVote) string {
+	key := CreateVoteKey(msg.Valcons, msg.SourceName)
+	store := k.GetVoteStore(ctx)
+	store.Set([]byte(key), k.cdc.MustMarshalBinaryBare(msg))
+	return key
 }
 
 func (k Keeper) StoreVoteProof(msg types.MsgOracleVoteProof) {
@@ -91,11 +109,6 @@ func (k Keeper) IsVoteValid(source string, valcons string, value string) bool {
 // Logger returns a module-specific logger.
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
-}
-
-// Get returns the pubkey from the adddress-pubkey relation
-func (k Keeper) GetSourceStore(ctx sdk.Context) sdk.KVStore {
-	return ctx.KVStore(k.sourceKey)
 }
 
 func (k Keeper) AddSource(ctx sdk.Context, name string, source types.Source) {

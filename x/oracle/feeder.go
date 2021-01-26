@@ -83,6 +83,7 @@ func feederTick(oracleKeeper Keeper) {
 	time.AfterFunc(time.Second * 20, func() {
 		txhash = sendVoteMsgs(values)
 	})
+	_ = txhash
 }
 
 
