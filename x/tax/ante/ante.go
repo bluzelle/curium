@@ -4,6 +4,7 @@ import (
 	"github.com/bluzelle/curium/x/tax"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bank "github.com/cosmos/cosmos-sdk/x/bank"
@@ -125,4 +126,22 @@ func collectFeeTax( ctx sdk.Context, supplyKeeper types.SupplyKeeper, taxCollect
 	}
 
 	return nil
+}
+
+func NewAnteHandler(
+	ak keeper.AccountKeeper,
+	sigGasConsumer ante.SignatureVerificationGasConsumer,
+) sdk.AnteHandler {
+	return sdk.ChainAnteDecorators(
+		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
+		ante.NewMempoolFeeDecorator(),
+		ante.NewValidateBasicDecorator(),
+		ante.NewValidateMemoDecorator(ak),
+		ante.NewConsumeGasForTxSizeDecorator(ak),
+		ante.NewSetPubKeyDecorator(ak), // SetPubKeyDecorator must be called before all signature verification decorators
+		ante.NewValidateSigCountDecorator(ak),
+		ante.NewSigGasConsumeDecorator(ak, sigGasConsumer),
+		ante.NewSigVerificationDecorator(ak),
+		ante.NewIncrementSequenceDecorator(ak), // innermost AnteDecorator
+	)
 }

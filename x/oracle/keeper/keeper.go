@@ -35,6 +35,7 @@ func NewKeeper(cdc *codec.Codec, sourceStoreKey sdk.StoreKey, paramspace types.P
 }
 
 func (k Keeper) GetSourceStore(ctx sdk.Context) sdk.KVStore {
+	return ctx.MultiStore().GetKVStore(k.sourceStoreKey)
 	return ctx.KVStore(k.sourceStoreKey)
 }
 

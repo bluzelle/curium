@@ -109,19 +109,21 @@ func fetchValues(sources []types.Source) []SourceAndValue {
 
 func fetchSource(source types.Source) (float64, error) {
 	resp, err := http.Get(source.Url)
-	if err != nil {
-		logger.Info(fmt.Sprintf("Error fetching oracle source %s", source.Name))
-		logger.Info(err.Error())
-	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	if resp != nil {
+		defer resp.Body.Close()
 
-	value, err := readValueFromJson(body, source.Property)
-	if err != nil {
-		logger.Info(fmt.Sprintf("Error fetching oracle source %s", source.Name))
-		logger.Info(err.Error())
+		body, err := ioutil.ReadAll(resp.Body)
+
+		value, err := readValueFromJson(body, source.Property)
+		if err != nil {
+			logger.Info(fmt.Sprintf("Error fetching oracle source %s", source.Name))
+			logger.Info(err.Error())
+		}
+		return value, nil
 	}
-	return value, nil
+	logger.Info(fmt.Sprintf("Error fetching oracle source %s", source.Name))
+	logger.Info(err.Error())
+	return 0, err
 }
 
 func readValueFromJson(jsonIn []byte, prop string) (float64, error) {

@@ -16,8 +16,8 @@ package app
 
 import (
 	"encoding/json"
-	"github.com/bluzelle/curium/x/tax/ante"
 	"github.com/bluzelle/curium/x/oracle"
+	"github.com/bluzelle/curium/x/tax/ante"
 	"math"
 	"os"
 	"time"
@@ -351,25 +351,27 @@ func NewCRUDApp(
 
 
 func addAnteHandler(app *CRUDApp) {
-	authAnteHandler := auth.NewAnteHandler(
+
+	authAnteHandler := ante.NewAnteHandler(
 		app.accountKeeper,
-		app.supplyKeeper,
 		auth.DefaultSigVerificationGasConsumer,
 	)
 
-	taxAnteHandler := sdk.ChainAnteDecorators(ante.NewTaxDecorator(
-		app.accountKeeper,
-		app.supplyKeeper,
-		app.taxKeeper,
-		app.bankKeeper,
-	))
+
+	//	taxAnteHandler := sdk.ChainAnteDecorators(ante.NewTaxDecorator(
+	//	app.accountKeeper,
+	//	app.supplyKeeper,
+	//	app.taxKeeper,
+	//	app.bankKeeper,
+	//))
 
 	comboAnteHandler := func(ctx sdk.Context, tx sdk.Tx, simulate bool) (newCtx sdk.Context, err error) {
-		ctx2, err := authAnteHandler(ctx, tx, simulate)
-		if err != nil {
-			return ctx2, err
-		}
-		return taxAnteHandler(ctx2, tx, simulate)
+		return authAnteHandler(ctx, tx, simulate)
+		//ctx2, err := authAnteHandler(ctx, tx, simulate)
+		//if err != nil {
+		//	return ctx2, err
+		//}
+		//return taxAnteHandler(ctx2, tx, simulate)
 
 	}
 
