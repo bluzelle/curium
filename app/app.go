@@ -17,11 +17,11 @@ package app
 import (
 	"encoding/json"
 	"github.com/bluzelle/curium/x/oracle"
-	"github.com/bluzelle/curium/x/tax/ante"
 	"math"
 	"os"
 	"time"
 
+	appAnte "github.com/bluzelle/curium/app/ante"
 	bluzellechain "github.com/bluzelle/curium/types"
 	"github.com/bluzelle/curium/x/crud"
 	"github.com/bluzelle/curium/x/tax"
@@ -352,8 +352,9 @@ func NewCRUDApp(
 
 func addAnteHandler(app *CRUDApp) {
 
-	authAnteHandler := ante.NewAnteHandler(
+	authAnteHandler := appAnte.NewAnteHandler(
 		app.accountKeeper,
+		app.supplyKeeper,
 		auth.DefaultSigVerificationGasConsumer,
 	)
 
