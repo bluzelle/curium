@@ -1,4 +1,4 @@
-package ante
+package feeCalculator
 
 import (
 	"fmt"
