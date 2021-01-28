@@ -2,6 +2,7 @@ package ante
 
 import (
 	"fmt"
+	"github.com/bluzelle/curium/app/ante/feeCalculator"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
@@ -39,7 +40,7 @@ func NewDeductFeeDecorator(ak keeper.AccountKeeper, sk types.SupplyKeeper) Deduc
 }
 
 func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
-	gasFeeCoins := CalculateGasFee(tx, ctx)
+	gasFeeCoins := feeCalculator.CalculateGasFee(tx, ctx)
 
 	feeTx, ok := tx.(FeeTx)
 	if !ok {
