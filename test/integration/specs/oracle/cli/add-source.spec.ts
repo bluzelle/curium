@@ -2,9 +2,17 @@ import {deleteSources} from "../source-utils";
 import {getBzClient} from "../bluzelle-client";
 import {BLOCK, blzcli, STANDARD_GAS} from "../../../helpers/blzcli";
 import {expect} from 'chai'
+import {testShouldBeFree} from "../shouldBeFreeHelper";
+import {API} from 'bluzelle'
 
 describe('add-source', () => {
      beforeEach(() => deleteSources(getBzClient()))
+
+    describe('should be free', () => {
+    testShouldBeFree('add-source', (bz: API) =>
+        blzcli('tx oracle add-source my-name my-url my-property --from vuser -y', STANDARD_GAS, BLOCK)
+    );
+    });
 
     it('should add a source', () => {
         return blzcli('tx oracle add-source my-name my-url my-property --from vuser -y', STANDARD_GAS, BLOCK)

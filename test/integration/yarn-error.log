@@ -1,5 +1,5 @@
 Arguments: 
-  /Users/scott/.nvm/versions/node/v14.8.0/bin/node /Users/scott/.yarn/bin/yarn.js add @types/ts-node
+  /Users/scott/.nvm/versions/node/v14.8.0/bin/node /Users/scott/.yarn/bin/yarn.js add @types/promise-passthrough
 
 PATH: 
   /usr/local/go/bin:/Users/scott/go/bin:/opt/local/bin:/opt/local/sbin:/Users/scott/Library/Python/3.7/bin:/Users/scott/.yarn/bin:/Users/scott/.nvm/versions/node/v14.8.0/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/opt/X11/bin:/Applications/Wireshark.app/Contents/MacOS:/Users/scott/Library/Android/sdk/platform-tools/:/usr/local/sbin:/Users/scott/go/bin
@@ -14,7 +14,7 @@ Platform:
   darwin x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@types%2fts-node: Not found
+  Error: https://registry.yarnpkg.com/@types%2fpromise-passthrough: Not found
       at Request.params.callback [as _callback] (/Users/scott/.yarn/lib/cli.js:66988:18)
       at Request.self.callback (/Users/scott/.yarn/lib/cli.js:140749:22)
       at Request.emit (events.js:314:20)
@@ -35,11 +35,17 @@ npm manifest:
     "dependencies": {
       "@types/mocha": "^8.2.0",
       "@types/node": "^14.14.20",
-      "bluzelle": "^2.1.9",
+      "bluzelle": "^2.1.10",
       "chai": "^4.2.0",
+      "lodash": "^4.17.20",
       "mocha": "^8.2.1",
+      "monet": "^0.9.1",
+      "promise-passthrough": "^1.0.5",
       "ts-node": "^9.1.1",
       "typescript": "^4.1.3"
+    },
+    "scripts": {
+      "test": "mocha -r ts-node/register specs/**/*.spec.ts"
     }
   }
 
@@ -237,10 +243,10 @@ Lockfile:
       varuint-bitcoin "^1.0.4"
       wif "^2.0.1"
   
-  bluzelle@^2.1.9:
-    version "2.1.9"
-    resolved "https://registry.yarnpkg.com/bluzelle/-/bluzelle-2.1.9.tgz#95b732f6bd97326916add0ef16ac4366139a5633"
-    integrity sha512-DdBvmIFJTEz3CQ1+Au5vV31B0p/qmitRSW1NU37iSbFs0ScnqwLea3fL5am3rD4YWcp5DoC2B1lOEZdet4UQfw==
+  bluzelle@^2.1.10:
+    version "2.1.10"
+    resolved "https://registry.yarnpkg.com/bluzelle/-/bluzelle-2.1.10.tgz#e9202b94bb1e5696095bad598558d50bb1ffb4f8"
+    integrity sha512-UA+6UbiwjEJWMSqRittd+BcIz4fR9GwidRy5ki1hGRmVMD2PR33dm+k1GhI8brizZXoEoFPmPVnV32yZ8mIPSA==
     dependencies:
       "@cosmostation/cosmosjs" "^0.6.8"
       "@types/lodash" "^4.14.161"
