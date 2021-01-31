@@ -264,8 +264,6 @@ For the following instructions, we will describe the steps to setup a validator 
 
     **TEST NET**:
    
-    Get some tokens to stake your validator from our FAUCET. Note that you can only use the faucet once every FIVE minutes. 
-
     i) Add a new local keypair for the account that will be the operator for the validator on this node:
 
     ```text
@@ -280,35 +278,19 @@ For the following instructions, we will describe the steps to setup a validator 
 
       poem reason &lt;...&gt; palace
 
-    CRITICAL: Note the address and mnemonic phrase values. You will need these on a long term basis.
+    CRITICAL: Note the Bluzelle address (starting with "bluzelle") and mnemonic phrase values. You will need these on a long term basis.
 
-    ii) Add a local key for the "faucet" account. Its mnemonic: 
-    ```
-    endless clog price asthma lottery various innocent base radio discover measure cushion account oval enable shove cost private hood immune unhappy once spell million
-    ```
+    ii) Get some tokens to stake your validator from our FAUCET endpoint. Note that you can only use the faucet once every FIVE minutes. 
+    Goto the following URL, replacing in your account's Bluzelle address:
     
-    You can add it with:
-    ```
-    blzcli keys add faucet --recover
-    ```
+    https://client.sentry.testnet.private.bluzelle.com:1317/mint/<address>
     
-    Once added, you will have a new local address:
-    ```
-    bluzelle135am3hulweusuu7qlgemwejxpf2nsr0423t8sx
-    ```
-    
-    iii) Run the faucet and fund yourself. Use the following command (this example assumes your validator user account is "vuser" from above steps):
-    ```
-    blzcli tx faucet mintfor $(blzcli keys show vuser -a) --node http://sandbox.sentry.testnet.public.bluzelle.com:26657 --gas-prices 0.002ubnt --gas=auto --gas-adjustment=2.0 --chain-id <chain id> --from faucet
-    ```
-    
-    iv) Verify you have tokens. If the above command gives an error that the account it not found, it likely means the faucet has not yet completed (takes a few seconds) or has failed for some reason: 
+    iii) Verify you have tokens. If the above URL gives an error that the account it not found or something else, it likely means the faucet 
+    has not yet completed (takes a few seconds) or has failed for some reason. Use the following command to check your balance: 
     ```
     blzcli q account $(blzcli keys show vuser -a) --node http://sandbox.sentry.testnet.public.bluzelle.com:26657
     ```
     
-    **Please do NOT take tokens from the faucet address. It is there as a convenience for the community. If you really want more tokens, just use the faucet.**
-
 24. ONLY do this step if you are following the **FORK** PATH. 
 
     Export your existing validator's operator wallet from the existing validator machine and import it to the new validator machine. We will assume that the existing wallet account is called `vuser` and will call the new imported wallet account the same name. 
