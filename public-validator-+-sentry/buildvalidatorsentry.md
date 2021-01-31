@@ -228,7 +228,7 @@ For the following instructions, we will describe the steps to setup a validator 
     
     i. If you want extra info for logging or analysis or debugging purposes, you can alternatively add the `--log_level info` flag to `blzd start`. 
     
-    ii. Don't get alarmed if you are following the **FORK** PATH and your validator starts up stating it is not a validator. This is NORMAL. Your validator is currently in jail, so it does not appear in the active validator set. That's all this message means.
+    ii. Don't get alarmed if you are following the **FORK** PATH and your validator starts up stating it is not a validator. This is NORMAL. Your validator is currently in jail, so it does not yet appear in the active validator set. That's all this message means. We will unjail you later.
 
 22. If you are creating a validator, wait till your new node catches up to the rest of the zone. It will be obvious as the node will slow down output and be getting blocks every 4-5 seconds. 
 
