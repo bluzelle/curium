@@ -8,11 +8,11 @@ For the following instructions, we will describe the steps to setup a validator 
 
 1. Refer to previous documents for initializing the server, dev environments, and building the Bluzelle Curium applications. Refer to steps `i-iii` listed below.
 
-   **CRITICAL**: If you are building for the **MAIN NET**, ensure you have built curium using the "**mainnet**" target. ALSO, in step iii below, after going to the "curium working directory", be sure to checkout the "SoftMainNet" branch with `git checkout SoftMainNet`.
+   **CRITICAL**: If you are building for the **MAIN NET**, ensure you have built curium using the "**mainnet**" target. 
    
    OR
 
-   **CRITICAL**: If you are building for the **TEST NET**, ensure you have built curium using the "**testnet**" target. Use this if you are doing a **REHEARSAL**.
+   **CRITICAL**: If you are building for the **TEST NET**, ensure you have built curium using the "**testnet**" target. Use this if you are doing a **FORK**.
    
    These are steps involved in setting up the OS, development environment, and building the nodes that intend to run in one of our Curium zones. Please go through this process for your validator and each of your sentries. **ONLY** follow the three specific links listed below, please. **Do not** click through the "next" button at the bottom of the third link, as you only need to execute the steps on these three links specifically.
 
@@ -22,7 +22,7 @@ For the following instructions, we will describe the steps to setup a validator 
     
     iii. [Build the Curium Project](/setup/build.md)
 
-2. Open incoming TCP port 26656 \(P2P\). Optionally, if you have sufficient firewall and packet filtering security \(to protect against DoS and DDoS attacks\), you may opt to also open up 26657 \(RPC\), and 1317 \(RESTful\). These two ports are only for the purposes of serving clients. If you have no such interest and do not want to deal with the security considerations, keep them closed.
+2. Open incoming TCP port 26656 \(P2P\). Optionally, if you have sufficient firewall and packet filtering security \(to protect against DoS and DDoS attacks\), you may opt to also open up 26657 \(RPC\), and 1317 \(RESTful\). These two ports are only for the purposes of serving clients. If you have no such interest and do not want to deal with the security considerations, keep them closed. There are many DoS and DDoS vectors possible if these ports are open, to open them with caution and only if necessary.
 
    If you are running both a sentry and a validator, follow these directives:
 
@@ -42,13 +42,13 @@ For the following instructions, we will describe the steps to setup a validator 
    
    Run the following command to find the existing chain-id:
    
-   **MAIN NET**:
+   **MAIN NET** (including **FORK** path):
    
    ```text
-   curl --location --request GET 'https://client.sentry.bluzellenet.bluzelle.com:1319/node_info' -s | jq '.node_info.network' | tr -d '"'
+   curl --location --request GET 'https://client.sentry.net.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
    ```
 
-   **TEST NET** (including REHEARSAL path):
+   **TEST NET**:
    
    ```text
    curl --location --request GET 'https://client.sentry.testnet.public.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
@@ -60,7 +60,7 @@ For the following instructions, we will describe the steps to setup a validator 
    blzd init <moniker> --chain-id <chain-id>  2>&1 | jq .node_id
    ```
 
-   Use a unique moniker string that uniquely identifies your validator/sentry. Please start the moniker with "validator" or "sentry", depending on what you are adding, and use camel case. Try to include your own or company name, if applicable. If doing a REHEARSAL, please use the same moniker as for your existing node(s), to ease contest procedures.
+   Use a unique moniker string that uniquely identifies your validator/sentry. Please start the moniker with "validator" or "sentry", depending on what you are adding, and use camel case. Try to include your own or company name, if applicable. If doing a **FORK**, please use the same moniker as for your existing node(s), to ease contest procedures.
    
    Examples:
 
@@ -72,7 +72,7 @@ For the following instructions, we will describe the steps to setup a validator 
    Here is an example of initializing your local daemon config:
 
    ```text
-   blzd init sentryBob --chain-id bluzelleSoftMainNet-1976  2>&1 | jq .node_id
+   blzd init sentryBob --chain-id bluzelleMainNet-1976  2>&1 | jq .node_id
    ```
 
    The JSON output will contain the node\_id. Note this value, as it can be used to identify this node to other nodes in the zone. Keep in mind that for this document’s purposes, your validator and sentry will both only point at each other. Your sentry will also point at other known public sentries (if you know any) and to Bluzelle's own gateway sentries. More on this later in this document.
@@ -93,16 +93,16 @@ For the following instructions, we will describe the steps to setup a validator 
 
    Use the following command, to get a list of all the gateway sentries, including their IP addresses and node id's:
 
-   **MAIN NET**:
+   **MAIN NET** (including **FORK** path):
    
    ```text
-   curl -s https://client.sentry.bluzellenet.bluzelle.com:26657/net_info | jq -C '[.result.peers[] | select(.node_info.moniker | startswith("daemon-sentry-gateway")) | {moniker: .node_info.moniker, id: .node_info.id, ip_address: .remote_ip}] | sort_by(.moniker)'
+   curl -s http://sandbox.sentry.net.bluzelle.com:26657/net_info | jq -C '[.result.peers[] | select(.node_info.moniker | startswith("daemon-sentry-gateway")) | {moniker: .node_info.moniker, id: .node_info.id, ip_address: .remote_ip}] | sort_by(.moniker)'
    ```
 
-   **TEST NET** (including REHEARSAL path):
+   **TEST NET**:
    
    ```text
-   curl -s https://client.sentry.testnet.public.bluzelle.com:26657/net_info | jq -C '[.result.peers[] | select(.node_info.moniker | startswith("daemon-sentry-gateway")) | {moniker: .node_info.moniker, id: .node_info.id, ip_address: .remote_ip}] | sort_by(.moniker)'
+   curl -s http://sandbox.sentry.testnet.public.bluzelle.com:26657/net_info | jq -C '[.result.peers[] | select(.node_info.moniker | startswith("daemon-sentry-gateway")) | {moniker: .node_info.moniker, id: .node_info.id, ip_address: .remote_ip}] | sort_by(.moniker)'
    ```
 
    Note down the sentry IP address and respective id, for each such gateway sentry. You will need this information next.
@@ -180,31 +180,31 @@ For the following instructions, we will describe the steps to setup a validator 
     
 19. Copy into your "~/.blzd/config/" directory the network's existing genesis.json file. You can interactively view it as follows, from our sentry nodes:
 
-    **MAIN NET**:
+    **MAIN NET** (including **FORK** path):
     ```text
-    curl http://client.sentry.bluzellenet.bluzelle.com:26657/genesis | jq -C '.result.genesis' | more -r
+    curl http://sandbox.sentry.net.bluzelle.com:26657/genesis | jq -C '.result.genesis' | more -r
     ```
 
-    **TEST NET** (including REHEARSAL path):
+    **TEST NET**:
     ```text
-    curl https://client.sentry.testnet.public.bluzelle.com:26657/genesis | jq -C '.result.genesis' | more -r
+    curl http://sandbox.sentry.testnet.public.bluzelle.com:26657/genesis | jq -C '.result.genesis' | more -r
     ```
 
     A convenient example to download it to the current folder from our sentry nodes:
 
-    **MAIN NET**:
+    **MAIN NET** (including **FORK** path):
     ```text
-    curl http://client.sentry.bluzellenet.bluzelle.com:26657/genesis | jq '.result.genesis' > genesis.json
+    curl http://sandbox.sentry.net.bluzelle.com:26657/genesis | jq '.result.genesis' > genesis.json
     ```
 
-    **TEST NET** (including REHEARSAL path):
+    **TEST NET**:
     ```text
-    curl https://client.sentry.testnet.public.bluzelle.com:26657/genesis | jq '.result.genesis' > genesis.json
+    curl http://sandbox.sentry.testnet.public.bluzelle.com:26657/genesis | jq '.result.genesis' > genesis.json
     ```
 
     Ensure to copy over and replace the existing genesis.json file in your `~/.blzd/config/` folder with the downloaded one from the existing network.
 
-20. ONLY do this step if you are following the **REHEARSAL** PATH. 
+20. ONLY do this step if you are following the **FORK** PATH. 
 
     Migrate your validator's consensus signing key from the old machine (the validator on the Soft MainNet) to the new machine (the validator on the Final TestNet). 
     
@@ -228,7 +228,7 @@ For the following instructions, we will describe the steps to setup a validator 
     
     i. If you want extra info for logging or analysis or debugging purposes, you can alternatively add the `--log_level info` flag to `blzd start`. 
     
-    ii. Don't get alarmed if you are following the **REHEARSAL** PATH and your validator starts up stating it is not a validator. This is NORMAL. Your validator is currently in jail, so it does not appear in the active validator set. That's all this message means.
+    ii. Don't get alarmed if you are following the **FORK** PATH and your validator starts up stating it is not a validator. This is NORMAL. Your validator is currently in jail, so it does not appear in the active validator set. That's all this message means.
 
 22. If you are creating a validator, wait till your new node catches up to the rest of the zone. It will be obvious as the node will slow down output and be getting blocks every 4-5 seconds. 
 
@@ -238,7 +238,7 @@ For the following instructions, we will describe the steps to setup a validator 
     watch 'blzcli status | jq ".sync_info.catching_up == false"'
     ```
 
-23. If you are following the **REHEARSAL** PATH, SKIP this step. 
+23. If you are following the **FORK** PATH, SKIP this step. 
 
     If you are creating a validator, you will now need to acquire BNT tokens. Following are instructions depending on if you are targeting the MAIN NET or TEST NET.
 
@@ -299,17 +299,17 @@ For the following instructions, we will describe the steps to setup a validator 
     
     iii) Run the faucet and fund yourself. Use the following command (this example assumes your validator user account is "vuser" from above steps):
     ```
-    blzcli tx faucet mintfor $(blzcli keys show vuser -a) --node https://client.sentry.testnet.public.bluzelle.com:26657 --gas-prices 0.002ubnt --gas=auto --gas-adjustment=2.0 --chain-id <chain id> --from faucet
+    blzcli tx faucet mintfor $(blzcli keys show vuser -a) --node http://sandbox.sentry.testnet.public.bluzelle.com:26657 --gas-prices 0.002ubnt --gas=auto --gas-adjustment=2.0 --chain-id <chain id> --from faucet
     ```
     
     iv) Verify you have tokens. If the above command gives an error that the account it not found, it likely means the faucet has not yet completed (takes a few seconds) or has failed for some reason: 
     ```
-    blzcli q account $(blzcli keys show vuser -a) --node https://client.sentry.testnet.public.bluzelle.com:26657
+    blzcli q account $(blzcli keys show vuser -a) --node http://sandbox.sentry.testnet.public.bluzelle.com:26657
     ```
     
     **Please do NOT take tokens from the faucet address. It is there as a convenience for the community. If you really want more tokens, just use the faucet.**
 
-24. ONLY do this step if you are following the **REHEARSAL** PATH. 
+24. ONLY do this step if you are following the **FORK** PATH. 
 
     Export your existing validator's operator wallet from the existing validator machine and import it to the new validator machine. We will assume that the existing wallet account is called `vuser` and will call the new imported wallet account the same name. 
 
@@ -351,7 +351,7 @@ For the following instructions, we will describe the steps to setup a validator 
     blzcli q account $(blzcli keys show vuser -a) | jq ".value.coins"
     ```  
 
-26. If you are following the **REHEARSAL** PATH, SKIP this step. 
+26. If you are following the **FORK** PATH, SKIP this step. 
 
     At this point, the new "vuser" account will also reflect the BNT tokens that were funded to it. We now need to add this node as a validator, as follows:
 
@@ -405,7 +405,7 @@ For the following instructions, we will describe the steps to setup a validator 
       --from vuser
     ```
 
-27. ONLY do this step if you are following the **REHEARSAL** PATH. 
+27. ONLY do this step if you are following the **FORK** PATH. 
     
     You will now unjail your validator to bring it back into the active validator set. Once you do this, the network will expect your validator to be running and it will once again be subject to all the requirements of being a validator, including slashing penalties, etc. Note that once unjailed, you CANNOT "re-jail" your validator. 
 
@@ -452,11 +452,11 @@ For the following instructions, we will describe the steps to setup a validator 
 
 30. Furthermore, within a few minutes, you should also see your validator listed listed at the Bluzelle Explorer:
 
-    **MAIN NET**:
+    **MAIN NET** (including **FORK** path):
 
-    http://bigdipper.bluzellenet.bluzelle.com/validators
+    http://bigdipper.net.bluzelle.com/validators
     
-    **TEST NET** (including REHEARSAL path):
+    **TEST NET**:
 
     https://bigdipper.testnet.public.bluzelle.com/validators
 
