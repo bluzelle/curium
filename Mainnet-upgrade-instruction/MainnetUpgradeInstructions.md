@@ -1,6 +1,6 @@
 # Mainnet Upgrade Instructions: from `Bluzelle Soft MainNet` to `Bluzelle Production Mainnet`
 
-Dear validators, you can now join the Bluzelle Production Mainnet by following [this guide](public-validator-+-sentry/buildvalidatorsentry.md)
+Dear validators, you can now join the Bluzelle Production Mainnet by following [this guide](../public-validator-+-sentry/buildvalidatorsentry.md)
 
 **Please follow the instructions for the REHEARSAL path**. You will effectively be building new Mainnet nodes, but they will inherit the exact same state, accounts, etc as the existing Soft MainNet, as per a snapshot taken at a specific block height. Your new validator will in fact use the exact same consensus private key to sign blocks, as the old validator on the Soft MainNet. The new Mainnet will start all over again from block 0, but its starting state will be the state inherited from the snapshot taken from the Soft MainNet.
 
