@@ -6,6 +6,8 @@
 
 For the following instructions, we will describe the steps to setup a validator or a sentry for an existing Public MainNet or TestNet. Unless otherwise stated, the instruction steps apply to both sentries and validators.
 
+If you are following the **FORK** path, keep in mind that you must ensure your new validator is on the new network, and not the old. If you start your new validator but it attempts to peer with the old network, there is a risk you could get **slashed for double-signing**, that comes with a substantial penalty. Please be extra careful to ensure you setup the new validator carefully, only talking to the new network and only configured for the new network.
+
 1. Refer to previous documents for initializing the server, dev environments, and building the Bluzelle Curium applications. Refer to steps `i-iii` listed below.
 
    **CRITICAL**: If you are building for the **MAIN NET**, ensure you have built curium using the "**mainnet**" target. 
@@ -283,7 +285,7 @@ For the following instructions, we will describe the steps to setup a validator 
     ii) Get some tokens to stake your validator from our FAUCET endpoint. Note that you can only use the faucet once every FIVE minutes. 
     Goto the following URL, replacing in your account's Bluzelle address:
     
-    https://client.sentry.testnet.private.bluzelle.com:1317/mint/<address>
+    https://client.sentry.testnet.public.bluzelle.com:1317/mint/<address>
     
     iii) Verify you have tokens. If the above URL gives an error that the account it not found or something else, it likely means the faucet 
     has not yet completed (takes a few seconds) or has failed for some reason. Use the following command to check your balance: 
