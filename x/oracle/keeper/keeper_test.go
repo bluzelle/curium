@@ -25,9 +25,3 @@ func TestCalculateProofHash(t *testing.T) {
 	})
 }
 
-func TestCreateVoteKey(t *testing.T) {
-	t.Run("it should create a store key from a valcons and source name", func(t *testing.T) {
-		key := keeper.CreateVoteKey("my-valcons", "my-source-name")
-		assert.Equal(t, key, keeper.GetCurrentBatchId() + ">my-source-name>my-valcons")
-	})
-}
