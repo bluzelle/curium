@@ -162,7 +162,13 @@ If you are following the **FORK** path, keep in mind that you must ensure your n
     # Maximum number of outbound peers to connect to, excluding persistent peers
     max_num_outbound_peers = 100
     ```
-
+    
+  If you are deploying a validator and sentry edit the validator's config.toml to set a suitable redial period, anything over 2 hours is advised.
+  
+    ```text
+    # Maximum pause when redialing a persistent peer (if zero, exponential backoff is used)
+    persistent_peers_max_dial_period = "10h"```
+    
 17. Edit ".blzd/config/app.toml" to set the minimum-gas-prices to “0.002ubnt”
 
     ```text
