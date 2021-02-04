@@ -16,7 +16,7 @@ If you are following the **FORK** path, keep in mind that you must ensure your n
 
    **CRITICAL**: If you are building for the **TEST NET**, ensure you have built curium using the "**testnet**" target. Use this if you are doing a **FORK**.
    
-   These are steps involved in setting up the OS, development environment, and building the nodes that intend to run in one of our Curium zones. Please go through this process for your validator and each of your sentries. **ONLY** follow the three specific links listed below, please. **Do not** click through the "next" button at the bottom of the third link, as you only need to execute the steps on these three links specifically.
+   These are steps involved in setting up the OS, development environment, and building the nodes that intend to run in one of our Curium zones. Please go through this process for your validator and each of your sentries. **ONLY** follow the three specific links listed below, please. **DO NOT** click through the "next" button at the bottom of the third link, as you only need to execute the steps on these three links specifically.
 
     i. [OS Setup for Curium](/setup/os.md)
     
