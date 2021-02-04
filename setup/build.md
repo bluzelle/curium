@@ -12,7 +12,8 @@
 
 2. Use make to build and install the blzd and blzcli executables. 
 
-   If you are building for a TestNet or your own private network, use "testnet". If you are building for the Bluzelle MainNet, use "mainnet". 
+   - If you are building for the Bluzelle TestNet or your own private network, use "testnet" as your target. 
+   - If you are building for the Bluzelle MainNet, use "mainnet" as your target. 
 
    ```text
    make <target>
