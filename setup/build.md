@@ -10,10 +10,13 @@
    cd ~/go/src/github.com/bluzelle/curium
    ```
 
-2. Use make to build and install the blzd and blzcli executables
+2. Use make to build and install the blzd and blzcli executables. 
+
+   - If you are building for the Bluzelle TestNet or your own private network, use "testnet" as your target. 
+   - If you are building for the Bluzelle MainNet, use "mainnet" as your target. 
 
    ```text
-   make testnet
+   make <target>
    ```
 
 3. Ensure Bluzelle CLI and daemon work by executing the binaries, you should be able to execute the apps from your home directory:
