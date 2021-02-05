@@ -108,16 +108,18 @@ type MsgOracleVote struct {
 	Value      string
 	Owner      sdk.AccAddress
 	SourceName string
+	Batch      string
 }
 
 
 // NewMsgOracleVote creates a new MsgOracleVote instance
-func NewMsgOracleVote(validatorAddr string, value string, owner sdk.AccAddress, sourceName string) MsgOracleVote {
+func NewMsgOracleVote(validatorAddr string, value string, owner sdk.AccAddress, sourceName string, batch string) MsgOracleVote {
 	return MsgOracleVote{
 		Valcons:    validatorAddr,
 		Value:      value,
 		Owner:      owner,
 		SourceName: sourceName,
+		Batch: batch,
 	}
 }
 

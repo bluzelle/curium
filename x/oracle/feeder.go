@@ -173,6 +173,7 @@ func generateVoteMsg(source SourceAndValue) (types.MsgOracleVote, error) {
 			fmt.Sprintf("%f", source.value),
 			getOracleUserAddress(),
 			source.source.Name,
+			keeper.GetCurrentBatchId(),
 		)
 		err := msg.ValidateBasic()
 		return msg, err
