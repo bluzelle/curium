@@ -24,7 +24,7 @@ func (k Keeper) StoreVote(ctx sdk.Context, msg types.MsgOracleVote) string {
 func (k Keeper) SearchVotes(ctx sdk.Context, prefix string) []types.MsgOracleVote {
 	iterator := sdk.KVStorePrefixIterator(k.GetVoteStore(ctx), []byte(prefix))
 	defer iterator.Close()
-	var votes []types.MsgOracleVote
+	votes  := make([]types.MsgOracleVote, 0)
 
 	for ;iterator.Valid(); iterator.Next() {
 		if ctx.GasMeter().IsPastLimit() {
