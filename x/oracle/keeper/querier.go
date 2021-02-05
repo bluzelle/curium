@@ -5,18 +5,20 @@ import (
 	// this line is used by starport scaffolding # 1
 	abci "github.com/tendermint/tendermint/abci/types"
 
+	"github.com/bluzelle/curium/x/oracle/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/bluzelle/curium/x/oracle/types"
 )
 
 // NewQuerier creates a new querier for oracle clients.
-func NewQuerier(k Keeper) sdk.Querier {
+func NewQuerier(k Keeper, cdc codec.Codec) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, error) {
 		switch path[0] {
 		// this line is used by starport scaffolding # 2
 		case types.QueryListSources:
 			return queryListSources(ctx, k)
+		case types.QuerySearchVotes:
+			return querySearchVotes(ctx, cdc, req, k)
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown oracle query endpoint")
 		}
@@ -27,5 +29,17 @@ func queryListSources(ctx sdk.Context, k Keeper) ([]byte, error) {
 	names, err := k.ListSources(ctx)
 	result, err := codec.MarshalJSONIndent(types.ModuleCdc, names)
 	return result, err
+}
+
+func querySearchVotes(ctx sdk.Context, cdc codec.Codec, req abci.RequestQuery, k Keeper) ([]byte, error) {
+	var query types.SearchVotesQueryData
+	k.cdc.MustUnmarshalJSON(req.Data, &query)
+
+	results := k.SearchVotes(ctx, query.Prefix)
+
+
+
+	x := codec.MustMarshalJSONIndent(k.cdc, results)
+	return x, nil
 }
 

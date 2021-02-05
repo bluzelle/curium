@@ -15,7 +15,7 @@ func TestCreateVoteKey(t *testing.T) {
 
 //func TestSearchVotes(t *testing.T) {
 //	t.Run("it should search for votes based on batchId", func(t *testing.T) {
-//		k := getKeeper()
+//		k := oracle.NewKeeper()
 //		ctx := context.NewCLIContext().
 //		k.StoreVote(ctx, types.MsgOracleVote{
 //			Valcons: "my-valcons",

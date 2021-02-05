@@ -4,7 +4,6 @@ import (
 	"fmt"
 	types "github.com/bluzelle/curium/x/oracle/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/tendermint/go-amino"
 )
 
 func (k Keeper) GetVoteStore(ctx sdk.Context) sdk.KVStore {
@@ -22,19 +21,19 @@ func (k Keeper) StoreVote(ctx sdk.Context, msg types.MsgOracleVote) string {
 	return key
 }
 
-func (k Keeper) SearchVotes(ctx sdk.Context, prefix string) []types.Vote {
+func (k Keeper) SearchVotes(ctx sdk.Context, prefix string) []types.MsgOracleVote {
 	iterator := sdk.KVStorePrefixIterator(k.GetVoteStore(ctx), []byte(prefix))
 	defer iterator.Close()
-	var votes []types.Vote
+	var votes []types.MsgOracleVote
 
 	for ;iterator.Valid(); iterator.Next() {
 		if ctx.GasMeter().IsPastLimit() {
 			break
 		}
 
-		var v types.Vote
-
-		amino.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &v)
+		var v types.MsgOracleVote
+		value := iterator.Value()
+		k.cdc.MustUnmarshalBinaryBare(value, &v)
 		votes = append(votes, v)
 	}
 	return votes

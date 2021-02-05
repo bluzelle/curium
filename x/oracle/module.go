@@ -112,7 +112,7 @@ func (AppModule) QuerierRoute() string {
 
 // NewQuerierHandler returns the oracle module sdk.Querier.
 func (am AppModule) NewQuerierHandler() sdk.Querier {
-	return keeper.NewQuerier(am.keeper)
+	return keeper.NewQuerier(am.keeper, cdc)
 }
 
 // InitGenesis performs genesis initialization for the oracle module. It returns

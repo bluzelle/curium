@@ -20,9 +20,10 @@ type Keeper struct {
 }
 
 // NewKeeper creates a oracle keeper
-func NewKeeper(cdc *codec.Codec, sourceStoreKey sdk.StoreKey, paramspace types.ParamSubspace) Keeper {
+func NewKeeper(cdc *codec.Codec, sourceStoreKey sdk.StoreKey, voteStoreKey sdk.StoreKey, paramspace types.ParamSubspace) Keeper {
 	keeper := Keeper{
 		sourceStoreKey: sourceStoreKey,
+		voteStoreKey: voteStoreKey,
 		cdc:       cdc,
 		//		paramspace: paramspace.WithKeyTable(types.ParamKeyTable()),
 	}

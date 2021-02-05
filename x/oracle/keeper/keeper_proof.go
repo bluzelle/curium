@@ -39,9 +39,6 @@ func (k Keeper) StoreVoteProof(msg types.MsgOracleVoteProof) {
 
 func (k Keeper) IsVoteValid(source string, valcons string, value string) bool {
 	proof := CalculateProofHash(valcons, value)
-	b := GetVoteProofs()[source+valcons].VoteHash
-	fmt.Println(proof, b)
 	return proof == GetVoteProofs()[source+valcons].VoteHash
-
 }
 

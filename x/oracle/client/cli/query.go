@@ -3,7 +3,6 @@ package cli
 import (
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/client/context"
-
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -28,6 +27,7 @@ func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		flags.GetCommands(
 			// this line is used by starport scaffolding # 1
 			GetCmdQListSources(queryRoute, cdc),
+			GetCmdQSearchVotes(queryRoute, cdc),
 		)...,
 	)
 
@@ -53,6 +53,32 @@ func GetCmdQListSources(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			if out == nil {
 				out = make(types.QueryResultListSources, 0)
 			}
+			return cliCtx.PrintOutput(out)
+		},
+	}
+}
+
+func GetCmdQSearchVotes(queryRoute string, cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "search-votes",
+		Short: "Search oracle votes",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			data := types.SearchVotesQueryData{
+				Prefix: args[0],
+			}
+			json := cdc.MustMarshalJSON(data)
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/searchvotes", queryRoute), json)
+
+			if err != nil {
+				fmt.Printf("Error: %s", err)
+				return nil
+			}
+
+			var out []types.MsgOracleVote
+			cdc.MustUnmarshalJSON(res, &out)
+
 			return cliCtx.PrintOutput(out)
 		},
 	}
