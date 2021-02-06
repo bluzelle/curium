@@ -39,7 +39,7 @@ func queryCalculateVoteProofSig(ctx sdk.Context, req abci.RequestQuery, k Keeper
 	var query types.CalculateProofSigQueryRequest
 	k.cdc.MustUnmarshalJSON(req.Data, &query)
 
-	sig := CalculateProofSig(query.Valcons, query.Value)
+	sig := CalculateProofSig(query.Value)
 	x := codec.MustMarshalJSONIndent(k.cdc, sig)
 	return x, nil
 }

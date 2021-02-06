@@ -16,7 +16,7 @@ func GetVoteProofs() map[string]types.MsgOracleVoteProof {
 	return voteProofs
 }
 
-func CalculateProofSig(valcons string, value string) string {
+func CalculateProofSig(value string) string {
 	v := GetPrivateValidator()
 	s, _ := v.Key.PrivKey.Sign([]byte(value))
 	return hex.EncodeToString(s)
@@ -35,14 +35,14 @@ func (k Keeper) StoreVoteProof(msg types.MsgOracleVoteProof) {
 	}
 }
 
-func (k Keeper) IsVoteValid(ctx sdk.Context, source string, valcons string, value string) bool {
+func (k Keeper) IsVoteValid(ctx sdk.Context, source string, valcons string, voteValue string) bool {
 	consAddr, _ := sdk.ConsAddressFromBech32(valcons)
-	val, found := k.stakingKeeper.GetValidatorByConsAddr(ctx, consAddr)
+	validator, found := k.stakingKeeper.GetValidatorByConsAddr(ctx, consAddr)
 
 	if found {
-		sigString := GetVoteProofs()[source+valcons].VoteSig
-		sig, _ := hex.DecodeString(sigString)
-		good := val.ConsPubKey.VerifyBytes([]byte(value), sig)
+		proofSignatureString := GetVoteProofs()[source+valcons].VoteSig
+		proofSignature, _ := hex.DecodeString(proofSignatureString)
+		good := validator.ConsPubKey.VerifyBytes([]byte(voteValue), proofSignature)
 		return good
 	}
 	return false

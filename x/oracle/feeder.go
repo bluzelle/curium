@@ -169,8 +169,8 @@ func generateVoteMsg(source SourceAndValue) (types.MsgOracleVote, error) {
 
 
 func generateVoteProofMsg(source SourceAndValue) (types.MsgOracleVoteProof, error) {
+	proof := keeper.CalculateProofSig(fmt.Sprintf("%f", source.value))
 	valcons := keeper.GetValconsAddress()
-	proof := keeper.CalculateProofSig(valcons, fmt.Sprintf("%f", source.value))
 	msg := types.NewMsgOracleVoteProof(valcons, proof, getOracleUserAddress(), source.source.Name)
 	err := msg.ValidateBasic()
 	if err != nil {

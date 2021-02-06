@@ -46,16 +46,15 @@ export const searchVotes = (bz: API, prefix) => bz.abciQuery("/custom/oracle/sea
 });
 
 export const addVote = (bz: API, vote: any) =>
-    bz.abciQuery('custom/oracle/calculateVoteProofHash', {
-        Valcons: VALCONS,
+    bz.abciQuery('custom/oracle/calculateVoteProofSig', {
         Value: vote.Value
     })
-        .then(hash =>
+        .then(sig =>
             bz.sendMessage({
                 type: 'oracle/MsgOracleVoteProof',
                 value: {
                     ValidatorAddr: VALCONS,
-                    VoteHash: hash.result,
+                    VoteSig: sig.result,
                     Owner: bz.address,
                     SourceName: vote.SourceName
                 }
