@@ -36,8 +36,6 @@ func (k Keeper) ListSources(ctx types.Context) ([]types2.Source, error) {
 		var source types2.Source
 		value := iterator.Value()
 		k.cdc.UnmarshalBinaryLengthPrefixed(value, &source)
-		key := string(iterator.Key())
-		_ = key
 		sources = append(sources, source)
 	}
 	return sources, nil
