@@ -12,7 +12,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/tendermint/tendermint/libs/log"
-	pvm "github.com/tendermint/tendermint/privval"
 	"github.com/tendermint/tendermint/rpc/core"
 	"github.com/tendermint/tendermint/rpc/core/types"
 	rpctypes "github.com/tendermint/tendermint/rpc/jsonrpc/types"
@@ -20,7 +19,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"os/user"
 	"strconv"
 	"sync"
 	"time"
@@ -59,16 +57,6 @@ func waitForCtx() {
 	for ; currCtx == nil; {
 		time.After(time.Second)
 	}
-}
-
-func getPrivateValidator() *pvm.FilePV {
-	usr, _ := user.Current()
-	homedir := usr.HomeDir
-	return pvm.LoadFilePV(homedir+"/.blzd/config/priv_validator_key.json", homedir+"/.blzd/data/priv_validator_state.json")
-}
-
-func getValconsAddress() string {
-	return (sdk.ConsAddress)(getPrivateValidator().GetAddress()).String()
 }
 
 type SourceAndValue struct {
@@ -169,7 +157,7 @@ func sendVoteMsgs(values []SourceAndValue) string {
 
 func generateVoteMsg(source SourceAndValue) (types.MsgOracleVote, error) {
 		msg := types.NewMsgOracleVote(
-			getValconsAddress(),
+			keeper.GetValconsAddress(),
 			fmt.Sprintf("%f", source.value),
 			getOracleUserAddress(),
 			source.source.Name,
@@ -181,7 +169,7 @@ func generateVoteMsg(source SourceAndValue) (types.MsgOracleVote, error) {
 
 
 func generateVoteProofMsg(source SourceAndValue) (types.MsgOracleVoteProof, error) {
-	valcons := getValconsAddress()
+	valcons := keeper.GetValconsAddress()
 	proof := keeper.CalculateProofHash(valcons, fmt.Sprintf("%f", source.value))
 	msg := types.NewMsgOracleVoteProof(valcons, proof, getOracleUserAddress(), source.source.Name)
 	err := msg.ValidateBasic()

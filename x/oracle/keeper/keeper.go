@@ -3,6 +3,8 @@ package keeper
 import (
 	"fmt"
 	"github.com/tendermint/tendermint/libs/log"
+	"github.com/tendermint/tendermint/privval"
+	"os/user"
 	"strings"
 	"time"
 
@@ -49,5 +51,15 @@ func GetCurrentBatchId() string {
 // Logger returns a module-specific logger.
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
+}
+
+func GetPrivateValidator() *privval.FilePV {
+	usr, _ := user.Current()
+	homedir := usr.HomeDir
+	return privval.LoadFilePV(homedir+"/.blzd/config/priv_validator_key.json", homedir+"/.blzd/data/priv_validator_state.json")
+}
+
+func GetValconsAddress() string {
+	return (sdk.ConsAddress)(GetPrivateValidator().GetAddress()).String()
 }
 

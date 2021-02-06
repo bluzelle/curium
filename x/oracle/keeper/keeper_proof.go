@@ -1,9 +1,7 @@
 package keeper
 
 import (
-	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
 	"github.com/bluzelle/curium/x/oracle/types"
 	"time"
 )
@@ -18,10 +16,9 @@ func GetVoteProofs() map[string]types.MsgOracleVoteProof {
 }
 
 func CalculateProofHash(valcons string, value string) string {
-	proofStr := fmt.Sprintf("%s%s", valcons, value)
-	proof := []byte(proofStr)
-	sum := sha256.Sum256(proof)
-	return hex.EncodeToString(sum[:])
+	v := GetPrivateValidator()
+	s, _ := v.Key.PrivKey.Sign([]byte(value))
+	return hex.EncodeToString(s)
 }
 
 func (k Keeper) StoreVoteProof(msg types.MsgOracleVoteProof) {
