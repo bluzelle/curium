@@ -88,7 +88,7 @@ If you are following the **FORK** path, keep in mind that you must ensure your n
    blzcli config output json 
    blzcli config indent true 
    blzcli config trust-node true
-   blzcli config keyring-backend test
+   blzcli config keyring-backend file
    ```
 
 7. Collect the node id's of the gateway sentries. 
@@ -317,6 +317,8 @@ If you are following the **FORK** path, keep in mind that you must ensure your n
     blzcli keys import vuser export.txt
     ```
     
+    Enter a password to encrypt the keys to vuser
+    
     Notes:
     
     i. If you have the mnemonic handy for your original vuser, you can just add the vuser to the new validator with the following:
@@ -326,6 +328,7 @@ If you are following the **FORK** path, keep in mind that you must ensure your n
     ```
     
     Paste in the mnemonic, when asked.
+    Enter a password to encrypt the keys to vuser
     
     ii. If your vuser for your original vuser is secured with a Ledger device, add it to the new validator machine as follows (ensure your Ledger device is plugged in and running the COSMOS app):
     
