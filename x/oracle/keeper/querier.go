@@ -21,8 +21,8 @@ func NewQuerier(k Keeper) sdk.Querier {
 			return querySearchVotes(ctx, req, k)
 		case types.QuerySearchVoteKeys:
 			return querySearchVoteKeys(ctx, req, k)
-		case types.QueryCalculateProofHash:
-			return queryCalculateVoteProofHash(ctx, req, k)
+		case types.QueryCalculateProofSig:
+			return queryCalculateVoteProofSig(ctx, req, k)
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown oracle query endpoint")
 		}
@@ -35,12 +35,12 @@ func queryListSources(ctx sdk.Context, k Keeper) ([]byte, error) {
 	return result, err
 }
 
-func queryCalculateVoteProofHash(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, error){
-	var query types.CalculateProofHashQueryRequest
+func queryCalculateVoteProofSig(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, error){
+	var query types.CalculateProofSigQueryRequest
 	k.cdc.MustUnmarshalJSON(req.Data, &query)
 
-	hash := CalculateProofHash(query.Valcons, query.Value)
-	x := codec.MustMarshalJSONIndent(k.cdc, hash)
+	sig := CalculateProofSig(query.Valcons, query.Value)
+	x := codec.MustMarshalJSONIndent(k.cdc, sig)
 	return x, nil
 }
 

@@ -6,7 +6,7 @@ const (
 	QueryListSources = "listsources"
 	QuerySearchVotes = "searchvotes"
 	QuerySearchVoteKeys = "searchvotekeys"
-	QueryCalculateProofHash = "calculateVoteProofHash"
+	QueryCalculateProofSig = "calculateVoteProofSig"
 )
 
 type QueryResultListSources = []struct{
@@ -21,7 +21,7 @@ type SearchVotesQueryRequest = struct{
 	Prefix string
 }
 
-type CalculateProofHashQueryRequest = struct {
+type CalculateProofSigQueryRequest = struct {
 	Valcons string
 	Value string
 }

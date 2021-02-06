@@ -201,17 +201,17 @@ func (msg MsgOracleVote) ValidateBasic() error {
  ********************************************************************/
 type MsgOracleVoteProof struct {
 	ValidatorAddr string
-	VoteHash string
+	VoteSig string
 	Owner sdk.AccAddress
 	SourceName string
 }
 
 
 // NewMsgOracleVoteProof creates a new MsgOracleVoteProof instance
-func NewMsgOracleVoteProof(validatorAddr string, voteHash string, owner sdk.AccAddress, sourceName string) MsgOracleVoteProof {
+func NewMsgOracleVoteProof(validatorAddr string, voteSig string, owner sdk.AccAddress, sourceName string) MsgOracleVoteProof {
 	return MsgOracleVoteProof{
 		ValidatorAddr: validatorAddr,
-		VoteHash: voteHash,
+		VoteSig: voteSig,
 		Owner: owner,
 		SourceName: sourceName,
 	}
@@ -235,7 +235,7 @@ func (msg MsgOracleVoteProof) ValidateBasic() error {
 	if len(msg.ValidatorAddr) < 1 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "missing validator address")
 	}
-	if len(msg.VoteHash) < 1 {
+	if len(msg.VoteSig) < 1 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "missing validator address")
 	}
 	return nil
