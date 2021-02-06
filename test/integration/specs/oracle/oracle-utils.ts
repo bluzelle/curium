@@ -42,7 +42,7 @@ export const listSources = (bz: API) => bz.abciQuery<any>('custom/oracle/listsou
     .then(s => s.result);
 
 export const searchVotes = (bz: API, prefix) => bz.abciQuery("/custom/oracle/searchvotes", {
-    Prefix: '2021'
+    Prefix: prefix
 });
 
 export const addVote = (bz: API, vote: any) =>
@@ -68,7 +68,7 @@ export const addVote = (bz: API, vote: any) =>
                     ...vote,
                     Valcons: VALCONS,
                     Owner: bz.address,
-                    Batch: "my-batch"
+                    Batch: ""
                 }
             }, {gas_price: 0.002})
         )

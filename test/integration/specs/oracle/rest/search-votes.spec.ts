@@ -22,7 +22,7 @@ describe('search-votes functions', function () {
                 SourceName: 'my-source-2'
             })
         ])
-            .then(() => searchVotes(bz, ''))
+            .then(() => searchVotes(bz, '2021'))
             .then(x => x.result)
             .then(passThrough(votes => expect(votes).to.have.length(2)))
             .then((votes: any[]) => votes.map(v => v.Value))
