@@ -6,10 +6,10 @@ import (
 )
 
 const (
-	ModuleName = types.ModuleName
-	RouterKey  = types.RouterKey
-	StoreKey   = types.StoreKey
-	VoteStoreKey = types.StoreKey
+	ModuleName     = types.ModuleName
+	RouterKey      = types.RouterKey
+	SourceStoreKey = types.SourceStoreKey
+	VoteStoreKey   = types.VoteStoreKey
 )
 
 

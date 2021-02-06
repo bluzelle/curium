@@ -5,7 +5,8 @@ const (
 	ModuleName = "oracle"
 
 	// StoreKey to be used when creating the KVStore
-	StoreKey = ModuleName
+	SourceStoreKey = ModuleName + "Source"
+	VoteStoreKey = ModuleName + "Votes"
 
 	// RouterKey to be used for routing msgs
 	RouterKey = ModuleName

@@ -14,7 +14,7 @@ export const deleteVotes = (bz: API) =>
 export const deleteSources = (bz: API) =>
     listSources(bz)
         .then((sources: any) => sources.length && bz.withTransaction(() =>
-                sources.map(source => deleteSource(bz, source.name))
+                sources.map(source => deleteSource(bz, source.Name))
             )
         )
 

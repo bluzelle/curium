@@ -65,7 +65,7 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 
 // GetQueryCmd returns no root query command for the oracle module.
 func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
-	return cli.GetQueryCmd(types.StoreKey, cdc)
+	return cli.GetQueryCmd(types.RouterKey, cdc)
 }
 
 //____________________________________________________________________________

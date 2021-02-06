@@ -16,7 +16,7 @@ describe('add-source functions', function()  {
             .then(() => listSources(bz))
             .then(sources => {
                 expect(sources).to.have.length(1);
-                expect(sources[0].name).to.equal('my-source');
+                expect(sources[0].Name).to.equal('my-source');
             });
     });
 
@@ -31,10 +31,10 @@ describe('add-source functions', function()  {
 
         await listSources(bz)
             .then(sources => expect(sources).to.deep.equal([{
-                name: "binance-eth-in-usdt",
-                url: "https://api.binance.com/api/v1/ticker/price?symbol=ETHUSDT",
-                property: "price",
-                owner: "bluzelle1ws42h2gjr6q8u5d2teexhrzz9xr9lqrxru50u2"
+                Name: "binance-eth-in-usdt",
+                Url: "https://api.binance.com/api/v1/ticker/price?symbol=ETHUSDT",
+                Property: "price",
+                Owner: "bluzelle1ws42h2gjr6q8u5d2teexhrzz9xr9lqrxru50u2"
             }]));
 
     });
