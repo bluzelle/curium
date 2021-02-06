@@ -19,6 +19,10 @@ func NewQuerier(k Keeper) sdk.Querier {
 			return queryListSources(ctx, k)
 		case types.QuerySearchVotes:
 			return querySearchVotes(ctx, req, k)
+		case types.QuerySearchVoteKeys:
+			return querySearchVoteKeys(ctx, req, k)
+		case types.QueryCalculateProofHash:
+			return queryCalculateVoteProofHash(ctx, req, k)
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown oracle query endpoint")
 		}
@@ -31,13 +35,32 @@ func queryListSources(ctx sdk.Context, k Keeper) ([]byte, error) {
 	return result, err
 }
 
+func queryCalculateVoteProofHash(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, error){
+	var query types.CalculateProofHashQueryRequest
+	k.cdc.MustUnmarshalJSON(req.Data, &query)
+
+	hash := CalculateProofHash(query.Valcons, query.Value)
+	x := codec.MustMarshalJSONIndent(k.cdc, hash)
+	return x, nil
+}
+
 func querySearchVotes(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, error) {
-	var query types.SearchVotesQueryData
+	var query types.SearchVotesQueryRequest
 	k.cdc.MustUnmarshalJSON(req.Data, &query)
 
 	results := k.SearchVotes(ctx, query.Prefix)
 
+	x := codec.MustMarshalJSONIndent(k.cdc, results)
+	return x, nil
+}
 
+
+
+func querySearchVoteKeys(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, error) {
+	var query types.SearchVotesQueryRequest
+	k.cdc.MustUnmarshalJSON(req.Data, &query)
+
+	results := k.SearchVoteKeys(ctx, query.Prefix)
 
 	x := codec.MustMarshalJSONIndent(k.cdc, results)
 	return x, nil

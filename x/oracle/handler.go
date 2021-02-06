@@ -14,7 +14,6 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 		switch msg := msg.(type) {
-	// this line is used by starport scaffolding # 1
 		 case types.MsgOracleVoteProof:
 		 	return handleMsgOracleVoteProof(ctx, k, msg)
 		case types.MsgOracleAddSource:
@@ -23,12 +22,20 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 			return handleMsgOracleDeleteSource(ctx, k, msg)
 		case types.MsgOracleVote:
 			return handleMsgOracleVote(ctx, k, msg)
+		case types.MsgOracleDeleteVotes:
+			return handleMsgOracleDeleteVotes(ctx, k, msg)
 		default:
 			errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName,  msg)
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 		}
 	}
 }
+
+func handleMsgOracleDeleteVotes(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleDeleteVotes) (*sdk.Result, error) {
+	k.DeleteVotes(ctx, msg.Prefix)
+	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
+}
+
 
 func handleMsgOracleDeleteSource(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleDeleteSource) (*sdk.Result, error) {
 	k.DeleteSource(ctx, msg.Name)

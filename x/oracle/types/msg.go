@@ -7,6 +7,45 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
+
+/*********************************************************************
+** MsgOracleDeleteVotes - struct for sending a vote preflight proof
+ ********************************************************************/
+type MsgOracleDeleteVotes struct {
+	Prefix string
+	Owner sdk.AccAddress
+}
+
+// NewMsgOracleDeleteVotes creates a new MsgOracleDeleteVotes instance
+func NewMsgOracleDeleteVotes(prefix string, owner sdk.AccAddress) MsgOracleDeleteVotes {
+	return MsgOracleDeleteVotes{
+		Prefix: prefix,
+		Owner: owner,
+	}
+}
+
+// nolint
+func (msg MsgOracleDeleteVotes) Route() string { return RouterKey }
+func (msg MsgOracleDeleteVotes) Type() string  { return "OracleDeleteVotes" }
+func (msg MsgOracleDeleteVotes) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{sdk.AccAddress(msg.Owner)}
+}
+
+// GetSignBytes gets the bytes for the message signer to sign on
+func (msg MsgOracleDeleteVotes) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
+}
+
+// ValidateBasic validity check for the AnteHandler
+func (msg MsgOracleDeleteVotes) ValidateBasic() error {
+	if len(msg.Prefix) < 1 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "missing prefix")
+	}
+	return nil
+}
+
+
 /*********************************************************************
 ** MsgOracleDeleteSource - struct for sending a vote preflight proof
  ********************************************************************/
@@ -14,7 +53,6 @@ type MsgOracleDeleteSource struct {
 	Name string
 	Owner sdk.AccAddress
 }
-
 
 // NewMsgOracleDeleteSource creates a new MsgOracleDeleteSource instance
 func NewMsgOracleDeleteSource(name string, owner sdk.AccAddress) MsgOracleDeleteSource {
@@ -53,7 +91,7 @@ func (msg MsgOracleDeleteSource) ValidateBasic() error {
 
 
 /*********************************************************************
-** MsgOracleAddSource - struct for sending a vote preflight proof
+** MsgOracleAddSource - struct for adding a source
  ********************************************************************/
 type MsgOracleAddSource struct {
 	Name string

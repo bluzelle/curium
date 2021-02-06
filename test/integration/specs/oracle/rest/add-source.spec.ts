@@ -1,6 +1,6 @@
 import {expect} from 'chai'
 import {API, bluzelle} from "bluzelle";
-import {addSource, deleteSources, listSources} from "../source-utils";
+import {addSource, deleteSources, listSources} from "../oracle-utils";
 import {getBzClient} from "../bluzelle-client";
 import {feedSources} from "../sources";
 

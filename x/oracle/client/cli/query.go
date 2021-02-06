@@ -65,7 +65,7 @@ func GetCmdQSearchVotes(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			data := types.SearchVotesQueryData{
+			data := types.SearchVotesQueryRequest{
 				Prefix: args[0],
 			}
 			json := cdc.MustMarshalJSON(data)

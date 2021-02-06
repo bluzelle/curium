@@ -11,6 +11,7 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgOracleDeleteSource{}, "oracle/MsgOracleDeleteSource", nil)
 	cdc.RegisterConcrete(MsgOracleVoteProof{}, "oracle/MsgOracleVoteProof", nil)
 	cdc.RegisterConcrete(MsgOracleVote{}, "oracle/MsgOracleVote", nil)
+	cdc.RegisterConcrete(MsgOracleDeleteVotes{}, "oracle/MsgOracleDeleteVotes", nil)
 }
 
 // ModuleCdc defines the module codec
