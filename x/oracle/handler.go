@@ -2,11 +2,10 @@ package oracle
 
 import (
 	"fmt"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/bluzelle/curium/x/oracle/keeper"
 	"github.com/bluzelle/curium/x/oracle/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 // NewHandler creates an sdk.Handler for all the oracle type messages
@@ -54,7 +53,7 @@ func handleMsgOracleAddSource(ctx sdk.Context, k keeper.Keeper, msg types.MsgOra
 }
 
 func handleMsgOracleVote(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleVote) (*sdk.Result, error) {
-	voteGood := k.IsVoteValid(msg.SourceName, msg.Valcons, msg.Value)
+	voteGood := k.IsVoteValid(ctx, msg.SourceName, msg.Valcons, msg.Value)
 	if voteGood {
 		k.StoreVote(ctx, msg)
 	}

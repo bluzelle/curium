@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/tendermint/tendermint/libs/log"
 	"github.com/tendermint/tendermint/privval"
 	"os/user"
@@ -17,15 +18,17 @@ import (
 type Keeper struct {
 	sourceStoreKey  sdk.StoreKey
 	voteStoreKey    sdk.StoreKey
+	stakingKeeper   staking.Keeper
 	cdc        *codec.Codec
 	paramspace types.ParamSubspace
 }
 
 // NewKeeper creates a oracle keeper
-func NewKeeper(cdc *codec.Codec, sourceStoreKey sdk.StoreKey, voteStoreKey sdk.StoreKey, paramspace types.ParamSubspace) Keeper {
+func NewKeeper(cdc *codec.Codec, sourceStoreKey sdk.StoreKey, voteStoreKey sdk.StoreKey, stakingKeeper staking.Keeper, paramspace types.ParamSubspace) Keeper {
 	keeper := Keeper{
 		sourceStoreKey: sourceStoreKey,
 		voteStoreKey: voteStoreKey,
+		stakingKeeper: stakingKeeper,
 		cdc:       cdc,
 		//		paramspace: paramspace.WithKeyTable(types.ParamKeyTable()),
 	}

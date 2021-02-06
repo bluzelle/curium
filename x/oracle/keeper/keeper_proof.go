@@ -3,6 +3,7 @@ package keeper
 import (
 	"encoding/hex"
 	"github.com/bluzelle/curium/x/oracle/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"time"
 )
 
@@ -34,8 +35,16 @@ func (k Keeper) StoreVoteProof(msg types.MsgOracleVoteProof) {
 	}
 }
 
-func (k Keeper) IsVoteValid(source string, valcons string, value string) bool {
-	proof := CalculateProofHash(valcons, value)
-	return proof == GetVoteProofs()[source+valcons].VoteHash
+func (k Keeper) IsVoteValid(ctx sdk.Context, source string, valcons string, value string) bool {
+	consAddr, _ := sdk.ConsAddressFromBech32(valcons)
+	val, found := k.stakingKeeper.GetValidatorByConsAddr(ctx, consAddr)
+
+	if found {
+		sigString := GetVoteProofs()[source+valcons].VoteHash
+		sig, _ := hex.DecodeString(sigString)
+		good := val.ConsPubKey.VerifyBytes([]byte(value), sig)
+		return good
+	}
+	return false
 }
 

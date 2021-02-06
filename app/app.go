@@ -272,6 +272,7 @@ func NewCRUDApp(
 		app.cdc,
 		keys[oracle.StoreKey],
 		keys[oracle.VoteStoreKey],
+		app.stakingKeeper,
 		nil,
 		)
 
