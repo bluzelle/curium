@@ -10,6 +10,7 @@ const (
 	RouterKey      = types.RouterKey
 	SourceStoreKey = types.SourceStoreKey
 	VoteStoreKey   = types.VoteStoreKey
+	ValueStoreKey  = types.ValueStoreKey
 )
 
 

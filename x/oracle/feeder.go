@@ -39,10 +39,10 @@ var oracleUser = struct {
 
 
 var currCtx *sdk.Context
-var cdc codec.Codec
+var cdc *codec.Codec
 var accountKeeper auth.AccountKeeper
 
-func StartFeeder(oracleKeeper Keeper, accKeeper auth.AccountKeeper, appCdc codec.Codec) {
+func StartFeeder(oracleKeeper Keeper, accKeeper auth.AccountKeeper, appCdc *codec.Codec) {
 	accountKeeper = accKeeper
 	cdc = appCdc
 	waitForCtx()
@@ -193,7 +193,7 @@ func BroadcastOracleMessages(msgs []sdk.Msg) (*coretypes.ResultBroadcastTxCommit
 
 	// TODO: make sure to dynamically get the chainID
 	txBldr := auth.NewTxBuilder(
-		utils.GetTxEncoder(&cdc), acc.GetAccountNumber(), acc.GetSequence(), 10000000, 2,
+		utils.GetTxEncoder(cdc), acc.GetAccountNumber(), acc.GetSequence(), 10000000, 2,
 		true, "bluzelle", "memo", nil, sdk.NewDecCoins(sdk.NewDecCoin("ubnt", sdk.NewInt(1000000))),
 	).WithKeybase(keybase)
 

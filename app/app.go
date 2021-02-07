@@ -160,7 +160,7 @@ func NewCRUDApp(
 		supply.StoreKey, distr.StoreKey, slashing.StoreKey,
 		gov.StoreKey, params.StoreKey, crud.StoreKey,
 		tax.StoreKey,
-		faucet.StoreKey, crud.LeaseKey, crud.OwnerKey, oracle.SourceStoreKey, oracle.VoteStoreKey)
+		faucet.StoreKey, crud.LeaseKey, crud.OwnerKey, oracle.SourceStoreKey, oracle.VoteStoreKey, oracle.ValueStoreKey)
 
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -272,6 +272,7 @@ func NewCRUDApp(
 		app.cdc,
 		keys[oracle.SourceStoreKey],
 		keys[oracle.VoteStoreKey],
+		keys[oracle.ValueStoreKey],
 		app.stakingKeeper,
 		nil,
 		)
@@ -346,7 +347,7 @@ func NewCRUDApp(
 		tmos.Exit(err.Error())
 	}
 
-	go oracle.StartFeeder(app.oracleKeeper, app.accountKeeper, *cdc)
+	go oracle.StartFeeder(app.oracleKeeper, app.accountKeeper, cdc)
 
 	return app
 }

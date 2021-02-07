@@ -7,6 +7,7 @@ const (
 	// StoreKey to be used when creating the KVStore
 	SourceStoreKey = ModuleName + "Source"
 	VoteStoreKey = ModuleName + "Votes"
+	ValueStoreKey = ModuleName + "Values"
 
 	// RouterKey to be used for routing msgs
 	RouterKey = ModuleName
