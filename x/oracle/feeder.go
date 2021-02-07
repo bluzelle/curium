@@ -42,15 +42,11 @@ var currCtx *sdk.Context
 var cdc *codec.Codec
 var accountKeeper auth.AccountKeeper
 
-func StartFeeder(oracleKeeper Keeper, accKeeper auth.AccountKeeper, appCdc *codec.Codec) {
+func RunFeeder(oracleKeeper Keeper, accKeeper auth.AccountKeeper, appCdc *codec.Codec) {
 	accountKeeper = accKeeper
 	cdc = appCdc
 	waitForCtx()
 	feederTick(oracleKeeper)
-	//c := cron.New()
-	//c.AddFunc("* * * * *", func(){feederTick(crudKeeper)})
-	//c.Start()
-
 }
 
 func waitForCtx() {

@@ -347,7 +347,7 @@ func NewCRUDApp(
 		tmos.Exit(err.Error())
 	}
 
-	go oracle.StartFeeder(app.oracleKeeper, app.accountKeeper, cdc)
+	go oracle.StartOracle(app.oracleKeeper, app.accountKeeper, cdc)
 
 	return app
 }
