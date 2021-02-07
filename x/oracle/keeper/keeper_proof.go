@@ -4,16 +4,20 @@ import (
 	"encoding/hex"
 	"github.com/bluzelle/curium/x/oracle/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"time"
 )
 
 var voteProofs map[string]types.MsgOracleVoteProof
 
-func GetVoteProofs() map[string]types.MsgOracleVoteProof {
-	if voteProofs == nil {
-		voteProofs = make(map[string]types.MsgOracleVoteProof)
-	}
-	return voteProofs
+func (k Keeper) GetProofStore(ctx sdk.Context) sdk.KVStore {
+	return ctx.KVStore(k.proofStoreKey)
+}
+
+func (k Keeper) GetVoteProof(ctx sdk.Context, sourceName string, valcons string) types.MsgOracleVoteProof {
+	var msg types.MsgOracleVoteProof
+		proofStore := k.GetProofStore(ctx)
+		proof := proofStore.Get([]byte(sourceName + valcons))
+		k.cdc.MustUnmarshalBinaryBare(proof, &msg)
+		return msg
 }
 
 func CalculateProofSig(value string) string {
@@ -22,17 +26,9 @@ func CalculateProofSig(value string) string {
 	return hex.EncodeToString(s)
 }
 
-func (k Keeper) StoreVoteProof(msg types.MsgOracleVoteProof) {
-	withinProofWindow := func() bool {
-		return time.Now().Second() <= 20
-	}
-
-	// TODO: This is temp for testing
-	withinProofWindow = func() bool { return true }
-
-	if withinProofWindow() {
-		GetVoteProofs()[msg.SourceName+msg.ValidatorAddr] = msg
-	}
+func (k Keeper) StoreVoteProof(ctx sdk.Context, msg types.MsgOracleVoteProof) {
+	proofStore := k.GetProofStore(ctx)
+	proofStore.Set([]byte(msg.SourceName + msg.ValidatorAddr), k.cdc.MustMarshalBinaryBare(msg))
 }
 
 func (k Keeper) IsVoteValid(ctx sdk.Context, source string, valcons string, voteValue string) bool {
@@ -40,7 +36,7 @@ func (k Keeper) IsVoteValid(ctx sdk.Context, source string, valcons string, vote
 	validator, found := k.stakingKeeper.GetValidatorByConsAddr(ctx, consAddr)
 
 	if found {
-		proofSignatureString := GetVoteProofs()[source+valcons].VoteSig
+		proofSignatureString := k.GetVoteProof(ctx, source, valcons).VoteSig
 		proofSignature, _ := hex.DecodeString(proofSignatureString)
 		good := validator.ConsPubKey.VerifyBytes([]byte(voteValue), proofSignature)
 		return good

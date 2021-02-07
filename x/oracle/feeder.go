@@ -38,36 +38,26 @@ var oracleUser = struct {
 }
 
 
-var currCtx *sdk.Context
-var cdc *codec.Codec
 var accountKeeper auth.AccountKeeper
 
-func RunFeeder(oracleKeeper Keeper, accKeeper auth.AccountKeeper, appCdc *codec.Codec) {
+func RunFeeder(oracleKeeper Keeper, accKeeper auth.AccountKeeper, cdc *codec.Codec) {
 	accountKeeper = accKeeper
-	cdc = appCdc
-	waitForCtx()
-	feederTick(oracleKeeper)
+	getValueAndSendProofAndVote(oracleKeeper, cdc)
 }
 
-func waitForCtx() {
-	for ; currCtx == nil; {
-		time.After(time.Second)
-	}
-}
 
 type SourceAndValue struct {
 	source types.Source
 	value float64
 }
 
-func feederTick(oracleKeeper Keeper) {
+func getValueAndSendProofAndVote(oracleKeeper Keeper, cdc *codec.Codec) {
 	sources, _ := oracleKeeper.ListSources(*currCtx)
 	values := fetchValues(sources)
-	txhash := sendPreflightMsgs(values)
+	sendPreflightMsgs(values, cdc)
 	time.AfterFunc(time.Second * 20, func() {
-		txhash = sendVoteMsgs(values)
+		sendVoteMsgs(values, cdc)
 	})
-	_ = txhash
 }
 
 
@@ -93,8 +83,13 @@ func fetchValues(sources []types.Source) []SourceAndValue {
 
 func fetchSource(source types.Source) (float64, error) {
 	resp, err := http.Get(source.Url)
-	if resp != nil {
-		defer resp.Body.Close()
+	if err == nil {
+		defer func() {
+			err := resp.Body.Close()
+			if err != nil {
+				logger.Info("Error closing http connection", source.Url)
+			}
+		}()
 
 		body, err := ioutil.ReadAll(resp.Body)
 
@@ -131,23 +126,23 @@ func readValueFromJson(jsonIn []byte, prop string) (float64, error) {
 	return out, nil
 }
 
-func sendPreflightMsgs(values []SourceAndValue) string {
+func sendPreflightMsgs(values []SourceAndValue, cdc *codec.Codec) string {
 	var msgs []sdk.Msg
 	for _, value := range values {
 		msg, _ := generateVoteProofMsg(value)
 		msgs = append(msgs, msg)
 	}
-	result, _ := BroadcastOracleMessages(msgs)
+	result, _ := BroadcastOracleMessages(msgs, cdc)
 	return hex.EncodeToString(result.Hash)
 }
 
-func sendVoteMsgs(values []SourceAndValue) string {
+func sendVoteMsgs(values []SourceAndValue, cdc *codec.Codec) string {
 	var msgs []sdk.Msg
 	for _, value := range values {
 		msg, _ := generateVoteMsg(value)
 		msgs = append(msgs, msg)
 	}
-	result, _ := BroadcastOracleMessages(msgs)
+	result, _ := BroadcastOracleMessages(msgs, cdc)
 	return hex.EncodeToString(result.Hash)
 }
 
@@ -176,7 +171,7 @@ func generateVoteProofMsg(source SourceAndValue) (types.MsgOracleVoteProof, erro
 	return msg, nil
 }
 
-func BroadcastOracleMessages(msgs []sdk.Msg) (*coretypes.ResultBroadcastTxCommit, error) {
+func BroadcastOracleMessages(msgs []sdk.Msg, cdc *codec.Codec) (*coretypes.ResultBroadcastTxCommit, error) {
 	keybase := clientKeys.NewInMemoryKeyBase()
 	account, err := keybase.CreateAccount("oracle", oracleUser.mnemonic, cryptoKeys.DefaultBIP39Passphrase, clientKeys.DefaultKeyPass, "44'/118'/0'/0/0", cryptoKeys.Secp256k1)
 

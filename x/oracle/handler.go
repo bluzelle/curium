@@ -64,7 +64,7 @@ func handleMsgOracleVote(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleVo
 }
 
 func handleMsgOracleVoteProof(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleVoteProof) (*sdk.Result, error) {
-	k.StoreVoteProof(msg)
+	k.StoreVoteProof(ctx, msg)
 	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }
 

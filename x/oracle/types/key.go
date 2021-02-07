@@ -6,6 +6,7 @@ const (
 
 	// StoreKey to be used when creating the KVStore
 	SourceStoreKey = ModuleName + "Source"
+	ProofStoreKey = ModuleName + "Proofs"
 	VoteStoreKey = ModuleName + "Votes"
 	ValueStoreKey = ModuleName + "Values"
 

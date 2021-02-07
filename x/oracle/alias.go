@@ -9,6 +9,7 @@ const (
 	ModuleName     = types.ModuleName
 	RouterKey      = types.RouterKey
 	SourceStoreKey = types.SourceStoreKey
+	ProofStoreKey  = types.ProofStoreKey
 	VoteStoreKey   = types.VoteStoreKey
 	ValueStoreKey  = types.ValueStoreKey
 )

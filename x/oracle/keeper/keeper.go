@@ -17,6 +17,7 @@ import (
 // Keeper of the oracle store
 type Keeper struct {
 	sourceStoreKey  sdk.StoreKey
+	proofStoreKey   sdk.StoreKey
 	voteStoreKey    sdk.StoreKey
 	valueStoreKey   sdk.StoreKey
 	stakingKeeper   staking.Keeper
@@ -25,9 +26,10 @@ type Keeper struct {
 }
 
 // NewKeeper creates a oracle keeper
-func NewKeeper(cdc *codec.Codec, sourceStoreKey sdk.StoreKey, voteStoreKey sdk.StoreKey, valueStoreKey sdk.StoreKey, stakingKeeper staking.Keeper, paramspace types.ParamSubspace) Keeper {
+func NewKeeper(cdc *codec.Codec, sourceStoreKey sdk.StoreKey, proofStoreKey sdk.StoreKey, voteStoreKey sdk.StoreKey, valueStoreKey sdk.StoreKey, stakingKeeper staking.Keeper, paramspace types.ParamSubspace) Keeper {
 	keeper := Keeper{
 		sourceStoreKey: sourceStoreKey,
+		proofStoreKey: proofStoreKey,
 		voteStoreKey: voteStoreKey,
 		valueStoreKey: valueStoreKey,
 		stakingKeeper: stakingKeeper,

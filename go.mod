@@ -14,6 +14,7 @@ require (
 	github.com/tendermint/go-amino v0.15.1
 	github.com/tendermint/tendermint v0.33.9
 	github.com/tendermint/tm-db v0.5.1
+	github.com/thoas/go-funk v0.7.0
 	github.com/wenxiang/go-nestedjson v0.0.0-20150910062500-11a6c4340577
 	golang.org/x/net v0.0.0-20200513185701-a91f0712d120 // indirect
 )
