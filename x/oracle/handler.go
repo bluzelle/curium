@@ -55,6 +55,12 @@ func handleMsgOracleAddSource(ctx sdk.Context, k keeper.Keeper, msg types.MsgOra
 func handleMsgOracleVote(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleVote) (*sdk.Result, error) {
 	voteGood := k.IsVoteValid(ctx, msg.SourceName, msg.Valcons, msg.Value)
 
+	validator, found := k.GetValidator(ctx, msg.Valcons)
+	var weight sdk.Dec
+	if found {
+		weight = validator.GetDelegatorShares()
+	}
+
 	if voteGood {
 		vote := types.Vote{
 			SourceName:       msg.SourceName,
@@ -62,10 +68,11 @@ func handleMsgOracleVote(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleVo
 			Value:            msg.Value,
 			Valcons: 		  msg.Valcons,
 			Owner:            msg.Owner,
+			Weight:		      weight,
 		}
 		k.StoreVote(ctx, vote)
 	}
-    fmt.Println("Vote received", voteGood, msg)
+
 
 
 	return &sdk.Result{Events: ctx.EventManager().Events()}, nil

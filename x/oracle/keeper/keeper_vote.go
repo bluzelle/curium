@@ -10,14 +10,17 @@ func (k Keeper) GetVoteStore(ctx sdk.Context) sdk.KVStore {
 	return ctx.KVStore(k.voteStoreKey)
 }
 
-func CreateVoteKey(valcons string, sourceName string) string {
+func CreateVoteKey(sourceName string, valcons string) string {
 	return fmt.Sprintf("%s>%s>%s", GetCurrentBatchId(), sourceName, valcons)
 }
 
 func (k Keeper) StoreVote(ctx sdk.Context, vote types.Vote) string {
-	key := CreateVoteKey(vote.Valcons, vote.SourceName)
+	key := CreateVoteKey(vote.SourceName, vote.Valcons)
 	store := k.GetVoteStore(ctx)
 	store.Set([]byte(key), k.cdc.MustMarshalBinaryBare(vote))
+
+
+
 	return key
 }
 
