@@ -164,10 +164,11 @@ If you are following the **FORK** path, keep in mind that you must ensure your n
     ```
     
   If you are deploying a validator and sentry edit the validator's config.toml to set a suitable redial period, anything over 2 hours is advised.
-  
-    ```text
+    
+    ```
     # Maximum pause when redialing a persistent peer (if zero, exponential backoff is used)
-    persistent_peers_max_dial_period = "10h"```
+    persistent_peers_max_dial_period = 10h
+    ```
     
 17. Edit ".blzd/config/app.toml" to set the minimum-gas-prices to “0.002ubnt”
 
@@ -266,7 +267,8 @@ If you are following the **FORK** path, keep in mind that you must ensure your n
     blzcli keys add vuser --recover
     ```
 
-    Provide the menemonic generated above from the web staking wallet, when asked for the BIP39 mnemonic. 
+    Provide the menemonic generated above from the web staking wallet when asked for the BIP39 mnemonic, when prompted for a keyring password, provide  a password  
+    to encrypt the keyring that holds the private key. You will be asked for this password in the future when signing with your private key. 
         
     v) Convert the desired amount of BLZ tokens to BNT tokens by using the "Convert to BNT" button. Please be patient, as we run the conversion relayer manually for now, and it runs a few times every day. Please join and follow our Telegram and Discord groups to keep updated.
 
@@ -277,8 +279,8 @@ If you are following the **FORK** path, keep in mind that you must ensure your n
     ```text
     blzcli keys add vuser
     ```
-
-    which will produce the following output:
+    Enter a password to encrypt the keyring that will hold the private key.
+    Check for the following output:
 
     * name: vuser type: local address: bluzelle1z&lt;...&gt; pubkey: bluzellepub1&lt;...&gt; mnemonic: "" threshold: 0 pubkeys: \[\]
 
