@@ -60,6 +60,11 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
+func (k Keeper) GetValidator(ctx sdk.Context, valcons string) (validator staking.Validator, found bool){
+	consAddr, _ := sdk.ConsAddressFromBech32(valcons)
+	return k.stakingKeeper.GetValidatorByConsAddr(ctx, consAddr)
+}
+
 func GetPrivateValidator() *privval.FilePV {
 	usr, _ := user.Current()
 	homedir := usr.HomeDir

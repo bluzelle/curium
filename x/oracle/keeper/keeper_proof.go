@@ -32,8 +32,11 @@ func (k Keeper) StoreVoteProof(ctx sdk.Context, msg types.MsgOracleVoteProof) {
 }
 
 func (k Keeper) IsVoteValid(ctx sdk.Context, source string, valcons string, voteValue string) bool {
-	consAddr, _ := sdk.ConsAddressFromBech32(valcons)
-	validator, found := k.stakingKeeper.GetValidatorByConsAddr(ctx, consAddr)
+	validator, found := k.GetValidator(ctx, valcons)
+
+	if validator.Jailed {
+		return false
+	}
 
 	if found {
 		proofSignatureString := k.GetVoteProof(ctx, source, valcons).VoteSig
