@@ -54,8 +54,16 @@ func handleMsgOracleAddSource(ctx sdk.Context, k keeper.Keeper, msg types.MsgOra
 
 func handleMsgOracleVote(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleVote) (*sdk.Result, error) {
 	voteGood := k.IsVoteValid(ctx, msg.SourceName, msg.Valcons, msg.Value)
+
 	if voteGood {
-		k.StoreVote(ctx, msg)
+		vote := types.Vote{
+			SourceName:       msg.SourceName,
+			Batch:            msg.Batch,
+			Value:            msg.Value,
+			Valcons: 		  msg.Valcons,
+			Owner:            msg.Owner,
+		}
+		k.StoreVote(ctx, vote)
 	}
     fmt.Println("Vote received", voteGood, msg)
 

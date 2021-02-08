@@ -10,9 +10,10 @@ type Source struct {
 }
 
 type Vote struct {
-	Name string
+	SourceName string
 	Batch string
-	Value float64
-	ValidatorAddress string
+	Value string
+	Valcons string
+	Owner types.AccAddress
 }
 
