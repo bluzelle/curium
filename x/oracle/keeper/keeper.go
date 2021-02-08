@@ -67,6 +67,10 @@ func GetPrivateValidator() *privval.FilePV {
 }
 
 func GetValconsAddress() string {
-	return (sdk.ConsAddress)(GetPrivateValidator().GetAddress()).String()
+	validator := GetPrivateValidator()
+	address := validator.GetAddress()
+	consAddress := (sdk.ConsAddress)(address)
+	addressString := consAddress.String()
+	return addressString
 }
 

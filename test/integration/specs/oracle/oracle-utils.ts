@@ -1,4 +1,5 @@
 import {API} from "../../../../../blzjs/client";
+import {passThrough} from "promise-passthrough";
 
 const VALCONS = 'bluzellevalcons12345'
 
@@ -45,28 +46,43 @@ export const searchVotes = (bz: API, prefix) => bz.abciQuery("/custom/oracle/sea
     Prefix: prefix
 });
 
-export const addVote = (bz: API, vote: any) =>
+const awaitContext = (prop, fn) => (state) =>
+    fn(state)
+        .then(val => ({...state, [prop]: val}))
+
+const getValcons = (bz: API) => bz.abciQuery('custom/oracle/getValcons', {})
+    .then(x => x.result)
+
+const calculateProofSig = (bz: API, value: string) =>
     bz.abciQuery('custom/oracle/calculateVoteProofSig', {
-        Value: vote.Value
-    })
-        .then(sig =>
-            bz.sendMessage({
-                type: 'oracle/MsgOracleVoteProof',
-                value: {
-                    ValidatorAddr: VALCONS,
-                    VoteSig: sig.result,
-                    Owner: bz.address,
-                    SourceName: vote.SourceName
-                }
-            }, {gas_price: 0.002})
+    Value: value
+})
+        .then(x => x.result)
+
+
+export const addVote = (bz: API, vote: any) =>
+    Promise.resolve({bz: bz, vote: vote})
+        .then(awaitContext('valcons', ctx => getValcons(ctx.bz)))
+        .then(awaitContext('sig', ctx => calculateProofSig(ctx.bz, ctx.vote.Value)))
+        .then(passThrough(ctx =>
+                bz.sendMessage({
+                    type: 'oracle/MsgOracleVoteProof',
+                    value: {
+                        ValidatorAddr: ctx.valcons,
+                        VoteSig: ctx.sig,
+                        Owner: ctx.bz.address,
+                        SourceName: ctx.vote.SourceName
+                    }
+                }, {gas_price: 0.002})
+            )
         )
-        .then((x) =>
-            bz.sendMessage({
+        .then(ctx =>
+            ctx.bz.sendMessage({
                 type: 'oracle/MsgOracleVote',
                 value: {
                     ...vote,
-                    Valcons: VALCONS,
-                    Owner: bz.address,
+                    Valcons: ctx.valcons,
+                    Owner: ctx.bz.address,
                     Batch: ""
                 }
             }, {gas_price: 0.002})

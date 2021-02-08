@@ -23,10 +23,19 @@ func NewQuerier(k Keeper) sdk.Querier {
 			return querySearchVoteKeys(ctx, req, k)
 		case types.QueryCalculateProofSig:
 			return queryCalculateVoteProofSig(ctx, req, k)
+		case types.QueryGetValcons:
+			return queryGetValcons()
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown oracle query endpoint")
 		}
 	}
+}
+
+func queryGetValcons() ([]byte, error) {
+	valcons := GetValconsAddress()
+//	b := []byte(valcons)
+	result, err := codec.MarshalJSONIndent(types.ModuleCdc, valcons)
+	return result, err
 }
 
 func queryListSources(ctx sdk.Context, k Keeper) ([]byte, error) {

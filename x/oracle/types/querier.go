@@ -7,6 +7,7 @@ const (
 	QuerySearchVotes = "searchvotes"
 	QuerySearchVoteKeys = "searchvotekeys"
 	QueryCalculateProofSig = "calculateVoteProofSig"
+	QueryGetValcons = "getValcons"
 )
 
 type QueryResultListSources = []struct{
