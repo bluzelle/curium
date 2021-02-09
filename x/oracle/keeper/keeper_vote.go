@@ -18,9 +18,6 @@ func (k Keeper) StoreVote(ctx sdk.Context, vote types.Vote) string {
 	key := CreateVoteKey(vote.SourceName, vote.Valcons)
 	store := k.GetVoteStore(ctx)
 	store.Set([]byte(key), k.cdc.MustMarshalBinaryBare(vote))
-
-
-
 	return key
 }
 
@@ -48,6 +45,10 @@ func (k Keeper) SearchVoteKeys(ctx sdk.Context, prefix string) []string {
 	}
 	return keys
 
+}
+
+func makeSearchVotePrefix(batch string, sourceName string) string {
+	return fmt.Sprintf("%s>%s", batch, sourceName)
 }
 
 func (k Keeper) SearchVotes(ctx sdk.Context, prefix string) []types.Vote {

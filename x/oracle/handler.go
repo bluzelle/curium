@@ -62,14 +62,16 @@ func handleMsgOracleVote(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleVo
 	}
 
 	if voteGood {
+		value, _ := sdk.NewDecFromStr(msg.Value)
 		vote := types.Vote{
 			SourceName:       msg.SourceName,
 			Batch:            msg.Batch,
-			Value:            msg.Value,
+			Value:            value,
 			Valcons: 		  msg.Valcons,
 			Owner:            msg.Owner,
 			Weight:		      weight,
 		}
+		k.UpdateSourceValue(ctx, vote)
 		k.StoreVote(ctx, vote)
 	}
 

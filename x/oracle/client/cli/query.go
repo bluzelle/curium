@@ -76,7 +76,7 @@ func GetCmdQSearchVotes(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return nil
 			}
 
-			var out []types.MsgOracleVote
+			var out []types.Vote
 			cdc.MustUnmarshalJSON(res, &out)
 
 			return cliCtx.PrintOutput(out)

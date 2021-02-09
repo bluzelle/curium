@@ -25,8 +25,8 @@ describe('search-votes functions', function () {
             .then(() => searchVotes(bz, '2021'))
             .then(x => x.result)
             .then(passThrough(votes => expect(votes).to.have.length(2)))
-            .then((votes: any[]) => votes.map(v => v.Value))
-            .then(votes => expect(votes).to.deep.equal(['20.2', '10.5']))
+            .then((votes: any[]) => votes.map(v => parseFloat(v.Value)))
+            .then(votes => expect(votes).to.deep.equal([20.2, 10.5]))
     });
 
     it('should search vote keys', () => {

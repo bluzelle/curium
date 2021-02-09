@@ -2,7 +2,6 @@ package types
 
 import (
 	"github.com/cosmos/cosmos-sdk/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 
@@ -16,9 +15,15 @@ type Source struct {
 type Vote struct {
 	SourceName string
 	Batch string
-	Value string
+	Value types.Dec
 	Valcons string
 	Owner types.AccAddress
-	Weight sdk.Dec
+	Weight types.Dec
 }
 
+type SourceValue struct {
+	SourceName string
+	Batch string
+	Value types.Dec
+	Owner types.AccAddress
+}
