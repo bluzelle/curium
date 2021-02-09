@@ -8,6 +8,7 @@ const (
 	QuerySearchVoteKeys = "searchvotekeys"
 	QueryCalculateProofSig = "calculateVoteProofSig"
 	QueryGetValcons = "getValcons"
+	QuerySearchSourceValues = "searchSourceValues"
 )
 
 type QueryResultListSources = []struct{
@@ -21,6 +22,11 @@ type QueryResultListSources = []struct{
 type SearchVotesQueryRequest = struct{
 	Prefix string
 }
+
+type SearchSourceValuesQueryRequest = struct{
+	Prefix string
+}
+
 
 type CalculateProofSigQueryRequest = struct {
 	Valcons string

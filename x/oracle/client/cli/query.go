@@ -28,6 +28,7 @@ func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			// this line is used by starport scaffolding # 1
 			GetCmdQListSources(queryRoute, cdc),
 			GetCmdQSearchVotes(queryRoute, cdc),
+			GetCmdQSearchSourceValues(queryRoute, cdc),
 		)...,
 	)
 
@@ -83,3 +84,30 @@ func GetCmdQSearchVotes(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		},
 	}
 }
+
+func GetCmdQSearchSourceValues(queryRoute string, cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "search-source-values",
+		Short: "Search source values",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			data := types.SearchSourceValuesQueryRequest{
+				Prefix: args[0],
+			}
+			json := cdc.MustMarshalJSON(data)
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/searchSourceValues", queryRoute), json)
+
+			if err != nil {
+				fmt.Printf("Error: %s", err)
+				return nil
+			}
+
+			var out []types.SourceValue
+			cdc.MustUnmarshalJSON(res, &out)
+
+			return cliCtx.PrintOutput(out)
+		},
+	}
+}
+

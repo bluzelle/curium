@@ -42,5 +42,24 @@ func calculateAverageFromVotes(votes []types.Vote) sdk.Dec {
 	return sum.Quo(totalWeight)
 }
 
+func (k Keeper) SearchSourceValues(ctx sdk.Context, prefix string) []types.SourceValue {
+	iterator := sdk.KVStorePrefixIterator(k.GetValueStore(ctx), []byte(prefix))
+	defer iterator.Close()
+	values  := make([]types.SourceValue, 0)
+
+	for ;iterator.Valid(); iterator.Next() {
+		if ctx.GasMeter().IsPastLimit() {
+			break
+		}
+
+		var v types.SourceValue
+		value := iterator.Value()
+		k.cdc.MustUnmarshalBinaryBare(value, &v)
+		values = append(values, v)
+	}
+	return values
+}
+
+
 
 
