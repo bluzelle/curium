@@ -47,3 +47,21 @@ func (k Keeper) IsVoteValid(ctx sdk.Context, source string, valcons string, vote
 	return false
 }
 
+func (k Keeper) SearchVoteProofs(ctx sdk.Context, prefix string) []types.MsgOracleVoteProof {
+	iterator := sdk.KVStorePrefixIterator(k.GetProofStore(ctx), []byte(prefix))
+	defer iterator.Close()
+	proofs := make([]types.MsgOracleVoteProof, 0)
+
+	for ;iterator.Valid(); iterator.Next() {
+		if ctx.GasMeter().IsPastLimit() {
+			break
+		}
+
+		var v types.MsgOracleVoteProof
+		value := iterator.Value()
+		k.cdc.MustUnmarshalBinaryBare(value, &v)
+		proofs = append(proofs, v)
+	}
+	return proofs
+}
+

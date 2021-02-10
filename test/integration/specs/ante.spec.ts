@@ -2,7 +2,7 @@ import {BLOCK, blzcli, STANDARD_GAS} from "../helpers/blzcli";
 import {getBzClient} from "./oracle/bluzelle-client";
 import {passThroughAwait} from "promise-passthrough";
 import {expect} from 'chai'
-import {addSource} from "./oracle/oracle-utils";
+import {addOracleSource} from 'oracle-js'
 
 describe('Ante handler tests', () => {
     it("should charge for regular transactions", async () => {
@@ -13,7 +13,11 @@ describe('Ante handler tests', () => {
 
     it('should not charge for oracle transactions', async () => {
         await shouldBeFree(
-            (bz) => addSource(bz, 'my-source', 'my-url', 'my-property', bz.address)
+            (bz) => addOracleSource(bz, {
+                Name: 'my-source',
+                Url: 'my-url',
+                Property: 'my-property'
+            }, {gas_price: 0.002})
         )
     });
 

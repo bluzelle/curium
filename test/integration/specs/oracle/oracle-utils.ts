@@ -1,5 +1,6 @@
 import {API} from "../../../../../blzjs/client";
 import {passThrough} from "promise-passthrough";
+import {listOracleSources} from 'oracle-js'
 
 const VALCONS = 'bluzellevalcons12345'
 
@@ -13,7 +14,7 @@ export const deleteVotes = (bz: API) =>
     }, {gas_price: 0.002})
 
 export const deleteSources = (bz: API) =>
-    listSources(bz)
+    listOracleSources(bz)
         .then((sources: any) => sources.length && bz.withTransaction(() =>
                 sources.map(source => deleteSource(bz, source.Name))
             )
@@ -27,24 +28,6 @@ const deleteSource = (bz: API, name: string): Promise<any> =>
             Owner: bz.address
         }
     }, {gas_price: 0.002});
-
-export const addSource = (bz: API, name: string, url: string, property: string, owner: string) =>
-    bz.sendMessage({
-        type: 'oracle/MsgOracleAddSource',
-        value: {
-            Name: name,
-            Url: url,
-            Property: property,
-            Owner: owner
-        }
-    }, {gas_price: 0.002})
-
-export const listSources = (bz: API) => bz.abciQuery<any>('custom/oracle/listsources')
-    .then(s => s.result);
-
-export const searchVotes = (bz: API, prefix) => bz.abciQuery("/custom/oracle/searchvotes", {
-    Prefix: prefix
-});
 
 const awaitContext = (prop, fn) => (state) =>
     fn(state)

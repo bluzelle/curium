@@ -1,8 +1,9 @@
 import {expect} from 'chai'
 import {API, bluzelle} from "bluzelle";
-import {addSource, deleteSources, listSources} from "../oracle-utils";
+import {deleteSources} from "../oracle-utils";
 import {getBzClient} from "../bluzelle-client";
 import {feedSources} from "../sources";
+import {listOracleSources, addOracleSource} from 'oracle-js'
 
 describe('add-source functions', function()  {
     this.timeout(10000);
@@ -12,8 +13,8 @@ describe('add-source functions', function()  {
     beforeEach(() => deleteSources(bz));
 
     it('should add sources', () => {
-        return addSource(bz, 'my-source', 'my-url', 'my-property', bz.address)
-            .then(() => listSources(bz))
+        return addOracleSource(bz, {Name: 'my-source', Url: 'my-url', Property: 'my-property'}, {gas_price: 0.002})
+            .then(() => listOracleSources(bz))
             .then(sources => {
                 expect(sources).to.have.length(1);
                 expect(sources[0].Name).to.equal('my-source');
@@ -21,15 +22,17 @@ describe('add-source functions', function()  {
     });
 
     it('should be able to add a source', async () => {
-        await addSource(
+        await addOracleSource(
             bz,
-            feedSources[0].name,
-            feedSources[0].url,
-            feedSources[0].property,
-            bz.address
+            {
+                Name: feedSources[0].name,
+                Url: feedSources[0].url,
+                Property: feedSources[0].property,
+            },
+            {gas_price: 0.002}
         )
 
-        await listSources(bz)
+        await listOracleSources(bz)
             .then(sources => expect(sources).to.deep.equal([{
                 Name: "binance-eth-in-usdt",
                 Url: "https://api.binance.com/api/v1/ticker/price?symbol=ETHUSDT",

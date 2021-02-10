@@ -96,7 +96,7 @@ func GetCmdQSearchSourceValues(queryRoute string, cdc *codec.Codec) *cobra.Comma
 				Prefix: args[0],
 			}
 			json := cdc.MustMarshalJSON(data)
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/searchSourceValues", queryRoute), json)
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", queryRoute, types.QuerySearchSourceValues), json)
 
 			if err != nil {
 				fmt.Printf("Error: %s", err)

@@ -1,8 +1,9 @@
 import {API} from "../../../../../../blzjs/client";
 import {getBzClient} from "../bluzelle-client";
-import {addVote, deleteVotes, searchVotes} from "../oracle-utils";
+import {addVote, deleteVotes} from "../oracle-utils";
 import {expect} from "chai";
 import {passThrough} from "promise-passthrough";
+import {searchOracleVotes} from 'oracle-js'
 
 describe('search-votes functions', function () {
     this.timeout(60000);
@@ -22,8 +23,7 @@ describe('search-votes functions', function () {
                 SourceName: 'my-source-2'
             })
         ])
-            .then(() => searchVotes(bz, '2021'))
-            .then(x => x.result)
+            .then(() => searchOracleVotes(bz, {Prefix: '2021'}))
             .then(passThrough(votes => expect(votes).to.have.length(2)))
             .then((votes: any[]) => votes.map(v => parseFloat(v.Value)))
             .then(votes => expect(votes).to.deep.equal([20.2, 10.5]))

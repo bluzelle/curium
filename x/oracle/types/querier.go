@@ -5,6 +5,7 @@ import "github.com/cosmos/cosmos-sdk/types"
 const (
 	QueryListSources = "listsources"
 	QuerySearchVotes = "searchvotes"
+	QuerySearchVoteProofs = "searchProofs"
 	QuerySearchVoteKeys = "searchvotekeys"
 	QueryCalculateProofSig = "calculateVoteProofSig"
 	QueryGetValcons = "getValcons"
@@ -20,6 +21,10 @@ type QueryResultListSources = []struct{
 
 
 type SearchVotesQueryRequest = struct{
+	Prefix string
+}
+
+type SearchVoteProofsQueryRequest = struct {
 	Prefix string
 }
 

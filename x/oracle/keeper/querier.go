@@ -19,6 +19,8 @@ func NewQuerier(k Keeper) sdk.Querier {
 			return queryListSources(ctx, k)
 		case types.QuerySearchVotes:
 			return querySearchVotes(ctx, req, k)
+		case types.QuerySearchVoteProofs:
+			return querySearchVoteProofs(ctx, req, k)
 		case types.QuerySearchVoteKeys:
 			return querySearchVoteKeys(ctx, req, k)
 		case types.QueryCalculateProofSig:
@@ -85,4 +87,15 @@ func querySearchVoteKeys(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]by
 	x := codec.MustMarshalJSONIndent(k.cdc, results)
 	return x, nil
 }
+
+func querySearchVoteProofs(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, error) {
+	var query types.SearchVoteProofsQueryRequest
+	k.cdc.MustUnmarshalJSON(req.Data, &query)
+
+	results := k.SearchVoteProofs(ctx, query.Prefix)
+
+	x := codec.MustMarshalJSONIndent(k.cdc, results)
+	return x, nil
+}
+
 
