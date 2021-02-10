@@ -8,13 +8,13 @@ require (
 	github.com/golang/mock v1.4.0
 	github.com/gorilla/mux v1.7.4
 	github.com/magiconair/properties v1.8.1
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/viper v1.6.3
 	github.com/stretchr/testify v1.6.1
 	github.com/tendermint/go-amino v0.15.1
 	github.com/tendermint/tendermint v0.33.9
 	github.com/tendermint/tm-db v0.5.1
-	github.com/thoas/go-funk v0.7.0
 	github.com/wenxiang/go-nestedjson v0.0.0-20150910062500-11a6c4340577
 	golang.org/x/net v0.0.0-20200513185701-a91f0712d120 // indirect
 )

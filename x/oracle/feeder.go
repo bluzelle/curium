@@ -11,6 +11,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
+	"github.com/robfig/cron/v3"
 	"github.com/tendermint/tendermint/libs/log"
 	"github.com/tendermint/tendermint/rpc/core"
 	"github.com/tendermint/tendermint/rpc/core/types"
@@ -42,7 +43,11 @@ var accountKeeper auth.AccountKeeper
 
 func RunFeeder(oracleKeeper Keeper, accKeeper auth.AccountKeeper, cdc *codec.Codec) {
 	accountKeeper = accKeeper
-	getValueAndSendProofAndVote(oracleKeeper, cdc)
+	c := cron.New()
+	c.AddFunc("* * * * *", func() {
+		GetValueAndSendProofAndVote(oracleKeeper, cdc)
+	})
+	c.Start()
 }
 
 
@@ -51,7 +56,7 @@ type SourceAndValue struct {
 	value float64
 }
 
-func getValueAndSendProofAndVote(oracleKeeper Keeper, cdc *codec.Codec) {
+func GetValueAndSendProofAndVote(oracleKeeper Keeper, cdc *codec.Codec) {
 	sources, _ := oracleKeeper.ListSources(*currCtx)
 	values := fetchValues(sources)
 	sendPreflightMsgs(values, cdc)
