@@ -182,10 +182,10 @@ func BroadcastOracleMessages(msgs []sdk.Msg, cdc *codec.Codec) (*coretypes.Resul
 	address := account.GetAddress()
 	acc := accountKeeper.GetAccount(*currCtx, address)
 
-	// TODO: make sure to dynamically get the chainID
+
 	txBldr := auth.NewTxBuilder(
 		utils.GetTxEncoder(cdc), acc.GetAccountNumber(), acc.GetSequence(), 10000000, 2,
-		true, "bluzelle", "memo", nil, sdk.NewDecCoins(sdk.NewDecCoin("ubnt", sdk.NewInt(1000000))),
+		false, currCtx.ChainID(), "memo", nil, sdk.NewDecCoins(sdk.NewDecCoin("ubnt", sdk.NewInt(1000000))),
 	).WithKeybase(keybase)
 
 	signedMsg, err := txBldr.BuildAndSign("oracle", clientKeys.DefaultKeyPass, msgs)

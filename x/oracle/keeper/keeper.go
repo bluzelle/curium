@@ -5,6 +5,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/tendermint/tendermint/libs/log"
 	"github.com/tendermint/tendermint/privval"
+	"os"
 	"os/user"
 	"strings"
 	"time"
@@ -63,6 +64,13 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 func (k Keeper) GetValidator(ctx sdk.Context, valcons string) (validator staking.Validator, found bool){
 	consAddr, _ := sdk.ConsAddressFromBech32(valcons)
 	return k.stakingKeeper.GetValidatorByConsAddr(ctx, consAddr)
+}
+
+func IsValidator() bool {
+	usr, _ := user.Current()
+	homedir := usr.HomeDir
+	_, err := os.Stat(homedir+"/.blzd/config/priv_validator_key.json")
+	return err == nil
 }
 
 func GetPrivateValidator() *privval.FilePV {
