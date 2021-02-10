@@ -53,7 +53,7 @@ func handleMsgOracleAddSource(ctx sdk.Context, k keeper.Keeper, msg types.MsgOra
 }
 
 func handleMsgOracleVote(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleVote) (*sdk.Result, error) {
-	voteGood := k.IsVoteValid(ctx, msg.SourceName, msg.Valcons, msg.Value)
+	voteGood := k.IsVoteValid(ctx, msg)
 
 	validator, found := k.GetValidator(ctx, msg.Valcons)
 	var weight sdk.Dec

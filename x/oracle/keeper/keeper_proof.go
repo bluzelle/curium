@@ -31,17 +31,17 @@ func (k Keeper) StoreVoteProof(ctx sdk.Context, msg types.MsgOracleVoteProof) {
 	proofStore.Set([]byte(msg.SourceName + msg.ValidatorAddr), k.cdc.MustMarshalBinaryBare(msg))
 }
 
-func (k Keeper) IsVoteValid(ctx sdk.Context, source string, valcons string, voteValue string) bool {
-	validator, found := k.GetValidator(ctx, valcons)
+func (k Keeper) IsVoteValid(ctx sdk.Context, msg types.MsgOracleVote) bool {
+	validator, found := k.GetValidator(ctx, msg.Valcons)
 
 	if validator.Jailed {
 		return false
 	}
 
 	if found {
-		proofSignatureString := k.GetVoteProof(ctx, source, valcons).VoteSig
+		proofSignatureString := k.GetVoteProof(ctx, msg.SourceName, msg.Valcons).VoteSig
 		proofSignature, _ := hex.DecodeString(proofSignatureString)
-		good := validator.ConsPubKey.VerifyBytes([]byte(voteValue), proofSignature)
+		good := validator.ConsPubKey.VerifyBytes([]byte(msg.Value), proofSignature)
 		return good
 	}
 	return false
