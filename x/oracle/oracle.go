@@ -1,7 +1,6 @@
 package oracle
 
 import (
-	"github.com/bluzelle/curium/x/oracle/keeper"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
@@ -16,15 +15,14 @@ func StartOracle(oracleKeeper Keeper, accountKeeper auth.AccountKeeper, cdc *cod
 }
 
 func Run(oracleKeeper Keeper, accountKeeper auth.AccountKeeper, cdc *codec.Codec) {
-	if keeper.IsValidator() {
+	if oracleKeeper.IsValidator(*currCtx) {
 		RunFeeder(oracleKeeper, accountKeeper, cdc)
 	}
+
 }
 
 func waitForCtx() {
-	for ; currCtx == nil; {
+	for currCtx == nil {
 		time.After(time.Second)
 	}
 }
-
-

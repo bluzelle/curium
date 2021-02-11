@@ -2,11 +2,11 @@ package keeper
 
 import (
 	"fmt"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/x/staking"
+	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/libs/log"
 	"github.com/tendermint/tendermint/privval"
-	"os"
-	"os/user"
 	"strings"
 	"time"
 
@@ -17,24 +17,24 @@ import (
 
 // Keeper of the oracle store
 type Keeper struct {
-	sourceStoreKey  sdk.StoreKey
-	proofStoreKey   sdk.StoreKey
-	voteStoreKey    sdk.StoreKey
-	valueStoreKey   sdk.StoreKey
-	stakingKeeper   staking.Keeper
-	cdc        *codec.Codec
-	paramspace types.ParamSubspace
+	sourceStoreKey sdk.StoreKey
+	proofStoreKey  sdk.StoreKey
+	voteStoreKey   sdk.StoreKey
+	valueStoreKey  sdk.StoreKey
+	stakingKeeper  staking.Keeper
+	cdc            *codec.Codec
+	paramspace     types.ParamSubspace
 }
 
 // NewKeeper creates a oracle keeper
 func NewKeeper(cdc *codec.Codec, sourceStoreKey sdk.StoreKey, proofStoreKey sdk.StoreKey, voteStoreKey sdk.StoreKey, valueStoreKey sdk.StoreKey, stakingKeeper staking.Keeper, paramspace types.ParamSubspace) Keeper {
 	keeper := Keeper{
 		sourceStoreKey: sourceStoreKey,
-		proofStoreKey: proofStoreKey,
-		voteStoreKey: voteStoreKey,
-		valueStoreKey: valueStoreKey,
-		stakingKeeper: stakingKeeper,
-		cdc:       cdc,
+		proofStoreKey:  proofStoreKey,
+		voteStoreKey:   voteStoreKey,
+		valueStoreKey:  valueStoreKey,
+		stakingKeeper:  stakingKeeper,
+		cdc:            cdc,
 		//		paramspace: paramspace.WithKeyTable(types.ParamKeyTable()),
 	}
 	return keeper
@@ -61,22 +61,20 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
-func (k Keeper) GetValidator(ctx sdk.Context, valcons string) (validator staking.Validator, found bool){
+func (k Keeper) GetValidator(ctx sdk.Context, valcons string) (validator staking.Validator, found bool) {
 	consAddr, _ := sdk.ConsAddressFromBech32(valcons)
 	return k.stakingKeeper.GetValidatorByConsAddr(ctx, consAddr)
 }
 
-func IsValidator() bool {
-	usr, _ := user.Current()
-	homedir := usr.HomeDir
-	_, err := os.Stat(homedir+"/.blzd/config/priv_validator_key.json")
-	return err == nil
+func (k Keeper) IsValidator(ctx sdk.Context) bool {
+	valcons := GetValconsAddress()
+	validator, _ := k.GetValidator(ctx, valcons)
+	return !validator.DelegatorShares.IsNil() && !validator.DelegatorShares.IsZero()
 }
 
 func GetPrivateValidator() *privval.FilePV {
-	usr, _ := user.Current()
-	homedir := usr.HomeDir
-	return privval.LoadFilePV(homedir+"/.blzd/config/priv_validator_key.json", homedir+"/.blzd/data/priv_validator_state.json")
+	homedir := viper.GetString(flags.FlagHome)
+	return privval.LoadFilePV(homedir+"/config/priv_validator_key.json", homedir+"/data/priv_validator_state.json")
 }
 
 func GetValconsAddress() string {
@@ -86,4 +84,3 @@ func GetValconsAddress() string {
 	addressString := consAddress.String()
 	return addressString
 }
-

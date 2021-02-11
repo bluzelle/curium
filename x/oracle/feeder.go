@@ -38,7 +38,6 @@ var oracleUser = struct {
 	mnemonic: "bone soup garage safe hotel remove rebuild tumble usage marriage skin opinion banana scene focus obtain very soap vocal print symptom winter update hundred",
 }
 
-
 var accountKeeper auth.AccountKeeper
 
 func RunFeeder(oracleKeeper Keeper, accKeeper auth.AccountKeeper, cdc *codec.Codec) {
@@ -50,21 +49,21 @@ func RunFeeder(oracleKeeper Keeper, accKeeper auth.AccountKeeper, cdc *codec.Cod
 	c.Start()
 }
 
-
 type SourceAndValue struct {
 	source types.Source
-	value float64
+	value  float64
 }
 
 func GetValueAndSendProofAndVote(oracleKeeper Keeper, cdc *codec.Codec) {
 	sources, _ := oracleKeeper.ListSources(*currCtx)
-	values := fetchValues(sources)
-	sendPreflightMsgs(values, cdc)
-	time.AfterFunc(time.Second * 20, func() {
-		sendVoteMsgs(values, cdc)
-	})
+	if len(sources) > 0 {
+		values := fetchValues(sources)
+		sendPreflightMsgs(values, cdc)
+		time.AfterFunc(time.Second*20, func() {
+			sendVoteMsgs(values, cdc)
+		})
+	}
 }
-
 
 func fetchValues(sources []types.Source) []SourceAndValue {
 	var results []SourceAndValue
@@ -76,7 +75,7 @@ func fetchValues(sources []types.Source) []SourceAndValue {
 			if err == nil {
 				results = append(results, SourceAndValue{
 					source: source,
-					 value: value,
+					value:  value,
 				})
 			}
 			wg.Done()
@@ -152,17 +151,16 @@ func sendVoteMsgs(values []SourceAndValue, cdc *codec.Codec) string {
 }
 
 func generateVoteMsg(source SourceAndValue) (types.MsgOracleVote, error) {
-		msg := types.NewMsgOracleVote(
-			keeper.GetValconsAddress(),
-			fmt.Sprintf("%f", source.value),
-			getOracleUserAddress(),
-			source.source.Name,
-			keeper.GetCurrentBatchId(),
-		)
-		err := msg.ValidateBasic()
-		return msg, err
+	msg := types.NewMsgOracleVote(
+		keeper.GetValconsAddress(),
+		fmt.Sprintf("%f", source.value),
+		getOracleUserAddress(),
+		source.source.Name,
+		keeper.GetCurrentBatchId(),
+	)
+	err := msg.ValidateBasic()
+	return msg, err
 }
-
 
 func generateVoteProofMsg(source SourceAndValue) (types.MsgOracleVoteProof, error) {
 	proof := keeper.CalculateProofSig(fmt.Sprintf("%f", source.value))
@@ -187,10 +185,16 @@ func BroadcastOracleMessages(msgs []sdk.Msg, cdc *codec.Codec) (*coretypes.Resul
 	address := account.GetAddress()
 	acc := accountKeeper.GetAccount(*currCtx, address)
 
-
 	txBldr := auth.NewTxBuilder(
-		utils.GetTxEncoder(cdc), acc.GetAccountNumber(), acc.GetSequence(), 10000000, 2,
-		false, currCtx.ChainID(), "memo", nil, sdk.NewDecCoins(sdk.NewDecCoin("ubnt", sdk.NewInt(1000000))),
+		utils.GetTxEncoder(cdc),
+		acc.GetAccountNumber(),
+		acc.GetSequence(),
+		10000000,
+		2,
+		false,
+		currCtx.ChainID(),
+		"memo", nil,
+		sdk.NewDecCoins(sdk.NewDecCoin("ubnt", sdk.NewInt(100000))),
 	).WithKeybase(keybase)
 
 	signedMsg, err := txBldr.BuildAndSign("oracle", clientKeys.DefaultKeyPass, msgs)
