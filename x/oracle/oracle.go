@@ -1,9 +1,12 @@
 package oracle
 
 import (
+	"errors"
+	"github.com/bluzelle/curium/x/oracle/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/spf13/viper"
 	"time"
 )
 
@@ -25,4 +28,17 @@ func waitForCtx() {
 	for currCtx == nil {
 		time.After(time.Second)
 	}
+}
+
+
+func readOracleConfig() (types.OracleConfig, error) {
+	address, err := sdk.AccAddressFromBech32(viper.GetString("oracle-user-address"))
+	if err != nil {
+		errors.New("unable to read oracle address from app.toml")
+	}
+
+	return types.OracleConfig{
+		UserAddress:  address,
+		UserMnemonic: viper.GetString("oracle-user-mnemonic"),
+	}, nil
 }

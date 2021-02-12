@@ -25,18 +25,7 @@ import (
 	"time"
 )
 
-func getOracleUserAddress() sdk.AccAddress {
-	address, _ := sdk.AccAddressFromBech32("bluzelle1ws42h2gjr6q8u5d2teexhrzz9xr9lqrxru50u2")
-	return address
-}
-
 var logger = log.NewTMLogger(log.NewSyncWriter(os.Stdout))
-
-var oracleUser = struct {
-	mnemonic string
-}{
-	mnemonic: "bone soup garage safe hotel remove rebuild tumble usage marriage skin opinion banana scene focus obtain very soap vocal print symptom winter update hundred",
-}
 
 var accountKeeper auth.AccountKeeper
 
@@ -133,7 +122,7 @@ func readValueFromJson(jsonIn []byte, prop string) (float64, error) {
 func sendPreflightMsgs(values []SourceAndValue, cdc *codec.Codec) string {
 	var msgs []sdk.Msg
 	for _, value := range values {
-		msg, _ := generateVoteProofMsg(value)
+		msg, _ := generateVoteProofMsg(cdc, value)
 		msgs = append(msgs, msg)
 	}
 	result, _ := BroadcastOracleMessages(msgs, cdc)
@@ -143,30 +132,39 @@ func sendPreflightMsgs(values []SourceAndValue, cdc *codec.Codec) string {
 func sendVoteMsgs(values []SourceAndValue, cdc *codec.Codec) string {
 	var msgs []sdk.Msg
 	for _, value := range values {
-		msg, _ := generateVoteMsg(value)
+		msg, _ := generateVoteMsg(cdc, value)
 		msgs = append(msgs, msg)
 	}
 	result, _ := BroadcastOracleMessages(msgs, cdc)
 	return hex.EncodeToString(result.Hash)
 }
 
-func generateVoteMsg(source SourceAndValue) (types.MsgOracleVote, error) {
+func generateVoteMsg(cdc *codec.Codec, source SourceAndValue) (types.MsgOracleVote, error) {
+	config, err := readOracleConfig()
+	if err != nil {
+		return types.MsgOracleVote{}, err
+	}
 	msg := types.NewMsgOracleVote(
 		keeper.GetValconsAddress(),
 		fmt.Sprintf("%f", source.value),
-		getOracleUserAddress(),
+		config.UserAddress,
 		source.source.Name,
 		keeper.GetCurrentBatchId(),
 	)
-	err := msg.ValidateBasic()
+	err = msg.ValidateBasic()
 	return msg, err
 }
 
-func generateVoteProofMsg(source SourceAndValue) (types.MsgOracleVoteProof, error) {
+func generateVoteProofMsg(cdc *codec.Codec, source SourceAndValue) (types.MsgOracleVoteProof, error) {
+	config, err := readOracleConfig()
+	if err != nil {
+		return types.MsgOracleVoteProof{}, err
+	}
+
 	proof := keeper.CalculateProofSig(fmt.Sprintf("%f", source.value))
 	valcons := keeper.GetValconsAddress()
-	msg := types.NewMsgOracleVoteProof(valcons, proof, getOracleUserAddress(), source.source.Name)
-	err := msg.ValidateBasic()
+	msg := types.NewMsgOracleVoteProof(valcons, proof, config.UserAddress, source.source.Name)
+	err = msg.ValidateBasic()
 	if err != nil {
 		logger.Info("Error generating vote proof message", source.source.Name)
 		return types.MsgOracleVoteProof{}, err
@@ -175,8 +173,13 @@ func generateVoteProofMsg(source SourceAndValue) (types.MsgOracleVoteProof, erro
 }
 
 func BroadcastOracleMessages(msgs []sdk.Msg, cdc *codec.Codec) (*coretypes.ResultBroadcastTxCommit, error) {
+	config, err := readOracleConfig()
+	if err != nil {
+		return nil, err
+	}
+
 	keybase := clientKeys.NewInMemoryKeyBase()
-	account, err := keybase.CreateAccount("oracle", oracleUser.mnemonic, cryptoKeys.DefaultBIP39Passphrase, clientKeys.DefaultKeyPass, "44'/118'/0'/0/0", cryptoKeys.Secp256k1)
+	account, err := keybase.CreateAccount("oracle", config.UserMnemonic, cryptoKeys.DefaultBIP39Passphrase, clientKeys.DefaultKeyPass, "44'/118'/0'/0/0", cryptoKeys.Secp256k1)
 
 	if err != nil {
 		logger.Info("Error creating keybase account", err)

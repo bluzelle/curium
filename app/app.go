@@ -147,6 +147,8 @@ func NewCRUDApp(
 	baseAppOptions ...func(*bam.BaseApp),
 ) *CRUDApp {
 
+
+
 	// First define the top level codec that will be shared by the different modules
 	cdc := MakeCodec()
 

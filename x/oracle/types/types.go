@@ -27,3 +27,8 @@ type SourceValue struct {
 	Value types.Dec
 	Owner types.AccAddress
 }
+
+type OracleConfig struct {
+	UserAddress types.AccAddress
+	UserMnemonic string
+}
