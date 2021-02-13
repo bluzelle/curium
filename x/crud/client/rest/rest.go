@@ -22,10 +22,8 @@ import (
 
 // RegisterRoutes - Central function to define routes that get registered by the main application
 func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, storeName string) {
-//	r.HandleFunc(fmt.Sprintf("/%s/count", storeName), BlzCountHandler(cliCtx)).Methods("POST")
 	r.HandleFunc("/abci-query", AbciQueryHandler(cliCtx)).Methods("POST")
 	r.HandleFunc("/account-txs/{address}/{start}", AccountTxsHandler(cliCtx)).Methods("GET")
-//	r.HandleFunc(fmt.Sprintf("/%s/count", storeName), BlzCountHandler(cliCtx)).Methods("POST")
 	r.HandleFunc(fmt.Sprintf("/%s/count/{UUID}", storeName), BlzQCountHandler(cliCtx, storeName)).Methods("GET")
 	r.HandleFunc(fmt.Sprintf("/%s/getlease/{UUID}/{key}", storeName), BlzQGetLeaseHandler(cliCtx, storeName)).Methods("GET")
 	r.HandleFunc(fmt.Sprintf("/%s/getnshortestleases/{UUID}/{N}", storeName), BlzQGetNShortestLeasesHandler(cliCtx, storeName)).Methods("GET")
