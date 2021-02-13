@@ -11,18 +11,13 @@ const counter = function* (): Generator<number>  {
     }
 }()
 
-
 for await (const request of server) {
-    const fn = endpoints()[request.url]
-    if(fn) {
-        const body = JSON.stringify(fn(request))
-        request.respond({ status: 200, body});
-    } else {
-        request.respond({status: 200, body: ''})
-    }
+    Promise.resolve(request.url)
+        .then(url => endpoints()[url])
+        .then(fn => fn ? fn(request) : '')
+        .then(result => JSON.stringify(result))
+        .then(body => request.respond({ status: 200, body}))
 }
-
-
 
 function endpoints() {
     return {
