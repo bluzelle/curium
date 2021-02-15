@@ -16,6 +16,7 @@ package app
 
 import (
 	"encoding/json"
+	"github.com/bluzelle/curium/x/aggregator"
 	"github.com/bluzelle/curium/x/oracle"
 	"math"
 	"os"
@@ -79,6 +80,7 @@ var (
 		tax.AppModuleBasic{},
 		faucet.AppModuleBasic{},
 		oracle.AppModuleBasic{},
+		aggregator.AppModuleBasic{},
 	)
 
 	// account permissions
@@ -136,6 +138,7 @@ type CRUDApp struct {
 	taxKeeper      tax.Keeper
 	oracleKeeper   oracle.Keeper
 	faucetKeeper   faucet.Keeper
+	aggKeeper		aggregator.Keeper
 
 	// Module Manager
 	mm *module.Manager
@@ -162,7 +165,10 @@ func NewCRUDApp(
 		supply.StoreKey, distr.StoreKey, slashing.StoreKey,
 		gov.StoreKey, params.StoreKey, crud.StoreKey,
 		tax.StoreKey,
-		faucet.StoreKey, crud.LeaseKey, crud.OwnerKey, oracle.SourceStoreKey, oracle.ProofStoreKey, oracle.VoteStoreKey, oracle.ValueStoreKey)
+		faucet.StoreKey, crud.LeaseKey, crud.OwnerKey, oracle.SourceStoreKey,
+		oracle.ProofStoreKey, oracle.VoteStoreKey, oracle.ValueStoreKey,
+		aggregator.AggValueStoreKey,
+		)
 
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -276,6 +282,7 @@ func NewCRUDApp(
 		keys[oracle.ProofStoreKey],
 		keys[oracle.VoteStoreKey],
 		keys[oracle.ValueStoreKey],
+		keys[aggregator.ValueQueueStoreKey],
 		app.stakingKeeper,
 		nil,
 		)
