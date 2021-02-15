@@ -8,9 +8,13 @@ import (
 var (
 	ValueQueueStoreKey = types.ValueQueueStoreKey
 	AggValueStoreKey = types.AggValueStoreKey
+	NewKeeper     = keeper.NewKeeper
+	NewQuerier    = keeper.NewQuerier
+	ModuleCdc     = types.ModuleCdc
+	RegisterCodec = types.RegisterCodec
+
 )
 
 type (
-
 Keeper = keeper.Keeper
 )

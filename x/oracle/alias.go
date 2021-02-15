@@ -24,4 +24,5 @@ var (
 
 type (
 	Keeper          = keeper.Keeper
+	SourceValue     = types.SourceValue
 )

@@ -138,7 +138,7 @@ type CRUDApp struct {
 	taxKeeper      tax.Keeper
 	oracleKeeper   oracle.Keeper
 	faucetKeeper   faucet.Keeper
-	aggKeeper		aggregator.Keeper
+	aggKeeper      aggregator.Keeper
 
 	// Module Manager
 	mm *module.Manager
@@ -149,8 +149,6 @@ func NewCRUDApp(
 	db dbm.DB,
 	baseAppOptions ...func(*bam.BaseApp),
 ) *CRUDApp {
-
-
 
 	// First define the top level codec that will be shared by the different modules
 	cdc := MakeCodec()
@@ -167,8 +165,8 @@ func NewCRUDApp(
 		tax.StoreKey,
 		faucet.StoreKey, crud.LeaseKey, crud.OwnerKey, oracle.SourceStoreKey,
 		oracle.ProofStoreKey, oracle.VoteStoreKey, oracle.ValueStoreKey,
-		aggregator.AggValueStoreKey,
-		)
+		aggregator.ValueQueueStoreKey, aggregator.AggValueStoreKey,
+	)
 
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -282,10 +280,17 @@ func NewCRUDApp(
 		keys[oracle.ProofStoreKey],
 		keys[oracle.VoteStoreKey],
 		keys[oracle.ValueStoreKey],
-		keys[aggregator.ValueQueueStoreKey],
 		app.stakingKeeper,
 		nil,
-		)
+	)
+
+	app.aggKeeper = aggregator.NewKeeper(
+		app.cdc,
+		app.oracleKeeper,
+		keys["valueQueueStoreKey"],
+		keys["aggValueStoreKey"],
+		nil,
+	)
 
 	app.faucetKeeper = faucet.NewKeeper(
 		app.supplyKeeper,
@@ -342,11 +347,7 @@ func NewCRUDApp(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 
-
 	addAnteHandler(app)
-
-
-
 
 	// initialize stores
 	app.MountKVStores(keys)
@@ -362,9 +363,7 @@ func NewCRUDApp(
 	return app
 }
 
-
 func addAnteHandler(app *CRUDApp) {
-
 
 	// The AnteHandler handles signature verification and transaction pre-processing
 	app.SetAnteHandler(
@@ -378,7 +377,6 @@ func addAnteHandler(app *CRUDApp) {
 	)
 
 }
-
 
 // GenesisState represents chain state at the start of the chain. Any initial state (account balances) are stored here.
 type GenesisState map[string]json.RawMessage
@@ -422,7 +420,7 @@ func (app *CRUDApp) ModuleAccountAddrs() map[string]bool {
 	return modAccAddrs
 }
 
-func (app *CRUDApp) ExportAppStateAndValidators(forZeroHeight bool, jailWhiteList []string,) (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
+func (app *CRUDApp) ExportAppStateAndValidators(forZeroHeight bool, jailWhiteList []string, ) (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 
 	// as if they could withdraw from the start of the next block
 	ctx := app.NewContext(true, abci.Header{Height: app.LastBlockHeight()})

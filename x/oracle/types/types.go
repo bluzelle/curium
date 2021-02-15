@@ -2,6 +2,7 @@ package types
 
 import (
 	"github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 
@@ -32,3 +33,5 @@ type OracleConfig struct {
 	UserAddress types.AccAddress
 	UserMnemonic string
 }
+
+type ValueUpdateListener func(sdk.Context, SourceValue)

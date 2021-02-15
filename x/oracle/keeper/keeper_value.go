@@ -6,6 +6,10 @@ import (
 	"github.com/bluzelle/curium/x/oracle/types"
 )
 
+func (k Keeper) RegisterValueUpdatedListener(listener types.ValueUpdateListener) {
+	valueUpdateListeners = append(valueUpdateListeners, listener)
+}
+
 func (k Keeper) GetValueStore(ctx sdk.Context) sdk.KVStore {
 	return ctx.KVStore(k.valueStoreKey)
 }
@@ -23,6 +27,10 @@ func (k Keeper) UpdateSourceValue(ctx sdk.Context, vote types.Vote) {
 		Owner:      vote.Owner,
 	}
 	store.Set([]byte(key), k.cdc.MustMarshalBinaryBare(sourceValue))
+
+	for _, listener := range valueUpdateListeners {
+		listener(ctx, sourceValue)
+	}
 }
 
 func MakeSourceValueKey(sourceName string, batch string) string {
