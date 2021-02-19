@@ -176,6 +176,7 @@ func generateVoteProofMsg(cdc *codec.Codec, source SourceAndValue) (types.MsgOra
 }
 
 func BroadcastOracleMessages(msgs []sdk.Msg, cdc *codec.Codec) (*coretypes.ResultBroadcastTxCommit, error) {
+	logger.Info("Sending oracle messages")
 	config, err := readOracleConfig()
 	if err != nil {
 		return nil, err
