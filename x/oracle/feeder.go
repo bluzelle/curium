@@ -47,7 +47,7 @@ type SourceAndValue struct {
 
 func GetValueAndSendProofAndVote(oracleKeeper Keeper, cdc *codec.Codec) {
 	sources, _ := oracleKeeper.ListSources(*currCtx)
-	logger.Info("Oracle fetching from %d sources", len(sources))
+	logger.Info("Oracle fetching from sources", "count", len(sources))
 	if len(sources) > 0 {
 		values := fetchValues(sources)
 		sendPreflightMsgs(values, cdc)
@@ -91,12 +91,12 @@ func fetchSource(source types.Source) (float64, error) {
 
 		value, err := readValueFromJson(body, source.Property)
 		if err != nil {
-			logger.Info(fmt.Sprintf("Error fetching oracle source %s", source.Name))
+			logger.Info("Error fetching oracle source", "name", source.Name)
 			logger.Info(err.Error())
 		}
 		return value, nil
 	}
-	logger.Info(fmt.Sprintf("Error fetching oracle source %s", source.Name))
+	logger.Info("Error fetching oracle source", "name",  source.Name)
 	logger.Info(err.Error())
 	return 0, err
 }
@@ -208,7 +208,7 @@ func BroadcastOracleMessages(msgs []sdk.Msg, cdc *codec.Codec) (*coretypes.Resul
 		rpcCtx := rpctypes.Context{}
 		result, err := core.BroadcastTxCommit(&rpcCtx, signedMsg)
 		if err != nil {
-			logger.Info(fmt.Sprintf("Error transmitting oracle preflight messages"))
+			logger.Info("Error transmitting oracle preflight messages")
 		}
 		return result, nil
 	}
