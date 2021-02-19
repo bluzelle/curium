@@ -30,9 +30,11 @@ var logger = log.NewTMLogger(log.NewSyncWriter(os.Stdout))
 var accountKeeper auth.AccountKeeper
 
 func RunFeeder(oracleKeeper Keeper, accKeeper auth.AccountKeeper, cdc *codec.Codec) {
+	logger.Info("Starting oracle feeder service")
 	accountKeeper = accKeeper
 	c := cron.New()
 	c.AddFunc("* * * * *", func() {
+		logger.Info("Oracle feeder run")
 		GetValueAndSendProofAndVote(oracleKeeper, cdc)
 	})
 	c.Start()
@@ -45,6 +47,7 @@ type SourceAndValue struct {
 
 func GetValueAndSendProofAndVote(oracleKeeper Keeper, cdc *codec.Codec) {
 	sources, _ := oracleKeeper.ListSources(*currCtx)
+	logger.Info("Oracle fetching from %d sources", len(sources))
 	if len(sources) > 0 {
 		values := fetchValues(sources)
 		sendPreflightMsgs(values, cdc)
