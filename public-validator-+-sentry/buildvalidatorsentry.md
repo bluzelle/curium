@@ -163,7 +163,7 @@ If you are following the **FORK** path, keep in mind that you must ensure your n
     max_num_outbound_peers = 100
     ```
 
-  If you are deploying a validator and sentry edit the validator's config.toml to set a suitable redial period.
+  If you are deploying a validator and sentry edit the validator's config.toml to set a short redial period.
 
     # Maximum pause when redialing a persistent peer (if zero, exponential backoff is used)
     persistent_peers_max_dial_period = "1s"
