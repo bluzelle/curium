@@ -11,7 +11,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
-	"github.com/robfig/cron/v3"
 	"github.com/tendermint/tendermint/libs/log"
 	"github.com/tendermint/tendermint/rpc/core"
 	"github.com/tendermint/tendermint/rpc/core/types"
@@ -32,12 +31,20 @@ var accountKeeper auth.AccountKeeper
 func RunFeeder(oracleKeeper Keeper, accKeeper auth.AccountKeeper, cdc *codec.Codec) {
 	logger.Info("Starting oracle feeder service")
 	accountKeeper = accKeeper
-	c := cron.New()
-	c.AddFunc("* * * * *", func() {
-		logger.Info("Oracle feeder run")
-		GetValueAndSendProofAndVote(oracleKeeper, cdc)
-	})
-	c.Start()
+
+
+	logger.Info("******** Test version - feeder loop disabled")
+	GetValueAndSendProofAndVote(oracleKeeper, cdc)
+// TODO: add the code below back in for production
+
+
+
+	//c := cron.New()
+	//c.AddFunc("* * * * *", func() {
+	//	logger.Info("Oracle feeder run")
+	//	GetValueAndSendProofAndVote(oracleKeeper, cdc)
+	//})
+	//c.Start()
 }
 
 type SourceAndValue struct {

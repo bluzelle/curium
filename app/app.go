@@ -317,9 +317,10 @@ func NewCRUDApp(
 		slashing.NewAppModule(app.slashingKeeper, app.accountKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
 		oracle.NewAppModule(app.oracleKeeper, app.crudKeeper),
+		aggregator.NewAppModule(app.aggKeeper),
 	)
 
-	app.mm.SetOrderBeginBlockers(distr.ModuleName, slashing.ModuleName, oracle.ModuleName)
+	app.mm.SetOrderBeginBlockers(distr.ModuleName, slashing.ModuleName, oracle.ModuleName, aggregator.ModuleName)
 	app.mm.SetOrderEndBlockers(gov.ModuleName, staking.ModuleName)
 
 	// Sets the order of Genesis - Order matters, genutil is to always come last
@@ -337,6 +338,7 @@ func NewCRUDApp(
 		supply.ModuleName,
 		genutil.ModuleName,
 		oracle.ModuleName,
+		aggregator.ModuleName,
 	)
 
 	// register all module routes and module queriers
@@ -359,6 +361,7 @@ func NewCRUDApp(
 	}
 
 	go oracle.StartOracle(app.oracleKeeper, app.accountKeeper, cdc)
+	go aggregator.StartAggregator(app.aggKeeper)
 
 	return app
 }

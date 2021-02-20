@@ -38,7 +38,27 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
+func (k Keeper) GetQueueStore(ctx sdk.Context) sdk.KVStore {
+	return ctx.KVStore(k.valueQueueStoreKey)
+}
+
+func (k Keeper) GetAggValueStore(ctx sdk.Context) sdk.KVStore {
+	return ctx.KVStore(k.aggValueStoreKey)
+}
+
+
+func (k Keeper) AddQueueItem(ctx sdk.Context, value oracle.SourceValue) {
+	key := []byte(value.Batch + ">" + value.SourceName)
+	store := k.GetQueueStore(ctx)
+	store.Set(key, k.cdc.MustMarshalBinaryBare(value))
+}
+
 func (k Keeper) SourceValueUpdatedListener(ctx sdk.Context, value oracle.SourceValue) {
-	fmt.Println(value)
+	k.AddQueueItem(ctx, value)
+}
+
+func (k Keeper) AggregateValues(ctx *sdk.Context) {
+	fmt.Println("***** AGGREGATE VALUES")
+
 }
 

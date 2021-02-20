@@ -27,7 +27,7 @@ func Run(oracleKeeper Keeper, accountKeeper auth.AccountKeeper, cdc *codec.Codec
 func waitForCtx() {
 	for currCtx == nil {
 		logger.Info("Oracle waiting for context")
-		time.Sleep(time.Second)
+		time.Sleep(5 * time.Second)
 	}
 }
 

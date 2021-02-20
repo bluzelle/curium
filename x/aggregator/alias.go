@@ -6,6 +6,7 @@ import (
 )
 
 var (
+	ModuleName = types.ModuleName
 	ValueQueueStoreKey = types.ValueQueueStoreKey
 	AggValueStoreKey = types.AggValueStoreKey
 	NewKeeper     = keeper.NewKeeper
