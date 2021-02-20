@@ -10,18 +10,18 @@ If you are following the **FORK** path, keep in mind that you must ensure your n
 
 1. Refer to previous documents for initializing the server, dev environments, and building the Bluzelle Curium applications. Refer to steps `i-iii` listed below.
 
-   **CRITICAL**: If you are building for the **MAIN NET**, ensure you have built curium using the "**mainnet**" target. 
-   
+   **CRITICAL**: If you are building for the **MAIN NET**, ensure you have built curium using the "**mainnet**" target.
+
    OR
 
    **CRITICAL**: If you are building for the **TEST NET**, ensure you have built curium using the "**testnet**" target. Use this if you are doing a **FORK**.
-   
+
    These are steps involved in setting up the OS, development environment, and building the nodes that intend to run in one of our Curium zones. Please go through this process for your validator and each of your sentries. **ONLY** follow the three specific links listed below, please. **DO NOT** click through the "next" button at the bottom of the third link, as you only need to execute the steps on these three links specifically.
 
     i. [OS Setup for Curium](/setup/os.md)
-    
+
     ii. [Development Environment Setup](/setup/devenv.md)
-    
+
     iii. [Build the Curium Project](/setup/build.md)
 
 2. Open incoming TCP port 26656 \(P2P\). Optionally, if you have sufficient firewall and packet filtering security \(to protect against DoS and DDoS attacks\), you may opt to also open up 26657 \(RPC\), and 1317 \(RESTful\). These two ports are only for the purposes of serving clients. If you have no such interest and do not want to deal with the security considerations, keep them closed. There are many DoS and DDoS vectors possible if these ports are open, to open them with caution and only if necessary.
@@ -40,18 +40,18 @@ If you are following the **FORK** path, keep in mind that you must ensure your n
    rm -rf .blz*
    ```
 
-4. Please ensure you have the correct chain-id. We change it whenever we restart a new network. 
-   
+4. Please ensure you have the correct chain-id. We change it whenever we restart a new network.
+
    Run the following command to find the existing chain-id:
-   
+
    **MAIN NET** (including **FORK** path):
-   
+
    ```text
    curl --location --request GET 'https://client.sentry.net.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
    ```
 
    **TEST NET**:
-   
+
    ```text
    curl --location --request GET 'https://client.sentry.testnet.public.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
    ```
@@ -63,7 +63,7 @@ If you are following the **FORK** path, keep in mind that you must ensure your n
    ```
 
    Use a unique moniker string that uniquely identifies your validator/sentry. Please start the moniker with "validator" or "sentry", depending on what you are adding, and use camel case. Try to include your own or company name, if applicable. If doing a **FORK**, please use the same moniker as for your existing node(s), to ease contest procedures.
-   
+
    Examples:
 
    ```text
@@ -85,24 +85,24 @@ If you are following the **FORK** path, keep in mind that you must ensure your n
 
    ```text
    blzcli config chain-id <chain-id>
-   blzcli config output json 
-   blzcli config indent true 
+   blzcli config output json
+   blzcli config indent true
    blzcli config trust-node true
    blzcli config keyring-backend file
    ```
 
-7. Collect the node id's of the gateway sentries. 
+7. Collect the node id's of the gateway sentries.
 
    Use the following command, to get a list of all the gateway sentries, including their IP addresses and node id's:
 
    **MAIN NET** (including **FORK** path):
-   
+
    ```text
    curl -s http://sandbox.sentry.net.bluzelle.com:26657/net_info | jq -C '[.result.peers[] | select(.node_info.moniker | startswith("daemon-sentry-gateway")) | {moniker: .node_info.moniker, id: .node_info.id, ip_address: .remote_ip}] | sort_by(.moniker)'
    ```
 
    **TEST NET**:
-   
+
    ```text
    curl -s http://sandbox.sentry.testnet.public.bluzelle.com:26657/net_info | jq -C '[.result.peers[] | select(.node_info.moniker | startswith("daemon-sentry-gateway")) | {moniker: .node_info.moniker, id: .node_info.id, ip_address: .remote_ip}] | sort_by(.moniker)'
    ```
@@ -133,7 +133,7 @@ If you are following the **FORK** path, keep in mind that you must ensure your n
 
    Of course, this depends highly on your setup. If your REST proxy is local to blzd, you can opt to only open up RPC to 127.0.0.1 and restrict access to RPC.
 
-10. If you are adding a sentry, append your validator's "@:26656" entry to the persistent\_peers comma-separated list in your sentry, in config.toml. 
+10. If you are adding a sentry, append your validator's "@:26656" entry to the persistent\_peers comma-separated list in your sentry, in config.toml.
 
 11. If you are adding a validator, append your sentry's "@:26656" entry to the persistent\_peers comma-separated list in your validator, in config.toml. Only applicable if you are also adding a sentry.
 
@@ -162,12 +162,12 @@ If you are following the **FORK** path, keep in mind that you must ensure your n
     # Maximum number of outbound peers to connect to, excluding persistent peers
     max_num_outbound_peers = 100
     ```
-    
-  If you are deploying a validator and sentry edit the validator's config.toml to set a suitable redial period, anything over 2 hours is advised.
-    
+
+  If you are deploying a validator and sentry edit the validator's config.toml to set a suitable redial period.
+
     # Maximum pause when redialing a persistent peer (if zero, exponential backoff is used)
-    persistent_peers_max_dial_period = 10h
-    
+    persistent_peers_max_dial_period = "1s"
+
 17. Edit ".blzd/config/app.toml" to set the minimum-gas-prices to “0.002ubnt”
 
     ```text
@@ -184,7 +184,7 @@ If you are following the **FORK** path, keep in mind that you must ensure your n
     ```text
     bluzelle_crud = true
     ```
-    
+
 19. Copy into your "~/.blzd/config/" directory the network's existing genesis.json file. You can interactively view it as follows, from our sentry nodes:
 
     **MAIN NET** (including **FORK** path):
@@ -211,11 +211,11 @@ If you are following the **FORK** path, keep in mind that you must ensure your n
 
     Ensure to copy over and replace the existing genesis.json file in your `~/.blzd/config/` folder with the downloaded one from the existing network.
 
-20. ONLY do this step if you are following the **FORK** PATH. 
+20. ONLY do this step if you are following the **FORK** PATH.
 
-    Migrate your validator's consensus signing key from the old machine (the validator on the Soft MainNet) to the new machine (the validator on the Final TestNet). 
-    
-    To do this, copy your `~/.blzd/config/priv_validator_key.json` from the old machine to the new machine at the same location, overwriting the existing file on the new machine. 
+    Migrate your validator's consensus signing key from the old machine (the validator on the Soft MainNet) to the new machine (the validator on the Final TestNet).
+
+    To do this, copy your `~/.blzd/config/priv_validator_key.json` from the old machine to the new machine at the same location, overwriting the existing file on the new machine.
 
 21. Start the Bluzelle daemon
 
@@ -232,12 +232,12 @@ If you are following the **FORK** path, keep in mind that you must ensure your n
     and then retry the start command.
 
     Notes.
-    
-    i. If you want extra info for logging or analysis or debugging purposes, you can alternatively add the `--log_level info` flag to `blzd start`. 
-    
+
+    i. If you want extra info for logging or analysis or debugging purposes, you can alternatively add the `--log_level info` flag to `blzd start`.
+
     ii. Don't get alarmed if you are following the **FORK** PATH and your validator starts up stating it is not a validator. This is NORMAL. Your validator is currently in jail, so it does not yet appear in the active validator set. That's all this message means. We will unjail you later.
 
-22. If you are creating a validator, wait till your new node catches up to the rest of the zone. It will be obvious as the node will slow down output and be getting blocks every 4-5 seconds. 
+22. If you are creating a validator, wait till your new node catches up to the rest of the zone. It will be obvious as the node will slow down output and be getting blocks every 4-5 seconds.
 
     To be sure, run the following command in another terminal on the validator and look for the output of `true`:
 
@@ -245,20 +245,20 @@ If you are following the **FORK** path, keep in mind that you must ensure your n
     watch 'blzcli status | jq ".sync_info.catching_up == false"'
     ```
 
-23. If you are following the **FORK** PATH, SKIP this step. 
+23. If you are following the **FORK** PATH, SKIP this step.
 
     If you are creating a validator, you will now need to acquire BNT tokens. Following are instructions depending on if you are targeting the MAIN NET or TEST NET.
 
     **MAIN NET**:
-   
+
     i) Be sure you have Metamask installed. It needs to be installed properly and connected to your ETH MainNet account that has access to the BLZ tokens you wish to use for your validator. You can use Metamask with Ledger and Trezor hardware wallets as well.
-   
+
     ii) Goto the following URL to sign into the staking application:
-    
-    https://staking.bluzelle.com/ 
-   
-    iii) Create a new BNT mnemonic for our MAIN NET, and store and secure this BNT mnemonic securely. **If you lose this mnemonic, you will lose ALL your funds.** Bluzelle is not responsible and there is no policy to "refund" anything. Note that this web wallet is **100% client side**. Your BNT mnemonic is generated on the local browser only and is never transmitted over the network. You are 100% responsible for storing and securing this mnemonic. 
-    
+
+    https://staking.bluzelle.com/
+
+    iii) Create a new BNT mnemonic for our MAIN NET, and store and secure this BNT mnemonic securely. **If you lose this mnemonic, you will lose ALL your funds.** Bluzelle is not responsible and there is no policy to "refund" anything. Note that this web wallet is **100% client side**. Your BNT mnemonic is generated on the local browser only and is never transmitted over the network. You are 100% responsible for storing and securing this mnemonic.
+
     iv) Add a new local keypair for the account that will be the operator for the validator on this node:
 
     ```text
@@ -266,12 +266,12 @@ If you are following the **FORK** path, keep in mind that you must ensure your n
     ```
 
     Provide the menemonic generated above from the web staking wallet when asked for the BIP39 mnemonic, when prompted for a keyring password, provide  a password  
-    to encrypt the keyring that holds the private key. You will be asked for this password in the future when signing with your private key. 
-        
+    to encrypt the keyring that holds the private key. You will be asked for this password in the future when signing with your private key.
+
     v) Convert the desired amount of BLZ tokens to BNT tokens by using the "Convert to BNT" button. Please be patient, as we run the conversion relayer manually for now, and it runs a few times every day. Please join and follow our Telegram and Discord groups to keep updated.
 
     **TEST NET**:
-   
+
     i) Add a new local keypair for the account that will be the operator for the validator on this node:
 
     ```text
@@ -288,55 +288,55 @@ If you are following the **FORK** path, keep in mind that you must ensure your n
 
     CRITICAL: Note the Bluzelle address (starting with "bluzelle") and mnemonic phrase values. You will need these on a long term basis.
 
-    ii) Get some tokens to stake your validator from our FAUCET endpoint. Note that you can only use the faucet once every FIVE minutes. 
+    ii) Get some tokens to stake your validator from our FAUCET endpoint. Note that you can only use the faucet once every FIVE minutes.
     Goto the following URL, replacing in your account's Bluzelle address:
-    
+
     https://client.sentry.testnet.public.bluzelle.com:1317/mint/<address>
-    
-    iii) Verify you have tokens. If the above URL gives an error that the account it not found or something else, it likely means the faucet 
-    has not yet completed (takes a few seconds) or has failed for some reason. Use the following command to check your balance: 
+
+    iii) Verify you have tokens. If the above URL gives an error that the account it not found or something else, it likely means the faucet
+    has not yet completed (takes a few seconds) or has failed for some reason. Use the following command to check your balance:
     ```
     blzcli q account $(blzcli keys show vuser -a) --node http://sandbox.sentry.testnet.public.bluzelle.com:26657
     ```
-    
-24. ONLY do this step if you are following the **FORK** PATH. 
 
-    Export your existing validator's operator wallet from the existing validator machine and import it to the new validator machine. We will assume that the existing wallet account is called `vuser` and will call the new imported wallet account the same name. 
+24. ONLY do this step if you are following the **FORK** PATH.
 
-    i. On the existing validator machine: 
-    
+    Export your existing validator's operator wallet from the existing validator machine and import it to the new validator machine. We will assume that the existing wallet account is called `vuser` and will call the new imported wallet account the same name.
+
+    i. On the existing validator machine:
+
     ```
-    blzcli keys export vuser 
+    blzcli keys export vuser
     ```
-    
+
     Note that the `passphrase to encrypt the exported key` that you provide is required when you import the key in the next step. Copy the output of the above command (it will display the output to your screen) and store it into a file. We will assume this file is called `export.txt`.
-    
+
     ii. On the new validator machine (provide the second password entered when doing the export):
-    
+
     ```
     blzcli keys import vuser export.txt
     ```
-    
+
     Enter a password to encrypt the keys to vuser
-    
+
     Notes:
-    
+
     i. If you have the mnemonic handy for your original vuser, you can just add the vuser to the new validator with the following:
-    
+
     ```
     blzcli keys add vuser --recover
     ```
-    
+
     Paste in the mnemonic, when asked.
     Enter a password to encrypt the keys to vuser
-    
+
     ii. If your vuser for your original vuser is secured with a Ledger device, add it to the new validator machine as follows (ensure your Ledger device is plugged in and running the COSMOS app):
-    
+
     ```
     blzcli keys add vuser --ledger --account <i>
     ```
-    
-    Typically, the value of i will be 0, unless you have multiple HD-derived accounts. 
+
+    Typically, the value of i will be 0, unless you have multiple HD-derived accounts.
 
 25. Verify your vuser account has the tokens you expect, by asking the local node:
 
@@ -344,7 +344,7 @@ If you are following the **FORK** path, keep in mind that you must ensure your n
     blzcli q account $(blzcli keys show vuser -a) | jq ".value.coins"
     ```  
 
-26. If you are following the **FORK** PATH, SKIP this step. 
+26. If you are following the **FORK** PATH, SKIP this step.
 
     At this point, the new "vuser" account will also reflect the BNT tokens that were funded to it. We now need to add this node as a validator, as follows:
 
@@ -353,7 +353,7 @@ If you are following the **FORK** path, keep in mind that you must ensure your n
       --amount=<bonding amount> \
       --pubkey=$(blzd tendermint show-validator) \
       --website="<your website>" \
-      --details="<description of your organization>" \ 
+      --details="<description of your organization>" \
       --security-contact="<contact information>" \
       --identity=<keyBase/UPort 16 HEX digit PGP public key hash> \
       --moniker=<your moniker> \
@@ -374,8 +374,8 @@ If you are following the **FORK** path, keep in mind that you must ensure your n
 
     You can experiment with different values for the amount, commission rate, and gas price, although the latter should match whatever you put into app.toml.
 
-    Be sure to not use 100% of the amount of BNT in your vuser account, as you need some BNT to pay for gas. 
-    
+    Be sure to not use 100% of the amount of BNT in your vuser account, as you need some BNT to pay for gas.
+
     We HIGHLY recommend including your Discord account and/or Email address in the "security contact" field, along with your name, as the primary contact.
 
     For example:
@@ -398,9 +398,9 @@ If you are following the **FORK** path, keep in mind that you must ensure your n
       --from vuser
     ```
 
-27. ONLY do this step if you are following the **FORK** PATH. 
-    
-    You will now unjail your validator to bring it back into the active validator set. Once you do this, the network will expect your validator to be running and it will once again be subject to all the requirements of being a validator, including slashing penalties, etc. Note that once unjailed, you CANNOT "re-jail" your validator. 
+27. ONLY do this step if you are following the **FORK** PATH.
+
+    You will now unjail your validator to bring it back into the active validator set. Once you do this, the network will expect your validator to be running and it will once again be subject to all the requirements of being a validator, including slashing penalties, etc. Note that once unjailed, you CANNOT "re-jail" your validator.
 
     ```
     blzcli tx slashing unjail --gas-prices 0.002ubnt --gas=auto --gas-adjustment=2.0 --from vuser --chain-id <chain id>
@@ -448,7 +448,7 @@ If you are following the **FORK** path, keep in mind that you must ensure your n
     **MAIN NET** (including **FORK** path):
 
     http://bigdipper.net.bluzelle.com/validators
-    
+
     **TEST NET**:
 
     https://bigdipper.testnet.public.bluzelle.com/validators
