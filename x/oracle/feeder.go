@@ -128,6 +128,7 @@ func sendPreflightMsgs(values []SourceAndValue, cdc *codec.Codec) string {
 		msg, _ := generateVoteProofMsg(cdc, value)
 		msgs = append(msgs, msg)
 	}
+	logger.Info("Sending oracle proof messages", "count", len(msgs))
 	result, _ := BroadcastOracleMessages(msgs, cdc)
 	return hex.EncodeToString(result.Hash)
 }
@@ -138,6 +139,7 @@ func sendVoteMsgs(values []SourceAndValue, cdc *codec.Codec) string {
 		msg, _ := generateVoteMsg(cdc, value)
 		msgs = append(msgs, msg)
 	}
+	logger.Info("Sending oracle vote messages", "count", len(msgs))
 	result, _ := BroadcastOracleMessages(msgs, cdc)
 	return hex.EncodeToString(result.Hash)
 }
@@ -176,7 +178,6 @@ func generateVoteProofMsg(cdc *codec.Codec, source SourceAndValue) (types.MsgOra
 }
 
 func BroadcastOracleMessages(msgs []sdk.Msg, cdc *codec.Codec) (*coretypes.ResultBroadcastTxCommit, error) {
-	logger.Info("Sending oracle messages")
 	config, err := readOracleConfig()
 	if err != nil {
 		return nil, err
