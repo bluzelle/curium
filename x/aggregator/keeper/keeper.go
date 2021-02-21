@@ -58,7 +58,10 @@ func (k Keeper) SourceValueUpdatedListener(ctx sdk.Context, value oracle.SourceV
 }
 
 func (k Keeper) AggregateValues(ctx *sdk.Context) {
+//	queue := k.readQueue(ctx)
 	fmt.Println("***** AGGREGATE VALUES")
+	// read queue and group by batch and then aggregate values into store
 
 }
+
 
