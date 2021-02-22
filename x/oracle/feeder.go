@@ -209,7 +209,7 @@ func BroadcastOracleMessages(msgs []sdk.Msg, cdc *codec.Codec) (*coretypes.Resul
 		acc.GetAccountNumber(),
 		acc.GetSequence(),
 		10000000,
-		2,
+		1,
 		false,
 		currCtx.ChainID(),
 		"memo", nil,
@@ -221,7 +221,7 @@ func BroadcastOracleMessages(msgs []sdk.Msg, cdc *codec.Codec) (*coretypes.Resul
 		rpcCtx := rpctypes.Context{}
 		result, err := core.BroadcastTxCommit(&rpcCtx, signedMsg)
 		if err != nil {
-			logger.Info("Error transmitting oracle preflight messages")
+			logger.Info("Error transmitting oracle messages")
 		}
 		return result, nil
 	}

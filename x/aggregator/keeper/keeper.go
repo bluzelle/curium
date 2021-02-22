@@ -29,7 +29,7 @@ func NewKeeper(cdc *codec.Codec, oracleKeeper oracle.Keeper, valueQueueStoreKey 
 		cdc:        cdc,
 //		paramspace: paramspace.WithKeyTable(types.ParamKeyTable()),
 	}
-	oracleKeeper.RegisterValueUpdatedListener(keeper.SourceValueUpdatedListener)
+//	oracleKeeper.RegisterValueUpdatedListener(keeper.SourceValueUpdatedListener)
 	return keeper
 }
 
