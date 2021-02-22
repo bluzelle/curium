@@ -57,15 +57,28 @@ func (k Keeper) AddQueueItem(ctx sdk.Context, value oracle.SourceValue) {
 	store.Set(key, k.cdc.MustMarshalBinaryBare(value))
 }
 
+func (k Keeper) VisitQueueItems(ctx sdk.Context, cb func(oracle.SourceValue)) {
+	store := k.GetQueueStore(ctx)
+	iterator := store.Iterator(nil, nil)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var value oracle.SourceValue
+		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &value)
+		cb(value)
+	}
+}
+
+
 func (k Keeper) SourceValueUpdatedListener(ctx sdk.Context, value oracle.SourceValue) {
 	k.AddQueueItem(ctx, value)
 }
 
-func (k Keeper) AggregateValues(ctx *sdk.Context) {
-//	queue := k.readQueue(ctx)
+func (k Keeper) AggregateValues(ctx sdk.Context) {
 	logger.Info("***** AGGREGATE VALUES")
-	// read queue and group by batch and then aggregate values into store
-
+	k.VisitQueueItems(ctx, func(value oracle.SourceValue) {
+		fmt.Println(value)
+	})
 }
 
 
