@@ -33,9 +33,8 @@ func RunFeeder(oracleKeeper Keeper, accKeeper auth.AccountKeeper, cdc *codec.Cod
 	logger.Info("Starting oracle feeder service")
 	accountKeeper = accKeeper
 
-	//	logger.Info("******** Test version - feeder loop disabled")
-	//	GetValueAndSendProofAndVote(oracleKeeper, cdc)
-	// TODO: add the code below back in for production
+	//TODO: For testing only - remove
+		GetValueAndSendProofAndVote(oracleKeeper, cdc)
 
 	c := cron.New()
 	c.AddFunc("* * * * *", func() {

@@ -3,6 +3,7 @@ package keeper
 import (
 	"fmt"
 	"github.com/bluzelle/curium/x/oracle"
+	"os"
 
 	"github.com/tendermint/tendermint/libs/log"
 
@@ -10,6 +11,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/bluzelle/curium/x/aggregator/types"
 )
+
+var logger = log.NewTMLogger(log.NewSyncWriter(os.Stdout))
+
 
 // Keeper of the aggregator store
 type Keeper struct {
@@ -29,7 +33,7 @@ func NewKeeper(cdc *codec.Codec, oracleKeeper oracle.Keeper, valueQueueStoreKey 
 		cdc:        cdc,
 //		paramspace: paramspace.WithKeyTable(types.ParamKeyTable()),
 	}
-//	oracleKeeper.RegisterValueUpdatedListener(keeper.SourceValueUpdatedListener)
+	oracleKeeper.RegisterValueUpdatedListener(keeper.SourceValueUpdatedListener)
 	return keeper
 }
 
@@ -59,7 +63,7 @@ func (k Keeper) SourceValueUpdatedListener(ctx sdk.Context, value oracle.SourceV
 
 func (k Keeper) AggregateValues(ctx *sdk.Context) {
 //	queue := k.readQueue(ctx)
-	fmt.Println("***** AGGREGATE VALUES")
+	logger.Info("***** AGGREGATE VALUES")
 	// read queue and group by batch and then aggregate values into store
 
 }

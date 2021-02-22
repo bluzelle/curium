@@ -287,8 +287,8 @@ func NewCRUDApp(
 	app.aggKeeper = aggregator.NewKeeper(
 		app.cdc,
 		app.oracleKeeper,
-		keys["valueQueueStoreKey"],
-		keys["aggValueStoreKey"],
+		keys[aggregator.ValueQueueStoreKey],
+		keys[aggregator.AggValueStoreKey],
 		nil,
 	)
 

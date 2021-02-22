@@ -24,8 +24,10 @@ func StartAggregator(aggKeeper Keeper) {
 func run(aggKeeper Keeper) {
 	c := cron.New()
 	c.AddFunc("* * * * *", func() {
-		logger.Info("Oracle aggregator run")
-		aggKeeper.AggregateValues(currCtx)
+		time.AfterFunc(40 * time.Second, func() {
+			logger.Info("Oracle aggregator run")
+			aggKeeper.AggregateValues(currCtx)
+		})
 	})
 	c.Start()
 }
