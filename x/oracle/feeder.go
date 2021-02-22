@@ -31,10 +31,6 @@ var accountKeeper auth.AccountKeeper
 
 func RunFeeder(oracleKeeper Keeper, accKeeper auth.AccountKeeper, cdc *codec.Codec) {
 	logger.Info("Starting oracle feeder service")
-	if !oracleKeeper.IsValidator(*currCtx) {
-		logger.Info("Not running feeder, host is not a validator")
-		return
-	}
 	accountKeeper = accKeeper
 
 	//	logger.Info("******** Test version - feeder loop disabled")
@@ -43,6 +39,10 @@ func RunFeeder(oracleKeeper Keeper, accKeeper auth.AccountKeeper, cdc *codec.Cod
 
 	c := cron.New()
 	c.AddFunc("* * * * *", func() {
+		if !oracleKeeper.IsValidator(*currCtx) {
+			logger.Info("Not running feeder, host is not a validator")
+			return
+		}
 		logger.Info("Oracle feeder run")
 		GetValueAndSendProofAndVote(oracleKeeper, cdc)
 	})
