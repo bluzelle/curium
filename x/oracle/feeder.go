@@ -31,14 +31,15 @@ var accountKeeper auth.AccountKeeper
 
 func RunFeeder(oracleKeeper Keeper, accKeeper auth.AccountKeeper, cdc *codec.Codec) {
 	logger.Info("Starting oracle feeder service")
+	if !oracleKeeper.IsValidator(*currCtx) {
+		logger.Info("Not running feeder, host is not a validator")
+		return
+	}
 	accountKeeper = accKeeper
 
-
-//	logger.Info("******** Test version - feeder loop disabled")
-//	GetValueAndSendProofAndVote(oracleKeeper, cdc)
-// TODO: add the code below back in for production
-
-
+	//	logger.Info("******** Test version - feeder loop disabled")
+	//	GetValueAndSendProofAndVote(oracleKeeper, cdc)
+	// TODO: add the code below back in for production
 
 	c := cron.New()
 	c.AddFunc("* * * * *", func() {
@@ -104,7 +105,7 @@ func fetchSource(source types.Source) (float64, error) {
 		}
 		return value, nil
 	}
-	logger.Info("Error fetching oracle source", "name",  source.Name)
+	logger.Info("Error fetching oracle source", "name", source.Name)
 	logger.Info(err.Error())
 	return 0, err
 }
@@ -138,6 +139,7 @@ func sendPreflightMsgs(values []SourceAndValue, cdc *codec.Codec) string {
 	}
 	logger.Info("Sending oracle proof messages", "count", len(msgs))
 	result, _ := BroadcastOracleMessages(msgs, cdc)
+	logger.Info("Oracle proof messages sent", "hash", result.Hash)
 	return hex.EncodeToString(result.Hash)
 }
 
@@ -149,6 +151,7 @@ func sendVoteMsgs(values []SourceAndValue, cdc *codec.Codec) string {
 	}
 	logger.Info("Sending oracle vote messages", "count", len(msgs))
 	result, _ := BroadcastOracleMessages(msgs, cdc)
+	logger.Info("Oracle vote messages sent", "hash", result.Hash)
 	return hex.EncodeToString(result.Hash)
 }
 

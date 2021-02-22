@@ -18,10 +18,7 @@ func StartOracle(oracleKeeper Keeper, accountKeeper auth.AccountKeeper, cdc *cod
 }
 
 func Run(oracleKeeper Keeper, accountKeeper auth.AccountKeeper, cdc *codec.Codec) {
-	if oracleKeeper.IsValidator(*currCtx) {
 		RunFeeder(oracleKeeper, accountKeeper, cdc)
-	}
-
 }
 
 func waitForCtx() {
