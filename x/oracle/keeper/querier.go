@@ -71,7 +71,7 @@ func querySearchSourceValues(ctx sdk.Context, req abci.RequestQuery, k Keeper) (
 	var query types.SearchSourceValuesQueryRequest
 	k.cdc.MustUnmarshalJSON(req.Data, &query)
 
-	results := k.SearchSourceValues(ctx, query.Prefix)
+	results := k.SearchSourceValues(ctx, query.Prefix, query.Page, query.Limit, query.Reverse)
 	x := codec.MustMarshalJSONIndent(k.cdc, results)
 	return x, nil
 }

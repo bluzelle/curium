@@ -5,6 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/bluzelle/curium/x/oracle/types"
 	"time"
+	storeIterator "github.com/cosmos/cosmos-sdk/store/types"
 )
 
 func (k Keeper) RegisterValueUpdatedListener(listener types.ValueUpdateListener) {
@@ -52,8 +53,13 @@ func calculateAverageFromVotes(votes []types.Vote) sdk.Dec {
 	return sum.Quo(totalWeight)
 }
 
-func (k Keeper) SearchSourceValues(ctx sdk.Context, prefix string) []types.SourceValue {
-	iterator := sdk.KVStorePrefixIterator(k.GetValueStore(ctx), []byte(prefix))
+func (k Keeper) SearchSourceValues(ctx sdk.Context, prefix string, page uint, limit uint, reverse bool) []types.SourceValue {
+	var iterator sdk.Iterator
+	if reverse {
+		iterator = storeIterator.KVStoreReversePrefixIteratorPaginated(k.GetValueStore(ctx), []byte(prefix), page, limit)
+	} else {
+		iterator = storeIterator.KVStorePrefixIteratorPaginated(k.GetValueStore(ctx), []byte(prefix), page, limit)
+	}
 	defer iterator.Close()
 	values  := make([]types.SourceValue, 0)
 

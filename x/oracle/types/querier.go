@@ -30,6 +30,9 @@ type SearchVoteProofsQueryRequest = struct {
 
 type SearchSourceValuesQueryRequest = struct{
 	Prefix string
+	Reverse bool
+	Page uint
+	Limit uint
 }
 
 
