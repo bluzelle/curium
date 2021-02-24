@@ -21,7 +21,7 @@ func (k Keeper) UpdateSourceValue(ctx sdk.Context, vote types.Vote) {
 	votes = append(votes, vote)
 	average := calculateAverageFromVotes(votes)
 	store := k.GetValueStore(ctx)
-	key := MakeSourceValueKey(vote.SourceName, vote.Batch)
+	key := MakeSourceValueKey(vote.Batch, vote.SourceName)
 	sourceValue := types.SourceValue{
 		SourceName: vote.SourceName,
 		Batch:      vote.Batch,
@@ -36,8 +36,8 @@ func (k Keeper) UpdateSourceValue(ctx sdk.Context, vote types.Vote) {
 	}
 }
 
-func MakeSourceValueKey(sourceName string, batch string) string {
-	return fmt.Sprintf("%s>%s", sourceName, batch)
+func MakeSourceValueKey(batch string, sourceName string) string {
+	return fmt.Sprintf("%s>%s", batch, sourceName)
 }
 
 
