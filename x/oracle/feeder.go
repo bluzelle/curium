@@ -34,7 +34,7 @@ func RunFeeder(oracleKeeper Keeper, accKeeper auth.AccountKeeper, cdc *codec.Cod
 	accountKeeper = accKeeper
 
 	//TODO: For testing only - remove
-		GetValueAndSendProofAndVote(oracleKeeper, cdc)
+	GetValueAndSendProofAndVote(oracleKeeper, cdc)
 
 	c := cron.New()
 	c.AddFunc("* * * * *", func() {
@@ -161,7 +161,7 @@ func generateVoteMsg(cdc *codec.Codec, source SourceAndValue) (types.MsgOracleVo
 	}
 	msg := types.NewMsgOracleVote(
 		keeper.GetValconsAddress(),
-		fmt.Sprintf("%f", source.value),
+		fmt.Sprintf("%.18f", source.value),
 		config.UserAddress,
 		source.source.Name,
 		keeper.GetCurrentBatchId(),
@@ -176,7 +176,7 @@ func generateVoteProofMsg(cdc *codec.Codec, source SourceAndValue) (types.MsgOra
 		return types.MsgOracleVoteProof{}, err
 	}
 
-	proof := keeper.CalculateProofSig(fmt.Sprintf("%f", source.value))
+	proof := keeper.CalculateProofSig(fmt.Sprintf("%.18f", source.value))
 	valcons := keeper.GetValconsAddress()
 	msg := types.NewMsgOracleVoteProof(valcons, proof, config.UserAddress, source.source.Name)
 	err = msg.ValidateBasic()
