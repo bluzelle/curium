@@ -17,6 +17,11 @@ var logger = log.NewTMLogger(log.NewSyncWriter(os.Stdout))
 
 
 func StartAggregator(aggKeeper Keeper) {
+	defer func() {
+		if err := recover(); err != nil {
+			logger.Error("panic occurred:", "err", err)
+		}
+	}()
 	waitForCtx()
 	run(aggKeeper)
 }

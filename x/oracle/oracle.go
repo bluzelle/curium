@@ -13,12 +13,17 @@ import (
 var currCtx *sdk.Context
 
 func StartOracle(oracleKeeper Keeper, accountKeeper auth.AccountKeeper, cdc *codec.Codec) {
+	defer func() {
+		if err := recover(); err != nil {
+			logger.Error("panic occurred:", "err", err)
+		}
+	}()
 	waitForCtx()
 	Run(oracleKeeper, accountKeeper, cdc)
 }
 
 func Run(oracleKeeper Keeper, accountKeeper auth.AccountKeeper, cdc *codec.Codec) {
-		RunFeeder(oracleKeeper, accountKeeper, cdc)
+	RunFeeder(oracleKeeper, accountKeeper, cdc)
 }
 
 func waitForCtx() {
@@ -27,7 +32,6 @@ func waitForCtx() {
 		time.Sleep(5 * time.Second)
 	}
 }
-
 
 func readOracleConfig() (types.OracleConfig, error) {
 	address, err := sdk.AccAddressFromBech32(viper.GetString("oracle-user-address"))
