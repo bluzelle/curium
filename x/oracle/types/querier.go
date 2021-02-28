@@ -10,7 +10,7 @@ const (
 	QueryCalculateProofSig = "calculateVoteProofSig"
 	QueryGetValcons = "getValcons"
 	QuerySearchSourceValues = "searchSourceValues"
-	QueryConfig = "queryConfig"
+	QueryConfig = "getConfig"
 )
 
 type QueryResultListSources = []struct{
