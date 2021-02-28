@@ -29,6 +29,7 @@ func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			GetCmdQListSources(queryRoute, cdc),
 			GetCmdQSearchVotes(queryRoute, cdc),
 			GetCmdQSearchSourceValues(queryRoute, cdc),
+			GetCmdQConfig(queryRoute, cdc),
 		)...,
 	)
 
@@ -111,3 +112,23 @@ func GetCmdQSearchSourceValues(queryRoute string, cdc *codec.Codec) *cobra.Comma
 	}
 }
 
+func GetCmdQConfig(queryRoute string, cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "config",
+		Short: "Show oracle config",
+		Args:  cobra.ExactArgs(0),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryConfig), nil)
+
+			if err != nil {
+				fmt.Printf("Error: %s", err)
+				return nil
+			}
+
+			var out types.QueryResultConfig
+			cdc.MustUnmarshalJSON(res, &out)
+			return cliCtx.PrintOutput(out)
+		},
+	}
+}

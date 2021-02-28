@@ -1,6 +1,6 @@
 package types
 
-import "github.com/cosmos/cosmos-sdk/types"
+import sdk "github.com/cosmos/cosmos-sdk/types"
 
 const (
 	QueryListSources = "listsources"
@@ -10,13 +10,18 @@ const (
 	QueryCalculateProofSig = "calculateVoteProofSig"
 	QueryGetValcons = "getValcons"
 	QuerySearchSourceValues = "searchSourceValues"
+	QueryConfig = "queryConfig"
 )
 
 type QueryResultListSources = []struct{
 	Name string
 	Url string
 	Property string
-	Owner types.AccAddress
+	Owner sdk.AccAddress
+}
+
+type QueryResultConfig = struct{
+	AdminAddress sdk.AccAddress
 }
 
 

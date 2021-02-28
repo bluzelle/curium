@@ -2,7 +2,6 @@ package oracle
 
 import (
 	"encoding/json"
-	"github.com/bluzelle/curium/x/crud"
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 
@@ -73,17 +72,14 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 // AppModule implements an application module for the oracle module.
 type AppModule struct {
 	AppModuleBasic
-
 	keeper        keeper.Keeper
-	crudKeeper    crud.Keeper
 }
 
 // NewAppModule creates a new AppModule object
-func NewAppModule(k keeper.Keeper, crudKeeper crud.Keeper) AppModule {
+func NewAppModule(k keeper.Keeper) AppModule {
 	return AppModule{
 		AppModuleBasic:      AppModuleBasic{},
 		keeper:              k,
-		crudKeeper:			 crudKeeper,
 	}
 }
 
@@ -133,13 +129,13 @@ func (am AppModule) ExportGenesis(ctx sdk.Context) json.RawMessage {
 
 // BeginBlock returns the begin blocker for the oracle module.
 func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
-	BeginBlocker(ctx, req, am.keeper, am.crudKeeper)
+	BeginBlocker(ctx, req)
 }
 
 // EndBlock returns the end blocker for the oracle module. It returns no validator
 // updates.
 func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-	EndBlocker(ctx, am.keeper, am.crudKeeper)
+	EndBlocker(ctx)
 	return []abci.ValidatorUpdate{}
 }
 

@@ -1,6 +1,7 @@
 package oracle
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/bluzelle/curium/x/oracle/keeper"
 	"github.com/bluzelle/curium/x/oracle/types"
@@ -31,17 +32,29 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 }
 
 func handleMsgOracleDeleteVotes(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleDeleteVotes) (*sdk.Result, error) {
+	if !bytes.Equal(msg.Owner, k.GetAdminAddress(ctx)) {
+		return &sdk.Result{}, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "unauthorized access")
+	}
+
 	k.DeleteVotes(ctx, msg.Prefix)
 	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }
 
 
 func handleMsgOracleDeleteSource(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleDeleteSource) (*sdk.Result, error) {
+	if !bytes.Equal(msg.Owner, k.GetAdminAddress(ctx)) {
+		return &sdk.Result{}, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "unauthorized access")
+	}
+
 	k.DeleteSource(ctx, msg.Name)
 	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }
 
 func handleMsgOracleAddSource(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleAddSource) (*sdk.Result, error) {
+	if !bytes.Equal(msg.Owner, k.GetAdminAddress(ctx)) {
+		return &sdk.Result{}, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "unauthorized access")
+	}
+
 	source := types.Source{
 		Name: msg.Name,
 		Url: msg.Url,

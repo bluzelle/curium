@@ -29,10 +29,20 @@ func NewQuerier(k Keeper) sdk.Querier {
 			return queryGetValcons()
 		case types.QuerySearchSourceValues:
 			return querySearchSourceValues(ctx, req, k)
+		case types.QueryConfig:
+			return queryConfig(ctx, k)
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown oracle query endpoint")
 		}
 	}
+}
+
+func queryConfig(ctx sdk.Context, k Keeper) ([]byte, error) {
+	config := types.QueryResultConfig{
+		AdminAddress: k.GetAdminAddress(ctx),
+	}
+	result, err := codec.MarshalJSONIndent(types.ModuleCdc, config)
+	return result, err
 }
 
 func queryGetValcons() ([]byte, error) {

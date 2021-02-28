@@ -163,8 +163,8 @@ func NewCRUDApp(
 		supply.StoreKey, distr.StoreKey, slashing.StoreKey,
 		gov.StoreKey, params.StoreKey, crud.StoreKey,
 		tax.StoreKey,
-		faucet.StoreKey, crud.LeaseKey, crud.OwnerKey, oracle.SourceStoreKey,
-		oracle.ProofStoreKey, oracle.VoteStoreKey, oracle.ValueStoreKey,
+		faucet.StoreKey, crud.LeaseKey, crud.OwnerKey, oracle.SourceStoreKey, oracle.ConfigStoreKey,
+		oracle.ProofStoreKey, oracle.VoteStoreKey, oracle.ValueStoreKey, oracle.ConfigStoreKey,
 		aggregator.ValueQueueStoreKey, aggregator.AggValueStoreKey,
 	)
 
@@ -277,6 +277,7 @@ func NewCRUDApp(
 	app.oracleKeeper = oracle.NewKeeper(
 		app.cdc,
 		keys[oracle.SourceStoreKey],
+		keys[oracle.ConfigStoreKey],
 		keys[oracle.ProofStoreKey],
 		keys[oracle.VoteStoreKey],
 		keys[oracle.ValueStoreKey],
@@ -316,7 +317,7 @@ func NewCRUDApp(
 		distr.NewAppModule(app.distrKeeper, app.accountKeeper, app.supplyKeeper, app.stakingKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.accountKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
-		oracle.NewAppModule(app.oracleKeeper, app.crudKeeper),
+		oracle.NewAppModule(app.oracleKeeper),
 		aggregator.NewAppModule(app.aggKeeper),
 	)
 
@@ -336,9 +337,9 @@ func NewCRUDApp(
 		crud.ModuleName,
 		tax.ModuleName,
 		supply.ModuleName,
-		genutil.ModuleName,
 		oracle.ModuleName,
 		aggregator.ModuleName,
+		genutil.ModuleName,
 	)
 
 	// register all module routes and module queriers
