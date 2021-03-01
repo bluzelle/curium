@@ -34,10 +34,38 @@ func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 		// this line is used by starport scaffolding # 1
 		GetCmdSourceAdd(cdc),
 		GetCmdSourceDelete(cdc),
+		GetCmdSetAdmin(cdc),
 	)...)
 
 	return oracleTxCmd
 }
+
+func GetCmdSetAdmin(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "set-admin <address>",
+		Short: "Set a new oracle admin address",
+		Args:  cobra.ExactArgs(1), // Does your request require arguments
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
+
+			newAdminAddr, err := sdk.AccAddressFromBech32(args[0])
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgOracleSetAdmin(newAdminAddr, cliCtx.GetFromAddress())
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+		},
+	}
+}
+
 
 func GetCmdSourceAdd(cdc *codec.Codec) *cobra.Command {
  	return &cobra.Command{

@@ -28,7 +28,7 @@ func NewMsgOracleDeleteVotes(prefix string, owner sdk.AccAddress) MsgOracleDelet
 func (msg MsgOracleDeleteVotes) Route() string { return RouterKey }
 func (msg MsgOracleDeleteVotes) Type() string  { return "OracleDeleteVotes" }
 func (msg MsgOracleDeleteVotes) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{sdk.AccAddress(msg.Owner)}
+	return []sdk.AccAddress{msg.Owner}
 }
 
 // GetSignBytes gets the bytes for the message signer to sign on
@@ -66,7 +66,7 @@ func NewMsgOracleDeleteSource(name string, owner sdk.AccAddress) MsgOracleDelete
 func (msg MsgOracleDeleteSource) Route() string { return RouterKey }
 func (msg MsgOracleDeleteSource) Type() string  { return "OracleDeleteSource" }
 func (msg MsgOracleDeleteSource) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{sdk.AccAddress(msg.Owner)}
+	return []sdk.AccAddress{msg.Owner}
 }
 
 // GetSignBytes gets the bytes for the message signer to sign on
@@ -115,7 +115,7 @@ func NewMsgOracleAddSource(name string, url string, property string, owner sdk.A
 func (msg MsgOracleAddSource) Route() string { return RouterKey }
 func (msg MsgOracleAddSource) Type() string  { return "OracleAddSource" }
 func (msg MsgOracleAddSource) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{sdk.AccAddress(msg.Owner)}
+	return []sdk.AccAddress{msg.Owner}
 }
 
 // GetSignBytes gets the bytes for the message signer to sign on
@@ -165,7 +165,7 @@ func NewMsgOracleVote(validatorAddr string, value string, owner sdk.AccAddress, 
 func (msg MsgOracleVote) Route() string { return RouterKey }
 func (msg MsgOracleVote) Type() string  { return "OracleVote" }
 func (msg MsgOracleVote) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{sdk.AccAddress(msg.Owner)}
+	return []sdk.AccAddress{msg.Owner}
 }
 
 // GetSignBytes gets the bytes for the message signer to sign on
@@ -221,7 +221,7 @@ func NewMsgOracleVoteProof(validatorAddr string, voteSig string, owner sdk.AccAd
 func (msg MsgOracleVoteProof) Route() string { return RouterKey }
 func (msg MsgOracleVoteProof) Type() string  { return "oracle/MsgOracleVoteProof" }
 func (msg MsgOracleVoteProof) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{sdk.AccAddress(msg.Owner)}
+	return []sdk.AccAddress{msg.Owner}
 }
 
 // GetSignBytes gets the bytes for the message signer to sign on
@@ -241,4 +241,43 @@ func (msg MsgOracleVoteProof) ValidateBasic() error {
 	return nil
 }
 
+
+
+
+/*********************************************************************
+** MsgOracleSetAdmin - struct for sending a set admin message
+ ********************************************************************/
+type MsgOracleSetAdmin struct {
+	NewAdminAddr sdk.AccAddress
+	Owner sdk.AccAddress
+}
+
+// NewMsgOracleSetAdmin creates a new MsgOracleSetAdmin instance
+func NewMsgOracleSetAdmin(newAdminAddr sdk.AccAddress, owner sdk.AccAddress,) MsgOracleSetAdmin {
+	return MsgOracleSetAdmin{
+		NewAdminAddr: newAdminAddr,
+		Owner: owner,
+	}
+}
+
+// nolint
+func (msg MsgOracleSetAdmin) Route() string { return RouterKey }
+func (msg MsgOracleSetAdmin) Type() string  { return "oracle/MsgOracleSetAdmin" }
+func (msg MsgOracleSetAdmin) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Owner}
+}
+
+// GetSignBytes gets the bytes for the message signer to sign on
+func (msg MsgOracleSetAdmin) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
+}
+
+// ValidateBasic validity check for the AnteHandler
+func (msg MsgOracleSetAdmin) ValidateBasic() error {
+	if msg.NewAdminAddr == nil {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "Invalid new addmin address")
+	}
+	return nil
+}
 

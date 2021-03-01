@@ -24,11 +24,21 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 			return handleMsgOracleVote(ctx, k, msg)
 		case types.MsgOracleDeleteVotes:
 			return handleMsgOracleDeleteVotes(ctx, k, msg)
+		case types.MsgOracleSetAdmin:
+			return handleMsgOracleSetAdmin(ctx, k, msg)
 		default:
 			errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName,  msg)
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 		}
 	}
+}
+
+func handleMsgOracleSetAdmin(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleSetAdmin) (*sdk.Result, error) {
+	if !bytes.Equal(msg.Owner, k.GetAdminAddress(ctx)) {
+		return &sdk.Result{}, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "unauthorized access")
+	}
+	k.SetAdminAddress(ctx, msg.NewAdminAddr)
+	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }
 
 func handleMsgOracleDeleteVotes(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleDeleteVotes) (*sdk.Result, error) {
