@@ -33,8 +33,11 @@ func NewKeeper(cdc *codec.Codec, oracleKeeper oracle.Keeper, valueQueueStoreKey 
 		cdc:        cdc,
 //		paramspace: paramspace.WithKeyTable(types.ParamKeyTable()),
 	}
-	oracleKeeper.RegisterValueUpdatedListener(keeper.SourceValueUpdatedListener)
 	return keeper
+}
+
+func (k Keeper) RegisterValueUpdatedListener() {
+	k.oracleKeeper.RegisterValueUpdatedListener(k.SourceValueUpdatedListener)
 }
 
 // Logger returns a module-specific logger.
@@ -71,6 +74,7 @@ func (k Keeper) VisitQueueItems(ctx sdk.Context, cb func(oracle.SourceValue)) {
 
 
 func (k Keeper) SourceValueUpdatedListener(ctx sdk.Context, value oracle.SourceValue) {
+	logger.Info("Adding source value to agg queue", "batch", value.Batch, "source", value.SourceName)
 	k.AddQueueItem(ctx, value)
 }
 

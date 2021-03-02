@@ -27,6 +27,7 @@ func StartAggregator(aggKeeper Keeper) {
 }
 
 func run(aggKeeper Keeper) {
+	aggKeeper.RegisterValueUpdatedListener()
 	c := cron.New()
 	c.AddFunc("* * * * *", func() {
 		time.AfterFunc(40 * time.Second, func() {

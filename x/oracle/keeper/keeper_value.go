@@ -2,10 +2,9 @@ package keeper
 
 import (
 	"fmt"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/bluzelle/curium/x/oracle/types"
-	"time"
 	storeIterator "github.com/cosmos/cosmos-sdk/store/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func (k Keeper) RegisterValueUpdatedListener(listener types.ValueUpdateListener) {
@@ -31,8 +30,7 @@ func (k Keeper) UpdateSourceValue(ctx sdk.Context, vote types.Vote) {
 	store.Set([]byte(key), k.cdc.MustMarshalBinaryBare(sourceValue))
 
 	for _, listener := range valueUpdateListeners {
-		// Delay the execution of the listener so it happens after the block is committed
-		time.AfterFunc(time.Second, func() {listener(ctx, sourceValue)})
+		listener(ctx, sourceValue)
 	}
 }
 
