@@ -321,8 +321,8 @@ func NewCRUDApp(
 		aggregator.NewAppModule(app.aggKeeper),
 	)
 
-	app.mm.SetOrderBeginBlockers(distr.ModuleName, slashing.ModuleName, oracle.ModuleName, aggregator.ModuleName)
-	app.mm.SetOrderEndBlockers(gov.ModuleName, staking.ModuleName)
+	app.mm.SetOrderBeginBlockers(distr.ModuleName, slashing.ModuleName, oracle.ModuleName)
+	app.mm.SetOrderEndBlockers(gov.ModuleName, staking.ModuleName, aggregator.ModuleName)
 
 	// Sets the order of Genesis - Order matters, genutil is to always come last
 	// NOTE: The genutils moodule must occur after staking so that pools are
@@ -362,7 +362,6 @@ func NewCRUDApp(
 	}
 
 	go oracle.StartOracle(app.oracleKeeper, app.accountKeeper, cdc)
-	go aggregator.StartAggregator(app.aggKeeper)
 
 	return app
 }
