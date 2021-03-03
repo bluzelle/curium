@@ -13,6 +13,13 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+type AggregatorValue struct {
+	Symbol string
+	InSymbol string
+	Value sdk.Dec
+	Count int64
+}
+
 var logger = log.NewTMLogger(log.NewSyncWriter(os.Stdout))
 
 // Keeper of the aggregator store
@@ -111,10 +118,37 @@ func (k Keeper) AggregateValues(ctx sdk.Context) {
 	logger.Info("End aggregate values")
 }
 
+
 func processBatch(ctx sdk.Context, k Keeper, values []AggregatorQueueItem) {
 	fixupUsdItems(values)
 	values = addInverses(values)
-	fmt.Println(values)
+
+	averagers := make(map[string]Averager)
+
+	for _, value := range values {
+		key := value.Symbol + "-" + value.InSymbol
+		x := averagers[key]
+		x.Add(value.Value)
+		averagers[key] = x
+	}
+
+	store := k.GetAggValueStore(ctx)
+
+	for key, averager := range averagers {
+		storeKey := MakeAggStoreKey(values[0].Batch, key)
+		parts := strings.Split(key, "-")
+		value := AggregatorValue{
+			Symbol:   parts[0],
+			InSymbol: parts[1],
+			Value:    averager.CalculateAverage(),
+			Count:    averager.Count,
+		}
+		store.Set(storeKey, k.cdc.MustMarshalBinaryBare(value))
+	}
+}
+
+func MakeAggStoreKey(batch string, pair string) []byte {
+	return []byte(batch + ">" + pair)
 }
 
 func addInverses(values []AggregatorQueueItem) []AggregatorQueueItem{
