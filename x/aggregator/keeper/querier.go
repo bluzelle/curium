@@ -14,15 +14,26 @@ import (
 func NewQuerier(k Keeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, error) {
 		switch path[0] {
-		// this line is used by starport scaffolding # 2
 		case types.QueryParams:
 			return queryParams(ctx, k)
-			// TODO: Put the modules query routes
+		case types.QuerySearchValues:
+			return querySearchValues(ctx, req, k)
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown aggregator query endpoint")
 		}
 	}
 }
+
+func querySearchValues(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, error) {
+	var query types.QueryReqSearchValues
+	k.cdc.MustUnmarshalJSON(req.Data, &query)
+
+	results := k.SearchValues(ctx, query.Prefix)
+
+	x := codec.MustMarshalJSONIndent(k.cdc, results)
+	return x, nil
+}
+
 
 func queryParams(ctx sdk.Context, k Keeper) ([]byte, error) {
 	params := k.GetParams(ctx)
@@ -34,6 +45,3 @@ func queryParams(ctx sdk.Context, k Keeper) ([]byte, error) {
 
 	return res, nil
 }
-
-// TODO: Add the modules query functions
-// They will be similar to the above one: queryParams()

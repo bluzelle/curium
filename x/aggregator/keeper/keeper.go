@@ -14,6 +14,7 @@ import (
 )
 
 type AggregatorValue struct {
+	Batch string
 	Symbol string
 	InSymbol string
 	Value sdk.Dec
@@ -138,6 +139,7 @@ func processBatch(ctx sdk.Context, k Keeper, values []AggregatorQueueItem) {
 		storeKey := MakeAggStoreKey(values[0].Batch, key)
 		parts := strings.Split(key, "-")
 		value := AggregatorValue{
+			Batch: values[0].Batch,
 			Symbol:   parts[0],
 			InSymbol: parts[1],
 			Value:    averager.CalculateAverage(),
@@ -154,13 +156,15 @@ func MakeAggStoreKey(batch string, pair string) []byte {
 func addInverses(values []AggregatorQueueItem) []AggregatorQueueItem{
 	var newValues []AggregatorQueueItem
 	for _, value := range values {
-		newValues = append(newValues, AggregatorQueueItem {
-			SourceName: value.SourceName + "-inverse" ,
-			Batch:      value.Batch,
-			Symbol:     value.InSymbol,
-			InSymbol:   value.Symbol,
-			Value:      sdk.NewDec(1).Quo(value.Value),
-		})
+		if !value.Value.IsZero() && !value.Value.IsNil() {
+			newValues = append(newValues, AggregatorQueueItem{
+				SourceName: value.SourceName + "-inverse",
+				Batch:      value.Batch,
+				Symbol:     value.InSymbol,
+				InSymbol:   value.Symbol,
+				Value:      sdk.NewDec(1).Quo(value.Value),
+			})
+		}
 	}
 	return append(values, newValues...)
 }
@@ -186,4 +190,22 @@ func batchQueueItems(ctx sdk.Context, k Keeper) map[string][]AggregatorQueueItem
 		batches[value.Batch] = append(batches[value.Batch], value)
 	})
 	return batches
+}
+
+func (k Keeper) SearchValues(ctx sdk.Context, prefix string) []AggregatorValue {
+	iterator := sdk.KVStorePrefixIterator(k.GetAggValueStore(ctx), []byte(prefix))
+	defer iterator.Close()
+	values := make([]AggregatorValue, 0)
+
+	for ;iterator.Valid(); iterator.Next() {
+		if ctx.GasMeter().IsPastLimit() {
+			break
+		}
+
+		var v AggregatorValue
+		value := iterator.Value()
+		k.cdc.MustUnmarshalBinaryBare(value, &v)
+		values = append(values, v)
+	}
+	return values
 }
