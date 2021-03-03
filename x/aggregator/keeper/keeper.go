@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"github.com/bluzelle/curium/x/oracle"
 	"os"
+	"strings"
 
 	"github.com/tendermint/tendermint/libs/log"
 
+	"github.com/bluzelle/curium/x/aggregator/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/bluzelle/curium/x/aggregator/types"
 )
 
 var logger = log.NewTMLogger(log.NewSyncWriter(os.Stdout))
@@ -50,29 +51,43 @@ func (k Keeper) GetAggValueStore(ctx sdk.Context) sdk.KVStore {
 	return ctx.KVStore(k.aggValueStoreKey)
 }
 
-func MakeQueueItemKey(value oracle.SourceValue) []byte {
+func MakeQueueItemKey(value AggregatorQueueItem) []byte {
 	return []byte(value.Batch + ">" + value.SourceName)
 }
 
-func (k Keeper) AddQueueItem(ctx sdk.Context, value oracle.SourceValue) {
-	key := MakeQueueItemKey(value)
-	store := k.GetQueueStore(ctx)
-	store.Set(key, k.cdc.MustMarshalBinaryBare(value))
+type AggregatorQueueItem struct {
+	SourceName string
+	Batch string
+	Symbol string
+	InSymbol string
 }
 
-func (k Keeper) DeleteQueueItem(ctx sdk.Context, value oracle.SourceValue) {
+func (k Keeper) AddQueueItem(ctx sdk.Context, value oracle.SourceValue) {
+	parts := strings.Split(value.SourceName, "-")
+	aggQueueItem := AggregatorQueueItem{
+		Batch: value.Batch,
+		SourceName: value.SourceName,
+		Symbol: parts[1],
+		InSymbol: parts[3],
+	}
+	key := MakeQueueItemKey(aggQueueItem)
+	store := k.GetQueueStore(ctx)
+	store.Set(key, k.cdc.MustMarshalBinaryBare(aggQueueItem))
+}
+
+func (k Keeper) DeleteQueueItem(ctx sdk.Context, value AggregatorQueueItem) {
 	key := MakeQueueItemKey(value)
 	store := k.GetQueueStore(ctx)
 	store.Delete(key)
 }
 
-func (k Keeper) VisitQueueItems(ctx sdk.Context, cb func(oracle.SourceValue)) {
+func (k Keeper) VisitQueueItems(ctx sdk.Context, cb func(AggregatorQueueItem)) {
 	store := k.GetQueueStore(ctx)
 	iterator := store.Iterator(nil, nil)
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var value oracle.SourceValue
+		var value AggregatorQueueItem
 		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &value)
 		cb(value)
 		k.DeleteQueueItem(ctx, value)
@@ -87,23 +102,25 @@ func (k Keeper) SourceValueUpdatedListener(ctx sdk.Context, value oracle.SourceV
 func (k Keeper) AggregateValues(ctx sdk.Context) {
 	logger.Info("Start aggregate values")
 	batches := batchQueueItems(ctx, k)
-	for batch := range(batches) {
+	for batch := range batches {
 		logger.Info("Processing batch", "batch", batch, "len", len(batches[batch]))
 		processBatch(ctx, k, batches[batch])
 	}
 	logger.Info("End aggregate values")
 }
 
-func processBatch(ctx sdk.Context, k Keeper, batch []oracle.SourceValue) {
+func processBatch(ctx sdk.Context, k Keeper, values []AggregatorQueueItem) {
 	
+	fmt.Println(values)
 }
 
-func batchQueueItems(ctx sdk.Context, k Keeper) map[string][]oracle.SourceValue {
-	var batches = map[string][]oracle.SourceValue{}
-	k.VisitQueueItems(ctx, func(value oracle.SourceValue) {
+
+func batchQueueItems(ctx sdk.Context, k Keeper) map[string][]AggregatorQueueItem {
+	var batches = map[string][]AggregatorQueueItem{}
+	k.VisitQueueItems(ctx, func(value AggregatorQueueItem) {
 		b := batches[value.Batch]
 		if b == nil {
-			batches[value.Batch] = make([]oracle.SourceValue, 0)
+			batches[value.Batch] = make([]AggregatorQueueItem, 0)
 		}
 		batches[value.Batch] = append(batches[value.Batch], value)
 	})
