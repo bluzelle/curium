@@ -8,4 +8,7 @@ const (
 
 type QueryReqSearchValues struct {
 	Prefix string
+	Reverse bool
+	Page uint
+	Limit uint
 }

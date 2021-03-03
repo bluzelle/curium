@@ -3,6 +3,7 @@ package keeper
 import (
 	"fmt"
 	"github.com/bluzelle/curium/x/oracle"
+	storeIterator "github.com/cosmos/cosmos-sdk/store/types"
 	"os"
 	"strings"
 
@@ -192,10 +193,21 @@ func batchQueueItems(ctx sdk.Context, k Keeper) map[string][]AggregatorQueueItem
 	return batches
 }
 
-func (k Keeper) SearchValues(ctx sdk.Context, prefix string) []AggregatorValue {
-	iterator := sdk.KVStorePrefixIterator(k.GetAggValueStore(ctx), []byte(prefix))
+func (k Keeper) SearchValues(ctx sdk.Context, prefix string, page uint, limit uint, reverse bool) []AggregatorValue {
+	if page == 0 {
+		page = 1
+	}
+	if limit == 0 {
+		limit = 100
+	}
+	var iterator sdk.Iterator
+	if reverse {
+		iterator = storeIterator.KVStoreReversePrefixIteratorPaginated(k.GetAggValueStore(ctx), []byte(prefix), page, limit)
+	} else {
+		iterator = storeIterator.KVStorePrefixIteratorPaginated(k.GetAggValueStore(ctx), []byte(prefix), page, limit)
+	}
 	defer iterator.Close()
-	values := make([]AggregatorValue, 0)
+	values  := make([]AggregatorValue, 0)
 
 	for ;iterator.Valid(); iterator.Next() {
 		if ctx.GasMeter().IsPastLimit() {
@@ -209,3 +221,5 @@ func (k Keeper) SearchValues(ctx sdk.Context, prefix string) []AggregatorValue {
 	}
 	return values
 }
+
+
