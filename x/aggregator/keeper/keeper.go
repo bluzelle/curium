@@ -60,6 +60,7 @@ type AggregatorQueueItem struct {
 	Batch string
 	Symbol string
 	InSymbol string
+	Value sdk.Dec
 }
 
 func (k Keeper) AddQueueItem(ctx sdk.Context, value oracle.SourceValue) {
@@ -69,6 +70,7 @@ func (k Keeper) AddQueueItem(ctx sdk.Context, value oracle.SourceValue) {
 		SourceName: value.SourceName,
 		Symbol: parts[1],
 		InSymbol: parts[3],
+		Value: value.Value,
 	}
 	key := MakeQueueItemKey(aggQueueItem)
 	store := k.GetQueueStore(ctx)
@@ -110,10 +112,35 @@ func (k Keeper) AggregateValues(ctx sdk.Context) {
 }
 
 func processBatch(ctx sdk.Context, k Keeper, values []AggregatorQueueItem) {
-	
+	fixupUsdItems(values)
+	values = addInverses(values)
 	fmt.Println(values)
 }
 
+func addInverses(values []AggregatorQueueItem) []AggregatorQueueItem{
+	var newValues []AggregatorQueueItem
+	for _, value := range values {
+		newValues = append(newValues, AggregatorQueueItem {
+			SourceName: value.SourceName + "-inverse" ,
+			Batch:      value.Batch,
+			Symbol:     value.InSymbol,
+			InSymbol:   value.Symbol,
+			Value:      sdk.NewDec(1).Quo(value.Value),
+		})
+	}
+	return append(values, newValues...)
+}
+
+func fixupUsdItems(values []AggregatorQueueItem) {
+	for i, value := range values {
+		if value.Symbol == "usdt" || value.Symbol == "usdc" {
+			values[i].Symbol = "usd"
+		}
+		if value.InSymbol == "usdt" || value.InSymbol == "usdc" {
+			values[i].InSymbol = "usd"
+		}
+	}
+}
 
 func batchQueueItems(ctx sdk.Context, k Keeper) map[string][]AggregatorQueueItem {
 	var batches = map[string][]AggregatorQueueItem{}
