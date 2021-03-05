@@ -15,11 +15,11 @@ import (
 )
 
 type AggregatorValue struct {
-	Batch string
-	Symbol string
+	Batch    string
+	Symbol   string
 	InSymbol string
-	Value sdk.Dec
-	Count int64
+	Value    sdk.Dec
+	Count    int64
 }
 
 var logger = log.NewTMLogger(log.NewSyncWriter(os.Stdout))
@@ -46,7 +46,6 @@ func NewKeeper(cdc *codec.Codec, oracleKeeper oracle.Keeper, valueQueueStoreKey 
 	return keeper
 }
 
-
 // Logger returns a module-specific logger.
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
@@ -66,20 +65,20 @@ func MakeQueueItemKey(value AggregatorQueueItem) []byte {
 
 type AggregatorQueueItem struct {
 	SourceName string
-	Batch string
-	Symbol string
-	InSymbol string
-	Value sdk.Dec
+	Batch      string
+	Symbol     string
+	InSymbol   string
+	Value      sdk.Dec
 }
 
 func (k Keeper) AddQueueItem(ctx sdk.Context, value oracle.SourceValue) {
 	parts := strings.Split(value.SourceName, "-")
 	aggQueueItem := AggregatorQueueItem{
-		Batch: value.Batch,
+		Batch:      value.Batch,
 		SourceName: value.SourceName,
-		Symbol: parts[1],
-		InSymbol: parts[3],
-		Value: value.Value,
+		Symbol:     parts[1],
+		InSymbol:   parts[3],
+		Value:      value.Value,
 	}
 	key := MakeQueueItemKey(aggQueueItem)
 	store := k.GetQueueStore(ctx)
@@ -120,9 +119,20 @@ func (k Keeper) AggregateValues(ctx sdk.Context) {
 	logger.Info("End aggregate values")
 }
 
+func filterZeroValues(values []AggregatorQueueItem) []AggregatorQueueItem {
+	var out []AggregatorQueueItem
+	for _, item := range values {
+		if item.Value.IsZero() || item.Value.IsNil() {
+			continue
+		}
+		out = append(out, item)
+	}
+	return out
+}
 
 func processBatch(ctx sdk.Context, k Keeper, values []AggregatorQueueItem) {
 	fixupUsdItems(values)
+	values = filterZeroValues(values)
 	values = addInverses(values)
 
 	averagers := make(map[string]Averager)
@@ -140,7 +150,7 @@ func processBatch(ctx sdk.Context, k Keeper, values []AggregatorQueueItem) {
 		storeKey := MakeAggStoreKey(values[0].Batch, key)
 		parts := strings.Split(key, "-")
 		value := AggregatorValue{
-			Batch: values[0].Batch,
+			Batch:    values[0].Batch,
 			Symbol:   parts[0],
 			InSymbol: parts[1],
 			Value:    averager.CalculateAverage(),
@@ -154,18 +164,16 @@ func MakeAggStoreKey(batch string, pair string) []byte {
 	return []byte(batch + ">" + pair)
 }
 
-func addInverses(values []AggregatorQueueItem) []AggregatorQueueItem{
+func addInverses(values []AggregatorQueueItem) []AggregatorQueueItem {
 	var newValues []AggregatorQueueItem
 	for _, value := range values {
-		if !value.Value.IsZero() && !value.Value.IsNil() {
-			newValues = append(newValues, AggregatorQueueItem{
-				SourceName: value.SourceName + "-inverse",
-				Batch:      value.Batch,
-				Symbol:     value.InSymbol,
-				InSymbol:   value.Symbol,
-				Value:      sdk.NewDec(1).Quo(value.Value),
-			})
-		}
+		newValues = append(newValues, AggregatorQueueItem{
+			SourceName: value.SourceName + "-inverse",
+			Batch:      value.Batch,
+			Symbol:     value.InSymbol,
+			InSymbol:   value.Symbol,
+			Value:      sdk.NewDec(1).Quo(value.Value),
+		})
 	}
 	return append(values, newValues...)
 }
@@ -207,9 +215,9 @@ func (k Keeper) SearchValues(ctx sdk.Context, prefix string, page uint, limit ui
 		iterator = storeIterator.KVStorePrefixIteratorPaginated(k.GetAggValueStore(ctx), []byte(prefix), page, limit)
 	}
 	defer iterator.Close()
-	values  := make([]AggregatorValue, 0)
+	values := make([]AggregatorValue, 0)
 
-	for ;iterator.Valid(); iterator.Next() {
+	for ; iterator.Valid(); iterator.Next() {
 		if ctx.GasMeter().IsPastLimit() {
 			break
 		}
@@ -221,5 +229,3 @@ func (k Keeper) SearchValues(ctx sdk.Context, prefix string, page uint, limit ui
 	}
 	return values
 }
-
-
