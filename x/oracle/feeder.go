@@ -2,6 +2,7 @@ package oracle
 
 import (
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"github.com/bluzelle/curium/x/oracle/keeper"
 	"github.com/bluzelle/curium/x/oracle/types"
@@ -12,6 +13,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/robfig/cron/v3"
+	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/libs/log"
 	"github.com/tendermint/tendermint/rpc/core"
 	"github.com/tendermint/tendermint/rpc/core/types"
@@ -32,9 +34,6 @@ var accountKeeper auth.AccountKeeper
 func RunFeeder(oracleKeeper Keeper, accKeeper auth.AccountKeeper, cdc *codec.Codec) {
 	logger.Info("Starting oracle feeder service")
 	accountKeeper = accKeeper
-
-	//TODO: For testing only - remove
-	GetValueAndSendProofAndVote(oracleKeeper, cdc)
 
 	c := cron.New()
 	c.AddFunc("* * * * *", func() {
@@ -227,4 +226,35 @@ func BroadcastOracleMessages(msgs []sdk.Msg, cdc *codec.Codec) (*coretypes.Resul
 
 	return nil, err
 
+}
+
+var currCtx *sdk.Context
+
+func StartFeeder(oracleKeeper Keeper, accountKeeper auth.AccountKeeper, cdc *codec.Codec) {
+	defer func() {
+		if err := recover(); err != nil {
+			logger.Error("panic occurred:", "err", err)
+		}
+	}()
+	waitForCtx()
+	RunFeeder(oracleKeeper, accountKeeper, cdc)
+}
+
+func waitForCtx() {
+	for currCtx == nil {
+		logger.Info("Oracle waiting for context")
+		time.Sleep(5 * time.Second)
+	}
+}
+
+func readOracleConfig() (types.OracleConfig, error) {
+	address, err := sdk.AccAddressFromBech32(viper.GetString("oracle-user-address"))
+	if err != nil {
+		errors.New("unable to read oracle address from app.toml")
+	}
+
+	return types.OracleConfig{
+		UserAddress:  address,
+		UserMnemonic: viper.GetString("oracle-user-mnemonic"),
+	}, nil
 }
