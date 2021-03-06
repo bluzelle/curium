@@ -26,6 +26,7 @@ func (k Keeper) UpdateSourceValue(ctx sdk.Context, vote types.Vote) {
 		Batch:      vote.Batch,
 		Value:      average,
 		Owner:      vote.Owner,
+		Height:     ctx.BlockHeight(),
 	}
 	store.Set([]byte(key), k.cdc.MustMarshalBinaryBare(sourceValue))
 

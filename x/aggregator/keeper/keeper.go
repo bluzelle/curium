@@ -20,6 +20,7 @@ type AggregatorValue struct {
 	InSymbol string
 	Value    sdk.Dec
 	Count    int64
+	Height   int64
 }
 
 var logger = log.NewTMLogger(log.NewSyncWriter(os.Stdout))
@@ -60,7 +61,7 @@ func (k Keeper) GetAggValueStore(ctx sdk.Context) sdk.KVStore {
 }
 
 func MakeQueueItemKey(value AggregatorQueueItem) []byte {
-	return []byte(value.Batch + ">" + value.SourceName)
+	return []byte(BlockNumberToString(value.Height) + ">" + value.Batch + ">" + value.SourceName)
 }
 
 type AggregatorQueueItem struct {
@@ -69,6 +70,7 @@ type AggregatorQueueItem struct {
 	Symbol     string
 	InSymbol   string
 	Value      sdk.Dec
+	Height     int64
 }
 
 func (k Keeper) AddQueueItem(ctx sdk.Context, value oracle.SourceValue) {
@@ -79,6 +81,7 @@ func (k Keeper) AddQueueItem(ctx sdk.Context, value oracle.SourceValue) {
 		Symbol:     parts[1],
 		InSymbol:   parts[3],
 		Value:      value.Value,
+		Height:     value.Height,
 	}
 	key := MakeQueueItemKey(aggQueueItem)
 	store := k.GetQueueStore(ctx)
@@ -109,14 +112,28 @@ func (k Keeper) SourceValueUpdatedListener(ctx sdk.Context, value oracle.SourceV
 	k.AddQueueItem(ctx, value)
 }
 
+func (k Keeper) isQueueReadyForProcessing(ctx sdk.Context) bool {
+	const BLOCKS_TO_WAIT = 3
+	store := k.GetQueueStore(ctx)
+	iterator := store.ReverseIterator(nil, nil)
+	defer iterator.Close()
+	if iterator.Valid() {
+		var item AggregatorQueueItem
+		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &item)
+		return item.Height + BLOCKS_TO_WAIT < ctx.BlockHeight()
+	}
+	return false
+}
+
 func (k Keeper) AggregateValues(ctx sdk.Context) {
-	logger.Info("Start aggregate values")
+	if !k.isQueueReadyForProcessing(ctx) {
+		return
+	}
 	batches := batchQueueItems(ctx, k)
 	for batch := range batches {
-		logger.Info("Processing batch", "batch", batch, "len", len(batches[batch]))
+		logger.Info("Aggregator processing batch", "batch", batch, "len", len(batches[batch]))
 		processBatch(ctx, k, batches[batch])
 	}
-	logger.Info("End aggregate values")
 }
 
 func filterZeroValues(values []AggregatorQueueItem) []AggregatorQueueItem {
@@ -187,6 +204,10 @@ func fixupUsdItems(values []AggregatorQueueItem) {
 			values[i].InSymbol = "usd"
 		}
 	}
+}
+
+func BlockNumberToString(blockNum int64) string {
+	return fmt.Sprintf("%020d", blockNum)
 }
 
 func batchQueueItems(ctx sdk.Context, k Keeper) map[string][]AggregatorQueueItem {

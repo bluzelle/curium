@@ -93,6 +93,7 @@ func handleMsgOracleVote(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleVo
 			Valcons: 		  msg.Valcons,
 			Owner:            msg.Owner,
 			Weight:		      weight,
+			Height:           ctx.BlockHeight(),
 		}
 		k.UpdateSourceValue(ctx, vote)
 		k.StoreVote(ctx, vote)
