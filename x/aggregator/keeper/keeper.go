@@ -108,7 +108,6 @@ func (k Keeper) VisitQueueItems(ctx sdk.Context, cb func(AggregatorQueueItem)) {
 }
 
 func (k Keeper) SourceValueUpdatedListener(ctx sdk.Context, value oracle.SourceValue) {
-	logger.Info("Adding source value to agg queue", "batch", value.Batch, "source", value.SourceName)
 	k.AddQueueItem(ctx, value)
 }
 
