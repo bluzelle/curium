@@ -23,6 +23,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -147,9 +148,9 @@ func sendVoteMsgs(values []SourceAndValue, cdc *codec.Codec) string {
 		msg, _ := generateVoteMsg(cdc, value)
 		msgs = append(msgs, msg)
 	}
-	logger.Info("Sending oracle vote messages", "count", len(msgs))
+	logger.Info("Sending feeder vote messages", "count", len(msgs))
 	result, _ := BroadcastOracleMessages(msgs, cdc)
-	logger.Info("Oracle vote messages sent", "hash", result.Hash)
+	logger.Info("Feeder vote messages sent", "hash", result.Hash)
 	return hex.EncodeToString(result.Hash)
 }
 
@@ -163,11 +164,28 @@ func generateVoteMsg(cdc *codec.Codec, source SourceAndValue) (types.MsgOracleVo
 		fmt.Sprintf("%.12f", source.value),
 		config.UserAddress,
 		source.source.Name,
-		keeper.GetCurrentBatchId(),
+		getCurrentBatchId(),
 	)
 	err = msg.ValidateBasic()
 	return msg, err
 }
+
+func getCurrentBatchId() string {
+	t := time.Date(
+		time.Now().Year(),
+		time.Now().Month(),
+		time.Now().Day(),
+		time.Now().Hour(),
+		time.Now().Minute(),
+		0,
+		0,
+		time.UTC,
+	).String()
+	t = strings.Replace(t, ":00 +0000 UTC", "", 1)
+	t = strings.Replace(t, " ", "-", -1)
+	return t
+}
+
 
 func generateVoteProofMsg(cdc *codec.Codec, source SourceAndValue) (types.MsgOracleVoteProof, error) {
 	config, err := readOracleConfig()
@@ -219,7 +237,7 @@ func BroadcastOracleMessages(msgs []sdk.Msg, cdc *codec.Codec) (*coretypes.Resul
 		rpcCtx := rpctypes.Context{}
 		result, err := core.BroadcastTxCommit(&rpcCtx, signedMsg)
 		if err != nil {
-			logger.Info("Error transmitting oracle messages")
+			logger.Info("Error transmitting feeder messages")
 		}
 		return result, nil
 	}
@@ -242,7 +260,7 @@ func StartFeeder(oracleKeeper Keeper, accountKeeper auth.AccountKeeper, cdc *cod
 
 func waitForCtx() {
 	for currCtx == nil {
-		logger.Info("Oracle waiting for context")
+		logger.Info("Feeder waiting for context")
 		time.Sleep(5 * time.Second)
 	}
 }

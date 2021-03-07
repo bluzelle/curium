@@ -2,17 +2,14 @@ package keeper
 
 import (
 	"fmt"
+	"github.com/bluzelle/curium/x/oracle/types"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/libs/log"
 	"github.com/tendermint/tendermint/privval"
-	"strings"
-	"time"
-
-	"github.com/bluzelle/curium/x/oracle/types"
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var valueUpdateListeners []types.ValueUpdateListener = make([]types.ValueUpdateListener, 0)
@@ -46,21 +43,6 @@ func NewKeeper(cdc *codec.Codec, sourceStoreKey sdk.StoreKey, configStoreKey sdk
 	return keeper
 }
 
-func GetCurrentBatchId() string {
-	t := time.Date(
-		time.Now().Year(),
-		time.Now().Month(),
-		time.Now().Day(),
-		time.Now().Hour(),
-		time.Now().Minute(),
-		0,
-		0,
-		time.UTC,
-	).String()
-	t = strings.Replace(t, ":00 +0000 UTC", "", 1)
-	t = strings.Replace(t, " ", "-", -1)
-	return t
-}
 
 // Logger returns a module-specific logger.
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
