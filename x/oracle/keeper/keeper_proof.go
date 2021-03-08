@@ -35,14 +35,24 @@ func (k Keeper) IsVoteValid(ctx sdk.Context, msg types.MsgOracleVote) bool {
 	validator, found := k.GetValidator(ctx, msg.Valcons)
 
 	if validator.Jailed {
+		logger.Info("Oracle vote received from jailed validator", "name", msg.SourceName, "valcons", msg.Valcons)
 		return false
+	}
+
+	if !found {
+		logger.Info("Oracle vote received from unknown validator", "name", msg.SourceName, "valcons", msg.Valcons)
 	}
 
 	if found {
 		proofSignatureString := k.GetVoteProof(ctx, msg.SourceName, msg.Valcons).VoteSig
 		proofSignature, _ := hex.DecodeString(proofSignatureString)
-		good := validator.ConsPubKey.VerifyBytes([]byte(msg.Value), proofSignature)
-		return good
+		isGood := validator.ConsPubKey.VerifyBytes([]byte(msg.Value), proofSignature)
+
+		if !isGood {
+			logger.Info("Oracle vote/proof mismatch", "name", msg.SourceName, "valcons", msg.Valcons)
+		}
+
+		return isGood
 	}
 	return false
 }

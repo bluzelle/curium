@@ -14,8 +14,8 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 		switch msg := msg.(type) {
-		 case types.MsgOracleVoteProof:
-		 	return handleMsgOracleVoteProof(ctx, k, msg)
+		case types.MsgOracleVoteProof:
+			return handleMsgOracleVoteProof(ctx, k, msg)
 		case types.MsgOracleAddSource:
 			return handleMsgOracleAddSource(ctx, k, msg)
 		case types.MsgOracleDeleteSource:
@@ -27,7 +27,7 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case types.MsgOracleSetAdmin:
 			return handleMsgOracleSetAdmin(ctx, k, msg)
 		default:
-			errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName,  msg)
+			errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName, msg)
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 		}
 	}
@@ -50,7 +50,6 @@ func handleMsgOracleDeleteVotes(ctx sdk.Context, k keeper.Keeper, msg types.MsgO
 	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }
 
-
 func handleMsgOracleDeleteSource(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleDeleteSource) (*sdk.Result, error) {
 	if !bytes.Equal(msg.Owner, k.GetAdminAddress(ctx)) {
 		return &sdk.Result{}, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "unauthorized access")
@@ -66,39 +65,42 @@ func handleMsgOracleAddSource(ctx sdk.Context, k keeper.Keeper, msg types.MsgOra
 	}
 
 	source := types.Source{
-		Name: msg.Name,
-		Url: msg.Url,
+		Name:     msg.Name,
+		Url:      msg.Url,
 		Property: msg.Property,
-		Owner: msg.Owner,
+		Owner:    msg.Owner,
 	}
 	k.AddSource(ctx, msg.Name, source)
 	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }
 
 func handleMsgOracleVote(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleVote) (*sdk.Result, error) {
-	voteGood := k.IsVoteValid(ctx, msg)
-	logger.Info("Vote received", "name", msg.SourceName, "good", voteGood)
+	isVoteGood := k.IsVoteValid(ctx, msg)
+
+	if !isVoteGood {
+		return &sdk.Result{Events: ctx.EventManager().Events()}, nil
+	}
 
 	validator, found := k.GetValidator(ctx, msg.Valcons)
 	var weight sdk.Dec
+
 	if found {
 		weight = validator.GetDelegatorShares()
-	}
 
-	if voteGood {
 		value, _ := sdk.NewDecFromStr(msg.Value)
 		vote := types.Vote{
-			SourceName:       msg.SourceName,
-			Batch:            msg.Batch,
-			Value:            value,
-			Valcons: 		  msg.Valcons,
-			Owner:            msg.Owner,
-			Weight:		      weight,
-			Height:           ctx.BlockHeight(),
+			SourceName: msg.SourceName,
+			Batch:      msg.Batch,
+			Value:      value,
+			Valcons:    msg.Valcons,
+			Owner:      msg.Owner,
+			Weight:     weight,
+			Height:     ctx.BlockHeight(),
 		}
 		k.UpdateSourceValue(ctx, vote)
 		k.StoreVote(ctx, vote)
 	}
+
 	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }
 
@@ -106,4 +108,3 @@ func handleMsgOracleVoteProof(ctx sdk.Context, k keeper.Keeper, msg types.MsgOra
 	k.StoreVoteProof(ctx, msg)
 	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }
-

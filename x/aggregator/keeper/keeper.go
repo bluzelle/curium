@@ -81,7 +81,6 @@ func (k Keeper) AddQueueItem(ctx sdk.Context, value oracle.SourceValue) {
 		Symbol:     parts[1],
 		InSymbol:   parts[3],
 		Value:      value.Value,
-		Height:     value.Height,
 	}
 	key := MakeQueueItemKey(aggQueueItem)
 	store := k.GetQueueStore(ctx)

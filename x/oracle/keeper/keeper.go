@@ -10,7 +10,10 @@ import (
 	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/libs/log"
 	"github.com/tendermint/tendermint/privval"
+	"os"
 )
+
+var logger = log.NewTMLogger(log.NewSyncWriter(os.Stdout))
 
 var valueUpdateListeners []types.ValueUpdateListener = make([]types.ValueUpdateListener, 0)
 
