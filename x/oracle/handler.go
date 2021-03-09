@@ -75,7 +75,7 @@ func handleMsgOracleAddSource(ctx sdk.Context, k keeper.Keeper, msg types.MsgOra
 }
 
 func handleMsgOracleVote(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleVote) (*sdk.Result, error) {
-	logger.Debug("Vote received", msg)
+	logger.Debug("Vote received", "msg", msg)
 	isVoteGood := k.IsVoteValid(ctx, msg)
 
 	if !isVoteGood {
@@ -106,6 +106,7 @@ func handleMsgOracleVote(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleVo
 }
 
 func handleMsgOracleVoteProof(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleVoteProof) (*sdk.Result, error) {
+	logger.Debug("Proof received", "msg", msg)
 	k.StoreVoteProof(ctx, msg)
 	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }
