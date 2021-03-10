@@ -66,7 +66,7 @@ func GetValueAndSendProofAndVote(oracleKeeper Keeper, cdc *codec.Codec) {
 }
 
 func fetchValues(sources []types.Source) []SourceAndValue {
-	var results []SourceAndValue
+	var results = make([]SourceAndValue, 0)
 	wg := sync.WaitGroup{}
 	for _, source := range sources {
 		wg.Add(1)
@@ -220,6 +220,8 @@ func BroadcastOracleMessages(msgs []sdk.Msg, cdc *codec.Codec) (*coretypes.Resul
 	address := account.GetAddress()
 	acc := accountKeeper.GetAccount(*currCtx, address)
 
+	minGasPrice := strings.Replace(viper.GetString("minimum-gas-prices"), "ubnt", "", 1)
+	gasPrice, _ := sdk.NewDecFromStr(minGasPrice)
 	txBldr := auth.NewTxBuilder(
 		utils.GetTxEncoder(cdc),
 		acc.GetAccountNumber(),
@@ -229,7 +231,7 @@ func BroadcastOracleMessages(msgs []sdk.Msg, cdc *codec.Codec) (*coretypes.Resul
 		false,
 		currCtx.ChainID(),
 		"memo", nil,
-		sdk.NewDecCoins(sdk.NewDecCoin("ubnt", sdk.NewInt(100000))),
+		sdk.NewDecCoins(sdk.NewDecCoinFromDec("ubnt", gasPrice)),
 	).WithKeybase(keybase)
 
 	signedMsg, err := txBldr.BuildAndSign("oracle", clientKeys.DefaultKeyPass, msgs)

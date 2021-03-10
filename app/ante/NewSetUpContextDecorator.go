@@ -75,7 +75,7 @@ func SetGasMeter(simulate bool, ctx sdk.Context, gasLimit uint64, tx sdk.Tx) sdk
 		return ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 	}
 
-	if strings.HasPrefix(tx.GetMsgs()[0].Type(), "Oracle") {
+	if strings.HasPrefix(tx.GetMsgs()[0].Type(), "oracle") {
 		return ctx.WithGasMeter(NewDummyGasMeter())
 	}
 	return ctx.WithGasMeter(sdk.NewGasMeter(gasLimit))
