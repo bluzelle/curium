@@ -2,6 +2,7 @@ package aggregator
 
 import (
 	"fmt"
+	"github.com/bluzelle/curium/app/ante"
 
 	"github.com/bluzelle/curium/x/aggregator/keeper"
 	"github.com/bluzelle/curium/x/aggregator/types"
@@ -12,7 +13,7 @@ import (
 // NewHandler creates an sdk.Handler for all the aggregator type messages
 func NewHandler(k keeper.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
-		ctx = ctx.WithEventManager(sdk.NewEventManager())
+		ctx = ctx.WithEventManager(sdk.NewEventManager()).WithGasMeter(ante.NewDummyGasMeter())
 		switch msg := msg.(type) {
 		default:
 			errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName,  msg)
