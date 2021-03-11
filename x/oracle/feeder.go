@@ -71,6 +71,11 @@ func fetchValues(sources []types.Source) []SourceAndValue {
 	for _, source := range sources {
 		wg.Add(1)
 		go func(source types.Source) {
+			defer func() {
+				if err := recover(); err != nil {
+					logger.Error("panic occurred fetching source", "source", source.Name, "err", err)
+				}
+			}()
 			value, err := fetchSource(source)
 			if err == nil {
 				results = append(results, SourceAndValue{
