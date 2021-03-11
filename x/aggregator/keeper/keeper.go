@@ -5,6 +5,7 @@ import (
 	"github.com/bluzelle/curium/x/oracle"
 	storeIterator "github.com/cosmos/cosmos-sdk/store/types"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/tendermint/tendermint/libs/log"
@@ -35,7 +36,7 @@ type Keeper struct {
 }
 
 // NewKeeper creates a aggregator keeper
-func NewKeeper(cdc *codec.Codec, oracleKeeper oracle.Keeper, valueQueueStoreKey sdk.StoreKey, aggValueStoreKey sdk.StoreKey, paramspace types.ParamSubspace) Keeper {
+func NewKeeper(cdc *codec.Codec, oracleKeeper oracle.Keeper, valueQueueStoreKey sdk.StoreKey, aggValueStoreKey sdk.StoreKey, _ types.ParamSubspace) Keeper {
 	keeper := Keeper{
 		oracleKeeper:       oracleKeeper,
 		valueQueueStoreKey: valueQueueStoreKey,
@@ -218,6 +219,61 @@ func batchQueueItems(ctx sdk.Context, k Keeper) map[string][]AggregatorQueueItem
 		}
 		batches[value.Batch] = append(batches[value.Batch], value)
 	})
+	return batches
+}
+
+func (k Keeper) SearchAggValueBatchKeys(ctx sdk.Context, previousKey string, limit uint, reverse bool) []string {
+	isInRange := func(key string) bool {
+		fmt.Println("****", key, previousKey, key < previousKey, key > previousKey)
+		if len(previousKey) == 0 {
+			return true
+		}
+
+		if reverse && key < previousKey {
+			return true
+		}
+		if !reverse && key > previousKey {
+			return true
+		}
+		return false
+	}
+
+	var batches = make([]string, 0)
+	store := k.GetAggValueStore(ctx)
+
+	if limit == 0 {
+		limit = 50
+	}
+
+	var iterator sdk.Iterator
+
+	if reverse {
+		iterator = store.ReverseIterator(nil, nil)
+	} else {
+		iterator = store.Iterator(nil, nil)
+	}
+	defer iterator.Close()
+
+	var re = regexp.MustCompile(`([^>]*).*`)
+	var prevBatch string
+
+	for ;iterator.Valid(); iterator.Next() {
+		key := string(iterator.Key())
+		batch := re.ReplaceAllString(key, `$1`)
+
+		if isInRange(batch) {
+
+			if batch != prevBatch {
+				batches = append(batches, batch)
+			}
+			prevBatch = batch
+		}
+
+		if uint(len(batches)) == limit {
+			break
+		}
+	}
+
 	return batches
 }
 
