@@ -42,7 +42,7 @@ func RunFeeder(oracleKeeper Keeper, accKeeper auth.AccountKeeper, cdc *codec.Cod
 			logger.Info("Not running feeder, host is not a validator")
 			return
 		}
-		logger.Info("Oracle feeder run")
+		logger.Info("Oracle feeder run", "Valcons", keeper.GetValconsAddress())
 		GetValueAndSendProofAndVote(oracleKeeper, cdc)
 	})
 	c.Start()

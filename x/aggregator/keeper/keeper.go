@@ -81,6 +81,7 @@ func (k Keeper) AddQueueItem(ctx sdk.Context, value oracle.SourceValue) {
 		Symbol:     parts[1],
 		InSymbol:   parts[3],
 		Value:      value.Value,
+		Height:	    value.Height,
 	}
 	key := MakeQueueItemKey(aggQueueItem)
 	store := k.GetQueueStore(ctx)
@@ -111,7 +112,7 @@ func (k Keeper) SourceValueUpdatedListener(ctx sdk.Context, value oracle.SourceV
 }
 
 func (k Keeper) isQueueReadyForProcessing(ctx sdk.Context) bool {
-	const BLOCKS_TO_WAIT = 3
+	const BLOCKS_TO_WAIT = 2
 	store := k.GetQueueStore(ctx)
 	iterator := store.ReverseIterator(nil, nil)
 	defer iterator.Close()

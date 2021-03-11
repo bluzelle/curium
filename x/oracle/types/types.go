@@ -20,7 +20,6 @@ type Vote struct {
 	Valcons string
 	Owner types.AccAddress
 	Weight types.Dec
-	Height int64
 }
 
 type SourceValue struct {
