@@ -26,7 +26,7 @@ func NewMsgOracleDeleteVotes(prefix string, owner sdk.AccAddress) MsgOracleDelet
 
 // nolint
 func (msg MsgOracleDeleteVotes) Route() string { return RouterKey }
-func (msg MsgOracleDeleteVotes) Type() string  { return "OracleDeleteVotes" }
+func (msg MsgOracleDeleteVotes) Type() string  { return "oracle/OracleDeleteVotes" }
 func (msg MsgOracleDeleteVotes) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner}
 }
@@ -64,7 +64,7 @@ func NewMsgOracleDeleteSource(name string, owner sdk.AccAddress) MsgOracleDelete
 
 // nolint
 func (msg MsgOracleDeleteSource) Route() string { return RouterKey }
-func (msg MsgOracleDeleteSource) Type() string  { return "OracleDeleteSource" }
+func (msg MsgOracleDeleteSource) Type() string  { return "oracle/OracleDeleteSource" }
 func (msg MsgOracleDeleteSource) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner}
 }
@@ -113,7 +113,7 @@ func NewMsgOracleAddSource(name string, url string, property string, owner sdk.A
 
 // nolint
 func (msg MsgOracleAddSource) Route() string { return RouterKey }
-func (msg MsgOracleAddSource) Type() string  { return "OracleAddSource" }
+func (msg MsgOracleAddSource) Type() string  { return "oracle/OracleAddSource" }
 func (msg MsgOracleAddSource) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner}
 }
@@ -163,7 +163,7 @@ func NewMsgOracleVote(validatorAddr string, value string, owner sdk.AccAddress, 
 
 // nolint
 func (msg MsgOracleVote) Route() string { return RouterKey }
-func (msg MsgOracleVote) Type() string  { return "OracleVote" }
+func (msg MsgOracleVote) Type() string  { return "oracle/OracleVote" }
 func (msg MsgOracleVote) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner}
 }
