@@ -224,7 +224,6 @@ func batchQueueItems(ctx sdk.Context, k Keeper) map[string][]AggregatorQueueItem
 
 func (k Keeper) SearchAggValueBatchKeys(ctx sdk.Context, previousKey string, limit uint, reverse bool) []string {
 	isInRange := func(key string) bool {
-		fmt.Println("****", key, previousKey, key < previousKey, key > previousKey)
 		if len(previousKey) == 0 {
 			return true
 		}
