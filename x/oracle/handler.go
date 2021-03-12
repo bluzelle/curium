@@ -97,8 +97,8 @@ func handleMsgOracleVote(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleVo
 			Owner:      msg.Owner,
 			Weight:     weight,
 		}
-		k.UpdateSourceValue(ctx, vote)
 		k.StoreVote(ctx, vote)
+		k.UpdateSourceValue(ctx, msg.Batch, msg.SourceName, msg.Owner)
 	}
 
 	return &sdk.Result{Events: ctx.EventManager().Events()}, nil

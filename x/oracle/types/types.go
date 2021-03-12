@@ -28,6 +28,7 @@ type SourceValue struct {
 	Value types.Dec
 	Owner types.AccAddress
 	Height int64
+	Count int64
 }
 
 type OracleConfig struct {

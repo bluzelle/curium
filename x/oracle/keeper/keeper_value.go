@@ -15,18 +15,28 @@ func (k Keeper) GetValueStore(ctx sdk.Context) sdk.KVStore {
 	return ctx.KVStore(k.valueStoreKey)
 }
 
-func (k Keeper) UpdateSourceValue(ctx sdk.Context, vote types.Vote) {
-	votes := k.SearchVotes(ctx, makeSearchVotePrefix(vote.Batch, vote.SourceName))
-	votes = append(votes, vote)
-	average := calculateAverageFromVotes(votes)
+func filterOutZeroValueVotes(votes []types.Vote) []types.Vote {
+	var out = make([]types.Vote, 0)
+	for _, v := range votes {
+		if !v.Value.IsZero() {
+			out = append(out, v)
+		}
+	}
+	return out
+}
+
+func (k Keeper) UpdateSourceValue(ctx sdk.Context, batch string, sourceName string, owner sdk.AccAddress) {
+	votes := k.SearchVotes(ctx, makeSearchVotePrefix(batch, sourceName))
+	average := calculateAverageFromVotes(filterOutZeroValueVotes(votes))
 	store := k.GetValueStore(ctx)
-	key := MakeSourceValueKey(vote.Batch, vote.SourceName)
+	key := MakeSourceValueKey(batch, sourceName)
 	sourceValue := types.SourceValue{
-		SourceName: vote.SourceName,
-		Batch:      vote.Batch,
+		SourceName: sourceName,
+		Batch:      batch,
 		Value:      average,
-		Owner:      vote.Owner,
+		Owner:      owner,
 		Height:     ctx.BlockHeight(),
+		Count:		int64(len(votes)),
 	}
 	store.Set([]byte(key), k.cdc.MustMarshalBinaryBare(sourceValue))
 
@@ -41,6 +51,10 @@ func MakeSourceValueKey(batch string, sourceName string) string {
 
 
 func calculateAverageFromVotes(votes []types.Vote) sdk.Dec {
+	if len(votes) == 0 {
+		return sdk.NewDecFromInt(sdk.NewInt(0))
+	}
+
 	sum := sdk.NewDecFromInt(sdk.NewInt(0))
 	totalWeight := sdk.NewDecFromInt(sdk.NewInt(0))
 
