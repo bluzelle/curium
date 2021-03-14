@@ -98,15 +98,17 @@ type MsgOracleAddSource struct {
 	Url string
 	Property string
 	Owner sdk.AccAddress
+	Weight int64
 }
 
 
 // NewMsgOracleAddSource creates a new MsgOracleAddSource instance
-func NewMsgOracleAddSource(name string, url string, property string, owner sdk.AccAddress) MsgOracleAddSource {
+func NewMsgOracleAddSource(name string, url string, property string, weight int64, owner sdk.AccAddress) MsgOracleAddSource {
 	return MsgOracleAddSource{
 		Name: name,
 		Url: url,
 		Property: property,
+		Weight: weight,
 		Owner: owner,
 	}
 }

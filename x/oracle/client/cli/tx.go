@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
+	"strconv"
 
 	"github.com/spf13/cobra"
 
@@ -69,16 +71,22 @@ func GetCmdSetAdmin(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdSourceAdd(cdc *codec.Codec) *cobra.Command {
  	return &cobra.Command{
- 		Use:   "add-source <name> <url> <property>",
+ 		Use:   "add-source <name> <url> <property> <weight>",
  		Short: "Add an oracle source",
- 		Args:  cobra.ExactArgs(3), // Does your request require arguments
+ 		Args:  cobra.ExactArgs(4), // Does your request require arguments
  		RunE: func(cmd *cobra.Command, args []string) error {
  			cliCtx := context.NewCLIContext().WithCodec(cdc)
  			inBuf := bufio.NewReader(cmd.InOrStdin())
  			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
 
- 			msg := types.NewMsgOracleAddSource(args[0], args[1], args[2], cliCtx.GetFromAddress())
- 			err := msg.ValidateBasic()
+ 			weight, err := strconv.ParseInt(args[3], 10, 64)
+
+ 			if err != nil {
+ 				return errors.New("oracle", 1, "invalid weight")
+			}
+
+ 			msg := types.NewMsgOracleAddSource(args[0], args[1], args[2], weight, cliCtx.GetFromAddress())
+ 			err = msg.ValidateBasic()
  			if err != nil {
  				return err
  			}
