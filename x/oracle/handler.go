@@ -70,6 +70,7 @@ func handleMsgOracleAddSource(ctx sdk.Context, k keeper.Keeper, msg types.MsgOra
 		Url:      msg.Url,
 		Property: msg.Property,
 		Owner:    msg.Owner,
+		Weight:   msg.Weight,
 	}
 	k.AddSource(ctx, msg.Name, source)
 	return &sdk.Result{Events: ctx.EventManager().Events()}, nil

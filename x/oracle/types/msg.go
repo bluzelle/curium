@@ -137,6 +137,9 @@ func (msg MsgOracleAddSource) ValidateBasic() error {
 	if len(msg.Property) < 1 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "missing property")
 	}
+	if msg.Weight < 1 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "missing weight")
+	}
 	return nil
 }
 

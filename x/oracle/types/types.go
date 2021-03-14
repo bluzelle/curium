@@ -11,6 +11,7 @@ type Source struct {
 	Url      string
 	Property string
 	Owner	types.AccAddress
+	Weight  int64
 }
 
 type Vote struct {
@@ -29,6 +30,7 @@ type SourceValue struct {
 	Owner types.AccAddress
 	Height int64
 	Count int64
+	Weight int64
 }
 
 type OracleConfig struct {
