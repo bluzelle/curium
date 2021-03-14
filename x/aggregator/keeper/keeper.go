@@ -72,6 +72,7 @@ type AggregatorQueueItem struct {
 	InSymbol   string
 	Value      sdk.Dec
 	Height     int64
+	Weight     int64
 }
 
 func (k Keeper) AddQueueItem(ctx sdk.Context, value oracle.SourceValue) {
@@ -83,6 +84,7 @@ func (k Keeper) AddQueueItem(ctx sdk.Context, value oracle.SourceValue) {
 		InSymbol:   parts[3],
 		Value:      value.Value,
 		Height:	    value.Height,
+		Weight:     value.Weight,
 	}
 	key := MakeQueueItemKey(aggQueueItem)
 	store := k.GetQueueStore(ctx)
@@ -157,7 +159,7 @@ func processBatch(ctx sdk.Context, k Keeper, values []AggregatorQueueItem) {
 	for _, value := range values {
 		key := value.Symbol + "-" + value.InSymbol
 		x := averagers[key]
-		x.Add(value.Value)
+		x.Add(value.Value, value.Weight)
 		averagers[key] = x
 	}
 

@@ -29,13 +29,16 @@ func (k Keeper) UpdateSourceValue(ctx sdk.Context, batch string, sourceName stri
 	votes := k.SearchVotes(ctx, makeSearchVotePrefix(batch, sourceName))
 	average := calculateAverageFromVotes(filterOutZeroValueVotes(votes))
 	store := k.GetValueStore(ctx)
+
 	var weight int64
 	source, err := k.GetSource(ctx, votes[0].SourceName)
 	if err != nil {
 		logger.Info("Can not find source, setting default weight to source value", "err", err)
 		weight = 50
+	} else {
+		weight = source.Weight
 	}
-	weight = source.Weight
+
 	key := MakeSourceValueKey(batch, sourceName)
 	sourceValue := types.SourceValue{
 		SourceName: sourceName,

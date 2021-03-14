@@ -10,9 +10,9 @@ import (
 func TestAverager(t *testing.T) {
 	t.Run("It should provide an average", func(t *testing.T) {
 		x := keeper.NewAverager()
-		x.Add(sdk.NewDec(10))
-		x.Add(sdk.NewDec(20))
-		x.Add(sdk.NewDec(30))
+		x.Add(sdk.NewDec(10), 100)
+		x.Add(sdk.NewDec(20), 100)
+		x.Add(sdk.NewDec(30), 100)
 		assert.True(t, x.CalculateAverage().Equal(sdk.NewDec(20)))
 	})
 }
