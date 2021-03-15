@@ -22,11 +22,15 @@ func (a *Averager) Add(dec sdk.Dec, weight int64) Averager {
 	} else {
 		a.Sum = a.Sum.Add(dec.MulInt64(weight))
 	}
-	a.WeightSum += weight
+	a.WeightSum = a.WeightSum + weight
 	a.Count = a.Count + 1
 	return *a
 }
 
 func (a Averager) CalculateAverage() sdk.Dec {
+	if a.WeightSum == 0 {
+		logger.Info("zero weight in average")
+		return a.Sum.QuoInt64(a.Count)
+	}
 	return a.Sum.QuoInt64(a.WeightSum)
 }

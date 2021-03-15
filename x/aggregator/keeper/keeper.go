@@ -192,6 +192,7 @@ func addInverses(values []AggregatorQueueItem) []AggregatorQueueItem {
 			Symbol:     value.InSymbol,
 			InSymbol:   value.Symbol,
 			Value:      sdk.NewDec(1).Quo(value.Value),
+			Weight:		value.Weight,
 		})
 	}
 	return append(values, newValues...)
