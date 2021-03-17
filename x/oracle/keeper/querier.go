@@ -23,18 +23,31 @@ func NewQuerier(k Keeper) sdk.Querier {
 			return querySearchVoteProofs(ctx, req, k)
 		case types.QuerySearchVoteKeys:
 			return querySearchVoteKeys(ctx, req, k)
-		case types.QueryCalculateProofSig:
-			return queryCalculateVoteProofSig(ctx, req, k)
-		case types.QueryGetValcons:
-			return queryGetValcons()
 		case types.QuerySearchSourceValues:
 			return querySearchSourceValues(ctx, req, k)
 		case types.QueryConfig:
 			return queryConfig(ctx, k)
+		case types.QueryValidatorByValcons:
+			return queryValidatorByValcons(ctx, req, k)
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown oracle query endpoint")
 		}
 	}
+}
+
+func queryValidatorByValcons(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, error) {
+	var query types.ValidatorByValconsQueryRequest
+	k.cdc.MustUnmarshalJSON(req.Data, &query)
+	consAddr, err := sdk.ConsAddressFromBech32(query.Valcons)
+	if err != nil {
+		return nil, err
+	}
+	validator, found := k.stakingKeeper.GetValidatorByConsAddr(ctx, consAddr)
+	if found {
+		result, err := codec.MarshalJSONIndent(types.ModuleCdc, validator)
+		return result, err
+	}
+	return nil, nil
 }
 
 func queryConfig(ctx sdk.Context, k Keeper) ([]byte, error) {
@@ -45,26 +58,10 @@ func queryConfig(ctx sdk.Context, k Keeper) ([]byte, error) {
 	return result, err
 }
 
-func queryGetValcons() ([]byte, error) {
-	valcons := GetValconsAddress()
-//	b := []byte(valcons)
-	result, err := codec.MarshalJSONIndent(types.ModuleCdc, valcons)
-	return result, err
-}
-
 func queryListSources(ctx sdk.Context, k Keeper) ([]byte, error) {
 	names, err := k.ListSources(ctx)
 	result, err := codec.MarshalJSONIndent(types.ModuleCdc, names)
 	return result, err
-}
-
-func queryCalculateVoteProofSig(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, error){
-	var query types.CalculateProofSigQueryRequest
-	k.cdc.MustUnmarshalJSON(req.Data, &query)
-
-	sig := CalculateProofSig(query.Value)
-	x := codec.MustMarshalJSONIndent(k.cdc, sig)
-	return x, nil
 }
 
 func querySearchVotes(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, error) {

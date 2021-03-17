@@ -7,10 +7,9 @@ const (
 	QuerySearchVotes = "searchvotes"
 	QuerySearchVoteProofs = "searchProofs"
 	QuerySearchVoteKeys = "searchvotekeys"
-	QueryCalculateProofSig = "calculateVoteProofSig"
-	QueryGetValcons = "getValcons"
 	QuerySearchSourceValues = "searchSourceValues"
 	QueryConfig = "getConfig"
+	QueryValidatorByValcons = "validatorByValcons"
 )
 
 type QueryResultListSources = []struct{
@@ -24,6 +23,9 @@ type QueryResultConfig = struct{
 	AdminAddress sdk.AccAddress
 }
 
+type ValidatorByValconsQueryRequest = struct {
+	Valcons string
+}
 
 type SearchVotesQueryRequest = struct{
 	Prefix string
