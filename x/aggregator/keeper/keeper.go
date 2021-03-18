@@ -279,6 +279,14 @@ func (k Keeper) SearchAggValueBatchKeys(ctx sdk.Context, previousKey string, lim
 	return batches
 }
 
+func (k Keeper) GetAggregatedValue(ctx sdk.Context, batch string, pair string) AggregatorValue {
+	store := k.GetAggValueStore(ctx)
+	bz := store.Get(MakeAggStoreKey(batch, pair))
+	var value AggregatorValue
+	k.cdc.MustUnmarshalBinaryBare(bz, &value)
+	return value
+}
+
 func (k Keeper) SearchValues(ctx sdk.Context, prefix string, page uint, limit uint, reverse bool) []AggregatorValue {
 	if page == 0 {
 		page = 1

@@ -2,9 +2,10 @@ package types
 
 // Query endpoints supported by the aggregator querier
 const (
-	QueryParams = "queryParams"
-	QuerySearchValues = "searchValues"
-	QuerySearchBatchKeys = "searchBatchKeys"
+	QueryParams             = "queryParams"
+	QuerySearchValues       = "searchValues"
+	QuerySearchBatchKeys    = "searchBatchKeys"
+	QueryGetAggregatedValue = "getAggregatedValue"
 )
 
 type QueryReqSearchValues struct {
@@ -12,6 +13,11 @@ type QueryReqSearchValues struct {
 	Reverse bool
 	Page uint
 	Limit uint
+}
+
+type QueryReqGetAggregatorValue struct {
+	Batch string
+	Pair string
 }
 
 type QueryReqSearchBatches struct {
