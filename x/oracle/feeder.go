@@ -68,6 +68,7 @@ func GetValueAndSendProofAndVote(oracleKeeper Keeper, cdc *codec.Codec) {
 func fetchValues(sources []types.Source) []SourceAndValue {
 	var results = make([]SourceAndValue, 0)
 	wg := sync.WaitGroup{}
+	var mutex = &sync.Mutex{}
 	for _, source := range sources {
 		wg.Add(1)
 		go func(source types.Source) {
@@ -78,10 +79,12 @@ func fetchValues(sources []types.Source) []SourceAndValue {
 			}()
 			value, err := fetchSource(source)
 			if err == nil {
+				mutex.Lock()
 				results = append(results, SourceAndValue{
 					source: source,
 					value:  value,
 				})
+				mutex.Unlock()
 			}
 			wg.Done()
 		}(source)
