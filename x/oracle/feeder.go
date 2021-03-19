@@ -77,15 +77,13 @@ func fetchValues(sources []types.Source) []SourceAndValue {
 					logger.Error("panic occurred fetching source", "source", source.Name, "err", err)
 				}
 			}()
-			value, err := fetchSource(source)
-			if err == nil {
+			value, _ := fetchSource(source)
 				mutex.Lock()
 				results = append(results, SourceAndValue{
 					source: source,
 					value:  value,
 				})
 				mutex.Unlock()
-			}
 			wg.Done()
 		}(source)
 	}
@@ -94,27 +92,33 @@ func fetchValues(sources []types.Source) []SourceAndValue {
 }
 
 func fetchSource(source types.Source) (float64, error) {
-	resp, err := http.Get(source.Url)
-	if err == nil {
-		defer func() {
-			err := resp.Body.Close()
-			if err != nil {
-				logger.Info("Error closing http connection", source.Url)
-			}
-		}()
-
-		body, err := ioutil.ReadAll(resp.Body)
-
-		value, err := readValueFromJson(body, source.Property)
-		if err != nil {
-			logger.Info("Error fetching oracle source", "name", source.Name)
-			logger.Info(err.Error())
-		}
-		return value, nil
+	client := http.Client{
+		Timeout: 10 * time.Second,
 	}
-	logger.Info("Error fetching oracle source", "name", source.Name)
-	logger.Info(err.Error())
-	return 0, err
+	client.Get(source.Url)
+	resp, err := http.Get(source.Url)
+	if err != nil {
+		logger.Info("Error fetching oracle source", "name", source.Name, "err", err)
+		return 0, err
+	}
+	defer func() {
+		err := resp.Body.Close()
+		if err != nil {
+			logger.Info("Error closing http connection", source.Url)
+		}
+	}()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return 0, err
+	}
+
+	value, err := readValueFromJson(body, source.Property)
+	if err != nil {
+		logger.Info("Error fetching oracle source", "name", source.Name, "err", err)
+		return 0, err
+	}
+	return value, nil
 }
 
 func readValueFromJson(jsonIn []byte, prop string) (float64, error) {
@@ -194,7 +198,6 @@ func getCurrentBatchId() string {
 	return t
 }
 
-
 func generateVoteProofMsg(cdc *codec.Codec, source SourceAndValue) (types.MsgOracleVoteProof, error) {
 	config, err := readOracleConfig()
 	if err != nil {
@@ -261,7 +264,7 @@ var currCtx *sdk.Context
 func StartFeeder(oracleKeeper Keeper, accountKeeper auth.AccountKeeper, cdc *codec.Codec) {
 	defer func() {
 		if err := recover(); err != nil {
-			logger.Error("panic occurred:", "err", err)
+			fmt.Println("panic occurred:", err)
 		}
 	}()
 	waitForCtx()
