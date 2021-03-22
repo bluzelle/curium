@@ -15,6 +15,28 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+type QueueItemKey struct {
+	Height int64
+	Batch  string
+	SourceName string
+}
+
+func (qik QueueItemKey) Bytes() []byte {
+	blockStr := fmt.Sprintf("%020d", qik.Height)
+	return []byte(blockStr + ">" + qik.Batch + ">" + qik.SourceName)
+}
+
+type AggStoreKey struct {
+	Batch    string
+	Symbol   string
+	InSymbol string
+}
+
+func (ask AggStoreKey) Bytes() []byte {
+	return []byte(ask.Batch + ">" + ask.Symbol + "-" + ask.InSymbol)
+}
+
+
 type AggregatorValue struct {
 	Batch    string
 	Symbol   string
@@ -61,10 +83,6 @@ func (k Keeper) GetAggValueStore(ctx sdk.Context) sdk.KVStore {
 	return ctx.KVStore(k.aggValueStoreKey)
 }
 
-func MakeQueueItemKey(value AggregatorQueueItem) []byte {
-	return []byte(BlockNumberToString(value.Height) + ">" + value.Batch + ">" + value.SourceName)
-}
-
 type AggregatorQueueItem struct {
 	SourceName string
 	Batch      string
@@ -86,13 +104,23 @@ func (k Keeper) AddQueueItem(ctx sdk.Context, value oracle.SourceValue) {
 		Height:	    value.Height,
 		Weight:     value.Weight,
 	}
-	key := MakeQueueItemKey(aggQueueItem)
+	key := QueueItemKey{
+		Height: aggQueueItem.Height,
+		Batch: aggQueueItem.Batch,
+		SourceName: aggQueueItem.SourceName,
+	}.Bytes()
+
 	store := k.GetQueueStore(ctx)
 	store.Set(key, k.cdc.MustMarshalBinaryBare(aggQueueItem))
 }
 
 func (k Keeper) DeleteQueueItem(ctx sdk.Context, value AggregatorQueueItem) {
-	key := MakeQueueItemKey(value)
+	key := QueueItemKey{
+		Height:     value.Height,
+		Batch:      value.Batch,
+		SourceName: value.SourceName,
+	}.Bytes()
+
 	store := k.GetQueueStore(ctx)
 	store.Delete(key)
 }
@@ -166,8 +194,13 @@ func processBatch(ctx sdk.Context, k Keeper, values []AggregatorQueueItem) {
 	store := k.GetAggValueStore(ctx)
 
 	for key, averager := range averagers {
-		storeKey := MakeAggStoreKey(values[0].Batch, key)
 		parts := strings.Split(key, "-")
+		storeKey := AggStoreKey{
+			Batch: values[0].Batch,
+			Symbol: parts[0],
+			InSymbol: parts[1],
+		}.Bytes()
+
 		value := AggregatorValue{
 			Batch:    values[0].Batch,
 			Symbol:   parts[0],
@@ -179,9 +212,6 @@ func processBatch(ctx sdk.Context, k Keeper, values []AggregatorQueueItem) {
 	}
 }
 
-func MakeAggStoreKey(batch string, pair string) []byte {
-	return []byte(batch + ">" + pair)
-}
 
 func addInverses(values []AggregatorQueueItem) []AggregatorQueueItem {
 	var newValues []AggregatorQueueItem
@@ -281,7 +311,13 @@ func (k Keeper) SearchAggValueBatchKeys(ctx sdk.Context, previousKey string, lim
 
 func (k Keeper) GetAggregatedValue(ctx sdk.Context, batch string, pair string) AggregatorValue {
 	store := k.GetAggValueStore(ctx)
-	bz := store.Get(MakeAggStoreKey(batch, pair))
+	parts := strings.Split(pair, "-")
+	storeKey := AggStoreKey{
+		Batch: batch,
+		Symbol: parts[0],
+		InSymbol: parts[1],
+	}.Bytes()
+	bz := store.Get(storeKey)
 	var value AggregatorValue
 	k.cdc.MustUnmarshalBinaryBare(bz, &value)
 	return value
