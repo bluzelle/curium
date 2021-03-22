@@ -15,28 +15,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-type QueueItemKey struct {
-	Height int64
-	Batch  string
-	SourceName string
-}
-
-func (qik QueueItemKey) Bytes() []byte {
-	blockStr := fmt.Sprintf("%020d", qik.Height)
-	return []byte(blockStr + ">" + qik.Batch + ">" + qik.SourceName)
-}
-
-type AggStoreKey struct {
-	Batch    string
-	Symbol   string
-	InSymbol string
-}
-
-func (ask AggStoreKey) Bytes() []byte {
-	return []byte(ask.Batch + ">" + ask.Symbol + "-" + ask.InSymbol)
-}
-
-
 type AggregatorValue struct {
 	Batch    string
 	Symbol   string
@@ -104,7 +82,7 @@ func (k Keeper) AddQueueItem(ctx sdk.Context, value oracle.SourceValue) {
 		Height:	    value.Height,
 		Weight:     value.Weight,
 	}
-	key := QueueItemKey{
+	key := types.QueueItemKey{
 		Height: aggQueueItem.Height,
 		Batch: aggQueueItem.Batch,
 		SourceName: aggQueueItem.SourceName,
@@ -115,7 +93,7 @@ func (k Keeper) AddQueueItem(ctx sdk.Context, value oracle.SourceValue) {
 }
 
 func (k Keeper) DeleteQueueItem(ctx sdk.Context, value AggregatorQueueItem) {
-	key := QueueItemKey{
+	key := types.QueueItemKey{
 		Height:     value.Height,
 		Batch:      value.Batch,
 		SourceName: value.SourceName,
@@ -195,7 +173,7 @@ func processBatch(ctx sdk.Context, k Keeper, values []AggregatorQueueItem) {
 
 	for key, averager := range averagers {
 		parts := strings.Split(key, "-")
-		storeKey := AggStoreKey{
+		storeKey := types.AggStoreKey{
 			Batch: values[0].Batch,
 			Symbol: parts[0],
 			InSymbol: parts[1],
@@ -312,7 +290,7 @@ func (k Keeper) SearchAggValueBatchKeys(ctx sdk.Context, previousKey string, lim
 func (k Keeper) GetAggregatedValue(ctx sdk.Context, batch string, pair string) AggregatorValue {
 	store := k.GetAggValueStore(ctx)
 	parts := strings.Split(pair, "-")
-	storeKey := AggStoreKey{
+	storeKey := types.AggStoreKey{
 		Batch: batch,
 		Symbol: parts[0],
 		InSymbol: parts[1],
