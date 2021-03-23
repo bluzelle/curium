@@ -6,6 +6,7 @@ const (
 	QuerySearchValues       = "searchValues"
 	QuerySearchBatchKeys    = "searchBatchKeys"
 	QueryGetAggregatedValue = "getAggregatedValue"
+	QueryGetPairValuesHistory = "getPairValuesHistory"
 )
 
 type QueryReqSearchValues struct {
@@ -24,4 +25,12 @@ type QueryReqSearchBatches struct {
 	PreviousBatch string
 	Reverse bool
 	Limit uint
+}
+
+type QueryReqGetPairValuesHistory struct {
+	StartBatch string
+	EndBatch string
+	Step int64
+	Symbol string
+	InSymbol string
 }

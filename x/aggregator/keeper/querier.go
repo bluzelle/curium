@@ -22,6 +22,8 @@ func NewQuerier(k Keeper) sdk.Querier {
 			return querySearchBatchKeys(ctx, req, k)
 		case types.QueryGetAggregatedValue:
 			return queryGetAggregatedValue(ctx, req, k)
+		case types.QueryGetPairValuesHistory:
+			return queryGetPairValuesHistory(ctx, req, k)
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown aggregator query endpoint")
 		}
@@ -64,4 +66,13 @@ func queryParams(ctx sdk.Context, k Keeper) ([]byte, error) {
 	}
 
 	return res, nil
+}
+
+func queryGetPairValuesHistory(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, error) {
+	var query types.QueryReqGetPairValuesHistory
+	k.cdc.MustUnmarshalJSON(req.Data, &query)
+
+	results := k.GetPairValuesHistory(ctx, query.StartBatch, query.EndBatch, query.Step, query.Symbol, query.InSymbol)
+	x := codec.MustMarshalJSONIndent(k.cdc, results)
+	return x, nil
 }

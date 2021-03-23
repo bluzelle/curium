@@ -217,10 +217,6 @@ func fixupUsdItems(values []AggregatorQueueItem) {
 	}
 }
 
-func BlockNumberToString(blockNum int64) string {
-	return fmt.Sprintf("%020d", blockNum)
-}
-
 func batchQueueItems(ctx sdk.Context, k Keeper) map[string][]AggregatorQueueItem {
 	var batches = map[string][]AggregatorQueueItem{}
 	k.VisitQueueItems(ctx, func(value AggregatorQueueItem) {
@@ -328,4 +324,45 @@ func (k Keeper) SearchValues(ctx sdk.Context, prefix string, page uint, limit ui
 		values = append(values, v)
 	}
 	return values
+}
+
+
+type HistoryResult struct {
+	Batch string
+	Value sdk.Dec
+}
+
+func (k Keeper) GetPairValuesHistory(ctx sdk.Context, startBatch string, endBatch string, step int64, symbol string, inSymbol string) []HistoryResult {
+	store := k.GetAggValueStore(ctx)
+	var results []HistoryResult
+
+	start := []byte(startBatch)
+	var end []byte
+	if len(endBatch) == 0 {
+		end = nil
+	} else {
+		end = []byte(endBatch)
+	}
+
+	iterator := store.Iterator(start, end)
+	currentStep := int64(0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		bytes := iterator.Key()
+		key := types.AggStoreKeyFromBytes(bytes)
+
+		if key.Symbol == symbol && key.InSymbol == inSymbol {
+			currentStep++
+			if currentStep >=  step {
+				currentStep = 0
+				var aggValue AggregatorValue
+				k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &aggValue)
+				results = append(results, HistoryResult{Batch: aggValue.Batch, Value: aggValue.Value})
+			}
+		}
+		if len(results) > 99 {
+			break
+		}
+	}
+	return results
 }
