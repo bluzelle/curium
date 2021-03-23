@@ -7,6 +7,16 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+type ValueKey struct {
+	Batch string
+	SourceName string
+}
+
+func (vk ValueKey) Bytes() []byte {
+	return []byte(fmt.Sprintf("%s>%s", vk.Batch, vk.SourceName))
+}
+
+
 func (k Keeper) RegisterValueUpdatedListener(listener types.ValueUpdateListener) {
 	valueUpdateListeners = append(valueUpdateListeners, listener)
 }
@@ -39,7 +49,11 @@ func (k Keeper) UpdateSourceValue(ctx sdk.Context, batch string, sourceName stri
 		weight = source.Weight
 	}
 
-	key := MakeSourceValueKey(batch, sourceName)
+	key := ValueKey{
+		Batch: batch,
+		SourceName: sourceName,
+	}.Bytes()
+
 	sourceValue := types.SourceValue{
 		SourceName: sourceName,
 		Batch:      batch,
@@ -49,16 +63,14 @@ func (k Keeper) UpdateSourceValue(ctx sdk.Context, batch string, sourceName stri
 		Count:		int64(len(votes)),
 		Weight:     weight,
 	}
-	store.Set([]byte(key), k.cdc.MustMarshalBinaryBare(sourceValue))
+	store.Set(key, k.cdc.MustMarshalBinaryBare(sourceValue))
 
 	for _, listener := range valueUpdateListeners {
 		listener(ctx, sourceValue)
 	}
 }
 
-func MakeSourceValueKey(batch string, sourceName string) string {
-	return fmt.Sprintf("%s>%s", batch, sourceName)
-}
+
 
 
 func calculateAverageFromVotes(votes []types.Vote) sdk.Dec {

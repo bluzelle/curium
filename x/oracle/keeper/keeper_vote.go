@@ -6,19 +6,34 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+
+type VoteKey struct {
+	Batch string
+	SourceName string
+	Valcons string
+}
+
+func voteToVoteKey(vote types.Vote) VoteKey {
+	return VoteKey{
+		Batch: vote.Batch,
+		SourceName: vote.SourceName,
+		Valcons: vote.Valcons,
+	}
+}
+
+func (vk VoteKey) Bytes() []byte {
+	return []byte(fmt.Sprintf("%s>%s>%s", vk.Batch, vk.SourceName, vk.Valcons))
+}
+
 func (k Keeper) GetVoteStore(ctx sdk.Context) sdk.KVStore {
 	return ctx.KVStore(k.voteStoreKey)
 }
 
-func CreateVoteKey(vote types.Vote) string {
-	return fmt.Sprintf("%s>%s>%s", vote.Batch, vote.SourceName, vote.Valcons)
-}
 
-func (k Keeper) StoreVote(ctx sdk.Context, vote types.Vote) string {
-	key := CreateVoteKey(vote)
+func (k Keeper) StoreVote(ctx sdk.Context, vote types.Vote)  {
+	key := voteToVoteKey(vote).Bytes()
 	store := k.GetVoteStore(ctx)
-	store.Set([]byte(key), k.cdc.MustMarshalBinaryBare(vote))
-	return key
+	store.Set(key, k.cdc.MustMarshalBinaryBare(vote))
 }
 
 func (k Keeper) DeleteVotes(ctx sdk.Context, prefix string) int {
