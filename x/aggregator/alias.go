@@ -7,8 +7,7 @@ import (
 
 var (
 	ModuleName = types.ModuleName
-	ValueQueueStoreKey = types.ValueQueueStoreKey
-	AggValueStoreKey = types.AggValueStoreKey
+	StoreKey = types.StoreKey
 	NewKeeper     = keeper.NewKeeper
 	NewQuerier    = keeper.NewQuerier
 	ModuleCdc     = types.ModuleCdc

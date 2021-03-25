@@ -11,14 +11,19 @@ const (
 	ModuleName = "aggregator"
 
 	// StoreKey to be used when creating the KVStore
-	ValueQueueStoreKey = "ValueQueue"
-	AggValueStoreKey = "AggValue"
+	StoreKey = ModuleName
 
 	// RouterKey to be used for routing msgs
 	RouterKey = ModuleName
 
 	// QuerierRoute to be used for querier msgs
 	QuerierRoute = ModuleName
+
+	// Store prefixes for various records
+	AggValueStorePrefix = "V"
+	QueueStorePrefix = "Q"
+
+
 )
 
 type QueueItemKey struct {
@@ -29,11 +34,11 @@ type QueueItemKey struct {
 
 func (qik QueueItemKey) Bytes() []byte {
 	blockStr := fmt.Sprintf("%020d", qik.Height)
-	return []byte(blockStr + ">" + qik.Batch + ">" + qik.SourceName)
+	return []byte(QueueStorePrefix + blockStr + ">" + qik.Batch + ">" + qik.SourceName)
 }
 
 func QueueItemKeyFromBytes(bytes []byte) QueueItemKey {
-	parts := strings.Split(string(bytes), ">")
+	parts := strings.Split(string(bytes[1:]), ">")
 	height, _ := strconv.ParseInt(parts[0], 10, 64)
 	return QueueItemKey{
 		Height: height,
@@ -49,11 +54,11 @@ type AggStoreKey struct {
 }
 
 func (ask AggStoreKey) Bytes() []byte {
-	return []byte(ask.Batch + ">" + ask.Symbol + "-" + ask.InSymbol)
+	return []byte(AggValueStorePrefix + ask.Batch + ">" + ask.Symbol + "-" + ask.InSymbol)
 }
 
 func AggStoreKeyFromBytes(bytes []byte) AggStoreKey {
-	parts := strings.Split(string(bytes), ">")
+	parts := strings.Split(string(bytes[1:]), ">")
 	symbolParts := strings.Split(parts[1], "-")
 	return AggStoreKey{
 		Batch: parts[0],

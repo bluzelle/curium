@@ -29,18 +29,16 @@ var logger = log.NewTMLogger(log.NewSyncWriter(os.Stdout))
 // Keeper of the aggregator store
 type Keeper struct {
 	oracleKeeper       oracle.Keeper
-	valueQueueStoreKey sdk.StoreKey
-	aggValueStoreKey   sdk.StoreKey
+	storeKey 		   sdk.StoreKey
 	cdc                *codec.Codec
 	paramspace         types.ParamSubspace
 }
 
 // NewKeeper creates a aggregator keeper
-func NewKeeper(cdc *codec.Codec, oracleKeeper oracle.Keeper, valueQueueStoreKey sdk.StoreKey, aggValueStoreKey sdk.StoreKey, _ types.ParamSubspace) Keeper {
+func NewKeeper(cdc *codec.Codec, oracleKeeper oracle.Keeper, storeKey sdk.StoreKey, _ types.ParamSubspace) Keeper {
 	keeper := Keeper{
 		oracleKeeper:       oracleKeeper,
-		valueQueueStoreKey: valueQueueStoreKey,
-		aggValueStoreKey:   aggValueStoreKey,
+		storeKey: storeKey,
 		cdc:                cdc,
 		//		paramspace: paramspace.WithKeyTable(types.ParamKeyTable()),
 	}
@@ -53,12 +51,8 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
-func (k Keeper) GetQueueStore(ctx sdk.Context) sdk.KVStore {
-	return ctx.KVStore(k.valueQueueStoreKey)
-}
-
-func (k Keeper) GetAggValueStore(ctx sdk.Context) sdk.KVStore {
-	return ctx.KVStore(k.aggValueStoreKey)
+func (k Keeper) GetStore(ctx sdk.Context) sdk.KVStore {
+	return ctx.KVStore(k.storeKey)
 }
 
 type AggregatorQueueItem struct {
@@ -88,7 +82,7 @@ func (k Keeper) AddQueueItem(ctx sdk.Context, value oracle.SourceValue) {
 		SourceName: aggQueueItem.SourceName,
 	}.Bytes()
 
-	store := k.GetQueueStore(ctx)
+	store := k.GetStore(ctx)
 	store.Set(key, k.cdc.MustMarshalBinaryBare(aggQueueItem))
 }
 
@@ -99,13 +93,13 @@ func (k Keeper) DeleteQueueItem(ctx sdk.Context, value AggregatorQueueItem) {
 		SourceName: value.SourceName,
 	}.Bytes()
 
-	store := k.GetQueueStore(ctx)
+	store := k.GetStore(ctx)
 	store.Delete(key)
 }
 
 func (k Keeper) VisitQueueItems(ctx sdk.Context, cb func(AggregatorQueueItem)) {
-	store := k.GetQueueStore(ctx)
-	iterator := store.Iterator(nil, nil)
+	store := k.GetStore(ctx)
+	iterator := sdk.KVStorePrefixIterator(store, []byte(types.QueueStorePrefix))
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
@@ -122,8 +116,8 @@ func (k Keeper) SourceValueUpdatedListener(ctx sdk.Context, value oracle.SourceV
 
 func (k Keeper) isQueueReadyForProcessing(ctx sdk.Context) bool {
 	const BLOCKS_TO_WAIT = 2
-	store := k.GetQueueStore(ctx)
-	iterator := store.ReverseIterator(nil, nil)
+	store := k.GetStore(ctx)
+	iterator := sdk.KVStoreReversePrefixIterator(store, []byte(types.QueueStorePrefix))
 	defer iterator.Close()
 	if iterator.Valid() {
 		var item AggregatorQueueItem
@@ -169,7 +163,7 @@ func processBatch(ctx sdk.Context, k Keeper, values []AggregatorQueueItem) {
 		averagers[key] = x
 	}
 
-	store := k.GetAggValueStore(ctx)
+	store := k.GetStore(ctx)
 
 	for key, averager := range averagers {
 		parts := strings.Split(key, "-")
@@ -245,7 +239,7 @@ func (k Keeper) SearchAggValueBatchKeys(ctx sdk.Context, previousKey string, lim
 	}
 
 	var batches = make([]string, 0)
-	store := k.GetAggValueStore(ctx)
+	store := k.GetStore(ctx)
 
 	if limit == 0 {
 		limit = 50
@@ -254,7 +248,7 @@ func (k Keeper) SearchAggValueBatchKeys(ctx sdk.Context, previousKey string, lim
 	var iterator sdk.Iterator
 
 	if reverse {
-		iterator = store.ReverseIterator(nil, nil)
+		iterator = sdk.KVStoreReversePrefixIterator(store, []byte(types.AggValueStorePrefix))
 	} else {
 		iterator = store.Iterator(nil, nil)
 	}
@@ -284,7 +278,7 @@ func (k Keeper) SearchAggValueBatchKeys(ctx sdk.Context, previousKey string, lim
 }
 
 func (k Keeper) GetAggregatedValue(ctx sdk.Context, batch string, pair string) AggregatorValue {
-	store := k.GetAggValueStore(ctx)
+	store := k.GetStore(ctx)
 	parts := strings.Split(pair, "-")
 	storeKey := types.AggStoreKey{
 		Batch: batch,
@@ -306,9 +300,9 @@ func (k Keeper) SearchValues(ctx sdk.Context, prefix string, page uint, limit ui
 	}
 	var iterator sdk.Iterator
 	if reverse {
-		iterator = storeIterator.KVStoreReversePrefixIteratorPaginated(k.GetAggValueStore(ctx), []byte(prefix), page, limit)
+		iterator = storeIterator.KVStoreReversePrefixIteratorPaginated(k.GetStore(ctx), []byte(types.AggValueStorePrefix + prefix), page, limit)
 	} else {
-		iterator = storeIterator.KVStorePrefixIteratorPaginated(k.GetAggValueStore(ctx), []byte(prefix), page, limit)
+		iterator = storeIterator.KVStorePrefixIteratorPaginated(k.GetStore(ctx), []byte(types.AggValueStorePrefix + prefix), page, limit)
 	}
 	defer iterator.Close()
 	values := make([]AggregatorValue, 0)
@@ -333,15 +327,15 @@ type HistoryResult struct {
 }
 
 func (k Keeper) GetPairValuesHistory(ctx sdk.Context, startBatch string, endBatch string, step int64, symbol string, inSymbol string) []HistoryResult {
-	store := k.GetAggValueStore(ctx)
+	store := k.GetStore(ctx)
 	var results []HistoryResult
 
-	start := []byte(startBatch)
+	start := []byte(types.AggValueStorePrefix + startBatch)
 	var end []byte
 	if len(endBatch) == 0 {
-		end = nil
+		end = sdk.PrefixEndBytes([]byte(types.AggValueStorePrefix))
 	} else {
-		end = []byte(endBatch)
+		end = []byte(types.AggValueStorePrefix + endBatch)
 	}
 
 	iterator := store.Iterator(start, end)

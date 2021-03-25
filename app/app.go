@@ -165,7 +165,7 @@ func NewCRUDApp(
 		tax.StoreKey,
 		faucet.StoreKey, crud.LeaseKey, crud.OwnerKey, oracle.SourceStoreKey, oracle.ConfigStoreKey,
 		oracle.ProofStoreKey, oracle.VoteStoreKey, oracle.ValueStoreKey, oracle.ConfigStoreKey,
-		aggregator.ValueQueueStoreKey, aggregator.AggValueStoreKey,
+		aggregator.StoreKey,
 	)
 
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
@@ -288,8 +288,7 @@ func NewCRUDApp(
 	app.aggKeeper = aggregator.NewKeeper(
 		app.cdc,
 		app.oracleKeeper,
-		keys[aggregator.ValueQueueStoreKey],
-		keys[aggregator.AggValueStoreKey],
+		keys[aggregator.StoreKey],
 		nil,
 	)
 
