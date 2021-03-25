@@ -278,13 +278,13 @@ func waitForCtx() {
 	}
 }
 
-func readOracleConfig() (types.OracleConfig, error) {
+func readOracleConfig() (types.LocalOracleConfig, error) {
 	address, err := sdk.AccAddressFromBech32(viper.GetString("oracle-user-address"))
 	if err != nil {
 		errors.New("unable to read oracle address from app.toml")
 	}
 
-	return types.OracleConfig{
+	return types.LocalOracleConfig{
 		UserAddress:  address,
 		UserMnemonic: viper.GetString("oracle-user-mnemonic"),
 	}, nil

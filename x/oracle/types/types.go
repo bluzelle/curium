@@ -33,7 +33,7 @@ type SourceValue struct {
 	Weight int64
 }
 
-type OracleConfig struct {
+type LocalOracleConfig struct {
 	UserAddress types.AccAddress
 	UserMnemonic string
 }
