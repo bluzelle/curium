@@ -15,15 +15,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-type AggregatorValue struct {
-	Batch    string
-	Symbol   string
-	InSymbol string
-	Value    sdk.Dec
-	Count    int64
-	Height   int64
-}
-
 var logger = log.NewTMLogger(log.NewSyncWriter(os.Stdout))
 
 // Keeper of the aggregator store
@@ -55,19 +46,9 @@ func (k Keeper) GetStore(ctx sdk.Context) sdk.KVStore {
 	return ctx.KVStore(k.storeKey)
 }
 
-type AggregatorQueueItem struct {
-	SourceName string
-	Batch      string
-	Symbol     string
-	InSymbol   string
-	Value      sdk.Dec
-	Height     int64
-	Weight     int64
-}
-
 func (k Keeper) AddQueueItem(ctx sdk.Context, value oracle.SourceValue) {
 	parts := strings.Split(value.SourceName, "-")
-	aggQueueItem := AggregatorQueueItem{
+	aggQueueItem := types.AggregatorQueueItem{
 		Batch:      value.Batch,
 		SourceName: value.SourceName,
 		Symbol:     parts[1],
@@ -86,7 +67,7 @@ func (k Keeper) AddQueueItem(ctx sdk.Context, value oracle.SourceValue) {
 	store.Set(key, k.cdc.MustMarshalBinaryBare(aggQueueItem))
 }
 
-func (k Keeper) DeleteQueueItem(ctx sdk.Context, value AggregatorQueueItem) {
+func (k Keeper) DeleteQueueItem(ctx sdk.Context, value types.AggregatorQueueItem) {
 	key := types.QueueItemKey{
 		Height:     value.Height,
 		Batch:      value.Batch,
@@ -97,13 +78,13 @@ func (k Keeper) DeleteQueueItem(ctx sdk.Context, value AggregatorQueueItem) {
 	store.Delete(key)
 }
 
-func (k Keeper) VisitQueueItems(ctx sdk.Context, cb func(AggregatorQueueItem)) {
+func (k Keeper) VisitQueueItems(ctx sdk.Context, cb func(types.AggregatorQueueItem)) {
 	store := k.GetStore(ctx)
 	iterator := sdk.KVStorePrefixIterator(store, []byte(types.QueueStorePrefix))
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var value AggregatorQueueItem
+		var value types.AggregatorQueueItem
 		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &value)
 		cb(value)
 		k.DeleteQueueItem(ctx, value)
@@ -120,7 +101,7 @@ func (k Keeper) isQueueReadyForProcessing(ctx sdk.Context) bool {
 	iterator := sdk.KVStoreReversePrefixIterator(store, []byte(types.QueueStorePrefix))
 	defer iterator.Close()
 	if iterator.Valid() {
-		var item AggregatorQueueItem
+		var item types.AggregatorQueueItem
 		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &item)
 		return item.Height + BLOCKS_TO_WAIT < ctx.BlockHeight()
 	}
@@ -138,8 +119,8 @@ func (k Keeper) AggregateValues(ctx sdk.Context) {
 	}
 }
 
-func filterZeroValues(values []AggregatorQueueItem) []AggregatorQueueItem {
-	var out []AggregatorQueueItem
+func filterZeroValues(values []types.AggregatorQueueItem) []types.AggregatorQueueItem {
+	var out []types.AggregatorQueueItem
 	for _, item := range values {
 		if item.Value.IsZero() || item.Value.IsNil() {
 			continue
@@ -149,7 +130,7 @@ func filterZeroValues(values []AggregatorQueueItem) []AggregatorQueueItem {
 	return out
 }
 
-func processBatch(ctx sdk.Context, k Keeper, values []AggregatorQueueItem) {
+func processBatch(ctx sdk.Context, k Keeper, values []types.AggregatorQueueItem) {
 	fixupUsdItems(values)
 	values = filterZeroValues(values)
 	values = addInverses(values)
@@ -173,22 +154,23 @@ func processBatch(ctx sdk.Context, k Keeper, values []AggregatorQueueItem) {
 			InSymbol: parts[1],
 		}.Bytes()
 
-		value := AggregatorValue{
+		value := types.AggregatorValue{
 			Batch:    values[0].Batch,
 			Symbol:   parts[0],
 			InSymbol: parts[1],
 			Value:    averager.CalculateAverage(),
 			Count:    averager.Count,
+			Height:		values[0].Height,
 		}
 		store.Set(storeKey, k.cdc.MustMarshalBinaryBare(value))
 	}
 }
 
 
-func addInverses(values []AggregatorQueueItem) []AggregatorQueueItem {
-	var newValues []AggregatorQueueItem
+func addInverses(values []types.AggregatorQueueItem) []types.AggregatorQueueItem {
+	var newValues []types.AggregatorQueueItem
 	for _, value := range values {
-		newValues = append(newValues, AggregatorQueueItem{
+		newValues = append(newValues, types.AggregatorQueueItem{
 			SourceName: value.SourceName + "-inverse",
 			Batch:      value.Batch,
 			Symbol:     value.InSymbol,
@@ -200,7 +182,7 @@ func addInverses(values []AggregatorQueueItem) []AggregatorQueueItem {
 	return append(values, newValues...)
 }
 
-func fixupUsdItems(values []AggregatorQueueItem) {
+func fixupUsdItems(values []types.AggregatorQueueItem) {
 	for i, value := range values {
 		if value.Symbol == "usdt" || value.Symbol == "usdc" {
 			values[i].Symbol = "usd"
@@ -211,12 +193,12 @@ func fixupUsdItems(values []AggregatorQueueItem) {
 	}
 }
 
-func batchQueueItems(ctx sdk.Context, k Keeper) map[string][]AggregatorQueueItem {
-	var batches = map[string][]AggregatorQueueItem{}
-	k.VisitQueueItems(ctx, func(value AggregatorQueueItem) {
+func batchQueueItems(ctx sdk.Context, k Keeper) map[string][]types.AggregatorQueueItem {
+	var batches = map[string][]types.AggregatorQueueItem{}
+	k.VisitQueueItems(ctx, func(value types.AggregatorQueueItem) {
 		b := batches[value.Batch]
 		if b == nil {
-			batches[value.Batch] = make([]AggregatorQueueItem, 0)
+			batches[value.Batch] = make([]types.AggregatorQueueItem, 0)
 		}
 		batches[value.Batch] = append(batches[value.Batch], value)
 	})
@@ -277,7 +259,7 @@ func (k Keeper) SearchAggValueBatchKeys(ctx sdk.Context, previousKey string, lim
 	return batches
 }
 
-func (k Keeper) GetAggregatedValue(ctx sdk.Context, batch string, pair string) AggregatorValue {
+func (k Keeper) GetAggregatedValue(ctx sdk.Context, batch string, pair string) types.AggregatorValue {
 	store := k.GetStore(ctx)
 	parts := strings.Split(pair, "-")
 	storeKey := types.AggStoreKey{
@@ -286,12 +268,12 @@ func (k Keeper) GetAggregatedValue(ctx sdk.Context, batch string, pair string) A
 		InSymbol: parts[1],
 	}.Bytes()
 	bz := store.Get(storeKey)
-	var value AggregatorValue
+	var value types.AggregatorValue
 	k.cdc.MustUnmarshalBinaryBare(bz, &value)
 	return value
 }
 
-func (k Keeper) SearchValues(ctx sdk.Context, prefix string, page uint, limit uint, reverse bool) []AggregatorValue {
+func (k Keeper) SearchValues(ctx sdk.Context, prefix string, page uint, limit uint, reverse bool) []types.AggregatorValue {
 	if page == 0 {
 		page = 1
 	}
@@ -305,14 +287,14 @@ func (k Keeper) SearchValues(ctx sdk.Context, prefix string, page uint, limit ui
 		iterator = storeIterator.KVStorePrefixIteratorPaginated(k.GetStore(ctx), []byte(types.AggValueStorePrefix + prefix), page, limit)
 	}
 	defer iterator.Close()
-	values := make([]AggregatorValue, 0)
+	values := make([]types.AggregatorValue, 0)
 
 	for ; iterator.Valid(); iterator.Next() {
 		if ctx.GasMeter().IsPastLimit() {
 			break
 		}
 
-		var v AggregatorValue
+		var v types.AggregatorValue
 		value := iterator.Value()
 		k.cdc.MustUnmarshalBinaryBare(value, &v)
 		values = append(values, v)
@@ -349,7 +331,7 @@ func (k Keeper) GetPairValuesHistory(ctx sdk.Context, startBatch string, endBatc
 			currentStep++
 			if currentStep >=  step {
 				currentStep = 0
-				var aggValue AggregatorValue
+				var aggValue types.AggregatorValue
 				k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &aggValue)
 				results = append(results, HistoryResult{Batch: aggValue.Batch, Value: aggValue.Value})
 			}
@@ -357,6 +339,28 @@ func (k Keeper) GetPairValuesHistory(ctx sdk.Context, startBatch string, endBatc
 		if len(results) > 99 {
 			break
 		}
+	}
+	return results
+}
+
+func (k Keeper) DumpAggValues(ctx sdk.Context) map[string]types.AggregatorValue {
+	iterator := sdk.KVStorePrefixIterator(k.GetStore(ctx), []byte(types.AggValueStorePrefix))
+	results := make(map[string]types.AggregatorValue)
+	for ; iterator.Valid(); iterator.Next() {
+		var value types.AggregatorValue
+		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &value)
+		results[string(iterator.Key()[1:])] = value
+	}
+	return results
+}
+
+func (k Keeper) DumpQueueItems(ctx sdk.Context) map[string]types.AggregatorQueueItem {
+	iterator := sdk.KVStorePrefixIterator(k.GetStore(ctx), []byte(types.QueueStorePrefix))
+	results := make(map[string]types.AggregatorQueueItem)
+	for ; iterator.Valid(); iterator.Next() {
+		var value types.AggregatorQueueItem
+		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &value)
+		results[string(iterator.Key()[1:])] = value
 	}
 	return results
 }

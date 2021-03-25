@@ -2,13 +2,15 @@ package types
 
 // GenesisState - all aggregator state that must be provided at genesis
 type GenesisState struct {
-	// TODO: Fill out what is needed by the module for genesis
+	AggValues map[string]AggregatorValue
+	QueueValues map[string]AggregatorQueueItem
 }
 
 // NewGenesisState creates a new GenesisState object
-func NewGenesisState( /* TODO: Fill out with what is needed for genesis state */) GenesisState {
+func NewGenesisState(aggValues map[string]AggregatorValue, queueValues map[string]AggregatorQueueItem) GenesisState {
 	return GenesisState{
-		// TODO: Fill out according to your genesis state
+		AggValues: aggValues,
+		QueueValues: queueValues,
 	}
 }
 

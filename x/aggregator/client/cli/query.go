@@ -2,7 +2,6 @@ package cli
 
 import (
 	"fmt"
-	"github.com/bluzelle/curium/x/aggregator/keeper"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/spf13/cobra"
 
@@ -52,7 +51,7 @@ func GetCmdQSearchValues(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return nil
 			}
 
-			var out []keeper.AggregatorValue
+			var out []types.AggregatorValue
 			cdc.MustUnmarshalJSON(res, &out)
 
 			return cliCtx.PrintOutput(out)
