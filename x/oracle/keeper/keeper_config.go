@@ -1,19 +1,17 @@
 package keeper
 
 import (
+	"github.com/bluzelle/curium/x/oracle/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) GetConfigStore(ctx sdk.Context) sdk.KVStore {
-	return ctx.KVStore(k.configStoreKey)
-}
 
 func (k Keeper) SetAdminAddress(ctx sdk.Context, admin sdk.AccAddress) {
-	store := k.GetConfigStore(ctx)
-	store.Set([]byte("admin-address"), admin)
+	store := k.GetStore(ctx)
+	store.Set([]byte(types.ConfigStorePrefix + "admin-address"), admin)
 }
 
 func (k Keeper) GetAdminAddress(ctx sdk.Context) sdk.AccAddress{
-	store := k.GetConfigStore(ctx)
-	return store.Get([]byte("admin-address"))
+	store := k.GetStore(ctx)
+	return store.Get([]byte(types.ConfigStorePrefix + "admin-address"))
 }

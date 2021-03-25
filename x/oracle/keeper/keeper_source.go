@@ -5,31 +5,27 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) GetSourceStore(ctx sdk.Context) sdk.KVStore {
-	return ctx.KVStore(k.sourceStoreKey)
-}
-
 func (k Keeper) AddSource(ctx sdk.Context, name string, source types.Source) {
-	store := k.GetSourceStore(ctx)
-	store.Set([]byte(name), k.cdc.MustMarshalBinaryLengthPrefixed(source))
+	store := k.GetStore(ctx)
+	store.Set([]byte(types.SourceStorePrefix + name), k.cdc.MustMarshalBinaryLengthPrefixed(source))
 }
 
 func (k Keeper) GetSource(ctx sdk.Context, name string) (types.Source, error) {
-	store := k.GetSourceStore(ctx)
+	store := k.GetStore(ctx)
 	var source types.Source
-	err := k.cdc.UnmarshalBinaryLengthPrefixed(store.Get([]byte(name)), &source)
+	err := k.cdc.UnmarshalBinaryLengthPrefixed(store.Get([]byte(types.SourceStorePrefix + name)), &source)
 	return source, err
 }
 
 func (k Keeper) DeleteSource(ctx sdk.Context, name string) error {
-	store := k.GetSourceStore(ctx)
-	store.Delete([]byte(name))
+	store := k.GetStore(ctx)
+	store.Delete([]byte(types.SourceStorePrefix + name))
 	return nil
 }
 
 func (k Keeper) ListSources(ctx sdk.Context) ([]types.Source, error) {
-	store := k.GetSourceStore(ctx)
-	iterator := store.Iterator(nil, nil)
+	store := k.GetStore(ctx)
+	iterator := sdk.KVStorePrefixIterator(store, []byte(types.SourceStorePrefix))
 	defer iterator.Close()
 	var sources = make([]types.Source, 0)
 	for ; iterator.Valid(); iterator.Next() {

@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"fmt"
 	"github.com/bluzelle/curium/x/oracle/types"
 	storeIterator "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -13,16 +12,12 @@ type ValueKey struct {
 }
 
 func (vk ValueKey) Bytes() []byte {
-	return []byte(fmt.Sprintf("%s>%s", vk.Batch, vk.SourceName))
+	return []byte(types.ValueStorePrefix + vk.Batch + ">" + vk.SourceName)
 }
 
 
 func (k Keeper) RegisterValueUpdatedListener(listener types.ValueUpdateListener) {
 	valueUpdateListeners = append(valueUpdateListeners, listener)
-}
-
-func (k Keeper) GetValueStore(ctx sdk.Context) sdk.KVStore {
-	return ctx.KVStore(k.valueStoreKey)
 }
 
 func filterOutZeroValueVotes(votes []types.Vote) []types.Vote {
@@ -38,7 +33,7 @@ func filterOutZeroValueVotes(votes []types.Vote) []types.Vote {
 func (k Keeper) UpdateSourceValue(ctx sdk.Context, batch string, sourceName string, owner sdk.AccAddress) {
 	votes := k.SearchVotes(ctx, makeSearchVotePrefix(batch, sourceName))
 	average := calculateAverageFromVotes(filterOutZeroValueVotes(votes))
-	store := k.GetValueStore(ctx)
+	store := k.GetStore(ctx)
 
 	var weight int64
 	source, err := k.GetSource(ctx, votes[0].SourceName)
@@ -92,9 +87,9 @@ func calculateAverageFromVotes(votes []types.Vote) sdk.Dec {
 func (k Keeper) SearchSourceValues(ctx sdk.Context, prefix string, page uint, limit uint, reverse bool) []types.SourceValue {
 	var iterator sdk.Iterator
 	if reverse {
-		iterator = storeIterator.KVStoreReversePrefixIteratorPaginated(k.GetValueStore(ctx), []byte(prefix), page, limit)
+		iterator = storeIterator.KVStoreReversePrefixIteratorPaginated(k.GetStore(ctx), []byte(types.ValueStorePrefix + prefix), page, limit)
 	} else {
-		iterator = storeIterator.KVStorePrefixIteratorPaginated(k.GetValueStore(ctx), []byte(prefix), page, limit)
+		iterator = storeIterator.KVStorePrefixIteratorPaginated(k.GetStore(ctx), []byte(types.ValueStorePrefix + prefix), page, limit)
 	}
 	defer iterator.Close()
 	values  := make([]types.SourceValue, 0)

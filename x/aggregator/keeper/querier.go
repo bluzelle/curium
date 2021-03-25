@@ -1,13 +1,12 @@
 package keeper
 
 import (
-	// this line is used by starport scaffolding # 1
-	abci "github.com/tendermint/tendermint/abci/types"
-
+	"github.com/bluzelle/curium/x/aggregator/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/bluzelle/curium/x/aggregator/types"
+	// this line is used by starport scaffolding # 1
+	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 // NewQuerier creates a new querier for aggregator clients.

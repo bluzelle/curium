@@ -20,30 +20,25 @@ var valueUpdateListeners []types.ValueUpdateListener = make([]types.ValueUpdateL
 
 // Keeper of the oracle store
 type Keeper struct {
-	sourceStoreKey sdk.StoreKey
-	configStoreKey sdk.StoreKey
-	proofStoreKey  sdk.StoreKey
-	voteStoreKey   sdk.StoreKey
-	valueStoreKey  sdk.StoreKey
-	valueQueueStoreKey sdk.StoreKey
+	storeKey sdk.StoreKey
 	stakingKeeper  staking.Keeper
 	cdc            *codec.Codec
 	paramspace     types.ParamSubspace
 }
 
 // NewKeeper creates a oracle keeper
-func NewKeeper(cdc *codec.Codec, sourceStoreKey sdk.StoreKey, configStoreKey sdk.StoreKey, proofStoreKey sdk.StoreKey, voteStoreKey sdk.StoreKey, valueStoreKey sdk.StoreKey, stakingKeeper staking.Keeper, paramspace types.ParamSubspace) Keeper {
+func NewKeeper(cdc *codec.Codec, storeKey sdk.StoreKey, stakingKeeper staking.Keeper, paramspace types.ParamSubspace) Keeper {
 	keeper := Keeper{
-		sourceStoreKey: sourceStoreKey,
-		configStoreKey: configStoreKey,
-		proofStoreKey:  proofStoreKey,
-		voteStoreKey:   voteStoreKey,
-		valueStoreKey:  valueStoreKey,
+		storeKey: storeKey,
 		stakingKeeper:  stakingKeeper,
 		cdc:            cdc,
 		//		paramspace: paramspace.WithKeyTable(types.ParamKeyTable()),
 	}
 	return keeper
+}
+
+func (k Keeper) GetStore(ctx sdk.Context) sdk.KVStore {
+	return ctx.KVStore(k.storeKey)
 }
 
 

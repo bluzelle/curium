@@ -7,11 +7,7 @@ import (
 
 const (
 	ModuleName     = types.ModuleName
-	SourceStoreKey = types.SourceStoreKey
-	ProofStoreKey  = types.ProofStoreKey
-	VoteStoreKey   = types.VoteStoreKey
-	ValueStoreKey  = types.ValueStoreKey
-	ConfigStoreKey = types.ConfigStoreKey
+	StoreKey = types.StoreKey
 )
 
 

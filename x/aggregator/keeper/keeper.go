@@ -258,7 +258,7 @@ func (k Keeper) SearchAggValueBatchKeys(ctx sdk.Context, previousKey string, lim
 	var prevBatch string
 
 	for ;iterator.Valid(); iterator.Next() {
-		key := string(iterator.Key())
+		key := string(iterator.Key()[1:])
 		batch := re.ReplaceAllString(key, `$1`)
 
 		if isInRange(batch) {

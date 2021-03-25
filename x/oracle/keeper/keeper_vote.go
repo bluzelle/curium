@@ -22,31 +22,26 @@ func voteToVoteKey(vote types.Vote) VoteKey {
 }
 
 func (vk VoteKey) Bytes() []byte {
-	return []byte(fmt.Sprintf("%s>%s>%s", vk.Batch, vk.SourceName, vk.Valcons))
+	return []byte(fmt.Sprintf("%s%s>%s>%s", types.VoteStorePrefix, vk.Batch, vk.SourceName, vk.Valcons))
 }
-
-func (k Keeper) GetVoteStore(ctx sdk.Context) sdk.KVStore {
-	return ctx.KVStore(k.voteStoreKey)
-}
-
 
 func (k Keeper) StoreVote(ctx sdk.Context, vote types.Vote)  {
 	key := voteToVoteKey(vote).Bytes()
-	store := k.GetVoteStore(ctx)
+	store := k.GetStore(ctx)
 	store.Set(key, k.cdc.MustMarshalBinaryBare(vote))
 }
 
 func (k Keeper) DeleteVotes(ctx sdk.Context, prefix string) int {
 	keys := k.SearchVoteKeys(ctx, prefix)
-	store := k.GetVoteStore(ctx)
-	for _, key := range(keys) {
+	store := k.GetStore(ctx)
+	for _, key := range keys {
 		store.Delete([]byte(key))
 	}
 	return len(keys)
 }
 
 func (k Keeper) SearchVoteKeys(ctx sdk.Context, prefix string) []string {
-	iterator := sdk.KVStorePrefixIterator(k.GetVoteStore(ctx), []byte(prefix))
+	iterator := sdk.KVStorePrefixIterator(k.GetStore(ctx), []byte(types.VoteStorePrefix + prefix))
 	defer iterator.Close()
 	keys  := make([]string, 0)
 
@@ -67,7 +62,7 @@ func makeSearchVotePrefix(batch string, sourceName string) string {
 }
 
 func (k Keeper) SearchVotes(ctx sdk.Context, prefix string) []types.Vote {
-	iterator := sdk.KVStorePrefixIterator(k.GetVoteStore(ctx), []byte(prefix))
+	iterator := sdk.KVStorePrefixIterator(k.GetStore(ctx), []byte(types.VoteStorePrefix + prefix))
 	defer iterator.Close()
 	votes  := make([]types.Vote, 0)
 
