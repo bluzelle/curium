@@ -8,13 +8,15 @@ import (
 type GenesisState struct {
 	Config GlobalOracleConfig
 	Sources map[string] Source
+	Votes map[string] Vote
 }
 
 // NewGenesisState creates a new GenesisState object
-func NewGenesisState(config GlobalOracleConfig, sources map[string] Source) GenesisState {
+func NewGenesisState(config GlobalOracleConfig, sources map[string] Source, votes map[string] Vote) GenesisState {
 	return GenesisState{
 		Config: config,
 		Sources: sources,
+		Votes: votes,
 	}
 }
 

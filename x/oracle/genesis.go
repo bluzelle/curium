@@ -19,6 +19,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) (data types.GenesisState) {
 	return types.NewGenesisState(
 		k.DumpGlobalConfig(ctx),
 		k.DumpSources(ctx),
+		k.DumpVotes(ctx),
 		)
 }
 
