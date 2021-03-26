@@ -107,6 +107,19 @@ func (k Keeper) SearchSourceValues(ctx sdk.Context, prefix string, page uint, li
 	return values
 }
 
+func (k Keeper) DumpSourceValues(ctx sdk.Context) map[string] types.SourceValue {
+	store := k.GetStore(ctx)
+	var results = make(map[string]types.SourceValue)
+	iterator := sdk.KVStorePrefixIterator(store, []byte(types.ValueStorePrefix))
+	for ; iterator.Valid(); iterator.Next() {
+		var value types.SourceValue
+		k.cdc.UnmarshalBinaryBare(iterator.Value(), &value)
+		results[string(iterator.Key())] = value
+	}
+	return results
+}
+
+
 
 
 

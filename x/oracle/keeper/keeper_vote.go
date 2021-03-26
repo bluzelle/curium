@@ -84,9 +84,9 @@ func (k Keeper) DumpVotes(ctx sdk.Context) map[string] types.Vote {
 	var results = make(map[string]types.Vote)
 	iterator := sdk.KVStorePrefixIterator(store, []byte(types.VoteStorePrefix))
 	for ; iterator.Valid(); iterator.Next() {
-		var source types.Vote
-		k.cdc.UnmarshalBinaryBare(iterator.Value(), &source)
-		results[string(iterator.Key())] = source
+		var vote types.Vote
+		k.cdc.UnmarshalBinaryBare(iterator.Value(), &vote)
+		results[string(iterator.Key())] = vote
 	}
 	return results
 }
