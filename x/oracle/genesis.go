@@ -16,7 +16,9 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 // to a genesis file, which can be imported again
 // with InitGenesis
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) (data types.GenesisState) {
-	// TODO: Define logic for exporting state
-	return types.NewGenesisState()
+	return types.NewGenesisState(
+		k.DumpGlobalConfig(ctx),
+		k.DumpSources(ctx),
+		)
 }
 

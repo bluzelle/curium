@@ -1,30 +1,28 @@
 package types
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/errors"
 )
-
-type GlobalOracleConfig struct {
-	AdminAddress sdk.AccAddress
-}
 
 // GenesisState - all oracle state that must be provided at genesis
 type GenesisState struct {
 	Config GlobalOracleConfig
+	Sources map[string] Source
 }
 
 // NewGenesisState creates a new GenesisState object
-func NewGenesisState() GenesisState {
+func NewGenesisState(config GlobalOracleConfig, sources map[string] Source) GenesisState {
 	return GenesisState{
-		GlobalOracleConfig{},
+		Config: config,
+		Sources: sources,
 	}
 }
 
 // DefaultGenesisState - default GenesisState used by Cosmos Hub
 func DefaultGenesisState() GenesisState {
 	return GenesisState{
-		GlobalOracleConfig{},
+		Config: GlobalOracleConfig{},
+		Sources: map[string] Source{},
 	}
 }
 

@@ -7,13 +7,13 @@ import (
 
 func (k Keeper) AddSource(ctx sdk.Context, name string, source types.Source) {
 	store := k.GetStore(ctx)
-	store.Set([]byte(types.SourceStorePrefix + name), k.cdc.MustMarshalBinaryLengthPrefixed(source))
+	store.Set([]byte(types.SourceStorePrefix + name), k.cdc.MustMarshalBinaryBare(source))
 }
 
 func (k Keeper) GetSource(ctx sdk.Context, name string) (types.Source, error) {
 	store := k.GetStore(ctx)
 	var source types.Source
-	err := k.cdc.UnmarshalBinaryLengthPrefixed(store.Get([]byte(types.SourceStorePrefix + name)), &source)
+	err := k.cdc.UnmarshalBinaryBare(store.Get([]byte(types.SourceStorePrefix + name)), &source)
 	return source, err
 }
 
@@ -31,8 +31,20 @@ func (k Keeper) ListSources(ctx sdk.Context) ([]types.Source, error) {
 	for ; iterator.Valid(); iterator.Next() {
 		var source types.Source
 		value := iterator.Value()
-		k.cdc.UnmarshalBinaryLengthPrefixed(value, &source)
+		k.cdc.UnmarshalBinaryBare(value, &source)
 		sources = append(sources, source)
 	}
 	return sources, nil
+}
+
+func (k Keeper) DumpSources(ctx sdk.Context) map[string] types.Source {
+	store := k.GetStore(ctx)
+	var results = make(map[string]types.Source)
+	iterator := sdk.KVStorePrefixIterator(store, []byte(types.SourceStorePrefix))
+	for ; iterator.Valid(); iterator.Next() {
+		var source types.Source
+		k.cdc.UnmarshalBinaryBare(iterator.Value(), &source)
+		results[string(iterator.Key())] = source
+	}
+	return results
 }

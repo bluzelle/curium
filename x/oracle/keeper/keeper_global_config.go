@@ -6,6 +6,12 @@ import (
 )
 
 
+func (k Keeper) DumpGlobalConfig(ctx sdk.Context) types.GlobalOracleConfig {
+	return types.GlobalOracleConfig{
+		AdminAddress: k.GetAdminAddress(ctx),
+	}
+}
+
 func (k Keeper) SetAdminAddress(ctx sdk.Context, admin sdk.AccAddress) {
 	store := k.GetStore(ctx)
 	store.Set([]byte(types.ConfigStorePrefix + "admin-address"), admin)
