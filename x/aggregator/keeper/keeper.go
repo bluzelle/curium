@@ -349,7 +349,7 @@ func (k Keeper) DumpAggValues(ctx sdk.Context) map[string]types.AggregatorValue 
 	for ; iterator.Valid(); iterator.Next() {
 		var value types.AggregatorValue
 		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &value)
-		results[string(iterator.Key()[1:])] = value
+		results[string(iterator.Key())] = value
 	}
 	return results
 }
@@ -360,7 +360,7 @@ func (k Keeper) DumpQueueItems(ctx sdk.Context) map[string]types.AggregatorQueue
 	for ; iterator.Valid(); iterator.Next() {
 		var value types.AggregatorQueueItem
 		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &value)
-		results[string(iterator.Key()[1:])] = value
+		results[string(iterator.Key())] = value
 	}
 	return results
 }
