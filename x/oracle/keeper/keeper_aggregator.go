@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+	aggregator "github.com/bluzelle/curium/x/oracle/aggregator"
 	"github.com/bluzelle/curium/x/oracle/types"
 	storeIterator "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -22,16 +23,17 @@ func (k Keeper) CheckAggregateValues(ctx sdk.Context) {
 		keys = append(keys, iterator.Key())
 	}
 
-	if len(queueValues) > 0 {
-		k.Logger(ctx).Info("Aggregating source values", "len", len(queueValues))
-	}
 
 	for _, key := range keys {
 		store.Delete(key)
 	}
 
-
-	// TODO: FINISH HERE!!!!!!!
+	if len(queueValues) > 0 {
+		k.Logger(ctx).Info("Aggregating source values", "len", len(queueValues))
+		for _, agg := range aggregator.GetAggregators() {
+			agg.AggregateSourceValues(ctx, store, queueValues)
+		}
+	}
 }
 
 func heightToString(height int64) string {
