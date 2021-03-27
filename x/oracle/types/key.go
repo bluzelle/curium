@@ -24,6 +24,7 @@ var (
 	VoteStoreKey   = NewOracleStoreKey(0x03)
 	ValueStoreKey  = NewOracleStoreKey(0x04)
 	ConfigStoreKey = NewOracleStoreKey(0x05)
+	SourceValueCacheKey = NewOracleStoreKey(0x06)
 )
 
 type OracleStoreKey struct {

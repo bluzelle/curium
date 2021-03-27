@@ -2,7 +2,6 @@ package oracle
 
 import (
 	"github.com/bluzelle/curium/app/ante"
-	aggregator "github.com/bluzelle/curium/x/oracle/aggregators"
 	"github.com/bluzelle/curium/x/oracle/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -17,5 +16,5 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) {
 
 // EndBlocker called every block, process inflation, update validator set.
 func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
-	aggregator.CheckAggregateValues(ctx.WithGasMeter(ante.NewDummyGasMeter()))
+	k.CheckAggregateValues(ctx.WithGasMeter(ante.NewDummyGasMeter()))
 }

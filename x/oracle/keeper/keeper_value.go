@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	aggregator "github.com/bluzelle/curium/x/oracle/aggregators"
 	"github.com/bluzelle/curium/x/oracle/types"
 	storeIterator "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -35,7 +34,6 @@ func (k Keeper) UpdateSourceValue(ctx sdk.Context, batch string, sourceName stri
 		weight = source.Weight
 	}
 
-	key := types.ValueStoreKey.MakeKey(batch, sourceName)
 
 	sourceValue := types.SourceValue{
 		SourceName: sourceName,
@@ -46,17 +44,9 @@ func (k Keeper) UpdateSourceValue(ctx sdk.Context, batch string, sourceName stri
 		Count:		int64(len(votes)),
 		Weight:     weight,
 	}
-	store.Set(key, k.cdc.MustMarshalBinaryBare(sourceValue))
-
-	//for _, listener := range valueUpdateListeners {
-	//	listener(ctx, sourceValue)
-	//}
-
-	updateFn := func(prefix []byte, key []byte, value interface{}) {
-		combinedKey := append(prefix, key...)
-		k.GetStore(ctx).Set(combinedKey, k.cdc.MustMarshalBinaryBare(value))
-	}
-	aggregator.NotifyAggregators(ctx, sourceValue, updateFn)
+	bz := k.cdc.MustMarshalBinaryBare(sourceValue)
+	store.Set(types.ValueStoreKey.MakeKey(batch, sourceName), bz)
+	store.Set(types.SourceValueCacheKey.MakeKey(heightToString(ctx.BlockHeight()), batch, sourceName), bz)
 }
 
 
