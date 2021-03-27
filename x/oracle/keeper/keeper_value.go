@@ -6,16 +6,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-type ValueKey struct {
-	Batch string
-	SourceName string
-}
-
-func (vk ValueKey) Bytes() []byte {
-	return []byte(types.ValueStorePrefix + vk.Batch + ">" + vk.SourceName)
-}
-
-
 func (k Keeper) RegisterValueUpdatedListener(listener types.ValueUpdateListener) {
 	valueUpdateListeners = append(valueUpdateListeners, listener)
 }
@@ -44,10 +34,7 @@ func (k Keeper) UpdateSourceValue(ctx sdk.Context, batch string, sourceName stri
 		weight = source.Weight
 	}
 
-	key := ValueKey{
-		Batch: batch,
-		SourceName: sourceName,
-	}.Bytes()
+	key := types.ValueStoreKey.MakeKey(batch, sourceName)
 
 	sourceValue := types.SourceValue{
 		SourceName: sourceName,
@@ -87,9 +74,9 @@ func calculateAverageFromVotes(votes []types.Vote) sdk.Dec {
 func (k Keeper) SearchSourceValues(ctx sdk.Context, prefix string, page uint, limit uint, reverse bool) []types.SourceValue {
 	var iterator sdk.Iterator
 	if reverse {
-		iterator = storeIterator.KVStoreReversePrefixIteratorPaginated(k.GetStore(ctx), []byte(types.ValueStorePrefix + prefix), page, limit)
+		iterator = storeIterator.KVStoreReversePrefixIteratorPaginated(k.GetStore(ctx), types.ValueStoreKey.MakeKey(prefix), page, limit)
 	} else {
-		iterator = storeIterator.KVStorePrefixIteratorPaginated(k.GetStore(ctx), []byte(types.ValueStorePrefix + prefix), page, limit)
+		iterator = storeIterator.KVStorePrefixIteratorPaginated(k.GetStore(ctx), types.ValueStoreKey.MakeKey(prefix), page, limit)
 	}
 	defer iterator.Close()
 	values  := make([]types.SourceValue, 0)
@@ -110,7 +97,7 @@ func (k Keeper) SearchSourceValues(ctx sdk.Context, prefix string, page uint, li
 func (k Keeper) DumpSourceValues(ctx sdk.Context) map[string] types.SourceValue {
 	store := k.GetStore(ctx)
 	var results = make(map[string]types.SourceValue)
-	iterator := sdk.KVStorePrefixIterator(store, []byte(types.ValueStorePrefix))
+	iterator := sdk.KVStorePrefixIterator(store, types.ValueStoreKey.Prefix)
 	for ; iterator.Valid(); iterator.Next() {
 		var value types.SourceValue
 		k.cdc.UnmarshalBinaryBare(iterator.Value(), &value)

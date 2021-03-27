@@ -11,7 +11,7 @@ var voteProofs map[string]types.MsgOracleVoteProof
 func (k Keeper) GetVoteProof(ctx sdk.Context, sourceName string, valcons string) types.MsgOracleVoteProof {
 	var msg types.MsgOracleVoteProof
 		proofStore := k.GetStore(ctx)
-		proof := proofStore.Get([]byte(types.ProofStorePrefix + sourceName + valcons))
+		proof := proofStore.Get([]byte(types.ProofStoreKey.MakeKey(sourceName, valcons)))
 		k.cdc.MustUnmarshalBinaryBare(proof, &msg)
 		return msg
 }
@@ -24,7 +24,7 @@ func CalculateProofSig(value string) string {
 
 func (k Keeper) StoreVoteProof(ctx sdk.Context, msg types.MsgOracleVoteProof) {
 	proofStore := k.GetStore(ctx)
-	proofStore.Set([]byte(types.ProofStorePrefix + msg.SourceName + msg.ValidatorAddr), k.cdc.MustMarshalBinaryBare(msg))
+	proofStore.Set([]byte(types.ProofStoreKey.MakeKey(msg.SourceName,msg.ValidatorAddr)), k.cdc.MustMarshalBinaryBare(msg))
 }
 
 func (k Keeper) IsVoteValid(ctx sdk.Context, msg types.MsgOracleVote) bool {
@@ -54,7 +54,7 @@ func (k Keeper) IsVoteValid(ctx sdk.Context, msg types.MsgOracleVote) bool {
 }
 
 func (k Keeper) SearchVoteProofs(ctx sdk.Context, prefix string) []types.MsgOracleVoteProof {
-	iterator := sdk.KVStorePrefixIterator(k.GetStore(ctx), []byte(types.ProofStorePrefix + prefix))
+	iterator := sdk.KVStorePrefixIterator(k.GetStore(ctx), types.ProofStoreKey.MakeKey(prefix))
 	defer iterator.Close()
 	proofs := make([]types.MsgOracleVoteProof, 0)
 

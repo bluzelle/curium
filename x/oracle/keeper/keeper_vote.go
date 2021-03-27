@@ -7,26 +7,12 @@ import (
 )
 
 
-type VoteKey struct {
-	Batch string
-	SourceName string
-	Valcons string
-}
-
-func voteToVoteKey(vote types.Vote) VoteKey {
-	return VoteKey{
-		Batch: vote.Batch,
-		SourceName: vote.SourceName,
-		Valcons: vote.Valcons,
-	}
-}
-
-func (vk VoteKey) Bytes() []byte {
-	return []byte(fmt.Sprintf("%s%s>%s>%s", types.VoteStorePrefix, vk.Batch, vk.SourceName, vk.Valcons))
+func voteToVoteKey(vote types.Vote) []byte {
+	return types.VoteStoreKey.MakeKey(vote.Batch, vote.SourceName, vote.Valcons)
 }
 
 func (k Keeper) StoreVote(ctx sdk.Context, vote types.Vote)  {
-	key := voteToVoteKey(vote).Bytes()
+	key := voteToVoteKey(vote)
 	store := k.GetStore(ctx)
 	store.Set(key, k.cdc.MustMarshalBinaryBare(vote))
 }
@@ -41,7 +27,7 @@ func (k Keeper) DeleteVotes(ctx sdk.Context, prefix string) int {
 }
 
 func (k Keeper) SearchVoteKeys(ctx sdk.Context, prefix string) []string {
-	iterator := sdk.KVStorePrefixIterator(k.GetStore(ctx), []byte(types.VoteStorePrefix + prefix))
+	iterator := sdk.KVStorePrefixIterator(k.GetStore(ctx), types.VoteStoreKey.MakeKey(prefix))
 	defer iterator.Close()
 	keys  := make([]string, 0)
 
@@ -62,7 +48,7 @@ func makeSearchVotePrefix(batch string, sourceName string) string {
 }
 
 func (k Keeper) SearchVotes(ctx sdk.Context, prefix string) []types.Vote {
-	iterator := sdk.KVStorePrefixIterator(k.GetStore(ctx), []byte(types.VoteStorePrefix + prefix))
+	iterator := sdk.KVStorePrefixIterator(k.GetStore(ctx), types.VoteStoreKey.MakeKey(prefix))
 	defer iterator.Close()
 	votes  := make([]types.Vote, 0)
 
@@ -82,7 +68,7 @@ func (k Keeper) SearchVotes(ctx sdk.Context, prefix string) []types.Vote {
 func (k Keeper) DumpVotes(ctx sdk.Context) map[string] types.Vote {
 	store := k.GetStore(ctx)
 	var results = make(map[string]types.Vote)
-	iterator := sdk.KVStorePrefixIterator(store, []byte(types.VoteStorePrefix))
+	iterator := sdk.KVStorePrefixIterator(store, types.VoteStoreKey.Prefix)
 	for ; iterator.Valid(); iterator.Next() {
 		var vote types.Vote
 		k.cdc.UnmarshalBinaryBare(iterator.Value(), &vote)
