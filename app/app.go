@@ -16,7 +16,6 @@ package app
 
 import (
 	"encoding/json"
-	"github.com/bluzelle/curium/x/aggregator"
 	"github.com/bluzelle/curium/x/oracle"
 	"math"
 	"os"
@@ -80,7 +79,7 @@ var (
 		tax.AppModuleBasic{},
 		faucet.AppModuleBasic{},
 		oracle.AppModuleBasic{},
-		aggregator.AppModuleBasic{},
+//		aggregator.AppModuleBasic{},
 	)
 
 	// account permissions
@@ -138,7 +137,7 @@ type CRUDApp struct {
 	taxKeeper      tax.Keeper
 	oracleKeeper   oracle.Keeper
 	faucetKeeper   faucet.Keeper
-	aggKeeper      aggregator.Keeper
+//	aggKeeper      aggregator.Keeper
 
 	// Module Manager
 	mm *module.Manager
@@ -164,7 +163,7 @@ func NewCRUDApp(
 		gov.StoreKey, params.StoreKey, crud.StoreKey,
 		tax.StoreKey,
 		faucet.StoreKey, crud.LeaseKey, crud.OwnerKey,
-		oracle.StoreKey,aggregator.StoreKey,
+		oracle.StoreKey, /*aggregator.StoreKey,*/
 	)
 
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
@@ -280,12 +279,12 @@ func NewCRUDApp(
 		nil,
 	)
 
-	app.aggKeeper = aggregator.NewKeeper(
-		app.cdc,
-		app.oracleKeeper,
-		keys[aggregator.StoreKey],
-		nil,
-	)
+	//app.aggKeeper = aggregator.NewKeeper(
+	//	app.cdc,
+	//	app.oracleKeeper,
+	//	keys[aggregator.StoreKey],
+	//	nil,
+	//)
 
 	app.faucetKeeper = faucet.NewKeeper(
 		app.supplyKeeper,
@@ -312,11 +311,11 @@ func NewCRUDApp(
 		slashing.NewAppModule(app.slashingKeeper, app.accountKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
 		oracle.NewAppModule(app.oracleKeeper),
-		aggregator.NewAppModule(app.aggKeeper),
+//		aggregator.NewAppModule(app.aggKeeper),
 	)
 
 	app.mm.SetOrderBeginBlockers(distr.ModuleName, slashing.ModuleName, oracle.ModuleName)
-	app.mm.SetOrderEndBlockers(gov.ModuleName, staking.ModuleName, aggregator.ModuleName)
+	app.mm.SetOrderEndBlockers(gov.ModuleName, staking.ModuleName, /*aggregator.ModuleName*/)
 
 	// Sets the order of Genesis - Order matters, genutil is to always come last
 	// NOTE: The genutils moodule must occur after staking so that pools are
@@ -332,7 +331,7 @@ func NewCRUDApp(
 		tax.ModuleName,
 		supply.ModuleName,
 		oracle.ModuleName,
-		aggregator.ModuleName,
+//		aggregator.ModuleName,
 		genutil.ModuleName,
 	)
 
