@@ -36,7 +36,6 @@ func NewTokenAggregator() TokenAggregator {
 }
 
 func (ta TokenAggregator) SourceValueUpdated(ctx sdk.Context, value types.SourceValue, updateFn func(prefix []byte, key []byte, value interface{})) {
-	fmt.Println(ctx, value)
 	parts := strings.Split(value.SourceName, "-")
 	aggQueueItem := AggregatorQueueItem{
 		Batch:      value.Batch,
