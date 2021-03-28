@@ -20,7 +20,9 @@ func (k Keeper) CheckAggregateValues(ctx sdk.Context) {
 	for ; iterator.Valid(); iterator.Next() {
 		var v types.SourceValue
 		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &v)
-		queueValues[v.Batch] = append(queueValues[v.Batch], v)
+		if !v.Value.IsZero() && !v.Value.IsNil() {
+			queueValues[v.Batch] = append(queueValues[v.Batch], v)
+		}
 		keys = append(keys, iterator.Key())
 	}
 
@@ -32,7 +34,7 @@ func (k Keeper) CheckAggregateValues(ctx sdk.Context) {
 		for _, values := range queueValues {
 			logger.Info("Aggregating source values", "len", len(queueValues))
 			for _, agg := range aggregator.GetAggregators() {
-				agg.AggregateSourceValues(ctx, store, values)
+				agg.AggregateSourceValues(ctx, *k.cdc, store, values)
 			}
 		}
 	}

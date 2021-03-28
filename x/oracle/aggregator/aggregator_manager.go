@@ -1,13 +1,13 @@
 package aggregator
 
 import (
-	tokenAggregator "github.com/bluzelle/curium/x/oracle/aggregator/token"
 	"github.com/bluzelle/curium/x/oracle/types"
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var aggregators = []Aggregator{
-	tokenAggregator.TokenAggregator{},
+	TokenAggregator{},
 }
 
 func GetAggregators() []Aggregator {
@@ -16,7 +16,7 @@ func GetAggregators() []Aggregator {
 
 
 type Aggregator interface {
-	AggregateSourceValues(ctx sdk.Context, store sdk.KVStore, values []types.SourceValue)
+	AggregateSourceValues(ctx sdk.Context, cdc codec.Codec, store sdk.KVStore, values []types.SourceValue)
 }
 
 
