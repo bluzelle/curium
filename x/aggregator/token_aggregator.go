@@ -49,6 +49,12 @@ type QueryReqSearchValues struct {
 	Limit uint
 }
 
+type QueryReqGetAggregatorValue struct {
+	Batch string
+	Pair string
+}
+
+
 
 
 func convertToAggSourceValues(values []types.SourceValue) []AggSourceValue {
@@ -82,6 +88,10 @@ func (ta TokenAggregator) Queriers(ctx sdk.Context, cmd string, req abci.Request
 	case "searchValues":
 		resp, err := querySearchValues(ctx, req, cdc, store)
 		return true, resp, err
+	case "getAggregatedValue":
+		resp, err := queryGetAggregatedValue(ctx, req, cdc, store)
+		return true, resp, err
+
 	}
 	return false, nil, nil
 }
@@ -102,6 +112,14 @@ func querySearchValues(ctx sdk.Context, req abci.RequestQuery, cdc codec.Codec, 
 	x := cdc.MustMarshalJSON(results)
 	return x, nil
 }
+
+func queryGetAggregatedValue(ctx sdk.Context, req abci.RequestQuery, cdc codec.Codec, store sdk.KVStore) ([]byte, error) {
+	var query QueryReqGetAggregatorValue
+	cdc.MustUnmarshalJSON(req.Data, &query)
+	results := GetAggregatedValue(ctx, store, cdc, query.Batch, query.Pair)
+	return cdc.MustMarshalJSON(results), nil
+}
+
 
 
 
@@ -246,6 +264,16 @@ func SearchValues(ctx sdk.Context, store sdk.KVStore, cdc codec.Codec, prefix st
 	}
 	return values
 }
+
+func GetAggregatedValue(ctx sdk.Context, store sdk.KVStore, cdc codec.Codec, batch string, pair string) AggValue {
+	parts := strings.Split(pair, "-")
+	storeKey := AggValueKey.MakeKey(batch, parts[0], parts[1])
+	bz := store.Get(storeKey)
+	var value AggValue
+	cdc.MustUnmarshalBinaryBare(bz, &value)
+	return value
+}
+
 
 
 
