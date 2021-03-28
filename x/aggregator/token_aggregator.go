@@ -5,6 +5,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	abci "github.com/tendermint/tendermint/abci/types"
+	"regexp"
 	"strings"
 )
 
@@ -76,11 +77,9 @@ func (ta TokenAggregator) Queriers(ctx sdk.Context, cmd string, req abci.Request
 func querySearchBatchKeys(ctx sdk.Context, req abci.RequestQuery, cdc codec.Codec, store sdk.KVStore) ([]byte, error) {
 	var query QueryReqSearchBatches
 	cdc.MustUnmarshalJSON(req.Data, &query)
-// TODO: FINISH HERE!!!!!
-//	results := k.SearchAggValueBatchKeys(ctx, query.PreviousBatch, query.Limit, query.Reverse)
 
-//	x := codec.MustMarshalJSONIndent(k.cdc, results)
-	return nil, nil
+	result := searchAggValueBatchKeys(ctx, store, query.PreviousBatch, query.Limit, query.Reverse)
+	return cdc.MustMarshalJSON(result), nil
 }
 
 
@@ -142,5 +141,60 @@ func addInverses(values []AggSourceValue) []AggSourceValue {
 	}
 	return append(values, inverses...)
 }
+
+
+func searchAggValueBatchKeys(ctx sdk.Context, store sdk.KVStore, previousKey string, limit uint, reverse bool) []string {
+	isInRange := func(key string) bool {
+		if len(previousKey) == 0 {
+			return true
+		}
+
+		if reverse && key < previousKey {
+			return true
+		}
+		if !reverse && key > previousKey {
+			return true
+		}
+		return false
+	}
+
+	var batches = make([]string, 0)
+
+	if limit == 0 {
+		limit = 50
+	}
+
+	var iterator sdk.Iterator
+
+	if reverse {
+		iterator = sdk.KVStoreReversePrefixIterator(store, AggValueKey.Prefix)
+	} else {
+		iterator = store.Iterator(nil, nil)
+	}
+	defer iterator.Close()
+
+	var re = regexp.MustCompile(`([^>]*).*`)
+	var prevBatch string
+
+	for ;iterator.Valid(); iterator.Next() {
+		key := string(iterator.Key()[1:])
+		batch := re.ReplaceAllString(key, `$1`)
+
+		if isInRange(batch) {
+
+			if batch != prevBatch {
+				batches = append(batches, batch)
+			}
+			prevBatch = batch
+		}
+
+		if uint(len(batches)) == limit {
+			break
+		}
+	}
+
+	return batches
+}
+
 
 
