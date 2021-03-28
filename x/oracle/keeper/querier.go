@@ -1,13 +1,15 @@
 package keeper
 
 import (
+	"github.com/bluzelle/curium/x/aggregator"
 	"github.com/cosmos/cosmos-sdk/codec"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
 	// this line is used by starport scaffolding # 1
 	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/bluzelle/curium/x/oracle/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 // NewQuerier creates a new querier for oracle clients.
@@ -30,7 +32,11 @@ func NewQuerier(k Keeper) sdk.Querier {
 		case types.QueryValidatorByValcons:
 			return queryValidatorByValcons(ctx, req, k)
 		default:
-			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown oracle query endpoint")
+			found, result, err := aggregator.Queriers(ctx, path, req, k.GetStore(ctx))
+			if !found {
+				return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown oracle query endpoint")
+			}
+			return result, err
 		}
 	}
 }

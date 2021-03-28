@@ -33,9 +33,7 @@ func (k Keeper) CheckAggregateValues(ctx sdk.Context) {
 	if len(queueValues) > 0 {
 		for _, values := range queueValues {
 			logger.Info("Aggregating source values", "len", len(queueValues))
-			for _, agg := range aggregator.GetAggregators() {
-				agg.AggregateSourceValues(ctx, *k.cdc, store, values)
-			}
+			aggregator.SourceValueUpdated(ctx, *k.cdc, store, values)
 		}
 	}
 }

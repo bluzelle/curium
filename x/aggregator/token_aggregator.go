@@ -4,6 +4,7 @@ import (
 	"github.com/bluzelle/curium/x/oracle/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 	"strings"
 )
 
@@ -51,6 +52,15 @@ func convertToAggSourceValues(values []types.SourceValue) []AggSourceValue {
 		})
 	}
 	return results
+}
+
+func (ta TokenAggregator) GetName() string {
+	return "token-price"
+}
+
+func (ta TokenAggregator) Queriers(ctx sdk.Context, cmd string, req abci.RequestQuery, store sdk.KVStore) (bool, []byte, error) {
+	// FINISH HERE
+	return false, nil, nil
 }
 
 func (ta TokenAggregator) AggregateSourceValues(ctx sdk.Context, cdc codec.Codec, store sdk.KVStore, sourceValues []types.SourceValue) {
@@ -111,4 +121,5 @@ func addInverses(values []AggSourceValue) []AggSourceValue {
 	}
 	return append(values, inverses...)
 }
+
 
