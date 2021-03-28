@@ -1,4 +1,4 @@
-package aggregator
+package aggregator_old
 
 import (
 	"encoding/json"
@@ -12,10 +12,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/bluzelle/curium/x/aggregator/client/cli"
-	"github.com/bluzelle/curium/x/aggregator/client/rest"
-	"github.com/bluzelle/curium/x/aggregator/keeper"
-	"github.com/bluzelle/curium/x/aggregator/types"
+	"github.com/bluzelle/curium/x/aggregator_old/client/cli"
+	"github.com/bluzelle/curium/x/aggregator_old/client/rest"
+	"github.com/bluzelle/curium/x/aggregator_old/keeper"
+	"github.com/bluzelle/curium/x/aggregator_old/types"
 )
 
 // Type check to ensure the interface is properly implemented

@@ -1,11 +1,11 @@
-package aggregator
+package aggregator_old
 
 import (
 	"fmt"
 	"github.com/bluzelle/curium/app/ante"
 
-	"github.com/bluzelle/curium/x/aggregator/keeper"
-	"github.com/bluzelle/curium/x/aggregator/types"
+	"github.com/bluzelle/curium/x/aggregator_old/keeper"
+	"github.com/bluzelle/curium/x/aggregator_old/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )

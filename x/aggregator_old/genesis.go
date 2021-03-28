@@ -1,10 +1,10 @@
-package aggregator
+package aggregator_old
 
 import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/bluzelle/curium/x/aggregator/types"
-	"github.com/bluzelle/curium/x/aggregator/keeper"
+	"github.com/bluzelle/curium/x/aggregator_old/types"
+	"github.com/bluzelle/curium/x/aggregator_old/keeper"
 )
 
 // InitGenesis initialize default parameters

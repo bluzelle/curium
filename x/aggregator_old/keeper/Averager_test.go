@@ -1,7 +1,7 @@
 package keeper_test
 
 import (
-	"github.com/bluzelle/curium/x/aggregator/keeper"
+	"github.com/bluzelle/curium/x/aggregator_old/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/assert"
 	"testing"

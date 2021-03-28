@@ -1,7 +1,7 @@
 package types_test
 
 import (
-	"github.com/bluzelle/curium/x/aggregator/types"
+	"github.com/bluzelle/curium/x/aggregator_old/types"
 	"github.com/magiconair/properties/assert"
 	"testing"
 )

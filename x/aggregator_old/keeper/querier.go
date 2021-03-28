@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/bluzelle/curium/x/aggregator/types"
+	"github.com/bluzelle/curium/x/aggregator_old/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"

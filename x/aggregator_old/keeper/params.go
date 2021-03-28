@@ -4,7 +4,7 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/bluzelle/curium/x/aggregator/types"
+	"github.com/bluzelle/curium/x/aggregator_old/types"
 )
 
 // GetParams returns the total set of aggregator parameters.

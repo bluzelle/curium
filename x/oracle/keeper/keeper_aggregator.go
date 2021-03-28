@@ -2,7 +2,7 @@ package keeper
 
 import (
 	"fmt"
-	"github.com/bluzelle/curium/x/oracle/aggregator"
+	"github.com/bluzelle/curium/x/aggregator"
 	"github.com/bluzelle/curium/x/oracle/types"
 	storeIterator "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
