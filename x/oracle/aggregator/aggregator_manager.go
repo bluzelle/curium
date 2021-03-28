@@ -7,7 +7,7 @@ import (
 )
 
 var aggregators = []Aggregator{
-	tokenAggregator.NewTokenAggregator(),
+	tokenAggregator.TokenAggregator{},
 }
 
 func GetAggregators() []Aggregator {

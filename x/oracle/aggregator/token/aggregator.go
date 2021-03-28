@@ -6,8 +6,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-var queueStoreKey = types.NewOracleStoreKey(0x10)
-
 type TokenAggregator struct {
 }
 
@@ -20,11 +18,9 @@ type AggregatorValue struct {
 	Height   int64
 }
 
-func NewTokenAggregator() TokenAggregator {
-	return TokenAggregator{}
-}
 
 func (ta TokenAggregator) AggregateSourceValues(ctx sdk.Context, store sdk.KVStore, values []types.SourceValue) {
+
 	fmt.Println("FINISH HERE!!!!")
 	//for _, value := range(values) {
 	//	parts := strings.Split(value.SourceName, "-")
