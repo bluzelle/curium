@@ -28,11 +28,11 @@ func findAggregator(name string) Aggregator{
 
 type Aggregator interface {
 	AggregateSourceValues(ctx sdk.Context, cdc codec.Codec, store sdk.KVStore, values []types.SourceValue)
-	Queriers(ctx sdk.Context, cmd string, req abci.RequestQuery, store sdk.KVStore) (bool, []byte, error)
+	Queriers(ctx sdk.Context, cmd string, req abci.RequestQuery, cdc codec.Codec, store sdk.KVStore) (bool, []byte, error)
 	GetName() string
 }
 
-func Queriers(ctx sdk.Context, path []string, req abci.RequestQuery, store sdk.KVStore) (bool, []byte, error) {
+func Queriers(ctx sdk.Context, path []string, req abci.RequestQuery, cdc codec.Codec,store sdk.KVStore) (bool, []byte, error) {
 	var (
 		found bool = false
 		result []byte
@@ -40,7 +40,7 @@ func Queriers(ctx sdk.Context, path []string, req abci.RequestQuery, store sdk.K
 	)
 	agg := findAggregator(path[1])
 	if agg != nil {
-		found, result, err = agg.Queriers(ctx, path[2], req, store)
+		found, result, err = agg.Queriers(ctx, path[2], req, cdc, store)
 	}
 	return found, result, err
 }

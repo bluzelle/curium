@@ -34,6 +34,12 @@ type AggSourceValue struct {
 	Weight int64
 }
 
+type QueryReqSearchBatches struct {
+	PreviousBatch string
+	Reverse bool
+	Limit uint
+}
+
 
 func convertToAggSourceValues(values []types.SourceValue) []AggSourceValue {
 	var results []AggSourceValue
@@ -58,10 +64,25 @@ func (ta TokenAggregator) GetName() string {
 	return "token-price"
 }
 
-func (ta TokenAggregator) Queriers(ctx sdk.Context, cmd string, req abci.RequestQuery, store sdk.KVStore) (bool, []byte, error) {
-	// FINISH HERE
+func (ta TokenAggregator) Queriers(ctx sdk.Context, cmd string, req abci.RequestQuery, cdc codec.Codec, store sdk.KVStore) (bool, []byte, error) {
+	switch cmd {
+	case "searchBatchKeys":
+		resp, err := querySearchBatchKeys(ctx, req, cdc, store)
+		return true, resp, err
+	}
 	return false, nil, nil
 }
+
+func querySearchBatchKeys(ctx sdk.Context, req abci.RequestQuery, cdc codec.Codec, store sdk.KVStore) ([]byte, error) {
+	var query QueryReqSearchBatches
+	cdc.MustUnmarshalJSON(req.Data, &query)
+// TODO: FINISH HERE!!!!!
+//	results := k.SearchAggValueBatchKeys(ctx, query.PreviousBatch, query.Limit, query.Reverse)
+
+//	x := codec.MustMarshalJSONIndent(k.cdc, results)
+	return nil, nil
+}
+
 
 func (ta TokenAggregator) AggregateSourceValues(ctx sdk.Context, cdc codec.Codec, store sdk.KVStore, sourceValues []types.SourceValue) {
 	values := convertToAggSourceValues(sourceValues)

@@ -32,7 +32,7 @@ func NewQuerier(k Keeper) sdk.Querier {
 		case types.QueryValidatorByValcons:
 			return queryValidatorByValcons(ctx, req, k)
 		default:
-			found, result, err := aggregator.Queriers(ctx, path, req, k.GetStore(ctx))
+			found, result, err := aggregator.Queriers(ctx, path, req, *k.cdc, k.GetStore(ctx))
 			if !found {
 				return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown oracle query endpoint")
 			}
