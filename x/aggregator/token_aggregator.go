@@ -54,6 +54,20 @@ type QueryReqGetAggregatorValue struct {
 	Pair string
 }
 
+type QueryReqGetPairValuesHistory struct {
+	StartBatch string
+	EndBatch string
+	Step int64
+	Symbol string
+	InSymbol string
+}
+
+type HistoryResult struct {
+	Batch string
+	Value sdk.Dec
+}
+
+
 
 
 
@@ -91,7 +105,9 @@ func (ta TokenAggregator) Queriers(ctx sdk.Context, cmd string, req abci.Request
 	case "getAggregatedValue":
 		resp, err := queryGetAggregatedValue(ctx, req, cdc, store)
 		return true, resp, err
-
+	case "getPairValuesHistory":
+		resp, err := queryGetPairValuesHistory(ctx, req, cdc, store)
+		return true, resp, err
 	}
 	return false, nil, nil
 }
@@ -117,6 +133,14 @@ func queryGetAggregatedValue(ctx sdk.Context, req abci.RequestQuery, cdc codec.C
 	var query QueryReqGetAggregatorValue
 	cdc.MustUnmarshalJSON(req.Data, &query)
 	results := GetAggregatedValue(ctx, store, cdc, query.Batch, query.Pair)
+	return cdc.MustMarshalJSON(results), nil
+}
+
+func queryGetPairValuesHistory(ctx sdk.Context, req abci.RequestQuery, cdc codec.Codec, store sdk.KVStore) ([]byte, error) {
+	var query QueryReqGetPairValuesHistory
+	cdc.MustUnmarshalJSON(req.Data, &query)
+
+	results := GetPairValuesHistory(ctx, store, cdc, query.StartBatch, query.EndBatch, query.Step, query.Symbol, query.InSymbol)
 	return cdc.MustMarshalJSON(results), nil
 }
 
@@ -273,6 +297,44 @@ func GetAggregatedValue(ctx sdk.Context, store sdk.KVStore, cdc codec.Codec, bat
 	cdc.MustUnmarshalBinaryBare(bz, &value)
 	return value
 }
+
+func GetPairValuesHistory(ctx sdk.Context, store sdk.KVStore, cdc codec.Codec, startBatch string, endBatch string, step int64, symbol string, inSymbol string) []HistoryResult {
+	var results []HistoryResult
+
+	start := AggValueKey.MakeKey(startBatch)
+	var end []byte
+	if len(endBatch) == 0 {
+		end = sdk.PrefixEndBytes(AggValueKey.Prefix)
+	} else {
+		end = AggValueKey.MakeKey(endBatch)
+	}
+
+	iterator := store.Iterator(start, end)
+	currentStep := int64(0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		parts := strings.Split(string(iterator.Key()[1:]), ">")
+		sym := parts[1]
+		inSym := parts[2]
+
+		if sym == symbol && inSym == inSymbol {
+			currentStep++
+			if currentStep >=  step {
+				currentStep = 0
+				var aggValue AggValue
+				cdc.MustUnmarshalBinaryBare(iterator.Value(), &aggValue)
+				results = append(results, HistoryResult{Batch: aggValue.Batch, Value: aggValue.Value})
+			}
+		}
+		if len(results) > 99 {
+			break
+		}
+	}
+	return results
+}
+
+
+
 
 
 
