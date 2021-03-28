@@ -3,6 +3,7 @@ package aggregator
 import (
 	"github.com/bluzelle/curium/x/oracle/types"
 	"github.com/cosmos/cosmos-sdk/codec"
+	storeIterator "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"regexp"
@@ -41,6 +42,14 @@ type QueryReqSearchBatches struct {
 	Limit uint
 }
 
+type QueryReqSearchValues struct {
+	Prefix string
+	Reverse bool
+	Page uint
+	Limit uint
+}
+
+
 
 func convertToAggSourceValues(values []types.SourceValue) []AggSourceValue {
 	var results []AggSourceValue
@@ -70,6 +79,9 @@ func (ta TokenAggregator) Queriers(ctx sdk.Context, cmd string, req abci.Request
 	case "searchBatchKeys":
 		resp, err := querySearchBatchKeys(ctx, req, cdc, store)
 		return true, resp, err
+	case "searchValues":
+		resp, err := querySearchValues(ctx, req, cdc, store)
+		return true, resp, err
 	}
 	return false, nil, nil
 }
@@ -81,6 +93,16 @@ func querySearchBatchKeys(ctx sdk.Context, req abci.RequestQuery, cdc codec.Code
 	result := searchAggValueBatchKeys(ctx, store, query.PreviousBatch, query.Limit, query.Reverse)
 	return cdc.MustMarshalJSON(result), nil
 }
+
+func querySearchValues(ctx sdk.Context, req abci.RequestQuery, cdc codec.Codec, store sdk.KVStore) ([]byte, error) {
+	var query QueryReqSearchValues
+	cdc.MustUnmarshalJSON(req.Data, &query)
+
+	results := SearchValues(ctx, store, cdc, query.Prefix, query.Page, query.Limit, query.Reverse)
+	x := cdc.MustMarshalJSON(results)
+	return x, nil
+}
+
 
 
 func (ta TokenAggregator) AggregateSourceValues(ctx sdk.Context, cdc codec.Codec, store sdk.KVStore, sourceValues []types.SourceValue) {
@@ -195,6 +217,37 @@ func searchAggValueBatchKeys(ctx sdk.Context, store sdk.KVStore, previousKey str
 
 	return batches
 }
+
+func SearchValues(ctx sdk.Context, store sdk.KVStore, cdc codec.Codec, prefix string, page uint, limit uint, reverse bool) []AggValue {
+	if page == 0 {
+		page = 1
+	}
+	if limit == 0 {
+		limit = 100
+	}
+	var iterator sdk.Iterator
+	if reverse {
+		iterator = storeIterator.KVStoreReversePrefixIteratorPaginated(store, AggValueKey.MakeKey(prefix), page, limit)
+	} else {
+		iterator = storeIterator.KVStorePrefixIteratorPaginated(store, AggValueKey.MakeKey(prefix), page, limit)
+	}
+	defer iterator.Close()
+	values := make([]AggValue, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		if ctx.GasMeter().IsPastLimit() {
+			break
+		}
+
+		var v AggValue
+		value := iterator.Value()
+		cdc.MustUnmarshalBinaryBare(value, &v)
+		values = append(values, v)
+	}
+	return values
+}
+
+
 
 
 
