@@ -10,11 +10,10 @@ import (
 	"strings"
 )
 
+// Store key for aggregated values
 var AggValueKey = types.NewOracleStoreKey(0x10)
 
-type TokenAggregator struct {
-}
-
+// Data structures used in the aggregator
 type AggValue struct {
 	Batch    string
 	Symbol   string
@@ -68,6 +67,69 @@ type HistoryResult struct {
 }
 
 
+// Defining the aggregator structure
+type TokenAggregator struct {
+}
+
+func (ta TokenAggregator) GetName() string {
+	return "token-price"
+}
+
+func (ta TokenAggregator) AggregateSourceValues(ctx sdk.Context, cdc codec.Codec, store sdk.KVStore, sourceValues []types.SourceValue) {
+	values := convertToAggSourceValues(sourceValues)
+	fixupUsdItems(values)
+	values = addInverses(values)
+
+
+	averagers := make(map[string]Averager)
+
+	for _, value := range values {
+		key := value.Symbol + "-" + value.InSymbol
+		x := averagers[key]
+		x.Add(value.Value, value.Weight)
+		averagers[key] = x
+	}
+
+	for key, averager := range averagers {
+		parts := strings.Split(key, "-")
+
+		storeKey := AggValueKey.MakeKey(values[0].Batch, parts[0], parts[1])
+
+		value := AggValue{
+			Batch:    values[0].Batch,
+			Symbol:   parts[0],
+			InSymbol: parts[1],
+			Value:    averager.CalculateAverage(),
+			Count:    averager.Count,
+			Height:		values[0].Height,
+		}
+		store.Set(storeKey, cdc.MustMarshalBinaryBare(value))
+	}
+
+}
+
+func (ta TokenAggregator) Queriers(ctx sdk.Context, cmd string, req abci.RequestQuery, cdc codec.Codec, store sdk.KVStore) (bool, []byte, error) {
+	switch cmd {
+	case "searchBatchKeys":
+		resp, err := querySearchBatchKeys(ctx, req, cdc, store)
+		return true, resp, err
+	case "searchValues":
+		resp, err := querySearchValues(ctx, req, cdc, store)
+		return true, resp, err
+	case "getAggregatedValue":
+		resp, err := queryGetAggregatedValue(ctx, req, cdc, store)
+		return true, resp, err
+	case "getPairValuesHistory":
+		resp, err := queryGetPairValuesHistory(ctx, req, cdc, store)
+		return true, resp, err
+	}
+	return false, nil, nil
+}
+
+
+
+
+
 
 
 
@@ -90,27 +152,7 @@ func convertToAggSourceValues(values []types.SourceValue) []AggSourceValue {
 	return results
 }
 
-func (ta TokenAggregator) GetName() string {
-	return "token-price"
-}
 
-func (ta TokenAggregator) Queriers(ctx sdk.Context, cmd string, req abci.RequestQuery, cdc codec.Codec, store sdk.KVStore) (bool, []byte, error) {
-	switch cmd {
-	case "searchBatchKeys":
-		resp, err := querySearchBatchKeys(ctx, req, cdc, store)
-		return true, resp, err
-	case "searchValues":
-		resp, err := querySearchValues(ctx, req, cdc, store)
-		return true, resp, err
-	case "getAggregatedValue":
-		resp, err := queryGetAggregatedValue(ctx, req, cdc, store)
-		return true, resp, err
-	case "getPairValuesHistory":
-		resp, err := queryGetPairValuesHistory(ctx, req, cdc, store)
-		return true, resp, err
-	}
-	return false, nil, nil
-}
 
 func querySearchBatchKeys(ctx sdk.Context, req abci.RequestQuery, cdc codec.Codec, store sdk.KVStore) ([]byte, error) {
 	var query QueryReqSearchBatches
@@ -147,38 +189,6 @@ func queryGetPairValuesHistory(ctx sdk.Context, req abci.RequestQuery, cdc codec
 
 
 
-func (ta TokenAggregator) AggregateSourceValues(ctx sdk.Context, cdc codec.Codec, store sdk.KVStore, sourceValues []types.SourceValue) {
-	values := convertToAggSourceValues(sourceValues)
-	fixupUsdItems(values)
-	values = addInverses(values)
-
-
-	averagers := make(map[string]Averager)
-
-	for _, value := range values {
-		key := value.Symbol + "-" + value.InSymbol
-		x := averagers[key]
-		x.Add(value.Value, value.Weight)
-		averagers[key] = x
-	}
-
-	for key, averager := range averagers {
-		parts := strings.Split(key, "-")
-
-		storeKey := AggValueKey.MakeKey(values[0].Batch, parts[0], parts[1])
-
-		value := AggValue{
-			Batch:    values[0].Batch,
-			Symbol:   parts[0],
-			InSymbol: parts[1],
-			Value:    averager.CalculateAverage(),
-			Count:    averager.Count,
-			Height:		values[0].Height,
-		}
-		store.Set(storeKey, cdc.MustMarshalBinaryBare(value))
-	}
-
-}
 
 func fixupUsdItems(values []AggSourceValue) {
 	for i, value := range values {
