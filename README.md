@@ -1,31 +1,26 @@
-# CURIUM Overview
+# curium
 
-[![Build Status](https://travis-ci.com/bluzelle/curium.svg?branch=devel)](https://travis-ci.com/bluzelle/curium) [![Coverage Status](https://coveralls.io/repos/github/bluzelle/curium/badge.svg?branch=devel)](https://coveralls.io/github/bluzelle/curium?branch=devel)
+**curium** is a blockchain built using Cosmos SDK and Tendermint and created with [Starport](https://github.com/tendermint/starport).
 
-## The Bluzelle Curium Application
+## Get started
 
-The decentralized database for Web 3.0. Bluzelle uses blockchain and edge computing for greater performance and security.
+```
+starport serve
+```
 
-### Bluzelle Curium REST Service
+`serve` command installs dependencies, builds, initializes and starts your blockchain in development.
 
-If all you need is the Light-client Daemon \(LCD\) REST server: [Building the Curium REST Service](rest-service/buildrest.md)
+## Configure
 
-### Bluzelle Curium Public Validator + Sentry Installation
+Your blockchain in development can be configured with `config.yml`. To learn more see the [reference](https://github.com/tendermint/starport#documentation).
 
-If you want to setup your own validator + sentry \(optional\) on our network: [Building a Public TestNet Validator + Sentry](public-validator-+-sentry/buildvalidatorsentry.md)
+## Launch
 
-### Bluzelle Curium Private Multi-Validator Zone Installation
+To launch your blockchain live on mutliple nodes use `starport network` commands. Learn more about [Starport Network](https://github.com/tendermint/spn).
 
-These are steps involved in setting up the OS, Dev Environment, building and deploying a multi-node Curium Zone.
+## Learn more
 
-1. [OS Setup for Curium](setup/os.md)
-2. [Development Environment Setup](setup/devenv.md)
-3. [Build the Curium Project](setup/build.md)
-4. [Deploy the Initial Node](setup/deploy.md)
-5. [Deploy Additional Nodes](setup/deployaddl.md)
-
-### Using a Bluzelle Curium Multi-Validator Zone
-
-* [Queries and Transactions](docs/commands/qAndTX.md)
-* [Useful Operations](docs/commands/useful.md) 
-
+- [Starport](https://github.com/tendermint/starport)
+- [Cosmos SDK documentation](https://docs.cosmos.network)
+- [Cosmos SDK Tutorials](https://tutorials.cosmos.network)
+- [Discord](https://discord.gg/W8trcGV)

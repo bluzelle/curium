@@ -1,93 +1,39 @@
-// Copyright (C) 2020 Bluzelle
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License, version 3,
-// as published by the Free Software Foundation.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
-
 package crud
 
 import (
-	"github.com/bluzelle/curium/x/crud/internal/keeper"
-	"github.com/bluzelle/curium/x/crud/internal/types"
+	"github.com/bluzelle/curium/x/crud/keeper"
+	"github.com/bluzelle/curium/x/crud/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	abci "github.com/tendermint/tendermint/abci/types"
 )
 
-type StoreExport struct {
-	Key []byte
-	Value []byte
-}
-
-type GenesisState struct {
-	CrudStore []StoreExport
-	LeaseStore []StoreExport
-	OwnerStore []StoreExport
-}
-
-func NewGenesisState(_ []types.BLZValue) GenesisState {
-	return GenesisState{
-		CrudStore: nil,
-		LeaseStore: nil,
-		OwnerStore: nil,
+// InitGenesis initializes the capability module's state from a provided genesis
+// state.
+func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
+	// this line is used by starport scaffolding # genesis/module/init
+	// Set all the CrudValue
+	for _, elem := range genState.CrudValueList {
+		k.SetCrudValue(ctx, *elem)
 	}
+
+	// Set CrudValue count
+	k.SetCrudValueCount(ctx, uint64(len(genState.CrudValueList)))
+
+	// this line is used by starport scaffolding # ibc/genesis/init
 }
 
-func ValidateGenesis(data GenesisState) error {
-	//for _, record := range data.BlzValues {
-	//	if record.Owner == nil {
-	//		return fmt.Errorf("invalid BlzValue: Value: %s. Error: Missing Owner", record.Value)
-	//	}
-	//}
-	return nil
-}
+// ExportGenesis returns the capability module's exported genesis.
+func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
+	genesis := types.DefaultGenesis()
 
-func DefaultGenesisState() GenesisState {
-	return GenesisState{
-		CrudStore: nil,
-		LeaseStore: nil,
-		OwnerStore: nil,
+	// this line is used by starport scaffolding # genesis/module/export
+	// Get all CrudValue
+	CrudValueList := k.GetAllCrudValue(ctx)
+	for _, elem := range CrudValueList {
+		elem := elem
+		genesis.CrudValueList = append(genesis.CrudValueList, &elem)
 	}
-}
 
-func InitGenesis(ctx sdk.Context, keeper keeper.IKeeper, data GenesisState) []abci.ValidatorUpdate {
-	importStore(keeper.GetKVStore(ctx), data.CrudStore)
-	importStore(keeper.GetLeaseStore(ctx), data.LeaseStore)
-	importStore(keeper.GetOwnerStore(ctx), data.OwnerStore)
-	return []abci.ValidatorUpdate{}
-}
+	// this line is used by starport scaffolding # ibc/genesis/export
 
-func importStore(store sdk.KVStore, records []StoreExport) {
-	for _, record := range records {
-		 value := record.Value
-		 if value == nil {
-		 	value = make([]byte, 0)
-		 }
-		store.Set(record.Key, value)
-	}
-}
-
-
-func ExportGenesis(ctx sdk.Context, k keeper.IKeeper) GenesisState {
-	return GenesisState{
-		exportStore(ctx, k.GetKVStore(ctx)),
-		exportStore(ctx, k.GetLeaseStore(ctx)),
-		exportStore(ctx, k.GetOwnerStore(ctx)),
-	}
-}
-
-func exportStore(ctx sdk.Context, store sdk.KVStore) []StoreExport {
-	var records []StoreExport
-	iterator := sdk.KVStorePrefixIterator(store, []byte{})
-	for ; iterator.Valid(); iterator.Next() {
-		records = append(records, StoreExport{iterator.Key(), iterator.Value()})
-	}
-	return records
+	return genesis
 }

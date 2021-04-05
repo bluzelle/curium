@@ -1,0 +1,32 @@
+accounts:
+  - name: vuser
+    coins: ["5000000000000000ubnt"]
+  - name: sync
+    coins: ["100000000ubnt"]
+  - name: bob
+    coins: ["500ubnt"]
+validator:
+  name: vuser
+  staked: "100000000ubnt"
+client:
+  vuex:
+    path: "vue/src/store"
+#faucet:
+#  name: bob
+#  coins: ["5000ubnt"]
+init:
+  config:
+    "consensus.timeout_propose": "3s"
+    "consensus.timeout_commit": "5s"
+    "p2p.addr_book_strict": false
+genesis:
+  app_state:
+    staking:
+      params:
+        bond_denom: "ubnt"
+    synchronizer:
+        sourceList:
+          - creator: sync
+            name: "binance"
+            url: "https://data-seed-prebsc-1-s1.binance.org:8545"
+

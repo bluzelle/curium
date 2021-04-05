@@ -1,0 +1,48 @@
+syntax = "proto3";
+package bluzelle.curium.synchronizer;
+
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+// this line is used by starport scaffolding # 1
+import "synchronizer/source.proto";
+import "synchronizer/config.proto";
+
+option go_package = "github.com/bluzelle/curium/x/synchronizer/types";
+
+// Query defines the gRPC querier service.
+service Query {
+    // this line is used by starport scaffolding # 2
+	rpc Source(QueryGetSourceRequest) returns (QueryGetSourceResponse) {
+		option (google.api.http).get = "/bluzelle/curium/synchronizer/source/{name}";
+	}
+	rpc SourceAll(QueryAllSourceRequest) returns (QueryAllSourceResponse) {
+		option (google.api.http).get = "/bluzelle/curium/synchronizer/source";
+	}
+	rpc GetConfig(QueryGetConfigRequest) returns (QueryGetConfigResponse) {
+		option (google.api.http).get = "/bluzelle/curium/synchronizer/config";
+	}
+}
+
+// this line is used by starport scaffolding # 3
+message QueryGetConfigRequest {}
+
+message QueryGetConfigResponse {
+	Config Config = 1;
+}
+
+message QueryGetSourceRequest {
+	string name = 1;
+}
+
+message QueryGetSourceResponse {
+	Source Source = 1;
+}
+
+message QueryAllSourceRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllSourceResponse {
+	repeated Source Source = 1;
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}

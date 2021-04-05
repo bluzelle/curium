@@ -1,0 +1,1 @@
+abigen --pkg contract --sol BinanceContract.sol --out BinanceContract.go
