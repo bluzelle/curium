@@ -8,9 +8,9 @@ accounts:
 validator:
   name: vuser
   staked: "100000000ubnt"
-client:
-  vuex:
-    path: "vue/src/store"
+#client:
+#  vuex:
+#    path: "vue/src/store"
 #faucet:
 #  name: bob
 #  coins: ["5000ubnt"]
