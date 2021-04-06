@@ -26,7 +26,7 @@ genesis:
         bond_denom: "ubnt"
     synchronizer:
         sourceList:
-          - creator: sync
+          - creator: "config.yml"
             name: "binance"
             url: "https://data-seed-prebsc-1-s1.binance.org:8545"
 

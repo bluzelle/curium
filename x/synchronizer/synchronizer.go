@@ -7,6 +7,7 @@ import (
 	"github.com/bluzelle/curium/x/synchronizer/contract"
 	"github.com/bluzelle/curium/x/synchronizer/keeper"
 	"github.com/bluzelle/curium/x/synchronizer/types"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -47,7 +48,7 @@ func runSynchronizer(t time.Time, k keeper.Keeper) {
 			}
 		}
 	}
-	curium.BroadcastMessages(currCtx, voteMessages, k.AccKeeper)
+	curium.BroadcastMessages(currCtx, voteMessages, k.AccKeeper, "sync")
 }
 
 func fetchDataFromContract(ctx sdk.Context, source types.Source) []contract.TestingRecord {
@@ -68,7 +69,7 @@ func fetchDataFromContract(ctx sdk.Context, source types.Source) []contract.Test
 }
 
 func generateVoteMsg(source types.Source, record contract.TestingRecord, k keeper.Keeper) (sdk.Msg, error) {
-	home := viper.GetString("home")
+	home := viper.GetString(flags.FlagHome)
 	kr, err := keyring.New("curium", keyring.BackendTest, home, nil)
 
 	if err != nil {

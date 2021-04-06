@@ -2,9 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="46e9c939-9b73-479c-a723-dfb27fc7a5cc" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/x/curium/BroadcastMessages.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/config.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config2.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/curium/BroadcastMessages.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/curium/BroadcastMessages.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/x/synchronizer/synchronizer.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/synchronizer.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -153,7 +154,7 @@
       <workItem from="1617153155320" duration="10317000" />
       <workItem from="1617205745939" duration="17425000" />
       <workItem from="1617323976697" duration="25265000" />
-      <workItem from="1617655014587" duration="6852000" />
+      <workItem from="1617655014587" duration="13601000" />
     </task>
     <servers />
   </component>
@@ -220,6 +221,11 @@
           <url>file://$PROJECT_DIR$/x/synchronizer/keeper/msg_server_SynchronizerVote.go</url>
           <line>40</line>
           <option name="timeStamp" value="85" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/x/synchronizer/synchronizer.go</url>
+          <line>72</line>
+          <option name="timeStamp" value="97" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

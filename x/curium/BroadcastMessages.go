@@ -1,6 +1,7 @@
 package curium
 
 import (
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/crypto"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
@@ -18,7 +19,7 @@ import (
 	"time"
 )
 
-func BroadcastMessages(ctx sdk.Context, msgs []types.Msg, accKeeper keeper.AccountKeeper) (*coretypes.ResultBroadcastTxCommit, error) {
+func BroadcastMessages(ctx sdk.Context, msgs []types.Msg, accKeeper keeper.AccountKeeper, from string) (*coretypes.ResultBroadcastTxCommit, error) {
 	// Choose your codec: Amino or Protobuf. Here, we use Protobuf, given by the
 	// following function.
 	encCfg := simapp.MakeTestEncodingConfig()
@@ -33,15 +34,15 @@ func BroadcastMessages(ctx sdk.Context, msgs []types.Msg, accKeeper keeper.Accou
 
 	txBuilder.SetGasLimit(200000)
 	txBuilder.SetFeeAmount(types.NewCoins(types.NewCoin("ubnt", types.NewInt(20000))))
-	txBuilder.SetMemo("synchronizer vote")
+	txBuilder.SetMemo("memo")
 	txBuilder.SetTimeoutHeight(uint64(ctx.BlockHeight() + 2))
 
-	home := viper.GetString("home")
+	home := viper.GetString(flags.FlagHome)
 	kr, err := keyring.New("curium", keyring.BackendTest, home, nil)
 	if err != nil {
 		return nil, err
 	}
-	keys, err := kr.Key("sync")
+	keys, err := kr.Key(from)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +50,7 @@ func BroadcastMessages(ctx sdk.Context, msgs []types.Msg, accKeeper keeper.Accou
 	addr := keys.GetAddress()
 	accnt := accKeeper.GetAccount(ctx, addr)
 
-	privArmor, err := kr.ExportPrivKeyArmor("sync", "")
+	privArmor, err := kr.ExportPrivKeyArmor(from, "")
 	if err != nil {
 		return nil, err
 	}
