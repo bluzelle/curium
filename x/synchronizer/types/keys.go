@@ -26,7 +26,6 @@ func KeyPrefix(p string) []byte {
 }
 
 const (
-	SourceKey      = "Source-value-"
-	SourceCountKey = "Source-count-"
-	ConfigKey      = "Config"
+	SourceKey      = "Source-"
+	ConfigKey      = "config-"
 )

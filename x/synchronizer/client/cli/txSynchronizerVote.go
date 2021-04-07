@@ -1,7 +1,8 @@
 package cli
 
 import (
-    "strconv"
+	"math/big"
+	"strconv"
 	"github.com/spf13/cobra"
 
     "github.com/cosmos/cosmos-sdk/client"
@@ -28,7 +29,7 @@ func CmdSynchronizerVote() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgSynchronizerVote(clientCtx.GetFromAddress().String(), string(argsUuid), string(argsOp), string(argsKey), string(argsValue), "")
+			msg := types.NewMsgSynchronizerVote(clientCtx.GetFromAddress().String(), string(argsUuid), string(argsOp), string(argsKey), string(argsValue), big.NewInt(0))
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

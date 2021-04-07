@@ -87,7 +87,7 @@ func generateVoteMsg(source types.Source, record binance.BluzelleAdapterTransact
 		"binance-"+record.Uuid,
 		record.Key,
 		record.Value,
-		record.Bookmark.String(),
+		record.Bookmark,
 		)
 	err = voteMsg.ValidateBasic()
 	if err != nil {

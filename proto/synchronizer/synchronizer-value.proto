@@ -7,5 +7,5 @@ import "gogoproto/gogo.proto";
 
 message SynchronizerValue {
   string value = 1;
-  string bookmark = 2;
+  bytes bookmark = 2;
 }
