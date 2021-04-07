@@ -43,7 +43,7 @@ func (k Keeper) AppendCrudValue(
 	creator string,
 	uuid string,
 	key string,
-	value string,
+	value []byte,
 	lease int64,
 	height int64,
 ) {

@@ -31,7 +31,7 @@ func CmdCreateCrudValue() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgCreateCrudValue(clientCtx.GetFromAddress().String(), string(argsUuid), string(argsKey), string(argsValue), lease)
+			msg := types.NewMsgCreateCrudValue(clientCtx.GetFromAddress().String(), string(argsUuid), string(argsKey), []byte(argsValue), lease)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -66,7 +66,7 @@ func CmdUpdateCrudValue() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgUpdateCrudValue(clientCtx.GetFromAddress().String(), string(argsUuid), string(argsKey), string(argsValue), lease)
+			msg := types.NewMsgUpdateCrudValue(clientCtx.GetFromAddress().String(), string(argsUuid), string(argsKey), []byte(argsValue), lease)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

@@ -2,15 +2,19 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="46e9c939-9b73-479c-a723-dfb27fc7a5cc" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/proto/synchronizer/synchronizer-value.proto" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proto/synchronizer/tx.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/synchronizer/tx.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/curium/BroadcastMessages.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/curium/BroadcastMessages.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/client/cli/txSynchronizerVote.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/client/cli/txSynchronizerVote.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proto/crud/CrudValue.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/crud/CrudValue.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proto/crud/tx.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/crud/tx.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/client/cli/txCrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/client/cli/txCrudValue.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/client/cli/txUpsertCrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/client/cli/txUpsertCrudValue.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/client/rest/txCrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/client/rest/txCrudValue.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/keeper/CrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/keeper/CrudValue.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/types/CrudValue.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/types/CrudValue.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/types/message_upsertCrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/types/message_upsertCrudValue.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/types/messages_CrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/types/messages_CrudValue.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/types/tx.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/types/tx.pb.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/x/synchronizer/keeper/msg_server_SynchronizerVote.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/keeper/msg_server_SynchronizerVote.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/synchronizer.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/synchronizer.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/types/message_SynchronizerVote.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/types/message_SynchronizerVote.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/types/tx.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/types/tx.pb.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,7 +48,7 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/x/synchronizer/contract" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/proto/synchronizer" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
@@ -62,9 +66,9 @@
       <recent name="$PROJECT_DIR$/x/curium" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/proto/synchronizer" />
       <recent name="$PROJECT_DIR$/x/synchronizer/contract" />
       <recent name="$PROJECT_DIR$/x/synchronizer/contract/contracts" />
-      <recent name="$PROJECT_DIR$/proto/synchronizer" />
       <recent name="$PROJECT_DIR$/js-client" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -162,7 +166,7 @@
       <workItem from="1617153155320" duration="10317000" />
       <workItem from="1617205745939" duration="17425000" />
       <workItem from="1617323976697" duration="25265000" />
-      <workItem from="1617655014587" duration="27666000" />
+      <workItem from="1617655014587" duration="31529000" />
     </task>
     <servers />
   </component>
@@ -221,17 +225,6 @@
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/x/synchronizer/keeper/msg_server_SynchronizerVote.go</url>
-          <line>40</line>
-          <option name="timeStamp" value="85" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

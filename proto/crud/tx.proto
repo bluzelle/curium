@@ -19,7 +19,7 @@ message MsgUpsertCrudValue {
   string creator = 1;
   string uuid = 2;
   string key = 3;
-  string value = 4;
+  bytes value = 4;
   int64 lease = 5;
 }
 
@@ -30,7 +30,7 @@ message MsgCreateCrudValue {
   string creator = 1;
   string uuid = 2;
   string key = 3;
-  string value = 4;
+  bytes value = 4;
   int64 lease = 5;
 }
 
@@ -41,7 +41,7 @@ message MsgUpdateCrudValue {
   string creator = 1;
   string uuid = 2;
   string key = 3;
-  string value = 4;
+  bytes value = 4;
   int64 lease = 5;
 }
 

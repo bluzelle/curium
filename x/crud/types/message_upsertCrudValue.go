@@ -7,7 +7,7 @@ import (
 
 var _ sdk.Msg = &MsgUpsertCrudValue{}
 
-func NewMsgUpsertCrudValue(creator string, uuid string, key string, value string, lease int64) *MsgUpsertCrudValue {
+func NewMsgUpsertCrudValue(creator string, uuid string, key string, value []byte, lease int64) *MsgUpsertCrudValue {
 	return &MsgUpsertCrudValue{
 		Creator: creator,
 		Uuid:    uuid,

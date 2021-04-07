@@ -7,7 +7,7 @@ import (
 
 var _ sdk.Msg = &MsgCreateCrudValue{}
 
-func NewMsgCreateCrudValue(creator string, uuid string, key string, value string, lease int64) *MsgCreateCrudValue {
+func NewMsgCreateCrudValue(creator string, uuid string, key string, value []byte, lease int64) *MsgCreateCrudValue {
 	return &MsgCreateCrudValue{
 		Creator: creator,
 		Uuid:    uuid,
@@ -48,7 +48,7 @@ func (msg *MsgCreateCrudValue) ValidateBasic() error {
 
 var _ sdk.Msg = &MsgUpdateCrudValue{}
 
-func NewMsgUpdateCrudValue(creator string, uuid string, key string, value string, lease int64) *MsgUpdateCrudValue {
+func NewMsgUpdateCrudValue(creator string, uuid string, key string, value []byte, lease int64) *MsgUpdateCrudValue {
 	return &MsgUpdateCrudValue{
 		Creator: creator,
 		Uuid:    uuid,

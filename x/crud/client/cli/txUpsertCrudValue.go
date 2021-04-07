@@ -20,7 +20,7 @@ func CmdUpsertCrudValue() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			argsUuid := string(args[0])
 			argsKey := string(args[1])
-			argsValue := string(args[2])
+			argsValue := []byte(args[2])
 			argsLease, err := strconv.ParseInt(args[3], 10, 64)
 			if err != nil {
 				return err
@@ -31,7 +31,7 @@ func CmdUpsertCrudValue() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgUpsertCrudValue(clientCtx.GetFromAddress().String(), string(argsUuid), string(argsKey), string(argsValue), argsLease)
+			msg := types.NewMsgUpsertCrudValue(clientCtx.GetFromAddress().String(), string(argsUuid), string(argsKey), argsValue, argsLease)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

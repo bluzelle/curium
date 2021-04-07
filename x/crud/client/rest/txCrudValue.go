@@ -16,7 +16,7 @@ type createCrudValueRequest struct {
 	Creator string       `json:"creator"`
 	Uuid    string       `json:"uuid"`
 	Key     string       `json:"key"`
-	Value   string       `json:"value"`
+	Value   []byte       `json:"value"`
 	Lease   string       `json:"lease"`
 	Height  string       `json:"height"`
 }
@@ -97,7 +97,7 @@ func updateCrudValueHandler(clientCtx client.Context) http.HandlerFunc {
 
 		parsedKey := req.Key
 
-		parsedValue := req.Value
+		parsedValue := []byte(req.Value)
 
 		parsedLease, err := strconv.ParseInt(req.Lease, 10, 64)
 		if err != nil {
