@@ -20,6 +20,7 @@ type (
 		memKey    sdk.StoreKey
 		AccKeeper authkeeper.AccountKeeper
 		CrudKeeper crudkeeper.Keeper
+		KeyringDir string
 		// this line is used by starport scaffolding # ibc/keeper/attribute
 	}
 )
@@ -30,6 +31,7 @@ func NewKeeper(
 	memKey sdk.StoreKey,
 	AccKeeper authkeeper.AccountKeeper,
 	CrudKeeper crudkeeper.Keeper,
+	KeyringDir string,
 	// this line is used by starport scaffolding # ibc/keeper/parameter
 ) *Keeper {
 	return &Keeper{
@@ -38,8 +40,13 @@ func NewKeeper(
 		memKey:   memKey,
 		AccKeeper: AccKeeper,
 		CrudKeeper: CrudKeeper,
+		KeyringDir: KeyringDir,
 		// this line is used by starport scaffolding # ibc/keeper/return
 	}
+}
+
+func (k Keeper) GetKeyringDir() string {
+	return k.KeyringDir
 }
 
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {

@@ -1,7 +1,6 @@
 package curium
 
 import (
-	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/crypto"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
@@ -12,14 +11,13 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	signing2 "github.com/cosmos/cosmos-sdk/x/auth/signing"
-	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/rpc/core/types"
 
 	"google.golang.org/grpc"
 	"time"
 )
 
-func BroadcastMessages(ctx sdk.Context, msgs []types.Msg, accKeeper keeper.AccountKeeper, from string) (*coretypes.ResultBroadcastTxCommit, error) {
+func BroadcastMessages(ctx sdk.Context, msgs []types.Msg, accKeeper keeper.AccountKeeper, from string, keyringDir string) (*coretypes.ResultBroadcastTxCommit, error) {
 	// Choose your codec: Amino or Protobuf. Here, we use Protobuf, given by the
 	// following function.
 	encCfg := simapp.MakeTestEncodingConfig()
@@ -37,8 +35,7 @@ func BroadcastMessages(ctx sdk.Context, msgs []types.Msg, accKeeper keeper.Accou
 	txBuilder.SetMemo("memo")
 	txBuilder.SetTimeoutHeight(uint64(ctx.BlockHeight() + 2))
 
-	home := viper.GetString(flags.FlagHome)
-	kr, err := keyring.New("curium", keyring.BackendTest, home, nil)
+	kr, err := keyring.New("curium", keyring.BackendTest, keyringDir, nil)
 	if err != nil {
 		return nil, err
 	}

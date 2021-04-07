@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"io"
 	"os"
 	"path/filepath"
@@ -215,6 +216,7 @@ type App struct {
 
 	// the module manager
 	mm *module.Manager
+
 }
 
 // New returns a reference to an initialized Gaia.
@@ -353,6 +355,7 @@ func New(
 		keys[synchronizertypes.MemStoreKey],
 		app.AccountKeeper,
 		app.crudKeeper,
+		cast.ToString(appOpts.Get(flags.FlagHome)),
 	)
 	synchronizerModule := synchronizer.NewAppModule(appCodec, app.synchronizerKeeper)
 

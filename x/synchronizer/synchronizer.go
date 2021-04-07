@@ -7,16 +7,16 @@ import (
 	"github.com/bluzelle/curium/x/synchronizer/contract"
 	"github.com/bluzelle/curium/x/synchronizer/keeper"
 	"github.com/bluzelle/curium/x/synchronizer/types"
-	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	eth "github.com/ethereum/go-ethereum/ethclient"
-	"github.com/spf13/viper"
 	"sync"
 	"time"
 )
+
+const CONTRACT_ADDRESS = "0x4Fe0D5763cF500454E2b105f6AE8b9b66Ea4dD64"
 
 var doOnce sync.Once
 var currCtx sdk.Context
@@ -27,19 +27,19 @@ func StartSynchronizer(ctx sdk.Context, k keeper.Keeper) {
 	doOnce.Do(func() {
 		go func() {
 			for {
-				t := <-ticker.C
-				runSynchronizer(t, k)
+				_ = <-ticker.C
+				runSynchronizer(k)
 			}
 		}()
 	})
 }
 
-func runSynchronizer(t time.Time, k keeper.Keeper) {
+func runSynchronizer(k keeper.Keeper) {
 	sources := k.GetAllSource(currCtx)
 	var voteMessages []sdk.Msg
 
 	for _, source := range sources {
-		data := fetchDataFromContract(currCtx, source)
+		data := fetchDataFromContract(source)
 		for _, item := range data {
 			msg, err := generateVoteMsg(source, item, k)
 			voteMessages = append(voteMessages, msg)
@@ -48,17 +48,17 @@ func runSynchronizer(t time.Time, k keeper.Keeper) {
 			}
 		}
 	}
-	curium.BroadcastMessages(currCtx, voteMessages, k.AccKeeper, "sync")
+	curium.BroadcastMessages(currCtx, voteMessages, k.AccKeeper, "sync", k.GetKeyringDir())
 }
 
-func fetchDataFromContract(ctx sdk.Context, source types.Source) []contract.TestingRecord {
+func fetchDataFromContract(source types.Source) []contract.TestingRecord {
 	ethCtx := context.Background()
-	backend, err := eth.Dial("https://data-seed-prebsc-1-s1.binance.org:8545/")
+	backend, err := eth.Dial(source.Url)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	addr := common.HexToAddress("0x4Fe0D5763cF500454E2b105f6AE8b9b66Ea4dD64")
+	addr := common.HexToAddress(CONTRACT_ADDRESS)
 	ctr, err := contract.NewTesting(addr, backend)
 	if err != nil {
 		fmt.Println(err)
@@ -69,8 +69,7 @@ func fetchDataFromContract(ctx sdk.Context, source types.Source) []contract.Test
 }
 
 func generateVoteMsg(source types.Source, record contract.TestingRecord, k keeper.Keeper) (sdk.Msg, error) {
-	home := viper.GetString(flags.FlagHome)
-	kr, err := keyring.New("curium", keyring.BackendTest, home, nil)
+	kr, err := keyring.New("curium", keyring.BackendTest, k.GetKeyringDir(), nil)
 
 	if err != nil {
 		return nil, err
