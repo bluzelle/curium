@@ -15,9 +15,6 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		k.SetCrudValue(ctx, *elem)
 	}
 
-	// Set CrudValue count
-	k.SetCrudValueCount(ctx, uint64(len(genState.CrudValueList)))
-
 	// this line is used by starport scaffolding # ibc/genesis/init
 }
 

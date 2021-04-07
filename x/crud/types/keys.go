@@ -27,5 +27,4 @@ func KeyPrefix(p string) []byte {
 
 const (
 	CrudValueKey      = "CrudValue-value-"
-	CrudValueCountKey = "CrudValue-count-"
 )

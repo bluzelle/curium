@@ -5,37 +5,8 @@ import (
 	"github.com/bluzelle/curium/x/crud/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"strconv"
 )
 
-// GetCrudValueCount get the total number of CrudValue
-func (k Keeper) GetCrudValueCount(ctx sdk.Context) uint64 {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CrudValueCountKey))
-	byteKey := types.KeyPrefix(types.CrudValueCountKey)
-	bz := store.Get(byteKey)
-
-	// Count doesn't exist: no element
-	if bz == nil {
-		return 0
-	}
-
-	// Parse bytes
-	count, err := strconv.ParseUint(string(bz), 10, 64)
-	if err != nil {
-		// Panic because the count should be always formattable to iint64
-		panic("cannot decode count")
-	}
-
-	return count
-}
-
-// SetCrudValueCount set the total number of CrudValue
-func (k Keeper) SetCrudValueCount(ctx sdk.Context, count uint64) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CrudValueCountKey))
-	byteKey := types.KeyPrefix(types.CrudValueCountKey)
-	bz := []byte(strconv.FormatUint(count, 10))
-	store.Set(byteKey, bz)
-}
 
 // AppendCrudValue appends a CrudValue in the store with a new id and update the count
 func (k Keeper) AppendCrudValue(
