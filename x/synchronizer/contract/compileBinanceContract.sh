@@ -1,1 +1,1 @@
-abigen --pkg contract --sol BinanceContract.sol --out BinanceContract.go
+abigen --pkg binance --sol binance/BluzelleAdapter.sol --out binance/BinanceContract.go
