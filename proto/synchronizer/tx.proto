@@ -19,8 +19,10 @@ service Msg {
 message MsgSynchronizerVote {
   string creator = 1;
   string op = 2;
-  string key = 3;
-  string value = 4;
+  string uuid = 3;
+  string key = 4;
+  string value = 5;
+  string bookmark = 6;
 }
 
 message MsgSynchronizerVoteResponse {

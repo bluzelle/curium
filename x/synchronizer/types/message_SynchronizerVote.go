@@ -7,41 +7,42 @@ import (
 
 var _ sdk.Msg = &MsgSynchronizerVote{}
 
-func NewMsgSynchronizerVote(creator string, op string, key string, value string) *MsgSynchronizerVote {
-  return &MsgSynchronizerVote{
-		Creator: creator,
-    Op: op,
-    Key: key,
-    Value: value,
+func NewMsgSynchronizerVote(creator string, op string, uuid string, key string, value string, bookmark string) *MsgSynchronizerVote {
+	return &MsgSynchronizerVote{
+		Creator:  creator,
+		Op:       op,
+		Uuid:     uuid,
+		Key:      key,
+		Value:    value,
+		Bookmark: bookmark,
 	}
 }
 
 func (msg *MsgSynchronizerVote) Route() string {
-  return RouterKey
+	return RouterKey
 }
 
 func (msg *MsgSynchronizerVote) Type() string {
-  return "SynchronizerVote"
+	return "SynchronizerVote"
 }
 
 func (msg *MsgSynchronizerVote) GetSigners() []sdk.AccAddress {
-  creator, err := sdk.AccAddressFromBech32(msg.Creator)
-  if err != nil {
-    panic(err)
-  }
-  return []sdk.AccAddress{creator}
+	creator, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{creator}
 }
 
 func (msg *MsgSynchronizerVote) GetSignBytes() []byte {
-  bz := ModuleCdc.MustMarshalJSON(msg)
-  return sdk.MustSortJSON(bz)
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
 }
 
 func (msg *MsgSynchronizerVote) ValidateBasic() error {
-  _, err := sdk.AccAddressFromBech32(msg.Creator)
-  	if err != nil {
-  		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
-  	}
-  return nil
+	_, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
+	return nil
 }
-

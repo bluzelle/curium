@@ -1,6 +1,7 @@
 package curium
 
 import (
+	"context"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/crypto"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
@@ -103,7 +104,8 @@ func BroadcastMessages(ctx sdk.Context, msgs []types.Msg, accKeeper keeper.Accou
 	}
 	defer grpcConn.Close()
 
-	txCtx := myCtx{}
+	txCtx, _ := context.WithDeadline(context.Background(), time.Now().Add(time.Second * 10))
+
 
 	// Broadcast the tx via gRPC. We create a new client for the Protobuf Tx
 	// service.
@@ -123,24 +125,4 @@ func BroadcastMessages(ctx sdk.Context, msgs []types.Msg, accKeeper keeper.Accou
 
 	return nil, nil
 }
-
-type myCtx struct {
-}
-
-func (m myCtx) Deadline() (deadline time.Time, ok bool) {
-	return time.Now().Add(time.Second * 10), true
-}
-
-func (m myCtx) Done() <-chan struct{} {
-	return make(chan struct{})
-}
-
-func (m myCtx) Err() error {
-	return nil
-}
-
-func (m myCtx) Value(key interface{}) interface{} {
-	return "value"
-}
-
 

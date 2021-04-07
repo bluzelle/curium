@@ -3,10 +3,14 @@
   <component name="ChangeListManager">
     <list default="true" id="46e9c939-9b73-479c-a723-dfb27fc7a5cc" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/contract/BinanceContract.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/contract/binance/BinanceContract.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/contract/BinanceContract.sol" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/contract/testing/BinanceContract.sol" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/contract/compileBinanceContract.sh" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/contract/compileBinanceContract.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proto/synchronizer/tx.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/synchronizer/tx.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/curium/BroadcastMessages.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/curium/BroadcastMessages.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/synchronizer/client/cli/txSynchronizerVote.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/client/cli/txSynchronizerVote.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/synchronizer/keeper/msg_server_SynchronizerVote.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/keeper/msg_server_SynchronizerVote.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/x/synchronizer/synchronizer.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/synchronizer.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/synchronizer/types/message_SynchronizerVote.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/types/message_SynchronizerVote.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/synchronizer/types/tx.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/types/tx.pb.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -158,7 +162,7 @@
       <workItem from="1617153155320" duration="10317000" />
       <workItem from="1617205745939" duration="17425000" />
       <workItem from="1617323976697" duration="25265000" />
-      <workItem from="1617655014587" duration="25670000" />
+      <workItem from="1617655014587" duration="27666000" />
     </task>
     <servers />
   </component>
@@ -225,11 +229,6 @@
           <url>file://$PROJECT_DIR$/x/synchronizer/keeper/msg_server_SynchronizerVote.go</url>
           <line>40</line>
           <option name="timeStamp" value="85" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/x/synchronizer/synchronizer.go</url>
-          <line>69</line>
-          <option name="timeStamp" value="115" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

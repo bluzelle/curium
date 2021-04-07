@@ -35,7 +35,7 @@ func (k msgServer) SynchronizerVote(goCtx context.Context,  msg *types.MsgSynchr
 		})
 		break
 	case "delete":
-//		k.CrudKeeper.RemoveCrudValue(ctx, "binance-store", msg.Key)
+		k.CrudKeeper.RemoveCrudValue(ctx, "binance-store", msg.Key)
 		break
 	default:
 		return nil, fmt.Errorf("invalid synchronizer command: %s", msg.Op)
