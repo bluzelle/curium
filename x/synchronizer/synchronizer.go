@@ -20,7 +20,8 @@ import (
 
 //const CONTRACT_ADDRESS = "0x4Fe0D5763cF500454E2b105f6AE8b9b66Ea4dD64"
 //const CONTRACT_ADDRESS = "0x55866CCc07b810d004c67B029BB5bc4b445D0201"
-const CONTRACT_ADDRESS = "0xe6C18bFB430743C98920244a25cd64EeC584326C"
+//const CONTRACT_ADDRESS = "0xe6C18bFB430743C98920244a25cd64EeC584326C"
+const CONTRACT_ADDRESS = "0x2a811c36C1fA9e071146e2A231c620e30EbF1Fd9"
 
 var doOnce sync.Once
 var currCtx sdk.Context
@@ -79,7 +80,7 @@ func fetchDataFromContract(k keeper.Keeper, source types.Source) []binance.Bluze
 
 		d, err := ctr.GetSynchronizerData(callOpts, start, big.NewInt(2))
 		data = append(data, d...)
-		end := start.Add(start, big.NewInt(int64(len(data))))
+		end := start.Add(start, big.NewInt(int64(len(d))))
 		saveBookmark(k.KeyringDir, end)
 	}
 	return data
