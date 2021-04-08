@@ -22,7 +22,7 @@ func CmdSynchronizerVote() *cobra.Command {
 			argsUuid := string(args[1])
 			argsKey := string(args[2])
 			argsValue := string(args[3])
-      
+
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
