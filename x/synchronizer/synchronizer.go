@@ -13,12 +13,14 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	eth "github.com/ethereum/go-ethereum/ethclient"
 	"math/big"
+	"os"
 	"sync"
 	"time"
 )
 
 //const CONTRACT_ADDRESS = "0x4Fe0D5763cF500454E2b105f6AE8b9b66Ea4dD64"
-const CONTRACT_ADDRESS = "0x55866CCc07b810d004c67B029BB5bc4b445D0201"
+//const CONTRACT_ADDRESS = "0x55866CCc07b810d004c67B029BB5bc4b445D0201"
+const CONTRACT_ADDRESS = "0xe6C18bFB430743C98920244a25cd64EeC584326C"
 
 var doOnce sync.Once
 var currCtx sdk.Context
@@ -41,7 +43,7 @@ func runSynchronizer(k keeper.Keeper) {
 	var voteMessages []sdk.Msg
 
 	for _, source := range sources {
-		data := fetchDataFromContract(source)
+		data := fetchDataFromContract(k, source)
 		for _, item := range data {
 			msg, err := generateVoteMsg(source, item, k)
 			voteMessages = append(voteMessages, msg)
@@ -53,7 +55,7 @@ func runSynchronizer(k keeper.Keeper) {
 	curium.BroadcastMessages(currCtx, voteMessages, k.AccKeeper, "sync", k.GetKeyringDir())
 }
 
-func fetchDataFromContract(source types.Source) []binance.BluzelleAdapterTransaction {
+func fetchDataFromContract(k keeper.Keeper, source types.Source) []binance.BluzelleAdapterTransaction {
 	ethCtx := context.Background()
 	backend, err := eth.Dial(source.Url)
 	if err != nil {
@@ -65,8 +67,21 @@ func fetchDataFromContract(source types.Source) []binance.BluzelleAdapterTransac
 	if err != nil {
 		fmt.Println(err)
 	}
-	callOpts := &bind.CallOpts{Context: ethCtx, Pending: false}
-	data, err := ctr.GetSynchronizerData(callOpts, big.NewInt(0), big.NewInt(50))
+
+	var data []binance.BluzelleAdapterTransaction
+	MAX_LOOPS := 1
+	for i := 0; i < MAX_LOOPS; i++ {
+		callOpts := &bind.CallOpts{Context: ethCtx, Pending: false}
+		start, err := readBookmark(k.KeyringDir)
+		if err != nil {
+			start = big.NewInt(0)
+		}
+
+		d, err := ctr.GetSynchronizerData(callOpts, start, big.NewInt(2))
+		data = append(data, d...)
+		end := start.Add(start, big.NewInt(int64(len(data))))
+		saveBookmark(k.KeyringDir, end)
+	}
 	return data
 }
 
@@ -87,7 +102,7 @@ func generateVoteMsg(source types.Source, record binance.BluzelleAdapterTransact
 		"binance-"+record.Uuid,
 		record.Key,
 		record.Value,
-		record.Bookmark,
+		record.Bookmark.Uint64(),
 		)
 	err = voteMsg.ValidateBasic()
 	if err != nil {
@@ -95,6 +110,22 @@ func generateVoteMsg(source types.Source, record binance.BluzelleAdapterTransact
 		return nil, err
 	}
 	return voteMsg, nil
+}
+
+// TODO: Lets just dump the bookmark into a file for now, but later we need to
+// incorporate this into the voting.
+
+func saveBookmark(dir string, data *big.Int) error {
+	err := os.WriteFile(dir + "/sync-bookmark", data.Bytes(), 0644)
+	return err
+}
+
+func readBookmark(dir string) (*big.Int, error) {
+	data, err := os.ReadFile(dir + "/sync-bookmark")
+	if err != nil {
+		return nil, err
+	}
+	return big.NewInt(0).SetBytes(data), nil
 }
 
 

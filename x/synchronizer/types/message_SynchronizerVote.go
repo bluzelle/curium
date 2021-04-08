@@ -3,19 +3,18 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"math/big"
 )
 
 var _ sdk.Msg = &MsgSynchronizerVote{}
 
-func NewMsgSynchronizerVote(creator string, op string, uuid string, key string, value string, bookmark *big.Int) *MsgSynchronizerVote {
+func NewMsgSynchronizerVote(creator string, op string, uuid string, key string, value string, bookmark uint64) *MsgSynchronizerVote {
 	return &MsgSynchronizerVote{
 		Creator:  creator,
 		Op:       op,
 		Uuid:     uuid,
 		Key:      key,
 		Value:    value,
-		Bookmark: bookmark.Bytes(),
+		Bookmark: bookmark,
 	}
 }
 

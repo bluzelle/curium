@@ -1,14 +1,13 @@
 package cli
 
 import (
-	"math/big"
-	"strconv"
 	"github.com/spf13/cobra"
+	"strconv"
 
-    "github.com/cosmos/cosmos-sdk/client"
+	"github.com/bluzelle/curium/x/synchronizer/types"
+	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	"github.com/bluzelle/curium/x/synchronizer/types"
 )
 
 var _ = strconv.Itoa(0)
@@ -19,17 +18,17 @@ func CmdSynchronizerVote() *cobra.Command {
 		Short: "Broadcast message SynchronizerVote",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-      argsOp := string(args[0])
-      argsUuid := string(args[1])
-      argsKey := string(args[2])
-      argsValue := string(args[3])
+			argsOp := string(args[0])
+			argsUuid := string(args[1])
+			argsKey := string(args[2])
+			argsValue := string(args[3])
       
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgSynchronizerVote(clientCtx.GetFromAddress().String(), string(argsUuid), string(argsOp), string(argsKey), string(argsValue), big.NewInt(0))
+			msg := types.NewMsgSynchronizerVote(clientCtx.GetFromAddress().String(), string(argsUuid), string(argsOp), string(argsKey), string(argsValue), uint64(0))
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -39,5 +38,5 @@ func CmdSynchronizerVote() *cobra.Command {
 
 	flags.AddTxFlagsToCmd(cmd)
 
-    return cmd
+	return cmd
 }

@@ -3,14 +3,17 @@
   <component name="ChangeListManager">
     <list default="true" id="46e9c939-9b73-479c-a723-dfb27fc7a5cc" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proto/synchronizer/synchronizer-value.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/synchronizer/synchronizer-value.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proto/crud/CrudValue.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/crud/CrudValue.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proto/crud/tx.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/crud/tx.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proto/synchronizer/synchronizer-value.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/synchronizer/synchronizer-value-meta.proto" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/proto/synchronizer/tx.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/synchronizer/tx.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/types/CrudValue.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/types/CrudValue.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/types/tx.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/types/tx.pb.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/x/synchronizer/client/cli/txSynchronizerVote.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/client/cli/txSynchronizerVote.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/keeper/source.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/keeper/source.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/synchronizer/keeper/msg_server_SynchronizerVote.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/keeper/msg_server_SynchronizerVote.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/x/synchronizer/synchronizer.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/synchronizer.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/types/keys.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/types/keys.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/x/synchronizer/types/message_SynchronizerVote.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/types/message_SynchronizerVote.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/types/synchronizer-value.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/types/synchronizer-value.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/synchronizer/types/synchronizer-value.pb.go" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/x/synchronizer/types/tx.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/types/tx.pb.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -163,7 +166,7 @@
       <workItem from="1617153155320" duration="10317000" />
       <workItem from="1617205745939" duration="17425000" />
       <workItem from="1617323976697" duration="25265000" />
-      <workItem from="1617655014587" duration="35987000" />
+      <workItem from="1617655014587" duration="44785000" />
     </task>
     <servers />
   </component>

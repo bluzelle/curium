@@ -5,7 +5,6 @@ option go_package = "github.com/bluzelle/curium/x/synchronizer/types";
 
 import "gogoproto/gogo.proto";
 
-message SynchronizerValue {
-  string value = 1;
-  bytes bookmark = 2;
+message SynchronizerValueMeta {
+  uint64 bookmark = 1;
 }

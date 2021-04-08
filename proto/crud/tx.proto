@@ -21,6 +21,7 @@ message MsgUpsertCrudValue {
   string key = 3;
   bytes value = 4;
   int64 lease = 5;
+  bytes metadata = 6;
 }
 
 message MsgUpsertCrudValueResponse {
@@ -32,6 +33,7 @@ message MsgCreateCrudValue {
   string key = 3;
   bytes value = 4;
   int64 lease = 5;
+  bytes metadata = 6;
 }
 
 message MsgCreateCrudValueResponse {
@@ -43,6 +45,7 @@ message MsgUpdateCrudValue {
   string key = 3;
   bytes value = 4;
   int64 lease = 5;
+  bytes metadata = 6;
 }
 
 message MsgUpdateCrudValueResponse { }

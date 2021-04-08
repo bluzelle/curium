@@ -22,7 +22,7 @@ message MsgSynchronizerVote {
   string uuid = 3;
   string key = 4;
   string value = 5;
-  bytes bookmark = 6;
+  uint64 bookmark = 6;
 }
 
 message MsgSynchronizerVoteResponse {

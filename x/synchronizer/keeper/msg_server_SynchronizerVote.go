@@ -33,18 +33,18 @@ func (k msgServer) SynchronizerVote(goCtx context.Context,  msg *types.MsgSynchr
 }
 
 func storeValue(ctx sdk.Context, k msgServer, msg *types.MsgSynchronizerVote) error {
-	value := k.cdc.MustMarshalBinaryBare(&types.SynchronizerValue{
-		Value:    msg.Value,
+	metadata := types.SynchronizerValueMeta{
 		Bookmark: msg.Bookmark,
-	})
+	}
 
 	k.CrudKeeper.SetCrudValue(ctx, crudtypes.CrudValue{
 		Creator: msg.Creator,
 		Uuid:    msg.Uuid,
 		Key:     msg.Key,
-		Value:   value,
+		Value:   []byte(msg.Value),
 		Lease:   int64(365 * 24 * 60 * 60 / 5),
 		Height:  ctx.BlockHeight(),
+		Metadata: k.cdc.MustMarshalBinaryBare(&metadata),
 	})
 	return nil
 }
