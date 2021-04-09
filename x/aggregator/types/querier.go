@@ -7,6 +7,7 @@ const (
 	QuerySearchBatchKeys    = "searchBatchKeys"
 	QueryGetAggregatedValue = "getAggregatedValue"
 	QueryGetPairValuesHistory = "getPairValuesHistory"
+	QueryGetLatestValues    = "getLatestValues"
 )
 
 type QueryReqSearchValues struct {
