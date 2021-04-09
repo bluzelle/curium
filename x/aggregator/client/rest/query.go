@@ -12,16 +12,12 @@ import (
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
-	// TODO: Define your GET REST endpoints
-	r.HandleFunc(
-		"/aggregator/latestValues",
-		queryLatestValuesFn(cliCtx),
-	).Methods("GET")
+	r.HandleFunc("/aggregator/latestValues", queryLatestValuesFn(cliCtx)).Methods("GET")
+	r.HandleFunc("/aggregator/latestPair/{symbol}/{inSymbol}", queryLatestPairFn(cliCtx)).Methods("GET")
 }
 
 func queryLatestValuesFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("testing")
 		route := fmt.Sprintf("custom/%s/getLatestValues", types.QuerierRoute)
 		res, _, err := cliCtx.QueryWithData(route,  nil)
 
@@ -32,6 +28,23 @@ func queryLatestValuesFn(cliCtx context.CLIContext) http.HandlerFunc {
 		rest.PostProcessResponse(w, cliCtx, res)
 	}
 }
+
+func queryLatestPairFn(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		route := fmt.Sprintf("custom/%s/getLatestPair", types.QuerierRoute)
+		args := types.RestLatestPairReq{Symbol: vars["symbol"], InSymbol: vars["inSymbol"]}
+		data := types.ModuleCdc.MustMarshalBinaryBare(args)
+		res, _, err := cliCtx.QueryWithData(route,  data)
+
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		rest.PostProcessResponse(w, cliCtx, res)
+	}
+}
+
 
 func queryParamsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

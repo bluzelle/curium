@@ -8,7 +8,13 @@ const (
 	QueryGetAggregatedValue = "getAggregatedValue"
 	QueryGetPairValuesHistory = "getPairValuesHistory"
 	QueryGetLatestValues    = "getLatestValues"
+	QueryGetPairValues      = "getLatestPair"
 )
+
+type RestLatestPairReq struct {
+	Symbol string
+	InSymbol string
+}
 
 type QueryReqSearchValues struct {
 	Prefix string
