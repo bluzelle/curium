@@ -46,10 +46,10 @@ func (msg *MsgCreate) ValidateBasic() error {
 	return nil
 }
 
-var _ sdk.Msg = &MsgUpdateCrudValue{}
+var _ sdk.Msg = &MsgUpdate{}
 
-func NewMsgUpdateCrudValue(creator string, uuid string, key string, value []byte, lease int64) *MsgUpdateCrudValue {
-	return &MsgUpdateCrudValue{
+func NewMsgUpdate(creator string, uuid string, key string, value []byte, lease int64) *MsgUpdate {
+	return &MsgUpdate{
 		Creator: creator,
 		Uuid:    uuid,
 		Key:     key,
@@ -58,15 +58,15 @@ func NewMsgUpdateCrudValue(creator string, uuid string, key string, value []byte
 	}
 }
 
-func (msg *MsgUpdateCrudValue) Route() string {
+func (msg *MsgUpdate) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgUpdateCrudValue) Type() string {
+func (msg *MsgUpdate) Type() string {
 	return "UpdateCrudValue"
 }
 
-func (msg *MsgUpdateCrudValue) GetSigners() []sdk.AccAddress {
+func (msg *MsgUpdate) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)
@@ -74,12 +74,12 @@ func (msg *MsgUpdateCrudValue) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgUpdateCrudValue) GetSignBytes() []byte {
+func (msg *MsgUpdate) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgUpdateCrudValue) ValidateBasic() error {
+func (msg *MsgUpdate) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
@@ -89,22 +89,22 @@ func (msg *MsgUpdateCrudValue) ValidateBasic() error {
 
 var _ sdk.Msg = &MsgCreate{}
 
-func NewMsgDeleteCrudValue(creator, uuid, key string) *MsgDeleteCrudValue {
-	return &MsgDeleteCrudValue{
+func NewMsgDelete(creator, uuid, key string) *MsgDelete {
+	return &MsgDelete{
 		Uuid:    uuid,
 		Key:     key,
 		Creator: creator,
 	}
 }
-func (msg *MsgDeleteCrudValue) Route() string {
+func (msg *MsgDelete) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgDeleteCrudValue) Type() string {
+func (msg *MsgDelete) Type() string {
 	return "DeleteCrudValue"
 }
 
-func (msg *MsgDeleteCrudValue) GetSigners() []sdk.AccAddress {
+func (msg *MsgDelete) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)
@@ -112,12 +112,12 @@ func (msg *MsgDeleteCrudValue) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgDeleteCrudValue) GetSignBytes() []byte {
+func (msg *MsgDelete) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgDeleteCrudValue) ValidateBasic() error {
+func (msg *MsgDelete) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)

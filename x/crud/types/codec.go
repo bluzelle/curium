@@ -9,23 +9,23 @@ import (
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	// this line is used by starport scaffolding # 2
-	cdc.RegisterConcrete(&MsgUpsertCrudValue{}, "crud/UpsertCrudValue", nil)
+	cdc.RegisterConcrete(&MsgUpsert{}, "crud/Upsert", nil)
 
 	cdc.RegisterConcrete(&MsgCreate{}, "crud/Create", nil)
-	cdc.RegisterConcrete(&MsgUpdateCrudValue{}, "crud/UpdateCrudValue", nil)
-	cdc.RegisterConcrete(&MsgDeleteCrudValue{}, "crud/DeleteCrudValue", nil)
+	cdc.RegisterConcrete(&MsgUpdate{}, "crud/Update", nil)
+	cdc.RegisterConcrete(&MsgDelete{}, "crud/Delete", nil)
 
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	// this line is used by starport scaffolding # 3
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgUpsertCrudValue{},
+		&MsgUpsert{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreate{},
-		&MsgUpdateCrudValue{},
-		&MsgDeleteCrudValue{},
+		&MsgUpdate{},
+		&MsgDelete{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)

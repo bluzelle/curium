@@ -105,7 +105,7 @@ func updateCrudValueHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgUpdateCrudValue(
+		msg := types.NewMsgUpdate(
 			req.Creator,
 			parsedUuid,
 			parsedKey,
@@ -144,7 +144,7 @@ func deleteCrudValueHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgDeleteCrudValue(
+		msg := types.NewMsgDelete(
 			req.Creator,
 			req.Uuid,
 			req.Key,

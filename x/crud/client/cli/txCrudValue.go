@@ -66,7 +66,7 @@ func CmdUpdateCrudValue() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgUpdateCrudValue(clientCtx.GetFromAddress().String(), string(argsUuid), string(argsKey), []byte(argsValue), lease)
+			msg := types.NewMsgUpdate(clientCtx.GetFromAddress().String(), string(argsUuid), string(argsKey), []byte(argsValue), lease)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -91,7 +91,7 @@ func CmdDeleteCrudValue() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgDeleteCrudValue(clientCtx.GetFromAddress().String(), args[0], args[1])
+			msg := types.NewMsgDelete(clientCtx.GetFromAddress().String(), args[0], args[1])
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

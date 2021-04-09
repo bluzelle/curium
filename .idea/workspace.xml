@@ -4,19 +4,17 @@
     <list default="true" id="46e9c939-9b73-479c-a723-dfb27fc7a5cc" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/proto/crud/tx.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/crud/tx.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/crud/client/cli/tx.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/client/cli/tx.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/x/crud/client/cli/txCrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/client/cli/txCrudValue.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/crud/client/rest/rest.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/client/rest/rest.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/client/cli/txUpsertCrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/client/cli/txUpsertCrudValue.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/x/crud/client/rest/txCrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/client/rest/txCrudValue.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/x/crud/handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/keeper/CrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/keeper/CrudValue.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/x/crud/keeper/msg_server_CrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/keeper/msg_server_CrudValue.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/x/crud/keeper/msg_server_upsertCrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/keeper/msg_server_upsertCrudValue.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/x/crud/types/codec.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/types/codec.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/types/message_upsertCrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/types/message_upsertCrudValue.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/x/crud/types/messages_CrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/types/messages_CrudValue.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/x/crud/types/tx.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/types/tx.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/client-js/client.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/client-js/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/client-js/yarn.lock" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -178,7 +176,7 @@
       <workItem from="1617921822159" duration="1237000" />
       <workItem from="1617923194927" duration="200000" />
       <workItem from="1617923439824" duration="515000" />
-      <workItem from="1617942935834" duration="6186000" />
+      <workItem from="1617942935834" duration="8007000" />
     </task>
     <servers />
   </component>

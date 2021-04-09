@@ -8,14 +8,14 @@ option go_package = "github.com/bluzelle/curium/x/crud/types";
 // Msg defines the Msg service.
 service Msg {
     // this line is used by starport scaffolding # proto/tx/rpc
-  rpc UpsertCrudValue(MsgUpsertCrudValue) returns (MsgUpsertCrudValueResponse);
+  rpc Upsert(MsgUpsert) returns (MsgUpsertResponse);
   rpc Create(MsgCreate) returns (MsgCreateResponse);
-  rpc UpdateCrudValue(MsgUpdateCrudValue) returns (MsgUpdateCrudValueResponse);
-  rpc DeleteCrudValue(MsgDeleteCrudValue) returns (MsgDeleteCrudValueResponse);
+  rpc Update(MsgUpdate) returns (MsgUpdateResponse);
+  rpc Delete(MsgDelete) returns (MsgDeleteResponse);
 }
 
 // this line is used by starport scaffolding # proto/tx/message
-message MsgUpsertCrudValue {
+message MsgUpsert {
   string creator = 1;
   string uuid = 2;
   string key = 3;
@@ -24,7 +24,7 @@ message MsgUpsertCrudValue {
   bytes metadata = 6;
 }
 
-message MsgUpsertCrudValueResponse {
+message MsgUpsertResponse {
 }
 
 message MsgCreate {
@@ -39,7 +39,7 @@ message MsgCreate {
 message MsgCreateResponse {
 }
 
-message MsgUpdateCrudValue {
+message MsgUpdate {
   string creator = 1;
   string uuid = 2;
   string key = 3;
@@ -48,12 +48,12 @@ message MsgUpdateCrudValue {
   bytes metadata = 6;
 }
 
-message MsgUpdateCrudValueResponse { }
+message MsgUpdateResponse { }
 
-message MsgDeleteCrudValue {
+message MsgDelete {
   string creator = 1;
   string uuid = 2;
   string key = 3;
 }
 
-message MsgDeleteCrudValueResponse { }
+message MsgDeleteResponse { }

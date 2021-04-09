@@ -55,8 +55,8 @@ func (k Keeper) HasCrudValue(ctx sdk.Context, uuid, key string) bool {
 	return store.Has(MakeCrudValueKey(uuid, key))
 }
 
-// GetCrudValueOwner returns the creator of the CrudValue
-func (k Keeper) GetCrudValueOwner(ctx sdk.Context, uuid, key string) string {
+// GetOwner returns the creator of the CrudValue
+func (k Keeper) GetOwner(ctx sdk.Context, uuid, key string) string {
 	return k.GetCrudValue(ctx, uuid, key).Creator
 }
 

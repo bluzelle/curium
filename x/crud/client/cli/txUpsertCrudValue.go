@@ -31,7 +31,7 @@ func CmdUpsertCrudValue() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgUpsertCrudValue(clientCtx.GetFromAddress().String(), string(argsUuid), string(argsKey), argsValue, argsLease)
+			msg := types.NewMsgUpsert(clientCtx.GetFromAddress().String(), string(argsUuid), string(argsKey), argsValue, argsLease)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
