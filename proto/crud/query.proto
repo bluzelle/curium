@@ -31,7 +31,8 @@ message QueryGetCrudValueResponse {
 }
 
 message QueryAllCrudValueRequest {
-	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+	string uuid = 1;
+	cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
 message QueryAllCrudValueResponse {

@@ -25,6 +25,10 @@ func KeyPrefix(p string) []byte {
 	return []byte(p)
 }
 
+func UuidPrefix(p string, uuid string) []byte {
+	return append(KeyPrefix(p), []byte(uuid)...)
+}
+
 const (
 	CrudValueKey      = "CrudValue-value-"
 )

@@ -2,12 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="46e9c939-9b73-479c-a723-dfb27fc7a5cc" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/x/synchronizer/client-js/client.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/integration/specs/create.specs.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/client-js/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/client-js/compile-proto.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/proto/crud/query.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/crud/query.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/keeper/grpc_query_CrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/keeper/grpc_query_CrudValue.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/types/keys.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/types/keys.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/types/query.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/types/query.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/synchronizer/client-js/client.ts" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/client-js/client.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/x/synchronizer/client-js/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/client-js/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/client-js/tsconfig.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/x/synchronizer/client-js/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/client-js/yarn.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/x/synchronizer/synchronizer.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/synchronizer.go" afterDir="false" />
     </list>
@@ -44,7 +46,7 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/x/synchronizer/client-js" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/proto" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
@@ -55,18 +57,18 @@
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.0" />
     <property name="settings.editor.selected.configurable" value="go.autoimport" />
-    <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
+    <property name="ts.external.directory.path" value="$PROJECT_DIR$/x/synchronizer/client-js/node_modules/typescript/lib" />
   </component>
   <component name="RecentsManager">
     <key name="GoMoveDeclarationDialog.RECENT_KEY">
       <recent name="$PROJECT_DIR$/x/curium" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/proto" />
       <recent name="$PROJECT_DIR$/x/synchronizer/client-js" />
       <recent name="$PROJECT_DIR$/proto/synchronizer" />
       <recent name="$PROJECT_DIR$/x/synchronizer/contract" />
       <recent name="$PROJECT_DIR$/x/synchronizer/contract/contracts" />
-      <recent name="$PROJECT_DIR$/js-client" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/x/synchronizer/contract/binance" />
@@ -76,7 +78,7 @@
       <recent name="$PROJECT_DIR$/x/synchronizer" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.curiumd">
+  <component name="RunManager" selected="Node.js.client.ts">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -90,15 +92,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="ArquillianTestNG" factoryName="" nameIsGenerated="true">
+    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
       <option name="arquillianRunConfiguration">
         <value>
           <option name="containerStateName" value="" />
         </value>
       </option>
-      <option name="TEST_OBJECT" value="CLASS" />
-      <properties />
-      <listeners />
+      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -108,9 +108,9 @@
       <working_directory value="$PROJECT_DIR$" />
       <parameters value="start " />
       <kind value="PACKAGE" />
-      <filePath value="$PROJECT_DIR$/cmd/curiumd/main.go" />
       <package value="github.com/bluzelle/curium/cmd/curiumd" />
       <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/cmd/curiumd/main.go" />
       <method v="2" />
     </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit">
@@ -151,8 +151,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Build.curiumd" />
         <item itemvalue="Node.js.client.ts" />
+        <item itemvalue="Go Build.curiumd" />
       </list>
     </recent_temporary>
   </component>
@@ -168,7 +168,12 @@
       <workItem from="1617153155320" duration="10317000" />
       <workItem from="1617205745939" duration="17425000" />
       <workItem from="1617323976697" duration="25265000" />
-      <workItem from="1617655014587" duration="52829000" />
+      <workItem from="1617655014587" duration="55375000" />
+      <workItem from="1617921650242" duration="165000" />
+      <workItem from="1617921822159" duration="1237000" />
+      <workItem from="1617923194927" duration="200000" />
+      <workItem from="1617923439824" duration="515000" />
+      <workItem from="1617942935834" duration="2374000" />
     </task>
     <servers />
   </component>
@@ -227,6 +232,23 @@
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/x/synchronizer/client-js/client.ts</url>
+          <line>9</line>
+          <properties lambdaOrdinal="0" />
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/x/crud/keeper/grpc_query_CrudValue.go</url>
+          <line>22</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

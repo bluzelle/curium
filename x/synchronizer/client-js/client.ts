@@ -1,8 +1,8 @@
-import {bluzelle} from '@bluzelle/db-js'
+import {bluzelle} from 'bluzelle'
 
 const bz = bluzelle({
-    mnemonic: '',
-    uuid: 'binance-demouuid',
+    mnemonic: 'firstuuid',
+    uuid: 'binance-firstuuid',
     endpoint: 'http://localhost:26657'
 });
 

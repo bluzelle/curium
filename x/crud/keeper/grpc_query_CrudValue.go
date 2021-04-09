@@ -12,16 +12,16 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) CrudValueAll(c context.Context, req *types.QueryAllCrudValueRequest) (*types.QueryAllCrudValueResponse, error) {
+func (k Keeper) CrudValueAll(goCtx context.Context, req *types.QueryAllCrudValueRequest) (*types.QueryAllCrudValueResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
 	var CrudValues []*types.CrudValue
-	ctx := sdk.UnwrapSDKContext(c)
+	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	store := ctx.KVStore(k.storeKey)
-	CrudValueStore := prefix.NewStore(store, types.KeyPrefix(types.CrudValueKey))
+	CrudValueStore := prefix.NewStore(store, types.UuidPrefix(types.CrudValueKey, req.Uuid))
 
 	pageRes, err := query.Paginate(CrudValueStore, req.Pagination, func(key []byte, value []byte) error {
 		var CrudValue types.CrudValue
