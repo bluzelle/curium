@@ -22,8 +22,8 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 			res, err := msgServer.UpsertCrudValue(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
-		case *types.MsgCreateCrudValue:
-			res, err := msgServer.CreateCrudValue(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgCreate:
+			res, err := msgServer.Create(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case *types.MsgUpdateCrudValue:

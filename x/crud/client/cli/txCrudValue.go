@@ -10,7 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 )
 
-func CmdCreateCrudValue() *cobra.Command {
+func CmdCreate() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create [uuid] [key] [value] [lease]",
 		Short: "Creates a new key/value",
@@ -31,7 +31,7 @@ func CmdCreateCrudValue() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgCreateCrudValue(clientCtx.GetFromAddress().String(), string(argsUuid), string(argsKey), []byte(argsValue), lease)
+			msg := types.NewMsgCreate(clientCtx.GetFromAddress().String(), string(argsUuid), string(argsKey), []byte(argsValue), lease)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

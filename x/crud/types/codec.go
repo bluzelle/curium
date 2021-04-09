@@ -11,7 +11,7 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	// this line is used by starport scaffolding # 2
 	cdc.RegisterConcrete(&MsgUpsertCrudValue{}, "crud/UpsertCrudValue", nil)
 
-	cdc.RegisterConcrete(&MsgCreateCrudValue{}, "crud/CreateCrudValue", nil)
+	cdc.RegisterConcrete(&MsgCreate{}, "crud/Create", nil)
 	cdc.RegisterConcrete(&MsgUpdateCrudValue{}, "crud/UpdateCrudValue", nil)
 	cdc.RegisterConcrete(&MsgDeleteCrudValue{}, "crud/DeleteCrudValue", nil)
 
@@ -23,7 +23,7 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgUpsertCrudValue{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgCreateCrudValue{},
+		&MsgCreate{},
 		&MsgUpdateCrudValue{},
 		&MsgDeleteCrudValue{},
 	)

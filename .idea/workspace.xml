@@ -2,16 +2,21 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="46e9c939-9b73-479c-a723-dfb27fc7a5cc" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/test/integration/specs/create.specs.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proto/crud/query.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/crud/query.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/crud/keeper/grpc_query_CrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/keeper/grpc_query_CrudValue.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/crud/types/keys.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/types/keys.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/crud/types/query.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/types/query.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/client-js/client.ts" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/client-js/client.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/client-js/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/client-js/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/client-js/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/client-js/yarn.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/synchronizer.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/synchronizer.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proto/crud/tx.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/crud/tx.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/client/cli/tx.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/client/cli/tx.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/client/cli/txCrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/client/cli/txCrudValue.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/client/rest/rest.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/client/rest/rest.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/client/rest/txCrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/client/rest/txCrudValue.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/keeper/msg_server_CrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/keeper/msg_server_CrudValue.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/keeper/msg_server_upsertCrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/keeper/msg_server_upsertCrudValue.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/types/codec.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/types/codec.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/types/messages_CrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/types/messages_CrudValue.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/types/tx.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/types/tx.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/synchronizer/client-js/client.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/synchronizer/client-js/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/synchronizer/client-js/yarn.lock" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -78,7 +83,7 @@
       <recent name="$PROJECT_DIR$/x/synchronizer" />
     </key>
   </component>
-  <component name="RunManager" selected="Node.js.client.ts">
+  <component name="RunManager" selected="Go Build.curiumd">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -151,8 +156,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Node.js.client.ts" />
         <item itemvalue="Go Build.curiumd" />
+        <item itemvalue="Node.js.client.ts" />
       </list>
     </recent_temporary>
   </component>
@@ -173,7 +178,7 @@
       <workItem from="1617921822159" duration="1237000" />
       <workItem from="1617923194927" duration="200000" />
       <workItem from="1617923439824" duration="515000" />
-      <workItem from="1617942935834" duration="2374000" />
+      <workItem from="1617942935834" duration="6186000" />
     </task>
     <servers />
   </component>
@@ -232,23 +237,6 @@
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/x/synchronizer/client-js/client.ts</url>
-          <line>9</line>
-          <properties lambdaOrdinal="0" />
-          <option name="timeStamp" value="7" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/x/crud/keeper/grpc_query_CrudValue.go</url>
-          <line>22</line>
-          <option name="timeStamp" value="8" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

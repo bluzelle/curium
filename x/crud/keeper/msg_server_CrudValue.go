@@ -9,7 +9,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func (k msgServer) CreateCrudValue(goCtx context.Context, msg *types.MsgCreateCrudValue) (*types.MsgCreateCrudValueResponse, error) {
+func (k msgServer) Create(goCtx context.Context, msg *types.MsgCreate) (*types.MsgCreateResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Checks that the element exists
@@ -27,7 +27,7 @@ func (k msgServer) CreateCrudValue(goCtx context.Context, msg *types.MsgCreateCr
 		ctx.BlockHeight(),
 	)
 
-	return &types.MsgCreateCrudValueResponse{}, nil
+	return &types.MsgCreateResponse{}, nil
 }
 
 func (k msgServer) UpdateCrudValue(goCtx context.Context, msg *types.MsgUpdateCrudValue) (*types.MsgUpdateCrudValueResponse, error) {

@@ -28,7 +28,7 @@ func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {
 
 func registerTxHandlers(clientCtx client.Context, r *mux.Router) {
 	// this line is used by starport scaffolding # 4
-	r.HandleFunc("/crud/CrudValues", createCrudValueHandler(clientCtx)).Methods("POST")
+	r.HandleFunc("/crud/CrudValues", createHandler(clientCtx)).Methods("POST")
 	r.HandleFunc("/crud/CrudValues/{id}", updateCrudValueHandler(clientCtx)).Methods("POST")
 	r.HandleFunc("/crud/CrudValues/{id}", deleteCrudValueHandler(clientCtx)).Methods("POST")
 

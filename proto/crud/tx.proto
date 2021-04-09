@@ -9,7 +9,7 @@ option go_package = "github.com/bluzelle/curium/x/crud/types";
 service Msg {
     // this line is used by starport scaffolding # proto/tx/rpc
   rpc UpsertCrudValue(MsgUpsertCrudValue) returns (MsgUpsertCrudValueResponse);
-  rpc CreateCrudValue(MsgCreateCrudValue) returns (MsgCreateCrudValueResponse);
+  rpc Create(MsgCreate) returns (MsgCreateResponse);
   rpc UpdateCrudValue(MsgUpdateCrudValue) returns (MsgUpdateCrudValueResponse);
   rpc DeleteCrudValue(MsgDeleteCrudValue) returns (MsgDeleteCrudValueResponse);
 }
@@ -27,7 +27,7 @@ message MsgUpsertCrudValue {
 message MsgUpsertCrudValueResponse {
 }
 
-message MsgCreateCrudValue {
+message MsgCreate {
   string creator = 1;
   string uuid = 2;
   string key = 3;
@@ -36,7 +36,7 @@ message MsgCreateCrudValue {
   bytes metadata = 6;
 }
 
-message MsgCreateCrudValueResponse {
+message MsgCreateResponse {
 }
 
 message MsgUpdateCrudValue {

@@ -19,9 +19,9 @@ func (k msgServer) UpsertCrudValue(goCtx context.Context, msg *types.MsgUpsertCr
 			return nil, err
 		}
 	} else {
-		_, err := k.CreateCrudValue(
+		_, err := k.Create(
 			goCtx,
-			types.NewMsgCreateCrudValue(msg.Creator, msg.Uuid, msg.Key, msg.Value, msg.Lease),
+			types.NewMsgCreate(msg.Creator, msg.Uuid, msg.Key, msg.Value, msg.Lease),
 		)
 		if err != nil {
 			return nil, err

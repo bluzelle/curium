@@ -11,7 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/rest"
 )
 
-type createCrudValueRequest struct {
+type createRequest struct {
 	BaseReq rest.BaseReq `json:"base_req"`
 	Creator string       `json:"creator"`
 	Uuid    string       `json:"uuid"`
@@ -21,9 +21,9 @@ type createCrudValueRequest struct {
 	Height  string       `json:"height"`
 }
 
-func createCrudValueHandler(clientCtx client.Context) http.HandlerFunc {
+func createHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req createCrudValueRequest
+		var req createRequest
 		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
 			return
@@ -52,7 +52,7 @@ func createCrudValueHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgCreateCrudValue(
+		msg := types.NewMsgCreate(
 			req.Creator,
 			parsedUuid,
 			parsedKey,

@@ -5,10 +5,10 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-var _ sdk.Msg = &MsgCreateCrudValue{}
+var _ sdk.Msg = &MsgCreate{}
 
-func NewMsgCreateCrudValue(creator string, uuid string, key string, value []byte, lease int64) *MsgCreateCrudValue {
-	return &MsgCreateCrudValue{
+func NewMsgCreate(creator string, uuid string, key string, value []byte, lease int64) *MsgCreate {
+	return &MsgCreate{
 		Creator: creator,
 		Uuid:    uuid,
 		Key:     key,
@@ -17,15 +17,15 @@ func NewMsgCreateCrudValue(creator string, uuid string, key string, value []byte
 	}
 }
 
-func (msg *MsgCreateCrudValue) Route() string {
+func (msg *MsgCreate) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgCreateCrudValue) Type() string {
-	return "CreateCrudValue"
+func (msg *MsgCreate) Type() string {
+	return "Create"
 }
 
-func (msg *MsgCreateCrudValue) GetSigners() []sdk.AccAddress {
+func (msg *MsgCreate) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)
@@ -33,12 +33,12 @@ func (msg *MsgCreateCrudValue) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgCreateCrudValue) GetSignBytes() []byte {
+func (msg *MsgCreate) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgCreateCrudValue) ValidateBasic() error {
+func (msg *MsgCreate) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
@@ -87,7 +87,7 @@ func (msg *MsgUpdateCrudValue) ValidateBasic() error {
 	return nil
 }
 
-var _ sdk.Msg = &MsgCreateCrudValue{}
+var _ sdk.Msg = &MsgCreate{}
 
 func NewMsgDeleteCrudValue(creator, uuid, key string) *MsgDeleteCrudValue {
 	return &MsgDeleteCrudValue{
