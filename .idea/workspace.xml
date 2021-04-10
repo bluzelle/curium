@@ -3,18 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="46e9c939-9b73-479c-a723-dfb27fc7a5cc" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proto/crud/tx.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/crud/tx.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/crud/client/cli/txCrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/client/cli/txCrudValue.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/crud/client/cli/txUpsertCrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/client/cli/txUpsertCrudValue.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/crud/client/rest/txCrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/client/rest/txCrudValue.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/crud/handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/handler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/crud/keeper/CrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/keeper/CrudValue.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/crud/keeper/msg_server_CrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/keeper/msg_server_CrudValue.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/crud/keeper/msg_server_upsertCrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/keeper/msg_server_upsertCrudValue.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/crud/types/codec.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/types/codec.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/crud/types/message_upsertCrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/types/message_upsertCrudValue.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/crud/types/messages_CrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/types/messages_CrudValue.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/crud/types/tx.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/types/tx.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/synchronizer/synchronizer.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/synchronizer.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -176,7 +165,7 @@
       <workItem from="1617921822159" duration="1237000" />
       <workItem from="1617923194927" duration="200000" />
       <workItem from="1617923439824" duration="515000" />
-      <workItem from="1617942935834" duration="8007000" />
+      <workItem from="1617942935834" duration="15096000" />
     </task>
     <servers />
   </component>
@@ -235,6 +224,17 @@
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/x/curium/BroadcastMessages.go</url>
+          <line>26</line>
+          <option name="timeStamp" value="19" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

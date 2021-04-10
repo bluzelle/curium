@@ -22,7 +22,8 @@ import (
 //const CONTRACT_ADDRESS = "0x55866CCc07b810d004c67B029BB5bc4b445D0201"
 //const CONTRACT_ADDRESS = "0xe6C18bFB430743C98920244a25cd64EeC584326C"
 //const CONTRACT_ADDRESS = "0x2a811c36C1fA9e071146e2A231c620e30EbF1Fd9"
-const CONTRACT_ADDRESS = "0x001e89c476c717484dB772C56b9B36E37EF2795c"
+//const CONTRACT_ADDRESS = "0x001e89c476c717484dB772C56b9B36E37EF2795c"
+const CONTRACT_ADDRESS = "0xcC4ce1b888EfBeff226592fb23c64F69a1Ee7Db2"
 
 var doOnce sync.Once
 var currCtx sdk.Context
@@ -54,7 +55,9 @@ func runSynchronizer(k keeper.Keeper) {
 			}
 		}
 	}
-	curium.BroadcastMessages(currCtx, voteMessages, k.AccKeeper, "sync", k.GetKeyringDir())
+	if len(voteMessages) > 0 {
+		curium.BroadcastMessages(currCtx, voteMessages, k.AccKeeper, "sync", k.GetKeyringDir())
+	}
 }
 
 func fetchDataFromContract(k keeper.Keeper, source types.Source) []binance.BluzelleAdapterTransaction {
