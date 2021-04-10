@@ -165,7 +165,7 @@
       <workItem from="1617921822159" duration="1237000" />
       <workItem from="1617923194927" duration="200000" />
       <workItem from="1617923439824" duration="515000" />
-      <workItem from="1617942935834" duration="15096000" />
+      <workItem from="1617942935834" duration="16764000" />
     </task>
     <servers />
   </component>
@@ -224,17 +224,6 @@
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/x/curium/BroadcastMessages.go</url>
-          <line>26</line>
-          <option name="timeStamp" value="19" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

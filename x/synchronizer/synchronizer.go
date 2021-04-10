@@ -82,11 +82,21 @@ func fetchDataFromContract(k keeper.Keeper, source types.Source) []binance.Bluze
 			start = big.NewInt(0)
 		}
 
-		d, err := ctr.GetSynchronizerData(callOpts, start, big.NewInt(2))
+		d, err := ctr.GetSynchronizerData(callOpts, start, big.NewInt(20))
 		data = append(data, d...)
+		fmt.Println("*********************************************************************")
+		fmt.Println("*********************************************************************")
+		fmt.Println("*********************************************************************")
+		fmt.Println("*********************************************************************")
+		fmt.Println("***** start=", start)
+
 		end := start.Add(start, big.NewInt(int64(len(d))))
 		saveBookmark(k.KeyringDir, end)
+		fmt.Println("**** end=", end)
+		fmt.Println("**** d=", data)
+		fmt.Println("********************************************************************")
 	}
+
 	return data
 }
 
