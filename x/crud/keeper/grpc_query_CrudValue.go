@@ -48,7 +48,7 @@ func (k Keeper) CrudValue(c context.Context, req *types.QueryGetCrudValueRequest
 	var CrudValue types.CrudValue
 	ctx := sdk.UnwrapSDKContext(c)
 
-	if !k.HasCrudValue(ctx, req.Uuid, req.Key) {
+	if !k.HasCrudValue(&ctx, req.Uuid, req.Key) {
 		return nil, sdkerrors.ErrKeyNotFound
 	}
 

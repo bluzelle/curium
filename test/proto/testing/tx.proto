@@ -1,0 +1,24 @@
+syntax = "proto3";
+package bluzelle.curium.testing;
+
+// this line is used by starport scaffolding # proto/tx/import
+
+option go_package = "github.com/bluzelle/curium/x/testing/types";
+
+// Msg defines the Msg service.
+service Msg {
+    // this line is used by starport scaffolding # proto/tx/rpc
+  rpc TestSendVote(MsgTestSendVote) returns (MsgTestSendVoteResponse);
+}
+
+// this line is used by starport scaffolding # proto/tx/message
+message MsgTestSendVote {
+  string creator = 1;
+  string id = 2;
+  bytes value = 3;
+  string from = 4;
+  string voteType = 5;
+}
+
+message MsgTestSendVoteResponse {
+}

@@ -9,7 +9,6 @@ import (
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	// this line is used by starport scaffolding # 2
-cdc.RegisterConcrete(&MsgSynchronizerVote{}, "synchronizer/SynchronizerVote", nil)
 
 	cdc.RegisterConcrete(&MsgSetConfig{}, "synchronizer/SetConfig", nil)
 
@@ -21,9 +20,6 @@ cdc.RegisterConcrete(&MsgSynchronizerVote{}, "synchronizer/SynchronizerVote", ni
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	// this line is used by starport scaffolding # 3
-registry.RegisterImplementations((*sdk.Msg)(nil),
-	&MsgSynchronizerVote{},
-)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgSetConfig{},
 	)

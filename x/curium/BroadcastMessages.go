@@ -18,7 +18,7 @@ import (
 	"time"
 )
 
-func BroadcastMessages(ctx sdk.Context, msgs []types.Msg, accKeeper keeper.AccountKeeper, from string, keyringDir string) (*coretypes.ResultBroadcastTxCommit, error) {
+func BroadcastMessages(ctx sdk.Context, msgs []types.Msg, accKeeper *keeper.AccountKeeper, from string, keyringDir string) (*coretypes.ResultBroadcastTxCommit, error) {
 	// Choose your codec: Amino or Protobuf. Here, we use Protobuf, given by the
 	// following function.
 	encCfg := simapp.MakeTestEncodingConfig()
@@ -31,8 +31,10 @@ func BroadcastMessages(ctx sdk.Context, msgs []types.Msg, accKeeper keeper.Accou
 		return nil, err
 	}
 
-	txBuilder.SetGasLimit(200000)
-	txBuilder.SetFeeAmount(types.NewCoins(types.NewCoin("ubnt", types.NewInt(20000))))
+	gas := uint64(400000)
+	txBuilder.SetGasLimit(gas)
+
+	txBuilder.SetFeeAmount(types.NewCoins(types.NewCoin("ubnt", types.NewInt(1000))))
 	txBuilder.SetMemo("memo")
 	txBuilder.SetTimeoutHeight(uint64(ctx.BlockHeight() + 2))
 
@@ -104,8 +106,7 @@ func BroadcastMessages(ctx sdk.Context, msgs []types.Msg, accKeeper keeper.Accou
 	}
 	defer grpcConn.Close()
 
-	txCtx, _ := context.WithDeadline(context.Background(), time.Now().Add(time.Second * 10))
-
+	txCtx, _ := context.WithDeadline(context.Background(), time.Now().Add(time.Second*10))
 
 	// Broadcast the tx via gRPC. We create a new client for the Protobuf Tx
 	// service.
@@ -125,4 +126,3 @@ func BroadcastMessages(ctx sdk.Context, msgs []types.Msg, accKeeper keeper.Accou
 
 	return nil, nil
 }
-

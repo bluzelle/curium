@@ -4,7 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"strconv"
 
-	"github.com/bluzelle/curium/x/synchronizer/types"
+	"github.com/bluzelle/curium/x/voting/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -12,23 +12,21 @@ import (
 
 var _ = strconv.Itoa(0)
 
-func CmdSynchronizerVote() *cobra.Command {
+func CmdVoteProof() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "SynchronizerVote [op] [uuid] [key] [value]",
-		Short: "Broadcast message SynchronizerVote",
-		Args:  cobra.ExactArgs(3),
+		Use:   "voteProof [valcons] [signature]",
+		Short: "Vote proof",
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			argsOp := string(args[0])
-			argsUuid := string(args[1])
-			argsKey := string(args[2])
-			argsValue := string(args[3])
+			argsValcons := string(args[0])
+			argsSignature := string(args[1])
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgSynchronizerVote(clientCtx.GetFromAddress().String(), string(argsUuid), string(argsOp), string(argsKey), string(argsValue), uint64(0))
+			msg := types.NewMsgVoteProof(clientCtx.GetFromAddress().String(), string(argsValcons), string(argsSignature))
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

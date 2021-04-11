@@ -8,7 +8,6 @@ option go_package = "github.com/bluzelle/curium/x/synchronizer/types";
 // Msg defines the Msg service.
 service Msg {
     // this line is used by starport scaffolding # proto/tx/rpc
-  rpc SynchronizerVote(MsgSynchronizerVote) returns (MsgSynchronizerVoteResponse);
   rpc SetConfig(MsgSetConfig) returns (MsgSetConfigResponse);
   rpc CreateSource(MsgCreateSource) returns (MsgCreateSourceResponse);
   rpc UpdateSource(MsgUpdateSource) returns (MsgUpdateSourceResponse);
@@ -16,17 +15,6 @@ service Msg {
 }
 
 // this line is used by starport scaffolding # proto/tx/message
-message MsgSynchronizerVote {
-  string creator = 1;
-  string op = 2;
-  string uuid = 3;
-  string key = 4;
-  string value = 5;
-  uint64 bookmark = 6;
-}
-
-message MsgSynchronizerVoteResponse {
-}
 
 message MsgSetConfig {
   string syncAddress = 1;

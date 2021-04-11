@@ -27,127 +27,6 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// this line is used by starport scaffolding # proto/tx/message
-type MsgSynchronizerVote struct {
-	Creator  string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	Op       string `protobuf:"bytes,2,opt,name=op,proto3" json:"op,omitempty"`
-	Uuid     string `protobuf:"bytes,3,opt,name=uuid,proto3" json:"uuid,omitempty"`
-	Key      string `protobuf:"bytes,4,opt,name=key,proto3" json:"key,omitempty"`
-	Value    string `protobuf:"bytes,5,opt,name=value,proto3" json:"value,omitempty"`
-	Bookmark uint64 `protobuf:"varint,6,opt,name=bookmark,proto3" json:"bookmark,omitempty"`
-}
-
-func (m *MsgSynchronizerVote) Reset()         { *m = MsgSynchronizerVote{} }
-func (m *MsgSynchronizerVote) String() string { return proto.CompactTextString(m) }
-func (*MsgSynchronizerVote) ProtoMessage()    {}
-func (*MsgSynchronizerVote) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5c082214998d7b7d, []int{0}
-}
-func (m *MsgSynchronizerVote) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgSynchronizerVote) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgSynchronizerVote.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgSynchronizerVote) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgSynchronizerVote.Merge(m, src)
-}
-func (m *MsgSynchronizerVote) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgSynchronizerVote) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgSynchronizerVote.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgSynchronizerVote proto.InternalMessageInfo
-
-func (m *MsgSynchronizerVote) GetCreator() string {
-	if m != nil {
-		return m.Creator
-	}
-	return ""
-}
-
-func (m *MsgSynchronizerVote) GetOp() string {
-	if m != nil {
-		return m.Op
-	}
-	return ""
-}
-
-func (m *MsgSynchronizerVote) GetUuid() string {
-	if m != nil {
-		return m.Uuid
-	}
-	return ""
-}
-
-func (m *MsgSynchronizerVote) GetKey() string {
-	if m != nil {
-		return m.Key
-	}
-	return ""
-}
-
-func (m *MsgSynchronizerVote) GetValue() string {
-	if m != nil {
-		return m.Value
-	}
-	return ""
-}
-
-func (m *MsgSynchronizerVote) GetBookmark() uint64 {
-	if m != nil {
-		return m.Bookmark
-	}
-	return 0
-}
-
-type MsgSynchronizerVoteResponse struct {
-}
-
-func (m *MsgSynchronizerVoteResponse) Reset()         { *m = MsgSynchronizerVoteResponse{} }
-func (m *MsgSynchronizerVoteResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgSynchronizerVoteResponse) ProtoMessage()    {}
-func (*MsgSynchronizerVoteResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5c082214998d7b7d, []int{1}
-}
-func (m *MsgSynchronizerVoteResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgSynchronizerVoteResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgSynchronizerVoteResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgSynchronizerVoteResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgSynchronizerVoteResponse.Merge(m, src)
-}
-func (m *MsgSynchronizerVoteResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgSynchronizerVoteResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgSynchronizerVoteResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgSynchronizerVoteResponse proto.InternalMessageInfo
-
 type MsgSetConfig struct {
 	SyncAddress string `protobuf:"bytes,1,opt,name=syncAddress,proto3" json:"syncAddress,omitempty"`
 }
@@ -156,7 +35,7 @@ func (m *MsgSetConfig) Reset()         { *m = MsgSetConfig{} }
 func (m *MsgSetConfig) String() string { return proto.CompactTextString(m) }
 func (*MsgSetConfig) ProtoMessage()    {}
 func (*MsgSetConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5c082214998d7b7d, []int{2}
+	return fileDescriptor_5c082214998d7b7d, []int{0}
 }
 func (m *MsgSetConfig) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -199,7 +78,7 @@ func (m *MsgSetConfigResponse) Reset()         { *m = MsgSetConfigResponse{} }
 func (m *MsgSetConfigResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgSetConfigResponse) ProtoMessage()    {}
 func (*MsgSetConfigResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5c082214998d7b7d, []int{3}
+	return fileDescriptor_5c082214998d7b7d, []int{1}
 }
 func (m *MsgSetConfigResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -238,7 +117,7 @@ func (m *MsgCreateSource) Reset()         { *m = MsgCreateSource{} }
 func (m *MsgCreateSource) String() string { return proto.CompactTextString(m) }
 func (*MsgCreateSource) ProtoMessage()    {}
 func (*MsgCreateSource) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5c082214998d7b7d, []int{4}
+	return fileDescriptor_5c082214998d7b7d, []int{2}
 }
 func (m *MsgCreateSource) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -295,7 +174,7 @@ func (m *MsgCreateSourceResponse) Reset()         { *m = MsgCreateSourceResponse
 func (m *MsgCreateSourceResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgCreateSourceResponse) ProtoMessage()    {}
 func (*MsgCreateSourceResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5c082214998d7b7d, []int{5}
+	return fileDescriptor_5c082214998d7b7d, []int{3}
 }
 func (m *MsgCreateSourceResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -334,7 +213,7 @@ func (m *MsgUpdateSource) Reset()         { *m = MsgUpdateSource{} }
 func (m *MsgUpdateSource) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateSource) ProtoMessage()    {}
 func (*MsgUpdateSource) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5c082214998d7b7d, []int{6}
+	return fileDescriptor_5c082214998d7b7d, []int{4}
 }
 func (m *MsgUpdateSource) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -391,7 +270,7 @@ func (m *MsgUpdateSourceResponse) Reset()         { *m = MsgUpdateSourceResponse
 func (m *MsgUpdateSourceResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateSourceResponse) ProtoMessage()    {}
 func (*MsgUpdateSourceResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5c082214998d7b7d, []int{7}
+	return fileDescriptor_5c082214998d7b7d, []int{5}
 }
 func (m *MsgUpdateSourceResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -429,7 +308,7 @@ func (m *MsgDeleteSource) Reset()         { *m = MsgDeleteSource{} }
 func (m *MsgDeleteSource) String() string { return proto.CompactTextString(m) }
 func (*MsgDeleteSource) ProtoMessage()    {}
 func (*MsgDeleteSource) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5c082214998d7b7d, []int{8}
+	return fileDescriptor_5c082214998d7b7d, []int{6}
 }
 func (m *MsgDeleteSource) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -479,7 +358,7 @@ func (m *MsgDeleteSourceResponse) Reset()         { *m = MsgDeleteSourceResponse
 func (m *MsgDeleteSourceResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgDeleteSourceResponse) ProtoMessage()    {}
 func (*MsgDeleteSourceResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5c082214998d7b7d, []int{9}
+	return fileDescriptor_5c082214998d7b7d, []int{7}
 }
 func (m *MsgDeleteSourceResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -509,8 +388,6 @@ func (m *MsgDeleteSourceResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgDeleteSourceResponse proto.InternalMessageInfo
 
 func init() {
-	proto.RegisterType((*MsgSynchronizerVote)(nil), "bluzelle.curium.synchronizer.MsgSynchronizerVote")
-	proto.RegisterType((*MsgSynchronizerVoteResponse)(nil), "bluzelle.curium.synchronizer.MsgSynchronizerVoteResponse")
 	proto.RegisterType((*MsgSetConfig)(nil), "bluzelle.curium.synchronizer.MsgSetConfig")
 	proto.RegisterType((*MsgSetConfigResponse)(nil), "bluzelle.curium.synchronizer.MsgSetConfigResponse")
 	proto.RegisterType((*MsgCreateSource)(nil), "bluzelle.curium.synchronizer.MsgCreateSource")
@@ -524,36 +401,29 @@ func init() {
 func init() { proto.RegisterFile("synchronizer/tx.proto", fileDescriptor_5c082214998d7b7d) }
 
 var fileDescriptor_5c082214998d7b7d = []byte{
-	// 455 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x94, 0xcf, 0x6e, 0xd3, 0x40,
-	0x10, 0xc6, 0xb3, 0x89, 0x5b, 0xe8, 0x50, 0x41, 0xb5, 0x14, 0x30, 0x01, 0xac, 0xc8, 0xa7, 0x0a,
-	0x09, 0x1b, 0x8a, 0x38, 0x70, 0x42, 0x50, 0x2e, 0x1c, 0x72, 0x20, 0x15, 0x1c, 0xb8, 0x25, 0xf6,
-	0xe0, 0x5a, 0xfe, 0xb3, 0xd6, 0xae, 0x17, 0x35, 0x3d, 0xf1, 0x08, 0xdc, 0x78, 0x25, 0x8e, 0xbd,
-	0xc1, 0x11, 0x25, 0x2f, 0x82, 0xbc, 0xb5, 0xcd, 0x3a, 0xb5, 0xea, 0xa4, 0xb7, 0xd9, 0xc9, 0xb7,
-	0xdf, 0x6f, 0x26, 0xfe, 0xb4, 0x70, 0x4f, 0xcc, 0x53, 0xef, 0x84, 0xb3, 0x34, 0x3c, 0x43, 0xee,
-	0xe6, 0xa7, 0x4e, 0xc6, 0x59, 0xce, 0xe8, 0xe3, 0x59, 0x2c, 0xcf, 0x30, 0x8e, 0xd1, 0xf1, 0x24,
-	0x0f, 0x65, 0xe2, 0xe8, 0x32, 0xfb, 0x27, 0x81, 0xbb, 0x63, 0x11, 0x1c, 0x6b, 0xbd, 0xcf, 0x2c,
-	0x47, 0x6a, 0xc2, 0x0d, 0x8f, 0xe3, 0x34, 0x67, 0xdc, 0x24, 0x23, 0x72, 0xb0, 0x33, 0xa9, 0x8e,
-	0xf4, 0x36, 0xf4, 0x59, 0x66, 0xf6, 0x55, 0xb3, 0xcf, 0x32, 0x4a, 0xc1, 0x90, 0x32, 0xf4, 0xcd,
-	0x81, 0xea, 0xa8, 0x9a, 0xee, 0xc1, 0x20, 0xc2, 0xb9, 0x69, 0xa8, 0x56, 0x51, 0xd2, 0x7d, 0xd8,
-	0xfa, 0x36, 0x8d, 0x25, 0x9a, 0x5b, 0xaa, 0x77, 0x71, 0xa0, 0x43, 0xb8, 0x39, 0x63, 0x2c, 0x4a,
-	0xa6, 0x3c, 0x32, 0xb7, 0x47, 0xe4, 0xc0, 0x98, 0xd4, 0x67, 0xfb, 0x09, 0x3c, 0x6a, 0x19, 0x6c,
-	0x82, 0x22, 0x63, 0xa9, 0x40, 0xfb, 0x39, 0xec, 0x16, 0x3f, 0x63, 0x7e, 0xc4, 0xd2, 0xaf, 0x61,
-	0x40, 0x47, 0x70, 0xab, 0x58, 0xec, 0xad, 0xef, 0x73, 0x14, 0xa2, 0x1c, 0x5a, 0x6f, 0xd9, 0xf7,
-	0x61, 0x5f, 0xbf, 0x51, 0x3b, 0x7d, 0x84, 0x3b, 0x63, 0x11, 0x1c, 0x15, 0xeb, 0xe1, 0x31, 0x93,
-	0xdc, 0xbb, 0x6a, 0x7b, 0x0a, 0x46, 0x3a, 0x4d, 0xb0, 0xdc, 0x5f, 0xd5, 0xc5, 0xb6, 0x92, 0xc7,
-	0xe5, 0x1f, 0x50, 0x94, 0xf6, 0x43, 0x78, 0xb0, 0x62, 0xb9, 0x42, 0xfb, 0x94, 0xf9, 0x9b, 0xd0,
-	0x06, 0x97, 0x69, 0xc6, 0x2a, 0x4d, 0xb7, 0xac, 0x69, 0x6f, 0x14, 0xed, 0x3d, 0xc6, 0x78, 0xbd,
-	0xdd, 0x4a, 0x6f, 0xdd, 0xa0, 0xf2, 0x3e, 0xfc, 0x6d, 0xc0, 0x60, 0x2c, 0x02, 0xfa, 0x9d, 0xc0,
-	0xde, 0xa5, 0xfc, 0xbc, 0x70, 0xae, 0x8a, 0x9d, 0xd3, 0xf2, 0x65, 0x87, 0xaf, 0x37, 0xbe, 0x52,
-	0x8d, 0x42, 0x23, 0xd8, 0xf9, 0x9f, 0x84, 0xa7, 0xdd, 0x3e, 0x95, 0x76, 0x78, 0xb8, 0xbe, 0xb6,
-	0x86, 0xe5, 0xb0, 0xdb, 0x08, 0xcb, 0xb3, 0x4e, 0x0f, 0x5d, 0x3e, 0x7c, 0xb5, 0x91, 0x5c, 0xa7,
-	0x36, 0x42, 0xd3, 0x4d, 0xd5, 0xe5, 0x6b, 0x50, 0xdb, 0xf2, 0x53, 0x50, 0x1b, 0xe1, 0xe9, 0xa6,
-	0xea, 0xf2, 0x35, 0xa8, 0x6d, 0xc9, 0x7a, 0xf7, 0xe1, 0xd7, 0xc2, 0x22, 0xe7, 0x0b, 0x8b, 0xfc,
-	0x5d, 0x58, 0xe4, 0xc7, 0xd2, 0xea, 0x9d, 0x2f, 0xad, 0xde, 0x9f, 0xa5, 0xd5, 0xfb, 0xe2, 0x06,
-	0x61, 0x7e, 0x22, 0x67, 0x8e, 0xc7, 0x12, 0xb7, 0xb2, 0x76, 0x2f, 0xac, 0xdd, 0x53, 0xb7, 0xf9,
-	0x00, 0xce, 0x33, 0x14, 0xb3, 0x6d, 0xf5, 0x08, 0xbe, 0xfc, 0x17, 0x00, 0x00, 0xff, 0xff, 0xb2,
-	0x7b, 0x35, 0xfc, 0x1d, 0x05, 0x00, 0x00,
+	// 349 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x93, 0xcb, 0x4e, 0xc2, 0x40,
+	0x14, 0x86, 0xa9, 0x25, 0x1a, 0x8e, 0x24, 0x9a, 0x89, 0x97, 0x4a, 0x4c, 0x43, 0xba, 0x32, 0x26,
+	0x76, 0x0c, 0xc6, 0xb5, 0x51, 0xdc, 0xb8, 0x60, 0x21, 0xc4, 0x8d, 0x3b, 0x28, 0xc7, 0xd2, 0x58,
+	0x3a, 0xcd, 0x5c, 0x12, 0xe0, 0x29, 0x7c, 0x2c, 0x97, 0x2c, 0x5c, 0xb8, 0x34, 0xf0, 0x22, 0xa6,
+	0x95, 0xea, 0x14, 0x89, 0x80, 0xbb, 0x99, 0xd3, 0xbf, 0xdf, 0x97, 0xc9, 0x9f, 0x03, 0xfb, 0x62,
+	0x18, 0x79, 0x3d, 0xce, 0xa2, 0x60, 0x84, 0x9c, 0xca, 0x81, 0x1b, 0x73, 0x26, 0x19, 0x39, 0xee,
+	0x84, 0x6a, 0x84, 0x61, 0x88, 0xae, 0xa7, 0x78, 0xa0, 0xfa, 0xae, 0x1e, 0x73, 0xce, 0xa1, 0xdc,
+	0x10, 0x7e, 0x0b, 0x65, 0x9d, 0x45, 0x4f, 0x81, 0x4f, 0xaa, 0xb0, 0x9d, 0x7c, 0xbf, 0xee, 0x76,
+	0x39, 0x0a, 0x61, 0x19, 0x55, 0xe3, 0xa4, 0xd4, 0xd4, 0x47, 0xce, 0x01, 0xec, 0xe9, 0x7f, 0x34,
+	0x51, 0xc4, 0x2c, 0x12, 0xe8, 0xdc, 0xc3, 0x4e, 0x43, 0xf8, 0x75, 0x8e, 0x6d, 0x89, 0x2d, 0xa6,
+	0xb8, 0x87, 0xc4, 0x82, 0x2d, 0x2f, 0xb9, 0x33, 0x3e, 0x03, 0x65, 0x57, 0x42, 0xa0, 0x18, 0xb5,
+	0xfb, 0x68, 0x6d, 0xa4, 0xe3, 0xf4, 0x4c, 0x76, 0xc1, 0x54, 0x3c, 0xb4, 0xcc, 0x74, 0x94, 0x1c,
+	0x9d, 0x23, 0x38, 0x9c, 0x43, 0xce, 0xd9, 0x1e, 0xe2, 0xee, 0x3a, 0x36, 0xf3, 0xb7, 0xad, 0x38,
+	0x6f, 0xd3, 0x91, 0xdf, 0xb6, 0xab, 0xd4, 0x76, 0x8b, 0x21, 0xfe, 0xef, 0x6d, 0x33, 0xb6, 0x0e,
+	0xc8, 0xd8, 0xb5, 0x37, 0x13, 0xcc, 0x86, 0xf0, 0xc9, 0x33, 0x94, 0x7e, 0x6a, 0x38, 0x75, 0xff,
+	0x6a, 0xcd, 0xd5, 0x0b, 0xa8, 0xd4, 0x56, 0xcf, 0x66, 0x52, 0x22, 0xa1, 0x9c, 0x6b, 0xea, 0x6c,
+	0x29, 0x43, 0x8f, 0x57, 0x2e, 0xd7, 0x8a, 0xeb, 0xd6, 0x5c, 0x63, 0xcb, 0xad, 0x7a, 0x7c, 0x05,
+	0xeb, 0xa2, 0xf2, 0x12, 0x6b, 0xae, 0xb9, 0xe5, 0x56, 0x3d, 0xbe, 0x82, 0x75, 0x51, 0xad, 0x37,
+	0x77, 0xaf, 0x13, 0xdb, 0x18, 0x4f, 0x6c, 0xe3, 0x63, 0x62, 0x1b, 0x2f, 0x53, 0xbb, 0x30, 0x9e,
+	0xda, 0x85, 0xf7, 0xa9, 0x5d, 0x78, 0xa4, 0x7e, 0x20, 0x7b, 0xaa, 0xe3, 0x7a, 0xac, 0x4f, 0x33,
+	0x34, 0xfd, 0x42, 0xd3, 0x01, 0xcd, 0x2f, 0xf1, 0x30, 0x46, 0xd1, 0xd9, 0x4c, 0x17, 0xf9, 0xe2,
+	0x33, 0x00, 0x00, 0xff, 0xff, 0x9f, 0x73, 0xe5, 0xe8, 0xe1, 0x03, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -569,7 +439,6 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
 	// this line is used by starport scaffolding # proto/tx/rpc
-	SynchronizerVote(ctx context.Context, in *MsgSynchronizerVote, opts ...grpc.CallOption) (*MsgSynchronizerVoteResponse, error)
 	SetConfig(ctx context.Context, in *MsgSetConfig, opts ...grpc.CallOption) (*MsgSetConfigResponse, error)
 	CreateSource(ctx context.Context, in *MsgCreateSource, opts ...grpc.CallOption) (*MsgCreateSourceResponse, error)
 	UpdateSource(ctx context.Context, in *MsgUpdateSource, opts ...grpc.CallOption) (*MsgUpdateSourceResponse, error)
@@ -582,15 +451,6 @@ type msgClient struct {
 
 func NewMsgClient(cc grpc1.ClientConn) MsgClient {
 	return &msgClient{cc}
-}
-
-func (c *msgClient) SynchronizerVote(ctx context.Context, in *MsgSynchronizerVote, opts ...grpc.CallOption) (*MsgSynchronizerVoteResponse, error) {
-	out := new(MsgSynchronizerVoteResponse)
-	err := c.cc.Invoke(ctx, "/bluzelle.curium.synchronizer.Msg/SynchronizerVote", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *msgClient) SetConfig(ctx context.Context, in *MsgSetConfig, opts ...grpc.CallOption) (*MsgSetConfigResponse, error) {
@@ -632,7 +492,6 @@ func (c *msgClient) DeleteSource(ctx context.Context, in *MsgDeleteSource, opts 
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	// this line is used by starport scaffolding # proto/tx/rpc
-	SynchronizerVote(context.Context, *MsgSynchronizerVote) (*MsgSynchronizerVoteResponse, error)
 	SetConfig(context.Context, *MsgSetConfig) (*MsgSetConfigResponse, error)
 	CreateSource(context.Context, *MsgCreateSource) (*MsgCreateSourceResponse, error)
 	UpdateSource(context.Context, *MsgUpdateSource) (*MsgUpdateSourceResponse, error)
@@ -643,9 +502,6 @@ type MsgServer interface {
 type UnimplementedMsgServer struct {
 }
 
-func (*UnimplementedMsgServer) SynchronizerVote(ctx context.Context, req *MsgSynchronizerVote) (*MsgSynchronizerVoteResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SynchronizerVote not implemented")
-}
 func (*UnimplementedMsgServer) SetConfig(ctx context.Context, req *MsgSetConfig) (*MsgSetConfigResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetConfig not implemented")
 }
@@ -661,24 +517,6 @@ func (*UnimplementedMsgServer) DeleteSource(ctx context.Context, req *MsgDeleteS
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
 	s.RegisterService(&_Msg_serviceDesc, srv)
-}
-
-func _Msg_SynchronizerVote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgSynchronizerVote)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MsgServer).SynchronizerVote(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/bluzelle.curium.synchronizer.Msg/SynchronizerVote",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).SynchronizerVote(ctx, req.(*MsgSynchronizerVote))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _Msg_SetConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -758,10 +596,6 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*MsgServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "SynchronizerVote",
-			Handler:    _Msg_SynchronizerVote_Handler,
-		},
-		{
 			MethodName: "SetConfig",
 			Handler:    _Msg_SetConfig_Handler,
 		},
@@ -780,92 +614,6 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "synchronizer/tx.proto",
-}
-
-func (m *MsgSynchronizerVote) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgSynchronizerVote) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgSynchronizerVote) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Bookmark != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.Bookmark))
-		i--
-		dAtA[i] = 0x30
-	}
-	if len(m.Value) > 0 {
-		i -= len(m.Value)
-		copy(dAtA[i:], m.Value)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Value)))
-		i--
-		dAtA[i] = 0x2a
-	}
-	if len(m.Key) > 0 {
-		i -= len(m.Key)
-		copy(dAtA[i:], m.Key)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Key)))
-		i--
-		dAtA[i] = 0x22
-	}
-	if len(m.Uuid) > 0 {
-		i -= len(m.Uuid)
-		copy(dAtA[i:], m.Uuid)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Uuid)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.Op) > 0 {
-		i -= len(m.Op)
-		copy(dAtA[i:], m.Op)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Op)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Creator) > 0 {
-		i -= len(m.Creator)
-		copy(dAtA[i:], m.Creator)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *MsgSynchronizerVoteResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgSynchronizerVoteResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgSynchronizerVoteResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	return len(dAtA) - i, nil
 }
 
 func (m *MsgSetConfig) Marshal() (dAtA []byte, err error) {
@@ -1126,47 +874,6 @@ func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *MsgSynchronizerVote) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Creator)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	l = len(m.Op)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	l = len(m.Uuid)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	l = len(m.Key)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	l = len(m.Value)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	if m.Bookmark != 0 {
-		n += 1 + sovTx(uint64(m.Bookmark))
-	}
-	return n
-}
-
-func (m *MsgSynchronizerVoteResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	return n
-}
-
 func (m *MsgSetConfig) Size() (n int) {
 	if m == nil {
 		return 0
@@ -1280,285 +987,6 @@ func sovTx(x uint64) (n int) {
 }
 func sozTx(x uint64) (n int) {
 	return sovTx(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-}
-func (m *MsgSynchronizerVote) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgSynchronizerVote: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgSynchronizerVote: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Creator = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Op", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Op = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Uuid", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Uuid = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Key = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Value = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 6:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Bookmark", wireType)
-			}
-			m.Bookmark = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Bookmark |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgSynchronizerVoteResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgSynchronizerVoteResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgSynchronizerVoteResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
 }
 func (m *MsgSetConfig) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)

@@ -15,6 +15,7 @@ import (
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
 
+	"github.com/bluzelle/curium/app/ante"
 	appparams "github.com/bluzelle/curium/app/params"
 	"github.com/bluzelle/curium/x/curium"
 	curiumkeeper "github.com/bluzelle/curium/x/curium/keeper"
@@ -30,7 +31,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/auth/ante"
+	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
@@ -93,6 +94,9 @@ import (
 	"github.com/bluzelle/curium/x/synchronizer"
 	synchronizerkeeper "github.com/bluzelle/curium/x/synchronizer/keeper"
 	synchronizertypes "github.com/bluzelle/curium/x/synchronizer/types"
+	"github.com/bluzelle/curium/x/voting"
+	votingkeeper "github.com/bluzelle/curium/x/voting/keeper"
+	votingtypes "github.com/bluzelle/curium/x/voting/types"
 )
 
 const Name = "curium"
@@ -140,6 +144,7 @@ var (
 		vesting.AppModuleBasic{},
 		curium.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
+		voting.AppModuleBasic{},
 		synchronizer.AppModuleBasic{},
 		crud.AppModuleBasic{},
 	)
@@ -210,13 +215,14 @@ type App struct {
 	curiumKeeper curiumkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
+	votingKeeper votingkeeper.Keeper
+
 	synchronizerKeeper synchronizerkeeper.Keeper
 
 	crudKeeper crudkeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
-
 }
 
 // New returns a reference to an initialized Gaia.
@@ -244,6 +250,7 @@ func New(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		curiumtypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
+		votingtypes.StoreKey,
 		synchronizertypes.StoreKey,
 		crudtypes.StoreKey,
 	)
@@ -341,6 +348,15 @@ func New(
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
+	app.votingKeeper = *votingkeeper.NewKeeper(
+		appCodec,
+		keys[votingtypes.StoreKey],
+		keys[votingtypes.MemStoreKey],
+		cast.ToString(appOpts.Get(flags.FlagHome)),
+		app.StakingKeeper,
+		app.AccountKeeper,
+	)
+	votingModule := voting.NewAppModule(appCodec, app.votingKeeper)
 
 	app.crudKeeper = *crudkeeper.NewKeeper(
 		appCodec,
@@ -355,6 +371,8 @@ func New(
 		keys[synchronizertypes.MemStoreKey],
 		app.AccountKeeper,
 		app.crudKeeper,
+		app.votingKeeper,
+		app.curiumKeeper,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 	)
 	synchronizerModule := synchronizer.NewAppModule(appCodec, app.synchronizerKeeper)
@@ -401,6 +419,7 @@ func New(
 		transferModule,
 		curium.NewAppModule(appCodec, app.curiumKeeper),
 		// this line is used by starport scaffolding # stargate/app/appModule
+		votingModule,
 		synchronizerModule,
 		crudModule,
 	)
@@ -414,7 +433,7 @@ func New(
 		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName,
 	)
 
-	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, synchronizertypes.ModuleName)
+	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, synchronizertypes.ModuleName, votingtypes.ModuleName)
 
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
@@ -437,6 +456,7 @@ func New(
 		ibctransfertypes.ModuleName,
 		curiumtypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
+		votingtypes.ModuleName,
 		synchronizertypes.ModuleName,
 		crudtypes.ModuleName,
 	)
@@ -455,7 +475,7 @@ func New(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetAnteHandler(
 		ante.NewAnteHandler(
-			app.AccountKeeper, app.BankKeeper, ante.DefaultSigVerificationGasConsumer,
+			app.AccountKeeper, app.BankKeeper, authante.DefaultSigVerificationGasConsumer,
 			encodingConfig.TxConfig.SignModeHandler(),
 		),
 	)
@@ -621,6 +641,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
+	paramsKeeper.Subspace(votingtypes.ModuleName)
 	paramsKeeper.Subspace(synchronizertypes.ModuleName)
 	paramsKeeper.Subspace(crudtypes.ModuleName)
 

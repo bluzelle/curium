@@ -1,0 +1,38 @@
+accounts:
+  - name: vuser
+    coins:
+      - 5000000000000000ubnt
+  - name: sync
+    coins:
+      - 100000000ubnt
+  - name: binance
+    coins:
+      - 50000000000ubnt
+validator:
+  name: vuser
+  staked: 100000000ubnt
+init:
+  config:
+    'consensus.timeout_propose': 3s
+    'consensus.timeout_commit': 5s
+    'p2p.addr_book_strict': false
+    'p2p.persistent_peers': '[7703ea267fd2b4ae63673167830bd27dfcd04cc8@127.0.0.1:26656]'
+  home: ~/.curium2
+genesis:
+  app_state:
+    staking:
+      params:
+        bond_denom: ubnt
+    synchronizer:
+      sourceList:
+        - creator: config.yml
+          name: binance
+          url: 'https://data-seed-prebsc-1-s1.binance.org:8545'
+host:
+  rpc: ':26667'
+  p2p: ':26666'
+  prof: ':6071'
+  grpc: ':9100'
+  api: ':1327'
+  frontend: ':8090'
+  dev-ui: ':12355'

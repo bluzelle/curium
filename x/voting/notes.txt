@@ -1,0 +1,11 @@
+voting
+--------
+get valcons
+create proof
+broadcast proof
+store proof/value in store keyed on id and valcons with block height
+
+3 blocks later send vote based on proof that was 3 blocks back
+wipe proof
+
+

@@ -2,3 +2,4 @@ node_modules
 vue
 secret.yml
 .DS_Store
+.idea/workspace.xml

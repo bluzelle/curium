@@ -18,10 +18,6 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 		switch msg := msg.(type) {
 		// this line is used by starport scaffolding # 1
-		case *types.MsgSynchronizerVote:
-					res, err := msgServer.SynchronizerVote(sdk.WrapSDKContext(ctx), msg)
-					return sdk.WrapServiceResult(ctx, res, err)
-
 		case *types.MsgSetConfig:
 			res, err := msgServer.SetConfig(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)

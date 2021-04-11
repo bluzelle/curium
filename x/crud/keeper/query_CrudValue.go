@@ -7,7 +7,7 @@ import (
 )
 
 func listCrudValue(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
-	msgs := keeper.GetAllCrudValue(ctx)
+	msgs := keeper.GetAllCrudValue(&ctx)
 
 	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, msgs)
 	if err != nil {
@@ -19,11 +19,11 @@ func listCrudValue(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.Legac
 
 func getCrudValue(ctx sdk.Context, uuid, key string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 
-	if !keeper.HasCrudValue(ctx, uuid, key) {
+	if !keeper.HasCrudValue(&ctx, uuid, key) {
 		return nil, sdkerrors.ErrKeyNotFound
 	}
 
-	msg := keeper.GetCrudValue(ctx, uuid, key)
+	msg := keeper.GetCrudValue(&ctx, uuid, key)
 
 	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, msg)
 	if err != nil {

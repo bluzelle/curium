@@ -7,7 +7,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-
 // AppendCrudValue appends a CrudValue in the store with a new id and update the count
 func (k Keeper) AppendCrudValue(
 	ctx sdk.Context,
@@ -35,14 +34,14 @@ func (k Keeper) AppendCrudValue(
 }
 
 // SetCrudValue set a specific CrudValue in the store
-func (k Keeper) SetCrudValue(ctx sdk.Context, CrudValue types.CrudValue) {
+func (k Keeper) SetCrudValue(ctx *sdk.Context, CrudValue types.CrudValue) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CrudValueKey))
 	b := k.cdc.MustMarshalBinaryBare(&CrudValue)
 	store.Set(MakeCrudValueKey(CrudValue.Uuid, CrudValue.Key), b)
 }
 
 // GetCrudValue returns a CrudValue from its id
-func (k Keeper) GetCrudValue(ctx sdk.Context, uuid, key string) types.CrudValue {
+func (k Keeper) GetCrudValue(ctx *sdk.Context, uuid, key string) types.CrudValue {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CrudValueKey))
 	var CrudValue types.CrudValue
 	k.cdc.MustUnmarshalBinaryBare(store.Get(MakeCrudValueKey(uuid, key)), &CrudValue)
@@ -50,24 +49,24 @@ func (k Keeper) GetCrudValue(ctx sdk.Context, uuid, key string) types.CrudValue 
 }
 
 // HasCrudValue checks if the CrudValue exists in the store
-func (k Keeper) HasCrudValue(ctx sdk.Context, uuid, key string) bool {
+func (k Keeper) HasCrudValue(ctx *sdk.Context, uuid, key string) bool {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CrudValueKey))
 	return store.Has(MakeCrudValueKey(uuid, key))
 }
 
 // GetOwner returns the creator of the CrudValue
-func (k Keeper) GetOwner(ctx sdk.Context, uuid, key string) string {
+func (k Keeper) GetOwner(ctx *sdk.Context, uuid, key string) string {
 	return k.GetCrudValue(ctx, uuid, key).Creator
 }
 
 // RemoveCrudValue removes a CrudValue from the store
-func (k Keeper) RemoveCrudValue(ctx sdk.Context, uuid, key string) {
+func (k Keeper) RemoveCrudValue(ctx *sdk.Context, uuid, key string) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CrudValueKey))
 	store.Delete(MakeCrudValueKey(uuid, key))
 }
 
 // GetAllCrudValue returns all CrudValue
-func (k Keeper) GetAllCrudValue(ctx sdk.Context) (list []types.CrudValue) {
+func (k Keeper) GetAllCrudValue(ctx *sdk.Context) (list []types.CrudValue) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CrudValueKey))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 

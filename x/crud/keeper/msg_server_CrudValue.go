@@ -13,7 +13,7 @@ func (k msgServer) Create(goCtx context.Context, msg *types.MsgCreate) (*types.M
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Checks that the element exists
-	if k.HasCrudValue(ctx, msg.Uuid, msg.Key) {
+	if k.HasCrudValue(&ctx, msg.Uuid, msg.Key) {
 		return nil, sdkerrors.New("crud", 0, "key already exists")
 	}
 
@@ -43,16 +43,16 @@ func (k msgServer) Update(goCtx context.Context, msg *types.MsgUpdate) (*types.M
 	}
 
 	// Checks that the element exists
-	if !k.HasCrudValue(ctx, msg.Uuid, msg.Key) {
+	if !k.HasCrudValue(&ctx, msg.Uuid, msg.Key) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %s doesn't exist", msg.Key))
 	}
 
 	// Checks if the the msg sender is the same as the current owner
-	if msg.Creator != k.GetOwner(ctx, msg.Uuid, msg.Key) {
+	if msg.Creator != k.GetOwner(&ctx, msg.Uuid, msg.Key) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
 	}
 
-	k.SetCrudValue(ctx, CrudValue)
+	k.SetCrudValue(&ctx, CrudValue)
 
 	return &types.MsgUpdateResponse{}, nil
 }
@@ -60,14 +60,14 @@ func (k msgServer) Update(goCtx context.Context, msg *types.MsgUpdate) (*types.M
 func (k msgServer) Delete(goCtx context.Context, msg *types.MsgDelete) (*types.MsgDeleteResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	if !k.HasCrudValue(ctx, msg.Uuid, msg.Key) {
+	if !k.HasCrudValue(&ctx, msg.Uuid, msg.Key) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %s doesn't exist", msg.Key))
 	}
-	if msg.Creator != k.GetOwner(ctx, msg.Uuid, msg.Key) {
+	if msg.Creator != k.GetOwner(&ctx, msg.Uuid, msg.Key) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
 	}
 
-	k.RemoveCrudValue(ctx, msg.Uuid, msg.Key)
+	k.RemoveCrudValue(&ctx, msg.Uuid, msg.Key)
 
 	return &types.MsgDeleteResponse{}, nil
 }

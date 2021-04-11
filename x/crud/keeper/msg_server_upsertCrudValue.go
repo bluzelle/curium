@@ -10,7 +10,7 @@ import (
 func (k msgServer) Upsert(goCtx context.Context, msg *types.MsgUpsert) (*types.MsgUpsertResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	if k.HasCrudValue(ctx, msg.Uuid, msg.Key) {
+	if k.HasCrudValue(&ctx, msg.Uuid, msg.Key) {
 		_, err := k.Update(
 			goCtx,
 			types.NewMsgUpdate(msg.Creator, msg.Uuid, msg.Key, msg.Value, msg.Lease),

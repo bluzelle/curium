@@ -12,7 +12,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	// this line is used by starport scaffolding # genesis/module/init
 	// Set all the CrudValue
 	for _, elem := range genState.CrudValueList {
-		k.SetCrudValue(ctx, *elem)
+		k.SetCrudValue(&ctx, *elem)
 	}
 
 	// this line is used by starport scaffolding # ibc/genesis/init
@@ -24,7 +24,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	// this line is used by starport scaffolding # genesis/module/export
 	// Get all CrudValue
-	CrudValueList := k.GetAllCrudValue(ctx)
+	CrudValueList := k.GetAllCrudValue(&ctx)
 	for _, elem := range CrudValueList {
 		elem := elem
 		genesis.CrudValueList = append(genesis.CrudValueList, &elem)

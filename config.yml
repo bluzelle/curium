@@ -3,8 +3,8 @@ accounts:
     coins: ["5000000000000000ubnt"]
   - name: sync
     coins: ["100000000ubnt"]
-  - name: bob
-    coins: ["500ubnt"]
+  - name: binance
+    coins: ["50000000000ubnt"]
 validator:
   name: vuser
   staked: "100000000ubnt"
@@ -19,6 +19,10 @@ init:
     "consensus.timeout_propose": "3s"
     "consensus.timeout_commit": "5s"
     "p2p.addr_book_strict": false
+    "p2p.max_num_inbound_peers": 100
+    "p2p.max_num_outbound_peers": 100
+    "p2p.max_packet_msg_payload_size": 1048576
+    "p2p.seeds": "db5e2a825ff72400f79d1970d29e0002e556e909@65.1.253.90:26656"
 genesis:
   app_state:
     staking:

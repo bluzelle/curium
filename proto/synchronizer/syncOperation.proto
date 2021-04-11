@@ -1,0 +1,15 @@
+syntax = "proto3";
+package bluzelle.curium.synchronizer;
+
+option go_package = "github.com/bluzelle/curium/x/synchronizer/types";
+
+import "gogoproto/gogo.proto";
+
+message SyncOperation {
+  string op = 1;
+  string uuid = 2;
+  string key = 3;
+  bytes value = 4;
+  uint64 bookmark = 5;
+  string creator = 6;
+}

@@ -3,10 +3,10 @@ package synchronizer
 import (
 	"context"
 	"fmt"
-	"github.com/bluzelle/curium/x/curium"
 	"github.com/bluzelle/curium/x/synchronizer/contract/binance"
 	"github.com/bluzelle/curium/x/synchronizer/keeper"
 	"github.com/bluzelle/curium/x/synchronizer/types"
+	votingtypes "github.com/bluzelle/curium/x/voting/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -29,7 +29,11 @@ var doOnce sync.Once
 var currCtx sdk.Context
 var ticker = time.NewTicker(time.Second * 15)
 
+
+
+
 func StartSynchronizer(ctx sdk.Context, k keeper.Keeper) {
+	k.VotingKeeper.RegisterVoteHandler(keeper.NewVoteHandler(k))
 	currCtx = ctx
 	doOnce.Do(func() {
 		go func() {
@@ -43,20 +47,31 @@ func StartSynchronizer(ctx sdk.Context, k keeper.Keeper) {
 
 func runSynchronizer(k keeper.Keeper) {
 	sources := k.GetAllSource(currCtx)
-	var voteMessages []sdk.Msg
 
 	for _, source := range sources {
 		data := fetchDataFromContract(k, source)
+		creator, err := getSyncUserAddress(k)
+
 		for _, item := range data {
-			msg, err := generateVoteMsg(source, item, k)
-			voteMessages = append(voteMessages, msg)
-			if err != nil {
-				k.Logger(currCtx).Info("Error creating vote message", "item", item)
+			value := types.SyncOperation{
+				Op:       item.Opt,
+				Uuid:     "binance-" + item.Uuid,
+				Key:      item.Key,
+				Value:    []byte(item.Value),
+				Bookmark: item.Bookmark.Uint64(),
+				Creator: creator,
 			}
+			if err != nil {
+				k.Logger(currCtx).Error("Unable to retrieve user from keyring", "name", "sync", "error", err)
+			}
+			k.VotingKeeper.Vote(currCtx, votingtypes.VotingRequest{
+				Id:       item.Bookmark.Uint64(),
+				VoteType: types.ModuleName,
+				Creator:  creator,
+				Value:    k.GetCdc().MustMarshalBinaryBare(&value),
+				From:     "sync",
+			})
 		}
-	}
-	if len(voteMessages) > 0 {
-		curium.BroadcastMessages(currCtx, voteMessages, k.AccKeeper, "sync", k.GetKeyringDir())
 	}
 }
 
@@ -84,10 +99,7 @@ func fetchDataFromContract(k keeper.Keeper, source types.Source) []binance.Bluze
 
 		d, err := ctr.GetSynchronizerData(callOpts, start, big.NewInt(20))
 		data = append(data, d...)
-		fmt.Println("*********************************************************************")
-		fmt.Println("*********************************************************************")
-		fmt.Println("*********************************************************************")
-		fmt.Println("*********************************************************************")
+		fmt.Println("******************* Synchronizer **************************************************")
 		fmt.Println("***** start=", start)
 
 		end := start.Add(start, big.NewInt(int64(len(d))))
@@ -100,38 +112,27 @@ func fetchDataFromContract(k keeper.Keeper, source types.Source) []binance.Bluze
 	return data
 }
 
-func generateVoteMsg(source types.Source, record binance.BluzelleAdapterTransaction, k keeper.Keeper) (sdk.Msg, error) {
+func getSyncUserAddress(k keeper.Keeper) (string, error) {
 	kr, err := keyring.New("curium", keyring.BackendTest, k.GetKeyringDir(), nil)
 
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	key, err := kr.Key("sync")
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	voteMsg := types.NewMsgSynchronizerVote(
-		key.GetAddress().String(),
-		record.Opt,
-		"binance-"+record.Uuid,
-		record.Key,
-		record.Value,
-		record.Bookmark.Uint64(),
-		)
-	err = voteMsg.ValidateBasic()
-	if err != nil {
-		k.Logger(currCtx).Info("Error generating vote message", "source", source)
-		return nil, err
-	}
-	return voteMsg, nil
+	return key.GetAddress().String(), nil
+
 }
+
 
 // TODO: Lets just dump the bookmark into a file for now, but later we need to
 // incorporate this into the voting.
 
 func saveBookmark(dir string, data *big.Int) error {
-	err := os.WriteFile(dir + "/sync-bookmark", data.Bytes(), 0644)
+	err := os.WriteFile(dir+"/sync-bookmark", data.Bytes(), 0644)
 	return err
 }
 
@@ -142,5 +143,3 @@ func readBookmark(dir string) (*big.Int, error) {
 	}
 	return big.NewInt(0).SetBytes(data), nil
 }
-
-

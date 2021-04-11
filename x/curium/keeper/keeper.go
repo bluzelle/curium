@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/tendermint/tendermint/libs/log"
 
@@ -28,4 +29,14 @@ func NewKeeper(cdc codec.Marshaler, storeKey, memKey sdk.StoreKey) *Keeper {
 
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
+}
+
+var lastBlockTime time.Time
+func (k Keeper) IsCaughtUp() bool {
+	result := false
+	if !lastBlockTime.IsZero() && time.Now().Sub(lastBlockTime) > time.Second * 5 {
+		result = true
+	}
+	lastBlockTime = time.Now()
+	return result
 }

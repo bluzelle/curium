@@ -6,7 +6,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-
 // AppendSource appends a source in the store with a new id and update the count
 func (k Keeper) AppendSource(
 	ctx sdk.Context,
@@ -77,4 +76,3 @@ func (k Keeper) GetAllSource(ctx sdk.Context) (list []types.Source) {
 
 	return
 }
-
