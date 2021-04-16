@@ -43,5 +43,14 @@ func (msg *MsgUpsert) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
+
+	if len(msg.Key) == 0 {
+		return sdkerrors.New("crud", 2, "Key cannot be empty")
+	}
+
+	if msg.Lease <= 0 {
+		return sdkerrors.New("crud", 2, "Invalid lease time")
+	}
+
 	return nil
 }

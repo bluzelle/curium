@@ -40,6 +40,7 @@ func (msg *MsgCreate) GetSignBytes() []byte {
 
 func (msg *MsgCreate) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
+
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
