@@ -3,26 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="46e9c939-9b73-479c-a723-dfb27fc7a5cc" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/app.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/app.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/curiumd/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/curiumd/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proto/crud/tx.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/crud/tx.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/crud/client/cli/tx.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/client/cli/tx.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/crud/handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/handler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/crud/keeper/CrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/keeper/CrudValue.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/crud/types/codec.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/types/codec.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/crud/types/keys.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/types/keys.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/crud/types/tx.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/types/tx.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/curium/BroadcastMessages.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/curium/BroadcastMessages.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/handler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/keeper/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/keeper/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/keeper/grpc_query_getConfig.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/keeper/grpc_query_getConfig.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/keeper/keeper.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/keeper/keeper.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/keeper/msg_server_SynchronizerVote.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/keeper/msg_server_SynchronizerVote.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/keeper/source.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/keeper/source.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/synchronizer.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/synchronizer.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/types/codec.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/types/codec.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/types/genesis.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/types/genesis.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x/synchronizer/types/keys.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/synchronizer/types/keys.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/types/message_upsertCrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/types/message_upsertCrudValue.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/x/crud/types/messages_CrudValue.go" beforeDir="false" afterPath="$PROJECT_DIR$/x/crud/types/messages_CrudValue.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -103,27 +85,14 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="ArquillianTestNG" factoryName="" nameIsGenerated="true">
-      <option name="arquillianRunConfiguration">
-        <value>
-          <option name="containerStateName" value="" />
-        </value>
-      </option>
-      <option name="TEST_OBJECT" value="CLASS" />
-      <properties />
-      <listeners />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="curiumd" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true">
       <module name="curium" />
       <working_directory value="$PROJECT_DIR$" />
       <parameters value="start " />
       <kind value="PACKAGE" />
+      <filePath value="$PROJECT_DIR$/cmd/curiumd/main.go" />
       <package value="github.com/bluzelle/curium/cmd/curiumd" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/cmd/curiumd/main.go" />
       <method v="2" />
     </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit">
@@ -188,11 +157,6 @@
       <workItem from="1617923439824" duration="515000" />
       <workItem from="1617942935834" duration="16764000" />
       <workItem from="1618530977108" duration="1617000" />
-      <workItem from="1618596333266" duration="1412000" />
-      <workItem from="1618603341844" duration="5084000" />
-      <workItem from="1618613526561" duration="1374000" />
-      <workItem from="1618673818549" duration="5908000" />
-      <workItem from="1618684127204" duration="3370000" />
     </task>
     <servers />
   </component>
@@ -251,17 +215,6 @@
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/x/crud/keeper/msg_server_read.go</url>
-          <line>21</line>
-          <option name="timeStamp" value="3" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

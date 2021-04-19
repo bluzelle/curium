@@ -9,6 +9,7 @@ import "crud/lease.proto";
 // Msg defines the Msg service.
 service Msg {
     // this line is used by starport scaffolding # proto/tx/rpc
+  rpc Read(MsgRead) returns (MsgReadResponse);
   rpc Upsert(MsgUpsert) returns (MsgUpsertResponse);
   rpc Create(MsgCreate) returns (MsgCreateResponse);
   rpc Update(MsgUpdate) returns (MsgUpdateResponse);
@@ -16,6 +17,17 @@ service Msg {
 }
 
 // this line is used by starport scaffolding # proto/tx/message
+message MsgRead {
+  string creator = 1;
+  string uuid = 2;
+  string key = 3;
+}
+
+message MsgReadResponse {
+  bytes value = 1;
+  string key = 2;
+}
+
 message MsgUpsert {
   string creator = 1;
   string uuid = 2;

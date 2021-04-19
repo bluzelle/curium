@@ -121,7 +121,6 @@ func getSyncUserAddress(k keeper.Keeper) (string, error) {
 	}
 
 	return key.GetAddress().String(), nil
-
 }
 
 // TODO: Lets just dump the bookmark into a file for now, but later we need to

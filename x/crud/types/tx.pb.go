@@ -28,6 +28,118 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // this line is used by starport scaffolding # proto/tx/message
+type MsgRead struct {
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	Uuid    string `protobuf:"bytes,2,opt,name=uuid,proto3" json:"uuid,omitempty"`
+	Key     string `protobuf:"bytes,3,opt,name=key,proto3" json:"key,omitempty"`
+}
+
+func (m *MsgRead) Reset()         { *m = MsgRead{} }
+func (m *MsgRead) String() string { return proto.CompactTextString(m) }
+func (*MsgRead) ProtoMessage()    {}
+func (*MsgRead) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c7d41a4f7f227f85, []int{0}
+}
+func (m *MsgRead) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgRead) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgRead.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgRead) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRead.Merge(m, src)
+}
+func (m *MsgRead) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgRead) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRead.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgRead proto.InternalMessageInfo
+
+func (m *MsgRead) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgRead) GetUuid() string {
+	if m != nil {
+		return m.Uuid
+	}
+	return ""
+}
+
+func (m *MsgRead) GetKey() string {
+	if m != nil {
+		return m.Key
+	}
+	return ""
+}
+
+type MsgReadResponse struct {
+	Value []byte `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
+	Key   string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
+}
+
+func (m *MsgReadResponse) Reset()         { *m = MsgReadResponse{} }
+func (m *MsgReadResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgReadResponse) ProtoMessage()    {}
+func (*MsgReadResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c7d41a4f7f227f85, []int{1}
+}
+func (m *MsgReadResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgReadResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgReadResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgReadResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgReadResponse.Merge(m, src)
+}
+func (m *MsgReadResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgReadResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgReadResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgReadResponse proto.InternalMessageInfo
+
+func (m *MsgReadResponse) GetValue() []byte {
+	if m != nil {
+		return m.Value
+	}
+	return nil
+}
+
+func (m *MsgReadResponse) GetKey() string {
+	if m != nil {
+		return m.Key
+	}
+	return ""
+}
+
 type MsgUpsert struct {
 	Creator  string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	Uuid     string `protobuf:"bytes,2,opt,name=uuid,proto3" json:"uuid,omitempty"`
@@ -41,7 +153,7 @@ func (m *MsgUpsert) Reset()         { *m = MsgUpsert{} }
 func (m *MsgUpsert) String() string { return proto.CompactTextString(m) }
 func (*MsgUpsert) ProtoMessage()    {}
 func (*MsgUpsert) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c7d41a4f7f227f85, []int{0}
+	return fileDescriptor_c7d41a4f7f227f85, []int{2}
 }
 func (m *MsgUpsert) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -119,7 +231,7 @@ func (m *MsgUpsertResponse) Reset()         { *m = MsgUpsertResponse{} }
 func (m *MsgUpsertResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgUpsertResponse) ProtoMessage()    {}
 func (*MsgUpsertResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c7d41a4f7f227f85, []int{1}
+	return fileDescriptor_c7d41a4f7f227f85, []int{3}
 }
 func (m *MsgUpsertResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -161,7 +273,7 @@ func (m *MsgCreate) Reset()         { *m = MsgCreate{} }
 func (m *MsgCreate) String() string { return proto.CompactTextString(m) }
 func (*MsgCreate) ProtoMessage()    {}
 func (*MsgCreate) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c7d41a4f7f227f85, []int{2}
+	return fileDescriptor_c7d41a4f7f227f85, []int{4}
 }
 func (m *MsgCreate) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -239,7 +351,7 @@ func (m *MsgCreateResponse) Reset()         { *m = MsgCreateResponse{} }
 func (m *MsgCreateResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgCreateResponse) ProtoMessage()    {}
 func (*MsgCreateResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c7d41a4f7f227f85, []int{3}
+	return fileDescriptor_c7d41a4f7f227f85, []int{5}
 }
 func (m *MsgCreateResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -281,7 +393,7 @@ func (m *MsgUpdate) Reset()         { *m = MsgUpdate{} }
 func (m *MsgUpdate) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdate) ProtoMessage()    {}
 func (*MsgUpdate) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c7d41a4f7f227f85, []int{4}
+	return fileDescriptor_c7d41a4f7f227f85, []int{6}
 }
 func (m *MsgUpdate) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -359,7 +471,7 @@ func (m *MsgUpdateResponse) Reset()         { *m = MsgUpdateResponse{} }
 func (m *MsgUpdateResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateResponse) ProtoMessage()    {}
 func (*MsgUpdateResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c7d41a4f7f227f85, []int{5}
+	return fileDescriptor_c7d41a4f7f227f85, []int{7}
 }
 func (m *MsgUpdateResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -398,7 +510,7 @@ func (m *MsgDelete) Reset()         { *m = MsgDelete{} }
 func (m *MsgDelete) String() string { return proto.CompactTextString(m) }
 func (*MsgDelete) ProtoMessage()    {}
 func (*MsgDelete) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c7d41a4f7f227f85, []int{6}
+	return fileDescriptor_c7d41a4f7f227f85, []int{8}
 }
 func (m *MsgDelete) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -455,7 +567,7 @@ func (m *MsgDeleteResponse) Reset()         { *m = MsgDeleteResponse{} }
 func (m *MsgDeleteResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgDeleteResponse) ProtoMessage()    {}
 func (*MsgDeleteResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c7d41a4f7f227f85, []int{7}
+	return fileDescriptor_c7d41a4f7f227f85, []int{9}
 }
 func (m *MsgDeleteResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -485,6 +597,8 @@ func (m *MsgDeleteResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgDeleteResponse proto.InternalMessageInfo
 
 func init() {
+	proto.RegisterType((*MsgRead)(nil), "bluzelle.curium.crud.MsgRead")
+	proto.RegisterType((*MsgReadResponse)(nil), "bluzelle.curium.crud.MsgReadResponse")
 	proto.RegisterType((*MsgUpsert)(nil), "bluzelle.curium.crud.MsgUpsert")
 	proto.RegisterType((*MsgUpsertResponse)(nil), "bluzelle.curium.crud.MsgUpsertResponse")
 	proto.RegisterType((*MsgCreate)(nil), "bluzelle.curium.crud.MsgCreate")
@@ -537,6 +651,7 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
 	// this line is used by starport scaffolding # proto/tx/rpc
+	Read(ctx context.Context, in *MsgRead, opts ...grpc.CallOption) (*MsgReadResponse, error)
 	Upsert(ctx context.Context, in *MsgUpsert, opts ...grpc.CallOption) (*MsgUpsertResponse, error)
 	Create(ctx context.Context, in *MsgCreate, opts ...grpc.CallOption) (*MsgCreateResponse, error)
 	Update(ctx context.Context, in *MsgUpdate, opts ...grpc.CallOption) (*MsgUpdateResponse, error)
@@ -549,6 +664,15 @@ type msgClient struct {
 
 func NewMsgClient(cc grpc1.ClientConn) MsgClient {
 	return &msgClient{cc}
+}
+
+func (c *msgClient) Read(ctx context.Context, in *MsgRead, opts ...grpc.CallOption) (*MsgReadResponse, error) {
+	out := new(MsgReadResponse)
+	err := c.cc.Invoke(ctx, "/bluzelle.curium.crud.Msg/Read", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *msgClient) Upsert(ctx context.Context, in *MsgUpsert, opts ...grpc.CallOption) (*MsgUpsertResponse, error) {
@@ -590,6 +714,7 @@ func (c *msgClient) Delete(ctx context.Context, in *MsgDelete, opts ...grpc.Call
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	// this line is used by starport scaffolding # proto/tx/rpc
+	Read(context.Context, *MsgRead) (*MsgReadResponse, error)
 	Upsert(context.Context, *MsgUpsert) (*MsgUpsertResponse, error)
 	Create(context.Context, *MsgCreate) (*MsgCreateResponse, error)
 	Update(context.Context, *MsgUpdate) (*MsgUpdateResponse, error)
@@ -600,6 +725,9 @@ type MsgServer interface {
 type UnimplementedMsgServer struct {
 }
 
+func (*UnimplementedMsgServer) Read(ctx context.Context, req *MsgRead) (*MsgReadResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Read not implemented")
+}
 func (*UnimplementedMsgServer) Upsert(ctx context.Context, req *MsgUpsert) (*MsgUpsertResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Upsert not implemented")
 }
@@ -615,6 +743,24 @@ func (*UnimplementedMsgServer) Delete(ctx context.Context, req *MsgDelete) (*Msg
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
 	s.RegisterService(&_Msg_serviceDesc, srv)
+}
+
+func _Msg_Read_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgRead)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).Read(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/bluzelle.curium.crud.Msg/Read",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).Read(ctx, req.(*MsgRead))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Msg_Upsert_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -694,6 +840,10 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*MsgServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "Read",
+			Handler:    _Msg_Read_Handler,
+		},
+		{
 			MethodName: "Upsert",
 			Handler:    _Msg_Upsert_Handler,
 		},
@@ -712,6 +862,87 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "crud/tx.proto",
+}
+
+func (m *MsgRead) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgRead) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgRead) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Key) > 0 {
+		i -= len(m.Key)
+		copy(dAtA[i:], m.Key)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Key)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Uuid) > 0 {
+		i -= len(m.Uuid)
+		copy(dAtA[i:], m.Uuid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Uuid)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgReadResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgReadResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgReadResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Key) > 0 {
+		i -= len(m.Key)
+		copy(dAtA[i:], m.Key)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Key)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Value) > 0 {
+		i -= len(m.Value)
+		copy(dAtA[i:], m.Value)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Value)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *MsgUpsert) Marshal() (dAtA []byte, err error) {
@@ -1071,6 +1302,44 @@ func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
+func (m *MsgRead) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Uuid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Key)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgReadResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Value)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Key)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
 func (m *MsgUpsert) Size() (n int) {
 	if m == nil {
 		return 0
@@ -1232,6 +1501,268 @@ func sovTx(x uint64) (n int) {
 }
 func sozTx(x uint64) (n int) {
 	return sovTx(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+}
+func (m *MsgRead) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgRead: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgRead: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Uuid", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Uuid = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Key = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgReadResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgReadResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgReadResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Value = append(m.Value[:0], dAtA[iNdEx:postIndex]...)
+			if m.Value == nil {
+				m.Value = []byte{}
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Key = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
 }
 func (m *MsgUpsert) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
