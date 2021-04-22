@@ -16,7 +16,7 @@ func NewAnteHandler(
 	signModeHandler signing.SignModeHandler,
 ) sdk.AnteHandler {
 	return sdk.ChainAnteDecorators(
-		auth.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
+		NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
 		auth.NewRejectExtensionOptionsDecorator(),
 		auth.NewMempoolFeeDecorator(),
 		auth.NewValidateBasicDecorator(),
@@ -26,7 +26,7 @@ func NewAnteHandler(
 		auth.NewRejectFeeGranterDecorator(),
 		auth.NewSetPubKeyDecorator(ak), // SetPubKeyDecorator must be called before all signature verification decorators
 		auth.NewValidateSigCountDecorator(ak),
-		auth.NewDeductFeeDecorator(ak, bankKeeper),
+		NewDeductFeeDecorator(ak, bankKeeper),
 		auth.NewSigGasConsumeDecorator(ak, sigGasConsumer),
 		auth.NewSigVerificationDecorator(ak, signModeHandler),
 		auth.NewIncrementSequenceDecorator(ak),
