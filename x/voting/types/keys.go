@@ -17,7 +17,7 @@ const (
 	MemStoreKey = "mem_capability"
 
 	ProofPrefix = "proof-"
-	VotePrefix = "vote-"
+	VotePrefix  = "vote-"
 
 	// this line is used by starport scaffolding # ibc/keys/name
 )

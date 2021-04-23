@@ -8,7 +8,7 @@ import (
 
 type FreeGasMeterTestSuite struct {
 	suite.Suite
-	GasMeter types.GasMeter
+	GasMeter          types.GasMeter
 	ZeroLimitGasMeter types.GasMeter
 }
 
@@ -41,7 +41,6 @@ func (suite *FreeGasMeterTestSuite) TestFreeGasMeter_IsPastLimit() {
 		suite.Falsef(suite.ZeroLimitGasMeter.IsPastLimit(), "should return false")
 	})
 }
-
 
 func (suite *FreeGasMeterTestSuite) TestFreeGasMeter_ConsumeGas() {
 	suite.Run("Should not panic if gas consumed is equal than limit", func() {

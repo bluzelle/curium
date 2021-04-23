@@ -39,7 +39,7 @@ func NewKeeper(
 	VotingKeeper votingkeeper.Keeper,
 	CuriumKeeper curiumkeeper.Keeper,
 	KeyringDir string,
-// this line is used by starport scaffolding # ibc/Keeper/parameter
+	// this line is used by starport scaffolding # ibc/Keeper/parameter
 ) *Keeper {
 	return &Keeper{
 		cdc:          cdc,
@@ -77,7 +77,7 @@ func (k Keeper) ExecuteOperation(ctx *sdk.Context, syncOp *types.SyncOperation) 
 			Uuid:     syncOp.Uuid,
 			Key:      syncOp.Key,
 			Value:    syncOp.Value,
-			Lease:    365 * 24 * 60 * 60 / 6,
+			Lease:    &crudtypes.Lease{Years: 1},
 			Height:   ctx.BlockHeight(),
 			Metadata: metaBytes,
 		})
@@ -92,7 +92,7 @@ func (k Keeper) ExecuteOperation(ctx *sdk.Context, syncOp *types.SyncOperation) 
 			Uuid:     syncOp.Uuid,
 			Key:      syncOp.Key,
 			Value:    syncOp.Value,
-			Lease:    365 * 24 * 60 * 60 / 6,
+			Lease:    &crudtypes.Lease{Years: 1},
 			Height:   ctx.BlockHeight(),
 			Metadata: metaBytes,
 		})

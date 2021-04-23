@@ -26,12 +26,12 @@ func CmdCreate() *cobra.Command {
 				return err
 			}
 
-			lease, err := strconv.ParseInt(argsLease, 10, 64)
+			lease, err := strconv.ParseUint(argsLease, 10, 32)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgCreate(clientCtx.GetFromAddress().String(), string(argsUuid), string(argsKey), []byte(argsValue), lease)
+			msg := types.NewMsgCreate(clientCtx.GetFromAddress().String(), string(argsUuid), string(argsKey), []byte(argsValue), &types.Lease{Seconds: uint32(lease)})
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -61,12 +61,12 @@ func CmdUpdateCrudValue() *cobra.Command {
 				return err
 			}
 
-			lease, err := strconv.ParseInt(argsLease, 10, 64)
+			lease, err := strconv.ParseUint(argsLease, 10, 32)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgUpdate(clientCtx.GetFromAddress().String(), string(argsUuid), string(argsKey), []byte(argsValue), lease)
+			msg := types.NewMsgUpdate(clientCtx.GetFromAddress().String(), string(argsUuid), string(argsKey), []byte(argsValue), &types.Lease{Seconds: uint32(lease)})
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

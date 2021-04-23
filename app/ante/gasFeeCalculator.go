@@ -5,7 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func CalculateGasFee(tx sdk.Tx, ctx sdk.Context) sdk.Coins{
+func CalculateGasFee(tx sdk.Tx, ctx sdk.Context) sdk.Coins {
 	var gasPrices sdk.Dec
 	gasPrices = ctx.MinGasPrices().AmountOf("ubnt")
 	// If I can't get the gas price from the context, get it from the transaction
@@ -20,4 +20,3 @@ func CalculateGasFee(tx sdk.Tx, ctx sdk.Context) sdk.Coins{
 	gasFee := gasPrices.MulInt64(int64(gasConsumed)).RoundInt64()
 	return sdk.NewCoins(sdk.NewCoin("ubnt", sdk.NewInt(gasFee)))
 }
-

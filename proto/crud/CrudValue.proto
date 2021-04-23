@@ -2,6 +2,7 @@ syntax = "proto3";
 package bluzelle.curium.crud;
 
 option go_package = "github.com/bluzelle/curium/x/crud/types";
+import "crud/lease.proto";
 
 
 message CrudValue {
@@ -9,7 +10,7 @@ message CrudValue {
   string uuid = 2;
   string key = 3;
   bytes value = 4;
-  int64 lease = 5;
+  Lease lease = 5;
   int64 height = 6;
   bytes metadata = 7;
 }

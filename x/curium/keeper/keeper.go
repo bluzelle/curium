@@ -32,9 +32,10 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 }
 
 var lastBlockTime time.Time
+
 func (k Keeper) IsCaughtUp() bool {
 	result := false
-	if !lastBlockTime.IsZero() && time.Now().Sub(lastBlockTime) > time.Second * 5 {
+	if !lastBlockTime.IsZero() && time.Now().Sub(lastBlockTime) > time.Second*5 {
 		result = true
 	}
 	lastBlockTime = time.Now()

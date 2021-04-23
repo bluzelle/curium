@@ -29,9 +29,6 @@ var doOnce sync.Once
 var currCtx sdk.Context
 var ticker = time.NewTicker(time.Second * 15)
 
-
-
-
 func StartSynchronizer(ctx sdk.Context, k keeper.Keeper) {
 	k.VotingKeeper.RegisterVoteHandler(keeper.NewVoteHandler(k))
 	currCtx = ctx
@@ -59,7 +56,7 @@ func runSynchronizer(k keeper.Keeper) {
 				Key:      item.Key,
 				Value:    []byte(item.Value),
 				Bookmark: item.Bookmark.Uint64(),
-				Creator: creator,
+				Creator:  creator,
 			}
 			if err != nil {
 				k.Logger(currCtx).Error("Unable to retrieve user from keyring", "name", "sync", "error", err)
@@ -126,7 +123,6 @@ func getSyncUserAddress(k keeper.Keeper) (string, error) {
 	return key.GetAddress().String(), nil
 
 }
-
 
 // TODO: Lets just dump the bookmark into a file for now, but later we need to
 // incorporate this into the voting.

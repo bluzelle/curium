@@ -7,7 +7,7 @@ import (
 
 var _ sdk.Msg = &MsgUpsert{}
 
-func NewMsgUpsert(creator string, uuid string, key string, value []byte, lease int64) *MsgUpsert {
+func NewMsgUpsert(creator string, uuid string, key string, value []byte, lease *Lease) *MsgUpsert {
 	return &MsgUpsert{
 		Creator: creator,
 		Uuid:    uuid,

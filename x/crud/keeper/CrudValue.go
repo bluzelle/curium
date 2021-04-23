@@ -14,7 +14,7 @@ func (k Keeper) AppendCrudValue(
 	uuid string,
 	key string,
 	value []byte,
-	lease int64,
+	lease *types.Lease,
 	height int64,
 ) {
 	// Create the CrudValue

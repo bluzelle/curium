@@ -91,6 +91,9 @@ import (
 	"github.com/bluzelle/curium/x/crud"
 	crudkeeper "github.com/bluzelle/curium/x/crud/keeper"
 	crudtypes "github.com/bluzelle/curium/x/crud/types"
+	"github.com/bluzelle/curium/x/nft"
+	nftkeeper "github.com/bluzelle/curium/x/nft/keeper"
+	nfttypes "github.com/bluzelle/curium/x/nft/types"
 	"github.com/bluzelle/curium/x/synchronizer"
 	synchronizerkeeper "github.com/bluzelle/curium/x/synchronizer/keeper"
 	synchronizertypes "github.com/bluzelle/curium/x/synchronizer/types"
@@ -144,6 +147,7 @@ var (
 		vesting.AppModuleBasic{},
 		curium.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
+		nft.AppModuleBasic{},
 		voting.AppModuleBasic{},
 		synchronizer.AppModuleBasic{},
 		crud.AppModuleBasic{},
@@ -215,6 +219,8 @@ type App struct {
 	curiumKeeper curiumkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
+	nftKeeper nftkeeper.Keeper
+
 	votingKeeper votingkeeper.Keeper
 
 	synchronizerKeeper synchronizerkeeper.Keeper
@@ -250,6 +256,7 @@ func New(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		curiumtypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
+		nfttypes.StoreKey,
 		votingtypes.StoreKey,
 		synchronizertypes.StoreKey,
 		crudtypes.StoreKey,
@@ -348,6 +355,13 @@ func New(
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
+	app.nftKeeper = *nftkeeper.NewKeeper(
+		appCodec,
+		keys[nfttypes.StoreKey],
+		keys[nfttypes.MemStoreKey],
+	)
+	nftModule := nft.NewAppModule(appCodec, app.nftKeeper)
+
 	app.votingKeeper = *votingkeeper.NewKeeper(
 		appCodec,
 		keys[votingtypes.StoreKey],
@@ -419,6 +433,7 @@ func New(
 		transferModule,
 		curium.NewAppModule(appCodec, app.curiumKeeper),
 		// this line is used by starport scaffolding # stargate/app/appModule
+		nftModule,
 		votingModule,
 		synchronizerModule,
 		crudModule,
@@ -456,6 +471,7 @@ func New(
 		ibctransfertypes.ModuleName,
 		curiumtypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
+		nfttypes.ModuleName,
 		votingtypes.ModuleName,
 		synchronizertypes.ModuleName,
 		crudtypes.ModuleName,
@@ -641,6 +657,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
+	paramsKeeper.Subspace(nfttypes.ModuleName)
 	paramsKeeper.Subspace(votingtypes.ModuleName)
 	paramsKeeper.Subspace(synchronizertypes.ModuleName)
 	paramsKeeper.Subspace(crudtypes.ModuleName)

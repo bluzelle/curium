@@ -51,7 +51,7 @@ func (g *freeGasMeter) ConsumeGas(amount storetypes.Gas, descriptor string) {
 		panic(storetypes.ErrorGasOverflow{descriptor})
 	}
 
-	if g.consumed > g.limit  && g.limit != 0 {
+	if g.consumed > g.limit && g.limit != 0 {
 		panic(storetypes.ErrorOutOfGas{descriptor})
 	}
 

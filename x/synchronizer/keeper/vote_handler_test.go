@@ -66,4 +66,3 @@ func TestTallyVotes(t *testing.T) {
 		})
 	})
 }
-

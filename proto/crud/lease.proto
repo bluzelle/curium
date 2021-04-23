@@ -1,0 +1,13 @@
+syntax = "proto3";
+package bluzelle.curium.crud;
+
+option go_package = "github.com/bluzelle/curium/x/crud/types";
+
+
+message Lease {
+  uint32 seconds = 1;
+  uint32 minutes = 2;
+  uint32 hours = 3;
+  uint32 days = 4;
+  uint32 years = 5;
+}

@@ -45,7 +45,7 @@ func NewKeeper(
 	homeDir string,
 	stakingKeeper stakingkeeper.Keeper,
 	accKeeper authkeeper.AccountKeeper,
-// this line is used by starport scaffolding # ibc/keeper/parameter
+	// this line is used by starport scaffolding # ibc/keeper/parameter
 ) *Keeper {
 	return &Keeper{
 		cdc:           cdc,
@@ -92,11 +92,11 @@ func (k Keeper) Vote(ctx sdk.Context, votingReq types.VotingRequest) {
 		Block:    ctx.BlockHeight() + 3,
 	}
 
-	voteQueue[ctx.BlockHeight()+3] = append(voteQueue[ctx.BlockHeight() + 3], vote)
+	voteQueue[ctx.BlockHeight()+3] = append(voteQueue[ctx.BlockHeight()+3], vote)
 }
 
-func MakeProofStoreKey(valcons string, voteType string, voteId uint64) []byte{
-	return append([]byte(valcons + voteType), uint64ToByteArray(voteId)...)
+func MakeProofStoreKey(valcons string, voteType string, voteId uint64) []byte {
+	return append([]byte(valcons+voteType), uint64ToByteArray(voteId)...)
 }
 
 func uint64ToByteArray(n uint64) []byte {
@@ -121,11 +121,10 @@ func (k Keeper) GetVoteStore(ctx sdk.Context) prefix.Store {
 	return prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.VotePrefix))
 }
 
-
 func (k Keeper) TransmitProofQueue(ctx sdk.Context) {
 	if len(proofQueue) > 0 {
 		var msgs []sdk.Msg
-		for i := 0; i < len(proofQueue); i++{
+		for i := 0; i < len(proofQueue); i++ {
 			msgs = append(msgs, &proofQueue[i])
 		}
 		result, err := curium.BroadcastMessages(ctx, msgs, &k.accKeeper, proofQueue[0].From, k.homeDir)
@@ -176,11 +175,9 @@ func (k Keeper) StoreVote(ctx sdk.Context, vote *types.Vote) {
 	store.Set(key, k.cdc.MustMarshalBinaryBare(vote))
 }
 
-
-
 func (k Keeper) CheckDeliverVotes(ctx sdk.Context) {
 	start := make([]byte, 8)
-	binary.LittleEndian.PutUint64(start, uint64(ctx.BlockHeight() - 2))
+	binary.LittleEndian.PutUint64(start, uint64(ctx.BlockHeight()-2))
 	store := k.GetVoteStore(ctx)
 	iterator := sdk.KVStorePrefixIterator(store, start)
 	var votes = map[string]map[uint64][]*types.Vote{}
@@ -194,7 +191,7 @@ func (k Keeper) CheckDeliverVotes(ctx sdk.Context) {
 		store.Delete(iterator.Key())
 	}
 
-	for voteType := range votes  {
+	for voteType := range votes {
 		if voteHandlers[voteType] == nil {
 			k.Logger(ctx).Error("No vote handler registered", "type", voteType)
 			continue

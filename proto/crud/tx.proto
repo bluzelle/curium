@@ -4,6 +4,7 @@ package bluzelle.curium.crud;
 // this line is used by starport scaffolding # proto/tx/import
 
 option go_package = "github.com/bluzelle/curium/x/crud/types";
+import "crud/lease.proto";
 
 // Msg defines the Msg service.
 service Msg {
@@ -20,7 +21,7 @@ message MsgUpsert {
   string uuid = 2;
   string key = 3;
   bytes value = 4;
-  int64 lease = 5;
+  Lease lease = 5;
   bytes metadata = 6;
 }
 
@@ -32,7 +33,7 @@ message MsgCreate {
   string uuid = 2;
   string key = 3;
   bytes value = 4;
-  int64 lease = 5;
+  Lease lease = 5;
   bytes metadata = 6;
 }
 
@@ -44,7 +45,7 @@ message MsgUpdate {
   string uuid = 2;
   string key = 3;
   bytes value = 4;
-  int64 lease = 5;
+  Lease lease = 5;
   bytes metadata = 6;
 }
 

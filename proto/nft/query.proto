@@ -1,0 +1,39 @@
+syntax = "proto3";
+package bluzelle.curium.nft;
+
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+// this line is used by starport scaffolding # 1
+import "nft/nft.proto";
+
+option go_package = "github.com/bluzelle/curium/x/nft/types";
+
+// Query defines the gRPC querier service.
+service Query {
+    // this line is used by starport scaffolding # 2
+	rpc Nft(QueryGetNftRequest) returns (QueryGetNftResponse) {
+		option (google.api.http).get = "/bluzelle/curium/nft/nft/{id}";
+	}
+	rpc NftAll(QueryAllNftRequest) returns (QueryAllNftResponse) {
+		option (google.api.http).get = "/bluzelle/curium/nft/nft";
+	}
+
+}
+
+// this line is used by starport scaffolding # 3
+message QueryGetNftRequest {
+	uint64 id = 1;
+}
+
+message QueryGetNftResponse {
+	Nft Nft = 1;
+}
+
+message QueryAllNftRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllNftResponse {
+	repeated Nft Nft = 1;
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}

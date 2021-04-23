@@ -46,7 +46,7 @@ func createHandler(clientCtx client.Context) http.HandlerFunc {
 
 		parsedValue := req.Value
 
-		parsedLease, err := strconv.ParseInt(req.Lease, 10, 64)
+		parsedLease, err := strconv.ParseUint(req.Lease, 10, 32)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -57,7 +57,7 @@ func createHandler(clientCtx client.Context) http.HandlerFunc {
 			parsedUuid,
 			parsedKey,
 			parsedValue,
-			parsedLease,
+			&types.Lease{Seconds: uint32(parsedLease)},
 		)
 
 		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
@@ -99,7 +99,7 @@ func updateCrudValueHandler(clientCtx client.Context) http.HandlerFunc {
 
 		parsedValue := []byte(req.Value)
 
-		parsedLease, err := strconv.ParseInt(req.Lease, 10, 64)
+		parsedLease, err := strconv.ParseUint(req.Lease, 10, 32)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -110,7 +110,7 @@ func updateCrudValueHandler(clientCtx client.Context) http.HandlerFunc {
 			parsedUuid,
 			parsedKey,
 			parsedValue,
-			parsedLease,
+			&types.Lease{Seconds: uint32(parsedLease)},
 		)
 
 		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)

@@ -49,4 +49,3 @@ func TallyVotes(votes []*votingtypes.Vote) *[]byte {
 	}
 	return m
 }
-
