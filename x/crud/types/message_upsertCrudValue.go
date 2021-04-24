@@ -48,9 +48,6 @@ func (msg *MsgUpsert) ValidateBasic() error {
 		return sdkerrors.New("crud", 2, "Key cannot be empty")
 	}
 
-	if msg.Lease <= 0 {
-		return sdkerrors.New("crud", 2, "Invalid lease time")
-	}
 
 	return nil
 }

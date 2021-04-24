@@ -13,11 +13,11 @@ func (k msgServer) Read(goCtx context.Context, msg *types.MsgRead) (*types.MsgRe
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Checks that the element exists
-	if !k.HasCrudValue(ctx, msg.Uuid, msg.Key) {
+	if !k.HasCrudValue(&ctx, msg.Uuid, msg.Key) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %s doesn't exist", msg.Key))
 	}
 
-	resp := &types.MsgReadResponse{Value: k.GetCrudValue(ctx, msg.Uuid, msg.Key).Value, Key: msg.Key}
+	resp := &types.MsgReadResponse{Value: k.GetCrudValue(&ctx, msg.Uuid, msg.Key).Value, Key: msg.Key}
 
 	return resp, nil
 
