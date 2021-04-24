@@ -5,6 +5,8 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/sdk/lib" />
       <excludeFolder url="file://$MODULE_DIR$/sdk/proto" />
+      <excludeFolder url="file://$MODULE_DIR$/sdk/ts/proto" />
+      <excludeFolder url="file://$MODULE_DIR$/sdk/ts/lib" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

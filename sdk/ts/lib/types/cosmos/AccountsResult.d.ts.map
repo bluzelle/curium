@@ -1,0 +1,1 @@
+{"version":3,"file":"AccountsResult.d.ts","sourceRoot":"","sources":["../../../src/types/cosmos/AccountsResult.ts"],"names":[],"mappings":"AAAA,OAAO,EAAC,aAAa,EAAC,MAAM,iBAAiB,CAAC;AAE9C,MAAM,WAAW,cAAc;IAC3B,MAAM,EAAE;QACJ,KAAK,EAAE,aAAa,CAAA;KACvB,CAAA;CACJ"}
