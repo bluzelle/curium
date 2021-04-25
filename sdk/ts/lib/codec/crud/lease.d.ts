@@ -2,7 +2,7 @@ import Long from "long";
 import _m0 from "protobufjs/minimal";
 export declare const protobufPackage = "bluzelle.curium.crud";
 export interface Lease {
-    seconds: number | undefined;
+    seconds: number;
     minutes: number;
     hours: number;
     days: number;

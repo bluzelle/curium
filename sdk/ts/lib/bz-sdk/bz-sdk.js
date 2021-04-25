@@ -23,26 +23,32 @@ exports.bluzelle = void 0;
 const rpc_1 = require("../client-lib/rpc");
 const query_1 = require("../codec/crud/query");
 const tx_1 = require("../codec/crud/tx");
+const CrudMsgTypes = __importStar(require("../codec/crud/tx"));
 const query_2 = require("../codec/nft/query");
 const tx_2 = require("../codec/nft/tx");
-const CrudMsgTypes = __importStar(require("../codec/crud/tx"));
 const NftMsgTypes = __importStar(require("../codec/nft/tx"));
+const query_3 = require("../codec/cosmos/bank/v1beta1/query");
+const tx_3 = require("../codec/cosmos/bank/v1beta1/tx");
+const BankMsgTypes = __importStar(require("../codec/cosmos/bank/v1beta1/tx"));
 const CommunicationService_1 = require("../client-lib/CommunicationService");
 const bluzelle = (options) => Promise.resolve(CommunicationService_1.newCommunicationService(options.url, options.mnemonic || ''))
     .then(cs => Promise.all([
     rpc_1.sdk(options, query_1.QueryClientImpl, tx_1.MsgClientImpl, CrudMsgTypes, cs),
-    rpc_1.sdk(options, query_2.QueryClientImpl, tx_2.MsgClientImpl, NftMsgTypes, cs)
+    rpc_1.sdk(options, query_2.QueryClientImpl, tx_2.MsgClientImpl, NftMsgTypes, cs),
+    rpc_1.sdk(options, query_3.QueryClientImpl, tx_3.MsgClientImpl, BankMsgTypes, cs)
 ]))
-    .then(([db, nft]) => ({
-    db, nft
+    .then(([db, nft, bank]) => ({
+    db, nft, bank
 }));
 exports.bluzelle = bluzelle;
-// Promise.resolve(bluzelle({
-//     mnemonic: "focus ill drift swift blood bitter move grace ensure diamond year tongue hint weekend bulb rebel avoid gas dose print remove receive yellow shoot",
-//     url: "http://localhost:26657",
-//     gasPrice: 0.002,
-//     maxGas: 1000000
-// }))
+Promise.resolve(exports.bluzelle({
+    mnemonic: "focus ill drift swift blood bitter move grace ensure diamond year tongue hint weekend bulb rebel avoid gas dose print remove receive yellow shoot",
+    url: "http://localhost:26657",
+    gasPrice: 0.002,
+    maxGas: 1000000
+}))
+    .then(sdk => sdk.bank.q.Balance({ address: "bluzelle13cpvky4s7e825ddwme4xh9g7ynxa4yes5uca7e", denom: "ubnt" }))
+    .then(x => x);
 //     .then(passThroughAwait(sdk => sdk.db.tx.Create({
 //         uuid: 'uuid2',
 //         key: 'foo',

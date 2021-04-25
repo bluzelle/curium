@@ -1,7 +1,7 @@
 import Long from "long";
+import _m0 from "protobufjs/minimal";
 import { CrudValue } from "../crud/CrudValue";
 import { PageRequest, PageResponse } from "../cosmos/base/query/v1beta1/pagination";
-import _m0 from "protobufjs/minimal";
 export declare const protobufPackage = "bluzelle.curium.crud";
 /** this line is used by starport scaffolding # 3 */
 export interface QueryGetCrudValueRequest {

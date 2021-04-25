@@ -6,8 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CrudValue = exports.protobufPackage = void 0;
 /* eslint-disable */
 const long_1 = __importDefault(require("long"));
-const lease_1 = require("../crud/lease");
 const minimal_1 = __importDefault(require("protobufjs/minimal"));
+const lease_1 = require("../crud/lease");
 exports.protobufPackage = "bluzelle.curium.crud";
 const baseCrudValue = {
     creator: "",
@@ -41,9 +41,11 @@ exports.CrudValue = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseCrudValue };
+        message.value = new Uint8Array();
+        message.metadata = new Uint8Array();
         while (reader.pos < end) {
             const tag = reader.uint32();
             switch (tag >>> 3) {
@@ -77,6 +79,8 @@ exports.CrudValue = {
     },
     fromJSON(object) {
         const message = { ...baseCrudValue };
+        message.value = new Uint8Array();
+        message.metadata = new Uint8Array();
         if (object.creator !== undefined && object.creator !== null) {
             message.creator = String(object.creator);
         }

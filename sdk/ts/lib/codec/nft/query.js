@@ -6,9 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.QueryClientImpl = exports.QueryAllNftResponse = exports.QueryAllNftRequest = exports.QueryGetNftResponse = exports.QueryGetNftRequest = exports.protobufPackage = void 0;
 /* eslint-disable */
 const long_1 = __importDefault(require("long"));
+const minimal_1 = __importDefault(require("protobufjs/minimal"));
 const nft_1 = require("../nft/nft");
 const pagination_1 = require("../cosmos/base/query/v1beta1/pagination");
-const minimal_1 = __importDefault(require("protobufjs/minimal"));
 exports.protobufPackage = "bluzelle.curium.nft";
 const baseQueryGetNftRequest = { id: long_1.default.UZERO };
 exports.QueryGetNftRequest = {
@@ -19,7 +19,7 @@ exports.QueryGetNftRequest = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseQueryGetNftRequest };
         while (reader.pos < end) {
@@ -71,7 +71,7 @@ exports.QueryGetNftResponse = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseQueryGetNftResponse };
         while (reader.pos < end) {
@@ -123,7 +123,7 @@ exports.QueryAllNftRequest = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseQueryAllNftRequest };
         while (reader.pos < end) {
@@ -180,7 +180,7 @@ exports.QueryAllNftResponse = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseQueryAllNftResponse };
         message.Nft = [];

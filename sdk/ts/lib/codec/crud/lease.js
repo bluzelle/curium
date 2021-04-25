@@ -8,10 +8,16 @@ exports.Lease = exports.protobufPackage = void 0;
 const long_1 = __importDefault(require("long"));
 const minimal_1 = __importDefault(require("protobufjs/minimal"));
 exports.protobufPackage = "bluzelle.curium.crud";
-const baseLease = { minutes: 0, hours: 0, days: 0, years: 0 };
+const baseLease = {
+    seconds: 0,
+    minutes: 0,
+    hours: 0,
+    days: 0,
+    years: 0,
+};
 exports.Lease = {
     encode(message, writer = minimal_1.default.Writer.create()) {
-        if (message.seconds !== undefined) {
+        if (message.seconds !== 0) {
             writer.uint32(8).uint32(message.seconds);
         }
         if (message.minutes !== 0) {
@@ -29,7 +35,7 @@ exports.Lease = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseLease };
         while (reader.pos < end) {
@@ -63,7 +69,7 @@ exports.Lease = {
             message.seconds = Number(object.seconds);
         }
         else {
-            message.seconds = undefined;
+            message.seconds = 0;
         }
         if (object.minutes !== undefined && object.minutes !== null) {
             message.minutes = Number(object.minutes);
@@ -106,7 +112,7 @@ exports.Lease = {
             message.seconds = object.seconds;
         }
         else {
-            message.seconds = undefined;
+            message.seconds = 0;
         }
         if (object.minutes !== undefined && object.minutes !== null) {
             message.minutes = object.minutes;

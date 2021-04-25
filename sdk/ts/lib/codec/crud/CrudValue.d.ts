@@ -1,6 +1,6 @@
 import Long from "long";
-import { Lease } from "../crud/lease";
 import _m0 from "protobufjs/minimal";
+import { Lease } from "../crud/lease";
 export declare const protobufPackage = "bluzelle.curium.crud";
 export interface CrudValue {
     creator: string;

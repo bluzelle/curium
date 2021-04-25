@@ -20,7 +20,7 @@ exports.Http = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseHttp };
         message.rules = [];
@@ -124,7 +124,7 @@ exports.HttpRule = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseHttpRule };
         message.additionalBindings = [];
@@ -334,7 +334,7 @@ exports.CustomHttpPattern = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseCustomHttpPattern };
         while (reader.pos < end) {

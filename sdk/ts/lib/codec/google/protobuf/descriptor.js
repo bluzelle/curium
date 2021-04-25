@@ -373,7 +373,7 @@ exports.FileDescriptorSet = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseFileDescriptorSet };
         message.file = [];
@@ -474,7 +474,7 @@ exports.FileDescriptorProto = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseFileDescriptorProto };
         message.dependency = [];
@@ -794,7 +794,7 @@ exports.DescriptorProto = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseDescriptorProto };
         message.field = [];
@@ -1046,7 +1046,7 @@ exports.DescriptorProto_ExtensionRange = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = {
             ...baseDescriptorProto_ExtensionRange,
@@ -1141,7 +1141,7 @@ exports.DescriptorProto_ReservedRange = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = {
             ...baseDescriptorProto_ReservedRange,
@@ -1214,7 +1214,7 @@ exports.ExtensionRangeOptions = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseExtensionRangeOptions };
         message.uninterpretedOption = [];
@@ -1274,6 +1274,7 @@ const baseFieldDescriptorProto = {
     defaultValue: "",
     oneofIndex: 0,
     jsonName: "",
+    proto3Optional: false,
 };
 exports.FieldDescriptorProto = {
     encode(message, writer = minimal_1.default.Writer.create()) {
@@ -1307,10 +1308,13 @@ exports.FieldDescriptorProto = {
         if (message.options !== undefined) {
             exports.FieldOptions.encode(message.options, writer.uint32(66).fork()).ldelim();
         }
+        if (message.proto3Optional === true) {
+            writer.uint32(136).bool(message.proto3Optional);
+        }
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseFieldDescriptorProto };
         while (reader.pos < end) {
@@ -1345,6 +1349,9 @@ exports.FieldDescriptorProto = {
                     break;
                 case 8:
                     message.options = exports.FieldOptions.decode(reader, reader.uint32());
+                    break;
+                case 17:
+                    message.proto3Optional = reader.bool();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -1415,6 +1422,12 @@ exports.FieldDescriptorProto = {
         else {
             message.options = undefined;
         }
+        if (object.proto3Optional !== undefined && object.proto3Optional !== null) {
+            message.proto3Optional = Boolean(object.proto3Optional);
+        }
+        else {
+            message.proto3Optional = false;
+        }
         return message;
     },
     toJSON(message) {
@@ -1435,6 +1448,8 @@ exports.FieldDescriptorProto = {
             (obj.options = message.options
                 ? exports.FieldOptions.toJSON(message.options)
                 : undefined);
+        message.proto3Optional !== undefined &&
+            (obj.proto3Optional = message.proto3Optional);
         return obj;
     },
     fromPartial(object) {
@@ -1499,6 +1514,12 @@ exports.FieldDescriptorProto = {
         else {
             message.options = undefined;
         }
+        if (object.proto3Optional !== undefined && object.proto3Optional !== null) {
+            message.proto3Optional = object.proto3Optional;
+        }
+        else {
+            message.proto3Optional = false;
+        }
         return message;
     },
 };
@@ -1514,7 +1535,7 @@ exports.OneofDescriptorProto = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseOneofDescriptorProto };
         while (reader.pos < end) {
@@ -1596,7 +1617,7 @@ exports.EnumDescriptorProto = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseEnumDescriptorProto };
         message.value = [];
@@ -1735,7 +1756,7 @@ exports.EnumDescriptorProto_EnumReservedRange = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = {
             ...baseEnumDescriptorProto_EnumReservedRange,
@@ -1814,7 +1835,7 @@ exports.EnumValueDescriptorProto = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = {
             ...baseEnumValueDescriptorProto,
@@ -1912,7 +1933,7 @@ exports.ServiceDescriptorProto = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseServiceDescriptorProto };
         message.method = [];
@@ -2025,7 +2046,7 @@ exports.MethodDescriptorProto = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseMethodDescriptorProto };
         while (reader.pos < end) {
@@ -2246,7 +2267,7 @@ exports.FileOptions = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseFileOptions };
         message.uninterpretedOption = [];
@@ -2682,7 +2703,7 @@ exports.MessageOptions = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseMessageOptions };
         message.uninterpretedOption = [];
@@ -2837,7 +2858,7 @@ exports.FieldOptions = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseFieldOptions };
         message.uninterpretedOption = [];
@@ -2994,7 +3015,7 @@ exports.OneofOptions = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseOneofOptions };
         message.uninterpretedOption = [];
@@ -3059,7 +3080,7 @@ exports.EnumOptions = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseEnumOptions };
         message.uninterpretedOption = [];
@@ -3153,7 +3174,7 @@ exports.EnumValueOptions = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseEnumValueOptions };
         message.uninterpretedOption = [];
@@ -3231,7 +3252,7 @@ exports.ServiceOptions = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseServiceOptions };
         message.uninterpretedOption = [];
@@ -3312,7 +3333,7 @@ exports.MethodOptions = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseMethodOptions };
         message.uninterpretedOption = [];
@@ -3430,10 +3451,11 @@ exports.UninterpretedOption = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseUninterpretedOption };
         message.name = [];
+        message.stringValue = new Uint8Array();
         while (reader.pos < end) {
             const tag = reader.uint32();
             switch (tag >>> 3) {
@@ -3468,6 +3490,7 @@ exports.UninterpretedOption = {
     fromJSON(object) {
         const message = { ...baseUninterpretedOption };
         message.name = [];
+        message.stringValue = new Uint8Array();
         if (object.name !== undefined && object.name !== null) {
             for (const e of object.name) {
                 message.name.push(exports.UninterpretedOption_NamePart.fromJSON(e));
@@ -3600,7 +3623,7 @@ exports.UninterpretedOption_NamePart = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = {
             ...baseUninterpretedOption_NamePart,
@@ -3674,7 +3697,7 @@ exports.SourceCodeInfo = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseSourceCodeInfo };
         message.location = [];
@@ -3753,7 +3776,7 @@ exports.SourceCodeInfo_Location = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = {
             ...baseSourceCodeInfo_Location,
@@ -3916,7 +3939,7 @@ exports.GeneratedCodeInfo = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseGeneratedCodeInfo };
         message.annotation = [];
@@ -3989,7 +4012,7 @@ exports.GeneratedCodeInfo_Annotation = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = {
             ...baseGeneratedCodeInfo_Annotation,

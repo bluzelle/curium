@@ -34,9 +34,10 @@ exports.PageRequest = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...basePageRequest };
+        message.key = new Uint8Array();
         while (reader.pos < end) {
             const tag = reader.uint32();
             switch (tag >>> 3) {
@@ -64,6 +65,7 @@ exports.PageRequest = {
     },
     fromJSON(object) {
         const message = { ...basePageRequest };
+        message.key = new Uint8Array();
         if (object.key !== undefined && object.key !== null) {
             message.key = bytesFromBase64(object.key);
         }
@@ -152,9 +154,10 @@ exports.PageResponse = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...basePageResponse };
+        message.nextKey = new Uint8Array();
         while (reader.pos < end) {
             const tag = reader.uint32();
             switch (tag >>> 3) {
@@ -173,6 +176,7 @@ exports.PageResponse = {
     },
     fromJSON(object) {
         const message = { ...basePageResponse };
+        message.nextKey = new Uint8Array();
         if (object.nextKey !== undefined && object.nextKey !== null) {
             message.nextKey = bytesFromBase64(object.nextKey);
         }

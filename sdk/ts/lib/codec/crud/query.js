@@ -6,9 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.QueryClientImpl = exports.QueryAllCrudValueResponse = exports.QueryAllCrudValueRequest = exports.QueryGetCrudValueResponse = exports.QueryGetCrudValueRequest = exports.protobufPackage = void 0;
 /* eslint-disable */
 const long_1 = __importDefault(require("long"));
+const minimal_1 = __importDefault(require("protobufjs/minimal"));
 const CrudValue_1 = require("../crud/CrudValue");
 const pagination_1 = require("../cosmos/base/query/v1beta1/pagination");
-const minimal_1 = __importDefault(require("protobufjs/minimal"));
 exports.protobufPackage = "bluzelle.curium.crud";
 const baseQueryGetCrudValueRequest = { uuid: "", key: "" };
 exports.QueryGetCrudValueRequest = {
@@ -22,7 +22,7 @@ exports.QueryGetCrudValueRequest = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = {
             ...baseQueryGetCrudValueRequest,
@@ -95,7 +95,7 @@ exports.QueryGetCrudValueResponse = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = {
             ...baseQueryGetCrudValueResponse,
@@ -158,7 +158,7 @@ exports.QueryAllCrudValueRequest = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = {
             ...baseQueryAllCrudValueRequest,
@@ -237,7 +237,7 @@ exports.QueryAllCrudValueResponse = {
         return writer;
     },
     decode(input, length) {
-        const reader = input instanceof Uint8Array ? new minimal_1.default.Reader(input) : input;
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = {
             ...baseQueryAllCrudValueResponse,
