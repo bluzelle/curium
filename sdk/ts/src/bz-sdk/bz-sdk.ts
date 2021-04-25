@@ -37,14 +37,14 @@ export const bluzelle = (options: SDKOptions): Promise<BluzelleSdk> =>
             db, nft, bank, staking
         }))
 
-Promise.resolve(bluzelle({
-    mnemonic: "focus ill drift swift blood bitter move grace ensure diamond year tongue hint weekend bulb rebel avoid gas dose print remove receive yellow shoot",
-    url: "http://localhost:26657",
-    gasPrice: 0.002,
-    maxGas: 1000000
-}))
-    .then(sdk => sdk.staking.q.Pool({}))
-    .then(x => x)
+// Promise.resolve(bluzelle({
+//     mnemonic: "focus ill drift swift blood bitter move grace ensure diamond year tongue hint weekend bulb rebel avoid gas dose print remove receive yellow shoot",
+//     url: "http://localhost:26657",
+//     gasPrice: 0.002,
+//     maxGas: 1000000
+// }))
+//     .then(sdk => sdk.staking.q.Pool({}))
+//     .then(x => x)
 
     // .then(sdk => sdk.bank.q.Balance({address: "bluzelle13cpvky4s7e825ddwme4xh9g7ynxa4yes5uca7e", denom: "ubnt"}))
 //     .then(passThroughAwait(sdk => sdk.db.tx.Create({
