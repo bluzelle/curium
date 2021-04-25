@@ -17,8 +17,8 @@ service Msg {
 // this line is used by starport scaffolding # proto/tx/message
 message MsgChunk {
   string creator = 1;
-  uint64 id = 2;
-  uint64 chunk = 3;
+  uint32 id = 2;
+  uint32 chunk = 3;
   bytes data = 4;
 }
 
@@ -32,12 +32,12 @@ message MsgCreateNft {
 }
 
 message MsgCreateNftResponse {
-  uint64 id = 1;
+  uint32 id = 1;
 }
 
 message MsgUpdateNft {
   string creator = 1;
-  uint64 id = 2;
+  uint32 id = 2;
   string mime = 3;
   string meta = 4;
 }
@@ -46,7 +46,7 @@ message MsgUpdateNftResponse { }
 
 message MsgDeleteNft {
   string creator = 1;
-  uint64 id = 2;
+  uint32 id = 2;
 }
 
 message MsgDeleteNftResponse { }

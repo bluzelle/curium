@@ -21,18 +21,18 @@ func NewQuerier(k Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 
 		switch path[0] {
 		case "get-nft-data":
-			id, err := strconv.ParseUint(path[1], 10, 64)
+			id, err := strconv.ParseUint(path[1], 10, 32)
 			if err != nil {
 				return nil, err
 			}
-			bz := k.GetNftData(ctx, id)
+			bz := k.GetNftData(ctx, uint32(id))
 			return bz, nil
 		case "get-nft":
-			id, err := strconv.ParseUint(path[1], 10, 64)
+			id, err := strconv.ParseUint(path[1], 10, 32)
 			if err != nil {
 				return nil, err
 			}
-			nft := k.GetNft(ctx, id)
+			nft := k.GetNft(ctx, uint32(id))
 			return k.cdc.MustMarshalJSON(&nft), nil
 
 

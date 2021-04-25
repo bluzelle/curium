@@ -7,7 +7,7 @@ option go_package = "github.com/bluzelle/curium/x/nft/types";
 
 message Nft {
   string creator = 1;
-  uint64 id = 2;
+  uint32 id = 2;
   string mime = 3;
   string meta = 4;
 }

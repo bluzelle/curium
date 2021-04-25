@@ -8,17 +8,17 @@ exports.MsgClientImpl = exports.MsgDeleteNftResponse = exports.MsgDeleteNft = ex
 const long_1 = __importDefault(require("long"));
 const minimal_1 = __importDefault(require("protobufjs/minimal"));
 exports.protobufPackage = "bluzelle.curium.nft";
-const baseMsgChunk = { creator: "", id: long_1.default.UZERO, chunk: long_1.default.UZERO };
+const baseMsgChunk = { creator: "", id: 0, chunk: 0 };
 exports.MsgChunk = {
     encode(message, writer = minimal_1.default.Writer.create()) {
         if (message.creator !== "") {
             writer.uint32(10).string(message.creator);
         }
-        if (!message.id.isZero()) {
-            writer.uint32(16).uint64(message.id);
+        if (message.id !== 0) {
+            writer.uint32(16).uint32(message.id);
         }
-        if (!message.chunk.isZero()) {
-            writer.uint32(24).uint64(message.chunk);
+        if (message.chunk !== 0) {
+            writer.uint32(24).uint32(message.chunk);
         }
         if (message.data.length !== 0) {
             writer.uint32(34).bytes(message.data);
@@ -37,10 +37,10 @@ exports.MsgChunk = {
                     message.creator = reader.string();
                     break;
                 case 2:
-                    message.id = reader.uint64();
+                    message.id = reader.uint32();
                     break;
                 case 3:
-                    message.chunk = reader.uint64();
+                    message.chunk = reader.uint32();
                     break;
                 case 4:
                     message.data = reader.bytes();
@@ -62,16 +62,16 @@ exports.MsgChunk = {
             message.creator = "";
         }
         if (object.id !== undefined && object.id !== null) {
-            message.id = long_1.default.fromString(object.id);
+            message.id = Number(object.id);
         }
         else {
-            message.id = long_1.default.UZERO;
+            message.id = 0;
         }
         if (object.chunk !== undefined && object.chunk !== null) {
-            message.chunk = long_1.default.fromString(object.chunk);
+            message.chunk = Number(object.chunk);
         }
         else {
-            message.chunk = long_1.default.UZERO;
+            message.chunk = 0;
         }
         if (object.data !== undefined && object.data !== null) {
             message.data = bytesFromBase64(object.data);
@@ -81,10 +81,8 @@ exports.MsgChunk = {
     toJSON(message) {
         const obj = {};
         message.creator !== undefined && (obj.creator = message.creator);
-        message.id !== undefined &&
-            (obj.id = (message.id || long_1.default.UZERO).toString());
-        message.chunk !== undefined &&
-            (obj.chunk = (message.chunk || long_1.default.UZERO).toString());
+        message.id !== undefined && (obj.id = message.id);
+        message.chunk !== undefined && (obj.chunk = message.chunk);
         message.data !== undefined &&
             (obj.data = base64FromBytes(message.data !== undefined ? message.data : new Uint8Array()));
         return obj;
@@ -101,13 +99,13 @@ exports.MsgChunk = {
             message.id = object.id;
         }
         else {
-            message.id = long_1.default.UZERO;
+            message.id = 0;
         }
         if (object.chunk !== undefined && object.chunk !== null) {
             message.chunk = object.chunk;
         }
         else {
-            message.chunk = long_1.default.UZERO;
+            message.chunk = 0;
         }
         if (object.data !== undefined && object.data !== null) {
             message.data = object.data;
@@ -239,11 +237,11 @@ exports.MsgCreateNft = {
         return message;
     },
 };
-const baseMsgCreateNftResponse = { id: long_1.default.UZERO };
+const baseMsgCreateNftResponse = { id: 0 };
 exports.MsgCreateNftResponse = {
     encode(message, writer = minimal_1.default.Writer.create()) {
-        if (!message.id.isZero()) {
-            writer.uint32(8).uint64(message.id);
+        if (message.id !== 0) {
+            writer.uint32(8).uint32(message.id);
         }
         return writer;
     },
@@ -255,7 +253,7 @@ exports.MsgCreateNftResponse = {
             const tag = reader.uint32();
             switch (tag >>> 3) {
                 case 1:
-                    message.id = reader.uint64();
+                    message.id = reader.uint32();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -267,17 +265,16 @@ exports.MsgCreateNftResponse = {
     fromJSON(object) {
         const message = { ...baseMsgCreateNftResponse };
         if (object.id !== undefined && object.id !== null) {
-            message.id = long_1.default.fromString(object.id);
+            message.id = Number(object.id);
         }
         else {
-            message.id = long_1.default.UZERO;
+            message.id = 0;
         }
         return message;
     },
     toJSON(message) {
         const obj = {};
-        message.id !== undefined &&
-            (obj.id = (message.id || long_1.default.UZERO).toString());
+        message.id !== undefined && (obj.id = message.id);
         return obj;
     },
     fromPartial(object) {
@@ -286,24 +283,19 @@ exports.MsgCreateNftResponse = {
             message.id = object.id;
         }
         else {
-            message.id = long_1.default.UZERO;
+            message.id = 0;
         }
         return message;
     },
 };
-const baseMsgUpdateNft = {
-    creator: "",
-    id: long_1.default.UZERO,
-    mime: "",
-    meta: "",
-};
+const baseMsgUpdateNft = { creator: "", id: 0, mime: "", meta: "" };
 exports.MsgUpdateNft = {
     encode(message, writer = minimal_1.default.Writer.create()) {
         if (message.creator !== "") {
             writer.uint32(10).string(message.creator);
         }
-        if (!message.id.isZero()) {
-            writer.uint32(16).uint64(message.id);
+        if (message.id !== 0) {
+            writer.uint32(16).uint32(message.id);
         }
         if (message.mime !== "") {
             writer.uint32(26).string(message.mime);
@@ -324,7 +316,7 @@ exports.MsgUpdateNft = {
                     message.creator = reader.string();
                     break;
                 case 2:
-                    message.id = reader.uint64();
+                    message.id = reader.uint32();
                     break;
                 case 3:
                     message.mime = reader.string();
@@ -348,10 +340,10 @@ exports.MsgUpdateNft = {
             message.creator = "";
         }
         if (object.id !== undefined && object.id !== null) {
-            message.id = long_1.default.fromString(object.id);
+            message.id = Number(object.id);
         }
         else {
-            message.id = long_1.default.UZERO;
+            message.id = 0;
         }
         if (object.mime !== undefined && object.mime !== null) {
             message.mime = String(object.mime);
@@ -370,8 +362,7 @@ exports.MsgUpdateNft = {
     toJSON(message) {
         const obj = {};
         message.creator !== undefined && (obj.creator = message.creator);
-        message.id !== undefined &&
-            (obj.id = (message.id || long_1.default.UZERO).toString());
+        message.id !== undefined && (obj.id = message.id);
         message.mime !== undefined && (obj.mime = message.mime);
         message.meta !== undefined && (obj.meta = message.meta);
         return obj;
@@ -388,7 +379,7 @@ exports.MsgUpdateNft = {
             message.id = object.id;
         }
         else {
-            message.id = long_1.default.UZERO;
+            message.id = 0;
         }
         if (object.mime !== undefined && object.mime !== null) {
             message.mime = object.mime;
@@ -437,14 +428,14 @@ exports.MsgUpdateNftResponse = {
         return message;
     },
 };
-const baseMsgDeleteNft = { creator: "", id: long_1.default.UZERO };
+const baseMsgDeleteNft = { creator: "", id: 0 };
 exports.MsgDeleteNft = {
     encode(message, writer = minimal_1.default.Writer.create()) {
         if (message.creator !== "") {
             writer.uint32(10).string(message.creator);
         }
-        if (!message.id.isZero()) {
-            writer.uint32(16).uint64(message.id);
+        if (message.id !== 0) {
+            writer.uint32(16).uint32(message.id);
         }
         return writer;
     },
@@ -459,7 +450,7 @@ exports.MsgDeleteNft = {
                     message.creator = reader.string();
                     break;
                 case 2:
-                    message.id = reader.uint64();
+                    message.id = reader.uint32();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -477,18 +468,17 @@ exports.MsgDeleteNft = {
             message.creator = "";
         }
         if (object.id !== undefined && object.id !== null) {
-            message.id = long_1.default.fromString(object.id);
+            message.id = Number(object.id);
         }
         else {
-            message.id = long_1.default.UZERO;
+            message.id = 0;
         }
         return message;
     },
     toJSON(message) {
         const obj = {};
         message.creator !== undefined && (obj.creator = message.creator);
-        message.id !== undefined &&
-            (obj.id = (message.id || long_1.default.UZERO).toString());
+        message.id !== undefined && (obj.id = message.id);
         return obj;
     },
     fromPartial(object) {
@@ -503,7 +493,7 @@ exports.MsgDeleteNft = {
             message.id = object.id;
         }
         else {
-            message.id = long_1.default.UZERO;
+            message.id = 0;
         }
         return message;
     },

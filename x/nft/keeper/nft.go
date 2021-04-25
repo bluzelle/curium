@@ -9,7 +9,7 @@ import (
 )
 
 // GetNftCount get the total number of nft
-func (k Keeper) GetNftCount(ctx sdk.Context) uint64 {
+func (k Keeper) GetNftCount(ctx sdk.Context) uint32 {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.NftCountKey))
 	byteKey := types.KeyPrefix(types.NftCountKey)
 	bz := store.Get(byteKey)
@@ -20,20 +20,20 @@ func (k Keeper) GetNftCount(ctx sdk.Context) uint64 {
 	}
 
 	// Parse bytes
-	count, err := strconv.ParseUint(string(bz), 10, 64)
+	count, err := strconv.ParseUint(string(bz), 10, 32)
 	if err != nil {
 		// Panic because the count should be always formattable to iint64
 		panic("cannot decode count")
 	}
 
-	return count
+	return uint32(count)
 }
 
 // SetNftCount set the total number of nft
-func (k Keeper) SetNftCount(ctx sdk.Context, count uint64) {
+func (k Keeper) SetNftCount(ctx sdk.Context, count uint32) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.NftCountKey))
 	byteKey := types.KeyPrefix(types.NftCountKey)
-	bz := []byte(strconv.FormatUint(count, 10))
+	bz := []byte(strconv.FormatUint(uint64(count), 10))
 	store.Set(byteKey, bz)
 }
 
@@ -43,7 +43,7 @@ func (k Keeper) AppendNft(
 	creator string,
 	meta string,
 	mime string,
-) uint64 {
+) uint32 {
 	// Create the nft
 	count := k.GetNftCount(ctx)
 	var nft = types.Nft{
@@ -71,14 +71,14 @@ func (k Keeper) SetNft(ctx sdk.Context, nft types.Nft) {
 }
 
 // GetNft returns a nft from its id
-func (k Keeper) GetNft(ctx sdk.Context, id uint64) types.Nft {
+func (k Keeper) GetNft(ctx sdk.Context, id uint32) types.Nft {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.NftKey))
 	var nft types.Nft
 	k.cdc.MustUnmarshalBinaryBare(store.Get(GetNftIDBytes(id)), &nft)
 	return nft
 }
 
-func (k Keeper) GetNftData(ctx sdk.Context, id uint64) []byte {
+func (k Keeper) GetNftData(ctx sdk.Context, id uint32) []byte {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.NftChunkKey))
 	var data []byte
 	iterator := sdk.KVStorePrefixIterator(store, append(GetNftIDBytes(id)))
@@ -90,18 +90,18 @@ func (k Keeper) GetNftData(ctx sdk.Context, id uint64) []byte {
 }
 
 // HasNft checks if the nft exists in the store
-func (k Keeper) HasNft(ctx sdk.Context, id uint64) bool {
+func (k Keeper) HasNft(ctx sdk.Context, id uint32) bool {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.NftKey))
 	return store.Has(GetNftIDBytes(id))
 }
 
 // GetNftOwner returns the creator of the nft
-func (k Keeper) GetNftOwner(ctx sdk.Context, id uint64) string {
+func (k Keeper) GetNftOwner(ctx sdk.Context, id uint32) string {
 	return k.GetNft(ctx, id).Creator
 }
 
 // RemoveNft removes a nft from the store
-func (k Keeper) RemoveNft(ctx sdk.Context, id uint64) {
+func (k Keeper) RemoveNft(ctx sdk.Context, id uint32) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.NftKey))
 	store.Delete(GetNftIDBytes(id))
 }
@@ -123,9 +123,9 @@ func (k Keeper) GetAllNft(ctx sdk.Context) (list []types.Nft) {
 }
 
 // GetNftIDBytes returns the byte representation of the ID
-func GetNftIDBytes(id uint64) []byte {
+func GetNftIDBytes(id uint32) []byte {
 	bz := make([]byte, 8)
-	binary.BigEndian.PutUint64(bz, id)
+	binary.BigEndian.PutUint32(bz, id)
 	return bz
 }
 
@@ -134,7 +134,7 @@ func GetNftIDFromBytes(bz []byte) uint64 {
 	return binary.BigEndian.Uint64(bz)
 }
 
-func (k Keeper) StoreNftChunk(ctx sdk.Context, id uint64, chunk uint64, data []byte) {
+func (k Keeper) StoreNftChunk(ctx sdk.Context, id uint32, chunk uint32, data []byte) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.NftChunkKey))
 	key := append(GetNftIDBytes(id), GetNftIDBytes(chunk)...)
 	store.Set(key, data)

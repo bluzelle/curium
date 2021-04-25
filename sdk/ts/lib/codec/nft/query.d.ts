@@ -5,7 +5,7 @@ import { PageRequest, PageResponse } from "../cosmos/base/query/v1beta1/paginati
 export declare const protobufPackage = "bluzelle.curium.nft";
 /** this line is used by starport scaffolding # 3 */
 export interface QueryGetNftRequest {
-    id: Long;
+    id: number;
 }
 export interface QueryGetNftResponse {
     Nft?: Nft;

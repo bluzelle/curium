@@ -7,8 +7,8 @@ export const protobufPackage = "bluzelle.curium.nft";
 /** this line is used by starport scaffolding # proto/tx/message */
 export interface MsgChunk {
   creator: string;
-  id: Long;
-  chunk: Long;
+  id: number;
+  chunk: number;
   data: Uint8Array;
 }
 
@@ -21,12 +21,12 @@ export interface MsgCreateNft {
 }
 
 export interface MsgCreateNftResponse {
-  id: Long;
+  id: number;
 }
 
 export interface MsgUpdateNft {
   creator: string;
-  id: Long;
+  id: number;
   mime: string;
   meta: string;
 }
@@ -35,12 +35,12 @@ export interface MsgUpdateNftResponse {}
 
 export interface MsgDeleteNft {
   creator: string;
-  id: Long;
+  id: number;
 }
 
 export interface MsgDeleteNftResponse {}
 
-const baseMsgChunk: object = { creator: "", id: Long.UZERO, chunk: Long.UZERO };
+const baseMsgChunk: object = { creator: "", id: 0, chunk: 0 };
 
 export const MsgChunk = {
   encode(
@@ -50,11 +50,11 @@ export const MsgChunk = {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
-    if (!message.id.isZero()) {
-      writer.uint32(16).uint64(message.id);
+    if (message.id !== 0) {
+      writer.uint32(16).uint32(message.id);
     }
-    if (!message.chunk.isZero()) {
-      writer.uint32(24).uint64(message.chunk);
+    if (message.chunk !== 0) {
+      writer.uint32(24).uint32(message.chunk);
     }
     if (message.data.length !== 0) {
       writer.uint32(34).bytes(message.data);
@@ -74,10 +74,10 @@ export const MsgChunk = {
           message.creator = reader.string();
           break;
         case 2:
-          message.id = reader.uint64() as Long;
+          message.id = reader.uint32();
           break;
         case 3:
-          message.chunk = reader.uint64() as Long;
+          message.chunk = reader.uint32();
           break;
         case 4:
           message.data = reader.bytes();
@@ -99,14 +99,14 @@ export const MsgChunk = {
       message.creator = "";
     }
     if (object.id !== undefined && object.id !== null) {
-      message.id = Long.fromString(object.id);
+      message.id = Number(object.id);
     } else {
-      message.id = Long.UZERO;
+      message.id = 0;
     }
     if (object.chunk !== undefined && object.chunk !== null) {
-      message.chunk = Long.fromString(object.chunk);
+      message.chunk = Number(object.chunk);
     } else {
-      message.chunk = Long.UZERO;
+      message.chunk = 0;
     }
     if (object.data !== undefined && object.data !== null) {
       message.data = bytesFromBase64(object.data);
@@ -117,10 +117,8 @@ export const MsgChunk = {
   toJSON(message: MsgChunk): unknown {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
-    message.id !== undefined &&
-      (obj.id = (message.id || Long.UZERO).toString());
-    message.chunk !== undefined &&
-      (obj.chunk = (message.chunk || Long.UZERO).toString());
+    message.id !== undefined && (obj.id = message.id);
+    message.chunk !== undefined && (obj.chunk = message.chunk);
     message.data !== undefined &&
       (obj.data = base64FromBytes(
         message.data !== undefined ? message.data : new Uint8Array()
@@ -136,14 +134,14 @@ export const MsgChunk = {
       message.creator = "";
     }
     if (object.id !== undefined && object.id !== null) {
-      message.id = object.id as Long;
+      message.id = object.id;
     } else {
-      message.id = Long.UZERO;
+      message.id = 0;
     }
     if (object.chunk !== undefined && object.chunk !== null) {
-      message.chunk = object.chunk as Long;
+      message.chunk = object.chunk;
     } else {
-      message.chunk = Long.UZERO;
+      message.chunk = 0;
     }
     if (object.data !== undefined && object.data !== null) {
       message.data = object.data;
@@ -287,15 +285,15 @@ export const MsgCreateNft = {
   },
 };
 
-const baseMsgCreateNftResponse: object = { id: Long.UZERO };
+const baseMsgCreateNftResponse: object = { id: 0 };
 
 export const MsgCreateNftResponse = {
   encode(
     message: MsgCreateNftResponse,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.id.isZero()) {
-      writer.uint32(8).uint64(message.id);
+    if (message.id !== 0) {
+      writer.uint32(8).uint32(message.id);
     }
     return writer;
   },
@@ -311,7 +309,7 @@ export const MsgCreateNftResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.id = reader.uint64() as Long;
+          message.id = reader.uint32();
           break;
         default:
           reader.skipType(tag & 7);
@@ -324,37 +322,31 @@ export const MsgCreateNftResponse = {
   fromJSON(object: any): MsgCreateNftResponse {
     const message = { ...baseMsgCreateNftResponse } as MsgCreateNftResponse;
     if (object.id !== undefined && object.id !== null) {
-      message.id = Long.fromString(object.id);
+      message.id = Number(object.id);
     } else {
-      message.id = Long.UZERO;
+      message.id = 0;
     }
     return message;
   },
 
   toJSON(message: MsgCreateNftResponse): unknown {
     const obj: any = {};
-    message.id !== undefined &&
-      (obj.id = (message.id || Long.UZERO).toString());
+    message.id !== undefined && (obj.id = message.id);
     return obj;
   },
 
   fromPartial(object: DeepPartial<MsgCreateNftResponse>): MsgCreateNftResponse {
     const message = { ...baseMsgCreateNftResponse } as MsgCreateNftResponse;
     if (object.id !== undefined && object.id !== null) {
-      message.id = object.id as Long;
+      message.id = object.id;
     } else {
-      message.id = Long.UZERO;
+      message.id = 0;
     }
     return message;
   },
 };
 
-const baseMsgUpdateNft: object = {
-  creator: "",
-  id: Long.UZERO,
-  mime: "",
-  meta: "",
-};
+const baseMsgUpdateNft: object = { creator: "", id: 0, mime: "", meta: "" };
 
 export const MsgUpdateNft = {
   encode(
@@ -364,8 +356,8 @@ export const MsgUpdateNft = {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
-    if (!message.id.isZero()) {
-      writer.uint32(16).uint64(message.id);
+    if (message.id !== 0) {
+      writer.uint32(16).uint32(message.id);
     }
     if (message.mime !== "") {
       writer.uint32(26).string(message.mime);
@@ -387,7 +379,7 @@ export const MsgUpdateNft = {
           message.creator = reader.string();
           break;
         case 2:
-          message.id = reader.uint64() as Long;
+          message.id = reader.uint32();
           break;
         case 3:
           message.mime = reader.string();
@@ -411,9 +403,9 @@ export const MsgUpdateNft = {
       message.creator = "";
     }
     if (object.id !== undefined && object.id !== null) {
-      message.id = Long.fromString(object.id);
+      message.id = Number(object.id);
     } else {
-      message.id = Long.UZERO;
+      message.id = 0;
     }
     if (object.mime !== undefined && object.mime !== null) {
       message.mime = String(object.mime);
@@ -431,8 +423,7 @@ export const MsgUpdateNft = {
   toJSON(message: MsgUpdateNft): unknown {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
-    message.id !== undefined &&
-      (obj.id = (message.id || Long.UZERO).toString());
+    message.id !== undefined && (obj.id = message.id);
     message.mime !== undefined && (obj.mime = message.mime);
     message.meta !== undefined && (obj.meta = message.meta);
     return obj;
@@ -446,9 +437,9 @@ export const MsgUpdateNft = {
       message.creator = "";
     }
     if (object.id !== undefined && object.id !== null) {
-      message.id = object.id as Long;
+      message.id = object.id;
     } else {
-      message.id = Long.UZERO;
+      message.id = 0;
     }
     if (object.mime !== undefined && object.mime !== null) {
       message.mime = object.mime;
@@ -508,7 +499,7 @@ export const MsgUpdateNftResponse = {
   },
 };
 
-const baseMsgDeleteNft: object = { creator: "", id: Long.UZERO };
+const baseMsgDeleteNft: object = { creator: "", id: 0 };
 
 export const MsgDeleteNft = {
   encode(
@@ -518,8 +509,8 @@ export const MsgDeleteNft = {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
-    if (!message.id.isZero()) {
-      writer.uint32(16).uint64(message.id);
+    if (message.id !== 0) {
+      writer.uint32(16).uint32(message.id);
     }
     return writer;
   },
@@ -535,7 +526,7 @@ export const MsgDeleteNft = {
           message.creator = reader.string();
           break;
         case 2:
-          message.id = reader.uint64() as Long;
+          message.id = reader.uint32();
           break;
         default:
           reader.skipType(tag & 7);
@@ -553,9 +544,9 @@ export const MsgDeleteNft = {
       message.creator = "";
     }
     if (object.id !== undefined && object.id !== null) {
-      message.id = Long.fromString(object.id);
+      message.id = Number(object.id);
     } else {
-      message.id = Long.UZERO;
+      message.id = 0;
     }
     return message;
   },
@@ -563,8 +554,7 @@ export const MsgDeleteNft = {
   toJSON(message: MsgDeleteNft): unknown {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
-    message.id !== undefined &&
-      (obj.id = (message.id || Long.UZERO).toString());
+    message.id !== undefined && (obj.id = message.id);
     return obj;
   },
 
@@ -576,9 +566,9 @@ export const MsgDeleteNft = {
       message.creator = "";
     }
     if (object.id !== undefined && object.id !== null) {
-      message.id = object.id as Long;
+      message.id = object.id;
     } else {
-      message.id = Long.UZERO;
+      message.id = 0;
     }
     return message;
   },

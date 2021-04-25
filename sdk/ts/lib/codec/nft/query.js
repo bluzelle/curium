@@ -10,11 +10,11 @@ const minimal_1 = __importDefault(require("protobufjs/minimal"));
 const nft_1 = require("../nft/nft");
 const pagination_1 = require("../cosmos/base/query/v1beta1/pagination");
 exports.protobufPackage = "bluzelle.curium.nft";
-const baseQueryGetNftRequest = { id: long_1.default.UZERO };
+const baseQueryGetNftRequest = { id: 0 };
 exports.QueryGetNftRequest = {
     encode(message, writer = minimal_1.default.Writer.create()) {
-        if (!message.id.isZero()) {
-            writer.uint32(8).uint64(message.id);
+        if (message.id !== 0) {
+            writer.uint32(8).uint32(message.id);
         }
         return writer;
     },
@@ -26,7 +26,7 @@ exports.QueryGetNftRequest = {
             const tag = reader.uint32();
             switch (tag >>> 3) {
                 case 1:
-                    message.id = reader.uint64();
+                    message.id = reader.uint32();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -38,17 +38,16 @@ exports.QueryGetNftRequest = {
     fromJSON(object) {
         const message = { ...baseQueryGetNftRequest };
         if (object.id !== undefined && object.id !== null) {
-            message.id = long_1.default.fromString(object.id);
+            message.id = Number(object.id);
         }
         else {
-            message.id = long_1.default.UZERO;
+            message.id = 0;
         }
         return message;
     },
     toJSON(message) {
         const obj = {};
-        message.id !== undefined &&
-            (obj.id = (message.id || long_1.default.UZERO).toString());
+        message.id !== undefined && (obj.id = message.id);
         return obj;
     },
     fromPartial(object) {
@@ -57,7 +56,7 @@ exports.QueryGetNftRequest = {
             message.id = object.id;
         }
         else {
-            message.id = long_1.default.UZERO;
+            message.id = 0;
         }
         return message;
     },

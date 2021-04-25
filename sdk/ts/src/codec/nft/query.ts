@@ -11,7 +11,7 @@ export const protobufPackage = "bluzelle.curium.nft";
 
 /** this line is used by starport scaffolding # 3 */
 export interface QueryGetNftRequest {
-  id: Long;
+  id: number;
 }
 
 export interface QueryGetNftResponse {
@@ -27,15 +27,15 @@ export interface QueryAllNftResponse {
   pagination?: PageResponse;
 }
 
-const baseQueryGetNftRequest: object = { id: Long.UZERO };
+const baseQueryGetNftRequest: object = { id: 0 };
 
 export const QueryGetNftRequest = {
   encode(
     message: QueryGetNftRequest,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.id.isZero()) {
-      writer.uint32(8).uint64(message.id);
+    if (message.id !== 0) {
+      writer.uint32(8).uint32(message.id);
     }
     return writer;
   },
@@ -48,7 +48,7 @@ export const QueryGetNftRequest = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.id = reader.uint64() as Long;
+          message.id = reader.uint32();
           break;
         default:
           reader.skipType(tag & 7);
@@ -61,26 +61,25 @@ export const QueryGetNftRequest = {
   fromJSON(object: any): QueryGetNftRequest {
     const message = { ...baseQueryGetNftRequest } as QueryGetNftRequest;
     if (object.id !== undefined && object.id !== null) {
-      message.id = Long.fromString(object.id);
+      message.id = Number(object.id);
     } else {
-      message.id = Long.UZERO;
+      message.id = 0;
     }
     return message;
   },
 
   toJSON(message: QueryGetNftRequest): unknown {
     const obj: any = {};
-    message.id !== undefined &&
-      (obj.id = (message.id || Long.UZERO).toString());
+    message.id !== undefined && (obj.id = message.id);
     return obj;
   },
 
   fromPartial(object: DeepPartial<QueryGetNftRequest>): QueryGetNftRequest {
     const message = { ...baseQueryGetNftRequest } as QueryGetNftRequest;
     if (object.id !== undefined && object.id !== null) {
-      message.id = object.id as Long;
+      message.id = object.id;
     } else {
-      message.id = Long.UZERO;
+      message.id = 0;
     }
     return message;
   },

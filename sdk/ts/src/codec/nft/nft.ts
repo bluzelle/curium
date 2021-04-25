@@ -6,20 +6,20 @@ export const protobufPackage = "bluzelle.curium.nft";
 
 export interface Nft {
   creator: string;
-  id: Long;
+  id: number;
   mime: string;
   meta: string;
 }
 
-const baseNft: object = { creator: "", id: Long.UZERO, mime: "", meta: "" };
+const baseNft: object = { creator: "", id: 0, mime: "", meta: "" };
 
 export const Nft = {
   encode(message: Nft, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
-    if (!message.id.isZero()) {
-      writer.uint32(16).uint64(message.id);
+    if (message.id !== 0) {
+      writer.uint32(16).uint32(message.id);
     }
     if (message.mime !== "") {
       writer.uint32(26).string(message.mime);
@@ -41,7 +41,7 @@ export const Nft = {
           message.creator = reader.string();
           break;
         case 2:
-          message.id = reader.uint64() as Long;
+          message.id = reader.uint32();
           break;
         case 3:
           message.mime = reader.string();
@@ -65,9 +65,9 @@ export const Nft = {
       message.creator = "";
     }
     if (object.id !== undefined && object.id !== null) {
-      message.id = Long.fromString(object.id);
+      message.id = Number(object.id);
     } else {
-      message.id = Long.UZERO;
+      message.id = 0;
     }
     if (object.mime !== undefined && object.mime !== null) {
       message.mime = String(object.mime);
@@ -85,8 +85,7 @@ export const Nft = {
   toJSON(message: Nft): unknown {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
-    message.id !== undefined &&
-      (obj.id = (message.id || Long.UZERO).toString());
+    message.id !== undefined && (obj.id = message.id);
     message.mime !== undefined && (obj.mime = message.mime);
     message.meta !== undefined && (obj.meta = message.meta);
     return obj;
@@ -100,9 +99,9 @@ export const Nft = {
       message.creator = "";
     }
     if (object.id !== undefined && object.id !== null) {
-      message.id = object.id as Long;
+      message.id = object.id;
     } else {
-      message.id = Long.UZERO;
+      message.id = 0;
     }
     if (object.mime !== undefined && object.mime !== null) {
       message.mime = object.mime;

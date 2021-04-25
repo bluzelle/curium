@@ -7,7 +7,7 @@ import (
 
 var _ sdk.Msg = &MsgChunk{}
 
-func NewMsgChunk(creator string, id uint64, chunk uint64, data []byte) *MsgChunk {
+func NewMsgChunk(creator string, id uint32, chunk uint32, data []byte) *MsgChunk {
 	return &MsgChunk{
 		Creator: creator,
 		Id:      id,

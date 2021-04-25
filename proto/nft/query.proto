@@ -22,7 +22,7 @@ service Query {
 
 // this line is used by starport scaffolding # 3
 message QueryGetNftRequest {
-	uint64 id = 1;
+	uint32 id = 1;
 }
 
 message QueryGetNftResponse {

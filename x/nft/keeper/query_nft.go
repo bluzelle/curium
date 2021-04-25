@@ -19,16 +19,16 @@ func listNft(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino
 }
 
 func getNft(ctx sdk.Context, key string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
-	id, err := strconv.ParseUint(key, 10, 64)
+	id, err := strconv.ParseUint(key, 10, 32)
 	if err != nil {
 		return nil, err
 	}
 
-	if !keeper.HasNft(ctx, id) {
+	if !keeper.HasNft(ctx, uint32(id)) {
 		return nil, sdkerrors.ErrKeyNotFound
 	}
 
-	msg := keeper.GetNft(ctx, id)
+	msg := keeper.GetNft(ctx, uint32(id))
 
 	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, msg)
 	if err != nil {

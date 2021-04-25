@@ -24,7 +24,7 @@ func (gs GenesisState) Validate() error {
 
 	// this line is used by starport scaffolding # genesis/types/validate
 	// Check for duplicated ID in nft
-	nftIdMap := make(map[uint64]bool)
+	nftIdMap := make(map[uint32]bool)
 
 	for _, elem := range gs.NftList {
 		if _, ok := nftIdMap[elem.Id]; ok {

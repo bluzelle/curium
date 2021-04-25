@@ -3,7 +3,7 @@ import _m0 from "protobufjs/minimal";
 export declare const protobufPackage = "bluzelle.curium.nft";
 export interface Nft {
     creator: string;
-    id: Long;
+    id: number;
     mime: string;
     meta: string;
 }

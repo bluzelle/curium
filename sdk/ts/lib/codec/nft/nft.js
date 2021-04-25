@@ -8,14 +8,14 @@ exports.Nft = exports.protobufPackage = void 0;
 const long_1 = __importDefault(require("long"));
 const minimal_1 = __importDefault(require("protobufjs/minimal"));
 exports.protobufPackage = "bluzelle.curium.nft";
-const baseNft = { creator: "", id: long_1.default.UZERO, mime: "", meta: "" };
+const baseNft = { creator: "", id: 0, mime: "", meta: "" };
 exports.Nft = {
     encode(message, writer = minimal_1.default.Writer.create()) {
         if (message.creator !== "") {
             writer.uint32(10).string(message.creator);
         }
-        if (!message.id.isZero()) {
-            writer.uint32(16).uint64(message.id);
+        if (message.id !== 0) {
+            writer.uint32(16).uint32(message.id);
         }
         if (message.mime !== "") {
             writer.uint32(26).string(message.mime);
@@ -36,7 +36,7 @@ exports.Nft = {
                     message.creator = reader.string();
                     break;
                 case 2:
-                    message.id = reader.uint64();
+                    message.id = reader.uint32();
                     break;
                 case 3:
                     message.mime = reader.string();
@@ -60,10 +60,10 @@ exports.Nft = {
             message.creator = "";
         }
         if (object.id !== undefined && object.id !== null) {
-            message.id = long_1.default.fromString(object.id);
+            message.id = Number(object.id);
         }
         else {
-            message.id = long_1.default.UZERO;
+            message.id = 0;
         }
         if (object.mime !== undefined && object.mime !== null) {
             message.mime = String(object.mime);
@@ -82,8 +82,7 @@ exports.Nft = {
     toJSON(message) {
         const obj = {};
         message.creator !== undefined && (obj.creator = message.creator);
-        message.id !== undefined &&
-            (obj.id = (message.id || long_1.default.UZERO).toString());
+        message.id !== undefined && (obj.id = message.id);
         message.mime !== undefined && (obj.mime = message.mime);
         message.meta !== undefined && (obj.meta = message.meta);
         return obj;
@@ -100,7 +99,7 @@ exports.Nft = {
             message.id = object.id;
         }
         else {
-            message.id = long_1.default.UZERO;
+            message.id = 0;
         }
         if (object.mime !== undefined && object.mime !== null) {
             message.mime = object.mime;

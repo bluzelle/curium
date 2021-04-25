@@ -62,7 +62,7 @@ type updateNftRequest struct {
 
 func updateNftHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
+		id, err := strconv.ParseUint(mux.Vars(r)["id"], 10, 32)
 		if err != nil {
 			return
 		}
@@ -90,7 +90,7 @@ func updateNftHandler(clientCtx client.Context) http.HandlerFunc {
 
 		msg := types.NewMsgUpdateNft(
 			req.Creator,
-			id,
+			uint32(id),
 			parsedMeta,
 		)
 
@@ -105,7 +105,7 @@ type deleteNftRequest struct {
 
 func deleteNftHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
+		id, err := strconv.ParseUint(mux.Vars(r)["id"], 10, 32)
 		if err != nil {
 			return
 		}
@@ -129,7 +129,7 @@ func deleteNftHandler(clientCtx client.Context) http.HandlerFunc {
 
 		msg := types.NewMsgDeleteNft(
 			req.Creator,
-			id,
+			uint32(id),
 		)
 
 		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)

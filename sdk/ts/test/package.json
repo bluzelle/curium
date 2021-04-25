@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
+    "@types/mocha": "^8.2.2",
     "@types/typescript": "^2.0.0",
     "testing": "bluzelle/curium-test#devel",
     "ts-node": "^9.1.1",

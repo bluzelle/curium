@@ -42,7 +42,7 @@ func CmdUpdateNft() *cobra.Command {
 		Short: "Update a nft",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			id, err := strconv.ParseUint(args[0], 10, 64)
+			id, err := strconv.ParseUint(args[0], 10, 32)
 			if err != nil {
 				return err
 			}
@@ -53,7 +53,7 @@ func CmdUpdateNft() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgUpdateNft(clientCtx.GetFromAddress().String(), id, string(argsMeta))
+			msg := types.NewMsgUpdateNft(clientCtx.GetFromAddress().String(), uint32(id), string(argsMeta))
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -72,7 +72,7 @@ func CmdDeleteNft() *cobra.Command {
 		Short: "Delete a nft by id",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			id, err := strconv.ParseUint(args[0], 10, 64)
+			id, err := strconv.ParseUint(args[0], 10, 32)
 			if err != nil {
 				return err
 			}
@@ -82,7 +82,7 @@ func CmdDeleteNft() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgDeleteNft(clientCtx.GetFromAddress().String(), id)
+			msg := types.NewMsgDeleteNft(clientCtx.GetFromAddress().String(), uint32(id))
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

@@ -4,8 +4,8 @@ export declare const protobufPackage = "bluzelle.curium.nft";
 /** this line is used by starport scaffolding # proto/tx/message */
 export interface MsgChunk {
     creator: string;
-    id: Long;
-    chunk: Long;
+    id: number;
+    chunk: number;
     data: Uint8Array;
 }
 export interface MsgChunkResponse {
@@ -16,11 +16,11 @@ export interface MsgCreateNft {
     meta: string;
 }
 export interface MsgCreateNftResponse {
-    id: Long;
+    id: number;
 }
 export interface MsgUpdateNft {
     creator: string;
-    id: Long;
+    id: number;
     mime: string;
     meta: string;
 }
@@ -28,7 +28,7 @@ export interface MsgUpdateNftResponse {
 }
 export interface MsgDeleteNft {
     creator: string;
-    id: Long;
+    id: number;
 }
 export interface MsgDeleteNftResponse {
 }
