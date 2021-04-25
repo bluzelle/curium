@@ -1,8 +1,9 @@
 import {expect} from 'chai'
 import {getSdk} from "../../../helpers/client-helpers/sdk-helpers";
 import {BluzelleSdk} from "../../../../src/bz-sdk/bz-sdk";
-import {passThroughAwait} from "promise-passthrough";
+import {passThrough, passThroughAwait} from "promise-passthrough";
 global.fetch = require('node-fetch')
+import {memoize, times} from 'lodash'
 
 describe("Store and retriving a NFT", () => {
 
@@ -67,11 +68,50 @@ describe("Store and retriving a NFT", () => {
                 .then(({id}) =>
                     fetch(`http://localhost:1317/nft/data/${id}`)
                 )
+                .then(passThrough(x =>
+                    expect(x.headers.get('content-type')).to.equal('my/mime')
+                ))
                 .then(x => x.text())
                 .then(x => {
                     expect(x).to.equal('chunk0chunk1chunk2')
                 })
+        });
+    });
 
+    describe('High load', () => {
+        it('should be able to store 100mb', () => {
+            return sdk.nft.tx.CreateNft({
+                creator: sdk.nft.address,
+                meta: 'my-meta',
+                mime: 'my/mime'
+            })
+                .then(passThroughAwait(({id}) =>
+                    Promise.all(times(100).map((chunk) =>
+                        sdk.nft.tx.Chunk({
+                            creator: sdk.nft.address,
+                            id,
+                            chunk,
+                            data: getMbPayload()
+                        })
+                    )))
+                )
+                .then(({id}) => fetchData(id))
+                .then(x => x);
         })
     })
 });
+
+const getMbPayload = memoize<() => Uint8Array>(() =>
+    times(1000 * 100).reduce((arr, n, idx) => {
+        arr.set([n % 256], idx)
+        return arr
+    }, new Uint8Array(1000 * 100))
+);
+
+const fetchData = (id: number) =>
+    fetch(`http://localhost:1317/nft/data/${id}`)
+        .then(x => x.arrayBuffer().then(buf => ({x, buf})))
+        .then(resp => ({
+            body: resp.buf,
+            contentType: resp.x.headers.get('content-type')
+        }))
