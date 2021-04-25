@@ -1,8 +1,8 @@
 {
   "name": "@bluzelle/sdk-js",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "JS sdk for Bluzelle",
-  "main": "lib/bluzelle-node.js",
+  "main": "lib/bz-sdk.js",
   "license": "MIT",
   "dependencies": {
     "@cosmjs/proto-signing": "0.25.0-alpha.2",
