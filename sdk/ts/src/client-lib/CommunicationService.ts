@@ -25,13 +25,7 @@ interface FailedTransaction {
 }
 
 
-const dummyMessageResponse = {
-    height: 0,
-    txhash: '',
-    gas_used: '',
-    gas_wanted: '',
-    data: []
-}
+const dummyMessageResponse = new Uint8Array()
 
 export interface CommunicationService {
     mnemonic: string
@@ -70,7 +64,7 @@ export const newCommunicationService = (url: string, mnemonic: string) => ({
     account: 0
 })
 
-export const withTransaction = <T>(service: CommunicationService, fn: () => T, {memo}: WithTransactionsOptions): Promise<MessageResponse<T>> => {
+export const withTransaction = <T>(service: CommunicationService, fn: () => T, {memo}: WithTransactionsOptions): Promise<Uint8Array> => {
     if (service.transactionMessageQueue) {
         throw new Error('withTransaction() can not be nested')
     }
@@ -82,7 +76,7 @@ export const withTransaction = <T>(service: CommunicationService, fn: () => T, {
 }
 
 
-export const sendMessage = <T, R>(ctx: CommunicationService, message: Message<T>, gasInfo: GasInfo): Promise<MessageResponse<R>> => {
+export const sendMessage = <T, R>(ctx: CommunicationService, message: Message<T>, gasInfo: GasInfo): Promise<Uint8Array> => {
     return ctx.transactionMessageQueue ? Promise.resolve(ctx.transactionMessageQueue?.items.push({
             message, gasInfo
         }))
@@ -94,7 +88,7 @@ export const sendMessage = <T, R>(ctx: CommunicationService, message: Message<T>
 }
 
 
-const sendMessages = (service: CommunicationService, queue: TransactionMessageQueue, retrans: boolean = false): Promise<MessageResponse<any>> =>
+const sendMessages = (service: CommunicationService, queue: TransactionMessageQueue, retrans: boolean = false): Promise<Uint8Array> =>
     new Promise((resolve, reject) => {
         msgChain = msgChain
             .then(() => {
@@ -139,8 +133,7 @@ const transmitTransaction = (service: CommunicationService, messages: MessageQue
                     /signature verification failed/.test(e.error) && (service.accountRequested = undefined)
                     throw e
                 })
-                .then((x: any) => ({...x, txhash: x.transactionHash}))
-                .then(x => x)
+                .then(x => (x as any)?.data[0].data ?? new Uint8Array())
         )
 
 }

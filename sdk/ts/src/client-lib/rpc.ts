@@ -63,12 +63,13 @@ const txRpc = (options: SDKOptions, communicationService: CommunicationService, 
     return Promise.resolve({
         request: (service, method, data): Promise<Uint8Array> => {
             addMessageType(`/${service}${method}`, (msgTypes)[`Msg${method}`]);
-            return sendMessage<any, Receipt>(communicationService, {
+            return sendMessage<any, Uint8Array>(communicationService, {
                 typeUrl: `/${service}${method}`,
                 value: (msgTypes)[`Msg${method}`].decode(data)
             }, {gas_price: options.gasPrice, max_gas: options.maxGas})
-                .then(standardizeResponse)
-                .then(stdResp => (msgTypes)[`Msg${method}Response`].encode(stdResp))
+                .then(x => x)
+//                .then(standardizeResponse)
+//                .then(stdResp => (msgTypes)[`Msg${method}Response`].encode(stdResp))
         }
     } as ProtobufRpcClient);
 };

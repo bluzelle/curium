@@ -1,0 +1,45 @@
+import {expect} from 'chai'
+import {getSdk} from "../../../helpers/client-helpers/sdk-helpers";
+import {BluzelleSdk} from "../../../../src/bz-sdk/bz-sdk";
+import {passThroughAwait} from "promise-passthrough";
+
+describe("Store and retriving a NFT", () => {
+
+    let sdk: BluzelleSdk
+    beforeEach(() => getSdk().then(s => sdk = s));
+
+    describe('CreateNft()', () => {
+        it('should store a nft record', () => {
+            return sdk.nft.tx.CreateNft({
+                creator: sdk.nft.address,
+                meta: 'my-meta',
+                mime: 'image/xxx'
+            })
+                .then(({id}) => sdk.nft.q.Nft({id}))
+                .then(({Nft}) => {
+                    expect(Nft?.creator).to.equal(sdk.nft.address);
+                    expect(Nft?.meta).to.equal('my-meta');
+                    expect(Nft?.mime).to.equal('image/xxx');
+                });
+        });
+    });
+
+    describe('Chunk()', () => {
+        it('should store a nft chunk', () => {
+            return sdk.nft.tx.CreateNft({
+                creator: sdk.nft.address,
+                meta: 'my-meta',
+                mime: 'my/mime'
+            })
+                .then(passThroughAwait(({id}) =>
+                    Promise.all([
+                        sdk.nft.tx.Chunk({id: id, chunk: 0, data: new TextEncoder().encode('chunk0'), creator: sdk.nft.address}),
+                        sdk.nft.tx.Chunk({id: id, chunk: 1, data: new TextEncoder().encode('chunk1'), creator: sdk.nft.address}),
+                        sdk.nft.tx.Chunk({id: id, chunk: 2, data: new TextEncoder().encode('chunk2'), creator: sdk.nft.address}),
+                    ])
+                ))
+                .then(({id}) => sdk.nft.q.Nft({id: id}))
+                .then(nft => nft)
+        })
+    })
+});
