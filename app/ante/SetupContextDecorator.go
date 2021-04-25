@@ -33,7 +33,7 @@ func NewSetUpContextDecorator() SetUpContextDecorator {
 func (sud SetUpContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
 	// all transactions must implement GasTx
 	gasTx, ok := tx.(GasTx)
-	isFree := strings.Contains(tx.GetMsgs()[0].Type(), ".voting.")
+	isFree := strings.Contains(tx.GetMsgs()[0].Type(), ".voting.") || strings.Contains(tx.GetMsgs()[0].Type(), ".nft.")
 
 	if !ok {
 		// Set a gas meter with limit 0 as to prevent an infinite gas meter attack

@@ -30,15 +30,19 @@ const NftMsgTypes = __importStar(require("../codec/nft/tx"));
 const query_3 = require("../codec/cosmos/bank/v1beta1/query");
 const tx_3 = require("../codec/cosmos/bank/v1beta1/tx");
 const BankMsgTypes = __importStar(require("../codec/cosmos/bank/v1beta1/tx"));
+const query_4 = require("../codec/cosmos/staking/v1beta1/query");
+const tx_4 = require("../codec/cosmos/staking/v1beta1/tx");
+const StakingMsgTypes = __importStar(require("../codec/cosmos/staking/v1beta1/tx"));
 const CommunicationService_1 = require("../client-lib/CommunicationService");
 const bluzelle = (options) => Promise.resolve(CommunicationService_1.newCommunicationService(options.url, options.mnemonic || ''))
     .then(cs => Promise.all([
     rpc_1.sdk(options, query_1.QueryClientImpl, tx_1.MsgClientImpl, CrudMsgTypes, cs),
     rpc_1.sdk(options, query_2.QueryClientImpl, tx_2.MsgClientImpl, NftMsgTypes, cs),
-    rpc_1.sdk(options, query_3.QueryClientImpl, tx_3.MsgClientImpl, BankMsgTypes, cs)
+    rpc_1.sdk(options, query_3.QueryClientImpl, tx_3.MsgClientImpl, BankMsgTypes, cs),
+    rpc_1.sdk(options, query_4.QueryClientImpl, tx_4.MsgClientImpl, StakingMsgTypes, cs),
 ]))
-    .then(([db, nft, bank]) => ({
-    db, nft, bank
+    .then(([db, nft, bank, staking]) => ({
+    db, nft, bank, staking
 }));
 exports.bluzelle = bluzelle;
 Promise.resolve(exports.bluzelle({
