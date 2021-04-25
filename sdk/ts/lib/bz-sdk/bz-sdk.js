@@ -41,18 +41,17 @@ const bluzelle = (options) => Promise.resolve(CommunicationService_1.newCommunic
     rpc_1.sdk(options, query_3.QueryClientImpl, tx_3.MsgClientImpl, BankMsgTypes, cs),
     rpc_1.sdk(options, query_4.QueryClientImpl, tx_4.MsgClientImpl, StakingMsgTypes, cs),
 ]))
-    .then(([db, nft, bank, staking]) => ({
-    db, nft, bank, staking
-}));
+    .then(([db, nft, bank, staking]) => ({ db, nft, bank, staking }));
 exports.bluzelle = bluzelle;
-Promise.resolve(exports.bluzelle({
-    mnemonic: "focus ill drift swift blood bitter move grace ensure diamond year tongue hint weekend bulb rebel avoid gas dose print remove receive yellow shoot",
-    url: "http://localhost:26657",
-    gasPrice: 0.002,
-    maxGas: 1000000
-}))
-    .then(sdk => sdk.bank.q.Balance({ address: "bluzelle13cpvky4s7e825ddwme4xh9g7ynxa4yes5uca7e", denom: "ubnt" }))
-    .then(x => x);
+// Promise.resolve(bluzelle({
+//     mnemonic: "focus ill drift swift blood bitter move grace ensure diamond year tongue hint weekend bulb rebel avoid gas dose print remove receive yellow shoot",
+//     url: "http://localhost:26657",
+//     gasPrice: 0.002,
+//     maxGas: 1000000
+// }))
+//     .then(sdk => sdk.staking.q.Pool({}))
+//     .then(x => x)
+// .then(sdk => sdk.bank.q.Balance({address: "bluzelle13cpvky4s7e825ddwme4xh9g7ynxa4yes5uca7e", denom: "ubnt"}))
 //     .then(passThroughAwait(sdk => sdk.db.tx.Create({
 //         uuid: 'uuid2',
 //         key: 'foo',
