@@ -17,14 +17,20 @@ import {MsgClientImpl as StakingMsgClientImpl} from '../codec/cosmos/staking/v1b
 import * as StakingMsgTypes from '../codec/cosmos/staking/v1beta1/tx'
 
 import {newCommunicationService} from "../client-lib/CommunicationService";
+import {Left, Right, Some} from "monet";
+import {entropyToMnemonic, generateMnemonic} from "bip39";
 
 export type DbSdk = SDK<CrudQueryClientImpl, CrudMsgClientImpl>
 export type NftSdk = SDK<NftQueryClientImpl, NftMsgClientImpl>
 export type BankSdk = SDK<BankQueryClientImpl, BankMsgClientImpl>
 export type StakingSdk = SDK<StakingQueryClientImpl, StakingMsgClientImpl>
 export type BluzelleSdk = { db: DbSdk, nft: NftSdk, bank: BankSdk, staking: StakingSdk }
+export interface Bluzelle {
+    (options: SDKOptions): Promise<BluzelleSdk>,
+    newMnemonic: (entropy?: string) => string
+}
 
-export const bluzelle = (options: SDKOptions): Promise<BluzelleSdk> =>
+export const bluzelle: Bluzelle = (options: SDKOptions): Promise<BluzelleSdk> =>
     Promise.resolve(newCommunicationService(options.url, options.mnemonic || ''))
         .then(cs => Promise.all([
                 sdk<CrudQueryClientImpl, CrudMsgClientImpl>(options, CrudQueryClientImpl, CrudMsgClientImpl, CrudMsgTypes, cs),
@@ -38,8 +44,23 @@ export const bluzelle = (options: SDKOptions): Promise<BluzelleSdk> =>
                    nft,
                    bank,
                    staking
-               ]) => ({db, nft, bank, staking}))
+               ]) => ({
+            db,
+            nft,
+            bank,
+            staking,
+               }))
 
+bluzelle.newMnemonic = newMnemonic;
+
+
+function newMnemonic(entropy: string = '' ): string {
+    return Right<string, string>(entropy)
+        .flatMap(entropy => entropy.length === 0 || entropy.length === 64 ? Right(entropy) : Left(entropy))
+        .map(entropy => entropy ? entropyToMnemonic(entropy as string) : generateMnemonic(256))
+        .leftMap(() => console.log("Entropy must be 64 char hex"))
+        .cata(() => 'Invalid entropy', mnemonic => mnemonic)
+}
 // Promise.resolve(bluzelle({
 //     mnemonic: "focus ill drift swift blood bitter move grace ensure diamond year tongue hint weekend bulb rebel avoid gas dose print remove receive yellow shoot",
 //     url: "http://localhost:26657",
