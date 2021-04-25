@@ -124,14 +124,14 @@ func (k Keeper) GetAllNft(ctx sdk.Context) (list []types.Nft) {
 
 // GetNftIDBytes returns the byte representation of the ID
 func GetNftIDBytes(id uint32) []byte {
-	bz := make([]byte, 8)
+	bz := make([]byte, 4)
 	binary.BigEndian.PutUint32(bz, id)
 	return bz
 }
 
-// GetNftIDFromBytes returns ID in uint64 format from a byte array
-func GetNftIDFromBytes(bz []byte) uint64 {
-	return binary.BigEndian.Uint64(bz)
+// GetNftIDFromBytes returns ID in uint32 format from a byte array
+func GetNftIDFromBytes(bz []byte) uint32 {
+	return binary.BigEndian.Uint32(bz)
 }
 
 func (k Keeper) StoreNftChunk(ctx sdk.Context, id uint32, chunk uint32, data []byte) {
