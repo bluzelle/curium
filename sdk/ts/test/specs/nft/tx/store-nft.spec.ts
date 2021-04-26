@@ -3,7 +3,8 @@ import {getSdk} from "../../../helpers/client-helpers/sdk-helpers";
 import {BluzelleSdk} from "../../../../src/bz-sdk/bz-sdk";
 import {passThrough, passThroughAwait} from "promise-passthrough";
 global.fetch = require('node-fetch')
-import {memoize, times} from 'lodash'
+import {memoize, times, chunk} from 'lodash'
+import {readFile} from "node:fs/promises";
 
 describe("Store and retriving a NFT", () => {
 
@@ -86,7 +87,7 @@ describe("Store and retriving a NFT", () => {
                 mime: 'my/mime'
             })
                 .then(passThroughAwait(({id}) =>
-                    Promise.all(times(1000).map((chunk) =>
+                    Promise.all(times(200).map((chunk) =>
                         sdk.nft.tx.Chunk({
                             creator: sdk.nft.address,
                             id,
@@ -99,13 +100,22 @@ describe("Store and retriving a NFT", () => {
                 .then(x => x);
         })
     })
+
+    describe("real image", () => {
+        it('should upload a real image', () => {
+            readFile('./test.png')
+                .then(data => {
+                    data
+                })
+        })
+    })
 });
 
 const getLargePayload = memoize<() => Uint8Array>(() =>
-    times(1000 * 100).reduce((arr, n, idx) => {
+    times(1000 * 500).reduce((arr, n, idx) => {
         arr.set([n % 256], idx)
         return arr
-    }, new Uint8Array(1000 * 100))
+    }, new Uint8Array(1000 * 500))
 );
 
 const fetchData = (id: number) =>

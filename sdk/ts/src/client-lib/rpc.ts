@@ -42,22 +42,7 @@ const queryRpc = (options: SDKOptions): Promise<ProtobufRpcClient> =>
         .then(tendermintClient => new QueryClient(tendermintClient))
         .then(createProtobufRpcClient)
 
-type Receipt = {
-    MsgType: string,
-    data: Uint8Array
-}
 
-interface StdResponse  {
-    txHash?: string,
-    txHeight?: Long,
-    data?: Uint8Array
-}
-
-const standardizeResponse = (resp: MessageResponse<Receipt>): Promise<StdResponse> => Promise.resolve({
-    txHash: resp.txhash,
-    txHeight: Long.fromInt(resp.height)
-    //data:  resp.data[0].data
-});
 
 const txRpc = (options: SDKOptions, communicationService: CommunicationService, msgTypes: Record<string, any>): Promise<ProtobufRpcClient> => {
     return Promise.resolve({
@@ -67,9 +52,6 @@ const txRpc = (options: SDKOptions, communicationService: CommunicationService, 
                 typeUrl: `/${service}${method}`,
                 value: (msgTypes)[`Msg${method}`].decode(data)
             }, {gas_price: options.gasPrice, max_gas: options.maxGas})
-                .then(x => x)
-//                .then(standardizeResponse)
-//                .then(stdResp => (msgTypes)[`Msg${method}Response`].encode(stdResp))
         }
     } as ProtobufRpcClient);
 };

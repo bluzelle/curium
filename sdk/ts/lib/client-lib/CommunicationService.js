@@ -58,16 +58,17 @@ const sendMessages = (service, queue, retrans = false) => new Promise((resolve, 
             .then(resolve)
             .catch(e => monet_1.Some(retrans)
             .filter(retrans => retrans === false)
-            .filter(() => /signature verification failed/.test(e.error))
+            .filter(() => /incorrect account sequence/.test(e))
             .map(() => service.seq = 0)
             .map(() => service.account = 0)
+            .map(() => delete service.accountRequested)
             .map(() => sendMessages(service, queue, true))
             .map(p => p.then(resolve).catch(reject))
             .cata(() => reject(e), () => {
         }));
     })
         // hacky way to make sure that connections arrive at server in order
-        .then(() => delay_1.default(200));
+        .then(() => delay_1.default(3000));
 });
 let chainId;
 const transmitTransaction = (service, messages, { memo }) => {
@@ -87,8 +88,12 @@ const transmitTransaction = (service, messages, { memo }) => {
         .then(res => checkErrors(res))
         .then(x => { var _a, _b; return (_b = (_a = x) === null || _a === void 0 ? void 0 : _a.data[0].data) !== null && _b !== void 0 ? _b : new Uint8Array(); })
         .catch((e) => {
-        /incorrect acccount sequence/.test(e) && (service.accountRequested = undefined);
-        throw e;
+        if (/incorrect acccount sequence/.test(e)) {
+            (service.accountRequested = undefined);
+        }
+        else {
+            throw e;
+        }
     }));
 };
 let msgChain = Promise.resolve();

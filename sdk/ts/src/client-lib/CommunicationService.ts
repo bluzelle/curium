@@ -16,15 +16,6 @@ interface MessageQueueItem<T> {
     gasInfo: GasInfo
 }
 
-interface FailedTransaction {
-    txhash: string
-    height: number
-    failedMsg?: Message<any>
-    failedMsgIdx?: number
-    error: string
-}
-
-
 const dummyMessageResponse = new Uint8Array()
 
 export interface CommunicationService {
@@ -109,7 +100,7 @@ const sendMessages = (service: CommunicationService, queue: TransactionMessageQu
                 }
             )
             // hacky way to make sure that connections arrive at server in order
-            .then(() => delay(200))
+            .then(() => delay(3000))
     });
 
 let chainId: string
@@ -175,11 +166,6 @@ const getSequence = (service: CommunicationService, cosmos: SigningStargateClien
             account: service.account
         }));
 
-
-const convertDataFromHexToString = (res: any) => ({
-    ...res,
-    data: res.data ? Buffer.from(res.data, 'hex').toString() : undefined
-})
 
 const checkErrors = (res: BroadcastTxFailure): BroadcastTxResponse => {
     if (res.code > 0) {
