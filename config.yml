@@ -5,6 +5,8 @@ accounts:
     coins: ["100000000ubnt"]
   - name: binance
     coins: ["50000000000ubnt"]
+  - name: nft
+    coins: ["1000000000000ubnt"]
 validator:
   name: vuser
   staked: "100000000ubnt"

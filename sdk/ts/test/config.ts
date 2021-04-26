@@ -4,6 +4,6 @@ interface Config {
 }
 
 export const localChain: Config = {
-    mnemonic:  "amazing clap feature fit library spread bicycle gift moon treat once suggest size quick during grass suffer broom grab nephew sister belt hard tornado",
+    mnemonic:  "foam card blouse leaf convince scrub marble pencil camp hover food install waste aunt minute alarm gauge cabin garbage over kitten jealous draft miracle",
     endpoint: "http://localhost:26657"
 }
