@@ -86,13 +86,13 @@ describe("Store and retriving a NFT", () => {
                 mime: 'my/mime'
             })
                 .then(passThroughAwait(({id}) =>
-                    Promise.all(times(100).map((chunk) =>
+                    Promise.all(times(400).map((chunk) =>
                         sdk.nft.tx.Chunk({
                             creator: sdk.nft.address,
                             id,
                             chunk,
-                            data: getMbPayload()
-                        })
+                            data: getLargePayload()
+                        }).then(() => console.log('chunk', chunk))
                     )))
                 )
                 .then(({id}) => fetchData(id))
@@ -101,11 +101,11 @@ describe("Store and retriving a NFT", () => {
     })
 });
 
-const getMbPayload = memoize<() => Uint8Array>(() =>
-    times(1000 * 100).reduce((arr, n, idx) => {
+const getLargePayload = memoize<() => Uint8Array>(() =>
+    times(1000 * 500).reduce((arr, n, idx) => {
         arr.set([n % 256], idx)
         return arr
-    }, new Uint8Array(1000 * 100))
+    }, new Uint8Array(1000 * 500))
 );
 
 const fetchData = (id: number) =>

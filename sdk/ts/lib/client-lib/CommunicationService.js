@@ -12,13 +12,7 @@ const stargate_1 = require("@cosmjs/stargate");
 const tx_1 = require("@cosmjs/proto-signing/build/codec/cosmos/tx/v1beta1/tx");
 const Registry_1 = require("./Registry");
 const TOKEN_NAME = 'ubnt';
-const dummyMessageResponse = {
-    height: 0,
-    txhash: '',
-    gas_used: '',
-    gas_wanted: '',
-    data: []
-};
+const dummyMessageResponse = new Uint8Array();
 const mnemonicToAddress = (mnemonic) => proto_signing_1.DirectSecp256k1HdWallet.fromMnemonic(mnemonic, undefined, 'bluzelle')
     .then(wallet => wallet.getAccounts())
     .then(x => x[0].address);
@@ -91,12 +85,11 @@ const transmitTransaction = (service, messages, { memo }) => {
         .then((txRaw) => Uint8Array.from(tx_1.TxRaw.encode(txRaw).finish()))
         .then((signedTx) => cosmos.broadcastTx(signedTx))
         .then(res => checkErrors(res))
+        .then(x => { var _a, _b; return (_b = (_a = x) === null || _a === void 0 ? void 0 : _a.data[0].data) !== null && _b !== void 0 ? _b : new Uint8Array(); })
         .catch((e) => {
-        /signature verification failed/.test(e.error) && (service.accountRequested = undefined);
+        /incorrect acccount sequence/.test(e) && (service.accountRequested = undefined);
         throw e;
-    })
-        .then((x) => ({ ...x, txhash: x.transactionHash }))
-        .then(x => x));
+    }));
 };
 let msgChain = Promise.resolve();
 const getSequence = (service, cosmos) => (service.accountRequested ? (service.accountRequested = service.accountRequested

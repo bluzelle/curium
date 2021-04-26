@@ -97,9 +97,10 @@ const sendMessages = (service: CommunicationService, queue: TransactionMessageQu
                         .catch(e =>
                             Some(retrans)
                                 .filter(retrans => retrans === false)
-                                .filter(() => /signature verification failed/.test(e.error))
+                                .filter(() => /incorrect account sequence/.test(e))
                                 .map(() => service.seq = 0)
                                 .map(() => service.account = 0)
+                                .map(() => delete service.accountRequested)
                                 .map(() => sendMessages(service, queue, true))
                                 .map(p => p.then(resolve).catch(reject))
                                 .cata(() => reject(e), () => {
@@ -129,11 +130,15 @@ const transmitTransaction = (service: CommunicationService, messages: MessageQue
                 .then((txRaw: TxRaw) => Uint8Array.from(TxRaw.encode(txRaw).finish()))
                 .then((signedTx: Uint8Array) => cosmos.broadcastTx(signedTx))
                 .then(res => checkErrors(res as BroadcastTxFailure))
-                .catch((e: FailedTransaction) => {
-                    /signature verification failed/.test(e.error) && (service.accountRequested = undefined)
-                    throw e
-                })
                 .then(x => (x as any)?.data[0].data ?? new Uint8Array())
+                .catch((e) => {
+                    if(/incorrect acccount sequence/.test(e)) {
+                        (service.accountRequested = undefined)
+                    } else {
+                        throw e
+                    }
+                })
+
         )
 
 }

@@ -1,5 +1,4 @@
 import { GasInfo } from "../legacyAdapter/types/GasInfo";
-import { MessageResponse } from "../legacyAdapter/types/MessageResponse";
 import { Message } from "../legacyAdapter/types/Message";
 import { SigningStargateClient } from "@cosmjs/stargate";
 interface MessageQueueItem<T> {
@@ -28,8 +27,8 @@ export declare const newCommunicationService: (url: string, mnemonic: string) =>
     seq: number;
     account: number;
 };
-export declare const withTransaction: <T>(service: CommunicationService, fn: () => T, { memo }: WithTransactionsOptions) => Promise<MessageResponse<T>>;
-export declare const sendMessage: <T, R>(ctx: CommunicationService, message: Message<T>, gasInfo: GasInfo) => Promise<MessageResponse<R>>;
+export declare const withTransaction: <T>(service: CommunicationService, fn: () => T, { memo }: WithTransactionsOptions) => Promise<Uint8Array>;
+export declare const sendMessage: <T, R>(ctx: CommunicationService, message: Message<T>, gasInfo: GasInfo) => Promise<Uint8Array>;
 export declare const getClient: (service: CommunicationService) => Promise<SigningStargateClient>;
 export {};
 //# sourceMappingURL=CommunicationService.d.ts.map

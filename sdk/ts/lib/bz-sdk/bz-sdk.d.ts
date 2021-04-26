@@ -17,5 +17,9 @@ export declare type BluzelleSdk = {
     bank: BankSdk;
     staking: StakingSdk;
 };
-export declare const bluzelle: (options: SDKOptions) => Promise<BluzelleSdk>;
+export interface Bluzelle {
+    (options: SDKOptions): Promise<BluzelleSdk>;
+    newMnemonic: (entropy?: string) => string;
+}
+export declare const bluzelle: Bluzelle;
 //# sourceMappingURL=bz-sdk.d.ts.map

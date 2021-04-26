@@ -42,8 +42,9 @@ const txRpc = (options, communicationService, msgTypes) => {
                 typeUrl: `/${service}${method}`,
                 value: (msgTypes)[`Msg${method}`].decode(data)
             }, { gas_price: options.gasPrice, max_gas: options.maxGas })
-                .then(standardizeResponse)
-                .then(stdResp => (msgTypes)[`Msg${method}Response`].encode(stdResp));
+                .then(x => x);
+            //                .then(standardizeResponse)
+            //                .then(stdResp => (msgTypes)[`Msg${method}Response`].encode(stdResp))
         }
     });
 };

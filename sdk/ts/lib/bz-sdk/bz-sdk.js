@@ -34,6 +34,8 @@ const query_4 = require("../codec/cosmos/staking/v1beta1/query");
 const tx_4 = require("../codec/cosmos/staking/v1beta1/tx");
 const StakingMsgTypes = __importStar(require("../codec/cosmos/staking/v1beta1/tx"));
 const CommunicationService_1 = require("../client-lib/CommunicationService");
+const monet_1 = require("monet");
+const bip39_1 = require("bip39");
 const bluzelle = (options) => Promise.resolve(CommunicationService_1.newCommunicationService(options.url, options.mnemonic || ''))
     .then(cs => Promise.all([
     rpc_1.sdk(options, query_1.QueryClientImpl, tx_1.MsgClientImpl, CrudMsgTypes, cs),
@@ -41,8 +43,21 @@ const bluzelle = (options) => Promise.resolve(CommunicationService_1.newCommunic
     rpc_1.sdk(options, query_3.QueryClientImpl, tx_3.MsgClientImpl, BankMsgTypes, cs),
     rpc_1.sdk(options, query_4.QueryClientImpl, tx_4.MsgClientImpl, StakingMsgTypes, cs),
 ]))
-    .then(([db, nft, bank, staking]) => ({ db, nft, bank, staking }));
+    .then(([db, nft, bank, staking]) => ({
+    db,
+    nft,
+    bank,
+    staking,
+}));
 exports.bluzelle = bluzelle;
+exports.bluzelle.newMnemonic = newMnemonic;
+function newMnemonic(entropy = '') {
+    return monet_1.Right(entropy)
+        .flatMap(entropy => entropy.length === 0 || entropy.length === 64 ? monet_1.Right(entropy) : monet_1.Left(entropy))
+        .map(entropy => entropy ? bip39_1.entropyToMnemonic(entropy) : bip39_1.generateMnemonic(256))
+        .leftMap(() => console.log("Entropy must be 64 char hex"))
+        .cata(() => 'Invalid entropy', mnemonic => mnemonic);
+}
 // Promise.resolve(bluzelle({
 //     mnemonic: "focus ill drift swift blood bitter move grace ensure diamond year tongue hint weekend bulb rebel avoid gas dose print remove receive yellow shoot",
 //     url: "http://localhost:26657",

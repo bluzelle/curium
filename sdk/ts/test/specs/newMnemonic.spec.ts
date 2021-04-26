@@ -17,5 +17,5 @@ describe('newMnemonic()', () => {
         expect(a.split(' ')).to.have.length(24);
         expect(b.split(' ')).to.have.length(24);
         expect(a).to.not.equal(b);
-    })
-})
+    });
+});

@@ -134,8 +134,8 @@ func GetNftIDFromBytes(bz []byte) uint32 {
 	return binary.BigEndian.Uint32(bz)
 }
 
-func (k Keeper) StoreNftChunk(ctx sdk.Context, id uint32, chunk uint32, data []byte) {
+func (k Keeper) StoreNftChunk(ctx sdk.Context, id uint32, chunk uint32, data *[]byte) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.NftChunkKey))
 	key := append(GetNftIDBytes(id), GetNftIDBytes(chunk)...)
-	store.Set(key, data)
+	store.Set(key, *data)
 }
