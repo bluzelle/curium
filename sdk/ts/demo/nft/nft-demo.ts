@@ -1,5 +1,4 @@
 import {bluzelle} from "../../src/bz-sdk/bz-sdk";
-import {passThroughAwait} from "promise-passthrough";
 import {readFile} from "fs/promises";
 
 bluzelle({
