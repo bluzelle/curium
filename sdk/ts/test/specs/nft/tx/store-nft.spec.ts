@@ -107,10 +107,12 @@ describe("Store and retriving a NFT", () => {
                 .then(data => sdk.helpers.nft.uploadNft({
                     meta: '',
                     mime: 'image/tiff'
-                }, data, (num, size) => console.log(num, size)))
+                }, data, (num, size) => console.log(num, size))
+                    .then(({id}) => fetchData(id))
+                    .then(({body}) => expect(data.equals(body)).to.be.true)
+                );
         });
     });
-
 });
 
 const getLargePayload = memoize<() => Uint8Array>(() =>
@@ -124,6 +126,6 @@ const fetchData = (id: number) =>
     fetch(`http://localhost:1317/nft/data/${id}`)
         .then(x => x.arrayBuffer().then(buf => ({x, buf})))
         .then(resp => ({
-            body: resp.buf,
+            body: new Uint8Array(resp.buf),
             contentType: resp.x.headers.get('content-type')
         }))
