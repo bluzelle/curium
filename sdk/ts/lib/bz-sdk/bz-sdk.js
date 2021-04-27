@@ -36,6 +36,7 @@ const StakingMsgTypes = __importStar(require("../codec/cosmos/staking/v1beta1/tx
 const CommunicationService_1 = require("../client-lib/CommunicationService");
 const monet_1 = require("monet");
 const bip39_1 = require("bip39");
+const nft_helpers_1 = require("../helpers/nft-helpers");
 const bluzelle = (options) => Promise.resolve(CommunicationService_1.newCommunicationService(options.url, options.mnemonic || ''))
     .then(cs => Promise.all([
     rpc_1.sdk(options, query_1.QueryClientImpl, tx_1.MsgClientImpl, CrudMsgTypes, cs),
@@ -48,6 +49,9 @@ const bluzelle = (options) => Promise.resolve(CommunicationService_1.newCommunic
     nft,
     bank,
     staking,
+    helpers: {
+        nft: nft_helpers_1.nftHelpers(nft)
+    }
 }));
 exports.bluzelle = bluzelle;
 exports.bluzelle.newMnemonic = newMnemonic;

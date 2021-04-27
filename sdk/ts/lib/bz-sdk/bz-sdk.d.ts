@@ -7,6 +7,7 @@ import { QueryClientImpl as BankQueryClientImpl } from '../codec/cosmos/bank/v1b
 import { MsgClientImpl as BankMsgClientImpl } from '../codec/cosmos/bank/v1beta1/tx';
 import { QueryClientImpl as StakingQueryClientImpl } from '../codec/cosmos/staking/v1beta1/query';
 import { MsgClientImpl as StakingMsgClientImpl } from '../codec/cosmos/staking/v1beta1/tx';
+import { NftHelpers } from "../helpers/nft-helpers";
 export declare type DbSdk = SDK<CrudQueryClientImpl, CrudMsgClientImpl>;
 export declare type NftSdk = SDK<NftQueryClientImpl, NftMsgClientImpl>;
 export declare type BankSdk = SDK<BankQueryClientImpl, BankMsgClientImpl>;
@@ -16,6 +17,9 @@ export declare type BluzelleSdk = {
     nft: NftSdk;
     bank: BankSdk;
     staking: StakingSdk;
+    helpers: {
+        nft: NftHelpers;
+    };
 };
 export interface Bluzelle {
     (options: SDKOptions): Promise<BluzelleSdk>;

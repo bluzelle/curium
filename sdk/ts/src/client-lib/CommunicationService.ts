@@ -100,7 +100,7 @@ const sendMessages = (service: CommunicationService, queue: TransactionMessageQu
                 }
             )
             // hacky way to make sure that connections arrive at server in order
-            .then(() => delay(3000))
+            .then(() => delay(1000))
     });
 
 let chainId: string

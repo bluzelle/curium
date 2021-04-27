@@ -13,7 +13,15 @@ bluzelle({
                 mime: 'image/tiff',
                 meta: ''
             }, data, (chunk, size) => console.log(chunk, size)))
-            .then(({id}) => console.log(id))
+            .then(({id}) => console.log('tiff id:', id))
+
+            .then(() => readFile('/Users/scott/Desktop/temp.mp4'))
+            .then(data => bz.helpers.nft.uploadNft({
+                mime: 'video/mp4',
+                meta: ''
+            }, data, (chunk, size) => console.log(chunk, size)))
+            .then(({id}) => console.log('video id:', id))
     )
+
 
 

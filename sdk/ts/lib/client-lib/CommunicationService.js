@@ -68,7 +68,7 @@ const sendMessages = (service, queue, retrans = false) => new Promise((resolve, 
         }));
     })
         // hacky way to make sure that connections arrive at server in order
-        .then(() => delay_1.default(3000));
+        .then(() => delay_1.default(1000));
 });
 let chainId;
 const transmitTransaction = (service, messages, { memo }) => {
@@ -111,10 +111,6 @@ const getSequence = (service, cosmos) => (service.accountRequested ? (service.ac
     seq: service.seq,
     account: service.account
 }));
-const convertDataFromHexToString = (res) => ({
-    ...res,
-    data: res.data ? Buffer.from(res.data, 'hex').toString() : undefined
-});
 const checkErrors = (res) => {
     if (res.code > 0) {
         throw res.rawLog;
