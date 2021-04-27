@@ -19,12 +19,13 @@ import * as StakingMsgTypes from '../codec/cosmos/staking/v1beta1/tx'
 import {newCommunicationService} from "../client-lib/CommunicationService";
 import {Left, Right, Some} from "monet";
 import {entropyToMnemonic, generateMnemonic} from "bip39";
+import {nftHelpers, NftHelpers} from "../helpers/nft-helpers";
 
 export type DbSdk = SDK<CrudQueryClientImpl, CrudMsgClientImpl>
 export type NftSdk = SDK<NftQueryClientImpl, NftMsgClientImpl>
 export type BankSdk = SDK<BankQueryClientImpl, BankMsgClientImpl>
 export type StakingSdk = SDK<StakingQueryClientImpl, StakingMsgClientImpl>
-export type BluzelleSdk = { db: DbSdk, nft: NftSdk, bank: BankSdk, staking: StakingSdk }
+export type BluzelleSdk = { db: DbSdk, nft: NftSdk, bank: BankSdk, staking: StakingSdk, helpers: {nft: NftHelpers} }
 export interface Bluzelle {
     (options: SDKOptions): Promise<BluzelleSdk>,
     newMnemonic: (entropy?: string) => string
@@ -49,6 +50,9 @@ export const bluzelle: Bluzelle = (options: SDKOptions): Promise<BluzelleSdk> =>
             nft,
             bank,
             staking,
+            helpers: {
+                nft: nftHelpers(nft)
+            }
                }))
 
 bluzelle.newMnemonic = newMnemonic;

@@ -6,6 +6,7 @@ import {addMessageType} from "./Registry";
 import {DirectSecp256k1HdWallet} from "@cosmjs/proto-signing";
 import {memoize} from 'lodash'
 import {MessageResponse} from "../legacyAdapter/types/MessageResponse";
+import {NftHelpers, nftHelpers} from "../helpers/nft-helpers";
 
 export interface SDKOptions {
     mnemonic?: string,
@@ -32,7 +33,7 @@ export const sdk = <Q, M>(options: SDKOptions, qImpl: any, mImpl: any, msgTypes:
             q: new qImpl(queryRpc),
             tx: new mImpl(txRpc),
             address,
-            withTransaction: (fn: () => unknown, options: { memo: string }) => withTransaction(cs, fn, options)
+            withTransaction: (fn: () => unknown, options: { memo: string }) => withTransaction(cs, fn, options),
         } as SDK<Q, M>))
 };
 

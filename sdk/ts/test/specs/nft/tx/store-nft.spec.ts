@@ -4,7 +4,7 @@ import {BluzelleSdk} from "../../../../src/bz-sdk/bz-sdk";
 import {passThrough, passThroughAwait} from "promise-passthrough";
 global.fetch = require('node-fetch')
 import {memoize, times, chunk} from 'lodash'
-import {readFile} from "node:fs/promises";
+import {readFile} from "fs/promises";
 
 describe("Store and retriving a NFT", () => {
 
@@ -97,18 +97,20 @@ describe("Store and retriving a NFT", () => {
                     )))
                 )
                 .then(({id}) => fetchData(id))
-                .then(x => x);
-        })
-    })
+                .then(x => expect(x.body.byteLength).to.equal(100000000));
+        });
+    });
 
-    describe("real image", () => {
-        it('should upload a real image', () => {
-            readFile('./test.png')
-                .then(data => {
-                    data
-                })
-        })
-    })
+    describe('Helpers', () => {
+        it('should store a largish file', () => {
+            return readFile(`${__dirname}/test.tiff`)
+                .then(data => sdk.helpers.nft.uploadNft({
+                    meta: '',
+                    mime: 'image/tiff'
+                }, data, (num, size) => console.log(num, size)))
+        });
+    });
+
 });
 
 const getLargePayload = memoize<() => Uint8Array>(() =>
