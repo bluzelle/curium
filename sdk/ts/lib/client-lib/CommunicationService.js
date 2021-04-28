@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getClient = exports.sendMessage = exports.withTransaction = exports.newCommunicationService = exports.mnemonicToAddress = void 0;
+exports.testHook = exports.getClient = exports.sendMessage = exports.withTransaction = exports.newCommunicationService = exports.mnemonicToAddress = void 0;
 const monet_1 = require("monet");
 const lodash_1 = require("lodash");
 const delay_1 = __importDefault(require("delay"));
@@ -68,8 +68,12 @@ const sendMessages = (service, queue, retrans = false) => new Promise((resolve, 
         }));
     })
         // hacky way to make sure that connections arrive at server in order
-        .then(() => delay_1.default(3000));
+        .then(() => delay_1.default(getDelayBetweenRequests(JSON.stringify(queue.items).length, service.url)));
 });
+const getDelayBetweenRequests = (length, url) => monet_1.Right(length)
+    .flatMap(length => length < 500 ? monet_1.Left(200) : monet_1.Right(length))
+    .flatMap(length => /localhost/.test(url) ? monet_1.Left(1000) : monet_1.Left(3000))
+    .cata(t => t, () => 3000);
 let chainId;
 const transmitTransaction = (service, messages, { memo }) => {
     let cosmos;
@@ -139,4 +143,7 @@ const getClient = (service) => getSigner(service.mnemonic)
 }));
 exports.getClient = getClient;
 const getChainId = lodash_1.memoize((client) => client.getChainId());
+exports.testHook = {
+    getDelayBetweenRequests
+};
 //# sourceMappingURL=CommunicationService.js.map

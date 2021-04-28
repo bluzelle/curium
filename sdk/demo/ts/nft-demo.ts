@@ -1,6 +1,6 @@
-import {bluzelle} from "../../src/bz-sdk/bz-sdk";
+import {bluzelle} from "@bluzelle/sdk-js";
 import {readFile} from "fs/promises";
-import {localChain} from '../../test/config'
+import {localChain} from '../../ts/test/config'
 
 bluzelle({
     mnemonic:  localChain.mnemonic,
