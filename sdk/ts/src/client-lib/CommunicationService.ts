@@ -1,5 +1,5 @@
 import {GasInfo} from "../legacyAdapter/types/GasInfo";
-import {Some} from "monet";
+import {Left, Right, Some} from "monet";
 import {MessageResponse} from "../legacyAdapter/types/MessageResponse";
 import {Message} from "../legacyAdapter/types/Message";
 import {memoize} from 'lodash'
@@ -100,8 +100,15 @@ const sendMessages = (service: CommunicationService, queue: TransactionMessageQu
                 }
             )
             // hacky way to make sure that connections arrive at server in order
-            .then(() => delay(1000))
+            .then(() => delay(getDelayBetweenRequests(JSON.stringify(queue.items).length, service.url)))
     });
+
+const getDelayBetweenRequests = (length: number, url: string): number =>
+    Right<number, number>(length)
+        .flatMap(length => length < 500 ? Left(200) : Right(length))
+        .flatMap(length => /localhost/.test(url) ? Left(1000) : Left(3000))
+        .cata(t => t, () => 3000)
+
 
 let chainId: string
 const transmitTransaction = (service: CommunicationService, messages: MessageQueueItem<any>[], {memo}: { memo: string }): Promise<any> => {
@@ -214,3 +221,6 @@ export const getClient = (service: CommunicationService) =>
 const getChainId = memoize<(client: SigningStargateClient) => Promise<string>>((client) => client.getChainId())
 
 
+export const testHook = {
+    getDelayBetweenRequests
+}

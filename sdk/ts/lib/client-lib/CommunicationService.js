@@ -68,7 +68,7 @@ const sendMessages = (service, queue, retrans = false) => new Promise((resolve, 
         }));
     })
         // hacky way to make sure that connections arrive at server in order
-        .then(() => delay_1.default(1000));
+        .then(() => delay_1.default(3000));
 });
 let chainId;
 const transmitTransaction = (service, messages, { memo }) => {

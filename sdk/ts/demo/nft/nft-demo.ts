@@ -1,9 +1,10 @@
 import {bluzelle} from "../../src/bz-sdk/bz-sdk";
 import {readFile} from "fs/promises";
+import {localChain} from '../../test/config'
 
 bluzelle({
-    mnemonic:  "foam card blouse leaf convince scrub marble pencil camp hover food install waste aunt minute alarm gauge cabin garbage over kitten jealous draft miracle",
-    url: "http://localhost:26657",
+    mnemonic:  localChain.mnemonic,
+    url: localChain.endpoint,
     gasPrice: 0.002,
     maxGas: 100000000
 })
@@ -11,7 +12,7 @@ bluzelle({
         readFile("./test.tiff")
             .then(data => bz.helpers.nft.uploadNft({
                 mime: 'image/tiff',
-                meta: ''
+                meta: JSON.stringify({myMeta: 'something'})
             }, data, (chunk, size) => console.log(chunk, size)))
             .then(({id}) => console.log('tiff id:', id))
 
