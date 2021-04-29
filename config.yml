@@ -12,7 +12,7 @@ validator:
   staked: "100000000ubnt"
 init:
   app:
-    "minimum-gas-prices": "0.000000002"
+    "minimum-gas-prices": "0.002ubnt"
     "api.address": "tcp://0.0.0.0:1317"
   config:
     "consensus.timeout_propose": "3s"
