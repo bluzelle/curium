@@ -2,8 +2,6 @@ package ante
 
 import (
 	"fmt"
-	"strings"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
@@ -30,10 +28,12 @@ func NewSetUpContextDecorator() SetUpContextDecorator {
 	return SetUpContextDecorator{}
 }
 
+
+
 func (sud SetUpContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
 	// all transactions must implement GasTx
 	gasTx, ok := tx.(GasTx)
-	isFree := strings.Contains(tx.GetMsgs()[0].Type(), ".voting.") || strings.Contains(tx.GetMsgs()[0].Type(), ".nft.")
+	isFree := tx.GetMsgs()[0].Route() == "voting" || tx.GetMsgs()[0].Route() == "nft"
 
 	if !ok {
 		// Set a gas meter with limit 0 as to prevent an infinite gas meter attack
@@ -72,9 +72,6 @@ func SetGasMeter(simulate bool, isFree bool, ctx sdk.Context, gasLimit uint64) s
 	// In various cases such as simulation and during the genesis block, we do not
 	// meter any gas utilization.
 	if simulate || ctx.BlockHeight() == 0 {
-		if isFree {
-			return ctx.WithGasMeter(NewFreeGasMeter(0))
-		}
 		return ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 	}
 
