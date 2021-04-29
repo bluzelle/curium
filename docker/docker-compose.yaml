@@ -2,15 +2,14 @@ version: "3.4"
 
 services:
   curium:
-    network_mode: host
     container_name: curium
     build: .
 #    expose:
 #      - "1317"
 #      - "9090"
 #      - "26657"
-#    ports:
-#      - "1317:1317"
-#      - "9090:9090"
-#      - "26657:26657"
+    ports:
+      - "1317:1317"
+      - "9090:9090"
+      - "26657:26657"
 

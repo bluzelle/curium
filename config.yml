@@ -10,21 +10,19 @@ accounts:
 validator:
   name: vuser
   staked: "100000000ubnt"
-#client:
-#  vuex:
-#    path: "vue/src/store"
-#faucet:
-#  name: bob
-#  coins: ["5000ubnt"]
 init:
+  app:
+    "minimum-gas-prices": "0.000000002"
+    "api.address": "tcp://0.0.0.0:1317"
   config:
     "consensus.timeout_propose": "3s"
     "consensus.timeout_commit": "5s"
     "p2p.addr_book_strict": false
     "p2p.max_num_inbound_peers": 100
     "p2p.max_num_outbound_peers": 100
-    "p2p.max_packet_msg_payload_size": 1048576
-    "p2p.seeds": "db5e2a825ff72400f79d1970d29e0002e556e909@65.1.253.90:26656"
+    "p2p.laddr": "tcp://0.0.0.0:26656"
+    "rpc.max_subscriptions_per_client": 20
+    "rpc.laddr": "tcp://0.0.0.0:26657"
 genesis:
   app_state:
     staking:

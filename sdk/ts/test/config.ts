@@ -4,7 +4,7 @@ interface Config {
 }
 
 export const localChain: Config = {
-    mnemonic:  "walnut message kitten actor onion loud already visual goddess embody joke spin bread orient proof ice snack damp image odor buyer extend mixture focus",
+    mnemonic:  "frog boring pony crime smooth blast patch elbow aspect elegant scout profit chunk rain aim stumble advance sting pond feel common length accuse combine",
     endpoint: "http://localhost:26657"
 }
 

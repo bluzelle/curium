@@ -106,7 +106,7 @@ const sendMessages = (service: CommunicationService, queue: TransactionMessageQu
 const getDelayBetweenRequests = (length: number, url: string): number =>
     Right<number, number>(length)
         .flatMap(length => length < 500 ? Left(200) : Right(length))
-        .flatMap(length => /localhost/.test(url) ? Left(1000) : Left(3000))
+        .flatMap(length => /localhost/.test(url) ? Left(500) : Left(500))
         .cata(t => t, () => 3000)
 
 
