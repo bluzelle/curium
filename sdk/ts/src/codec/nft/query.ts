@@ -11,7 +11,7 @@ export const protobufPackage = "bluzelle.curium.nft";
 
 /** this line is used by starport scaffolding # 3 */
 export interface QueryGetNftRequest {
-  id: number;
+  id: string;
 }
 
 export interface QueryGetNftResponse {
@@ -27,15 +27,15 @@ export interface QueryAllNftResponse {
   pagination?: PageResponse;
 }
 
-const baseQueryGetNftRequest: object = { id: 0 };
+const baseQueryGetNftRequest: object = { id: "" };
 
 export const QueryGetNftRequest = {
   encode(
     message: QueryGetNftRequest,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.id !== 0) {
-      writer.uint32(8).uint32(message.id);
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
     }
     return writer;
   },
@@ -48,7 +48,7 @@ export const QueryGetNftRequest = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.id = reader.uint32();
+          message.id = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -61,9 +61,9 @@ export const QueryGetNftRequest = {
   fromJSON(object: any): QueryGetNftRequest {
     const message = { ...baseQueryGetNftRequest } as QueryGetNftRequest;
     if (object.id !== undefined && object.id !== null) {
-      message.id = Number(object.id);
+      message.id = String(object.id);
     } else {
-      message.id = 0;
+      message.id = "";
     }
     return message;
   },
@@ -79,7 +79,7 @@ export const QueryGetNftRequest = {
     if (object.id !== undefined && object.id !== null) {
       message.id = object.id;
     } else {
-      message.id = 0;
+      message.id = "";
     }
     return message;
   },

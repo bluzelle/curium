@@ -19,6 +19,7 @@ export interface SDK<Q, M> {
     q: Q,
     tx: M,
     address: string,
+    url: string,
     withTransaction: (fn: () => unknown, options: {memo: string}) => unknown
 };
 
@@ -33,6 +34,7 @@ export const sdk = <Q, M>(options: SDKOptions, qImpl: any, mImpl: any, msgTypes:
             q: new qImpl(queryRpc),
             tx: new mImpl(txRpc),
             address,
+            url: options.url,
             withTransaction: (fn: () => unknown, options: { memo: string }) => withTransaction(cs, fn, options),
         } as SDK<Q, M>))
 };

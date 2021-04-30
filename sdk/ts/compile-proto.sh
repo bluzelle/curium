@@ -55,7 +55,6 @@ protoc \
   "../../proto/crud/query.proto" \
   "../../proto/nft/tx.proto" \
   "../../proto/nft/query.proto" \
-  "../../proto/nft/nftUploadRequest.proto" \
   "./proto/gogoproto/gogo.proto" \
   "./proto/tendermint/types/types.proto" \
   "./proto/tendermint/types/validator.proto" \

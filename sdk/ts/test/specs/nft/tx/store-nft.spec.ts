@@ -5,6 +5,7 @@ import {passThrough, passThroughAwait} from "promise-passthrough";
 global.fetch = require('node-fetch')
 import {memoize, times, chunk} from 'lodash'
 import {readFile} from "fs/promises";
+import {createHash} from 'crypto'
 
 describe("Store and retriving a NFT", () => {
 
@@ -13,10 +14,14 @@ describe("Store and retriving a NFT", () => {
 
     describe('CreateNft()', () => {
         it('should store a nft record', () => {
+            const hash = createHash("sha256")
+                .update("my-nft")
+                .digest("hex");
             return sdk.nft.tx.CreateNft({
                 creator: sdk.nft.address,
                 meta: 'my-meta',
                 mime: 'image/xxx',
+                id: hash
             })
                 .then(({id}) => sdk.nft.q.Nft({id}))
                 .then(({Nft}) => {
@@ -29,10 +34,17 @@ describe("Store and retriving a NFT", () => {
 
     describe('UpdateNft()', () => {
         it('should update the nft data', () => {
+            const hash = createHash("sha256")
+                .update("my-nft")
+                .digest("hex")
+
+
+
             return sdk.nft.tx.CreateNft({
                 creator: sdk.nft.address,
                 meta: 'my-meta',
-                mime: 'my-mime'
+                mime: 'my-mime',
+                id: hash
             })
                 .then(passThroughAwait(({id}) =>
                     sdk.nft.tx.UpdateNft({
@@ -52,65 +64,15 @@ describe("Store and retriving a NFT", () => {
         })
     })
 
-    describe('Chunk()', () => {
-        it('should store nft chunks', () => {
-            return sdk.nft.tx.CreateNft({
-                creator: sdk.nft.address,
-                meta: 'my-meta',
-                mime: 'my/mime'
-            })
-                .then(passThroughAwait(({id}) =>
-                    Promise.all([
-                        sdk.nft.tx.Chunk({id: id, chunk: 0, data: new TextEncoder().encode('chunk0'), creator: sdk.nft.address}),
-                        sdk.nft.tx.Chunk({id: id, chunk: 1, data: new TextEncoder().encode('chunk1'), creator: sdk.nft.address}),
-                        sdk.nft.tx.Chunk({id: id, chunk: 2, data: new TextEncoder().encode('chunk2'), creator: sdk.nft.address}),
-                    ])
-                ))
-                .then(({id}) =>
-                    fetch(`http://localhost:1317/nft/data/${id}`)
-                )
-                .then(passThrough(x =>
-                    expect(x.headers.get('content-type')).to.equal('my/mime')
-                ))
-                .then(x => x.text())
-                .then(x => {
-                    expect(x).to.equal('chunk0chunk1chunk2')
-                })
-        });
-    });
-
-    describe('High load', () => {
-        it('should be able to store 100mb', () => {
-            return sdk.nft.tx.CreateNft({
-                creator: sdk.nft.address,
-                meta: 'my-meta',
-                mime: 'my/mime'
-            })
-                .then(passThroughAwait(({id}) =>
-                    Promise.all(times(200).map((chunk) =>
-                        sdk.nft.tx.Chunk({
-                            creator: sdk.nft.address,
-                            id,
-                            chunk,
-                            data: getLargePayload()
-                        }).then(() => console.log('chunk', chunk))
-                    )))
-                )
-                .then(({id}) => fetchData(id))
-                .then(x => expect(x.body.byteLength).to.equal(100000000));
-        });
-    });
-
     describe('Helpers', () => {
         it('should store a largish file', () => {
-            return readFile(`${__dirname}/test.tiff`)
-                .then(data => sdk.helpers.nft.uploadNft({
+
+            return sdk.helpers.nft.uploadNft({
                     meta: '',
                     mime: 'image/tiff'
-                }, data, (num, size) => console.log(num, size))
+                }, getLargePayload())
                     .then(({id}) => fetchData(id))
-                    .then(({body}) => expect(data.equals(body)).to.be.true)
-                );
+                    .then(({body}) => expect(body).to.deep.equal(getLargePayload()))
         });
     });
 });
@@ -122,7 +84,7 @@ const getLargePayload = memoize<() => Uint8Array>(() =>
     }, new Uint8Array(1000 * 500))
 );
 
-const fetchData = (id: number) =>
+const fetchData = (id: string) =>
     fetch(`http://localhost:1317/nft/data/${id}`)
         .then(x => x.arrayBuffer().then(buf => ({x, buf})))
         .then(resp => ({

@@ -2,8 +2,9 @@ import {MsgCreateNft, MsgCreateNftResponse} from "../codec/nft/tx";
 import {BluzelleSdk, NftSdk} from "../bz-sdk/bz-sdk";
 import {passThroughAwait} from "promise-passthrough";
 import {chunk} from 'lodash'
+import {createHash} from "crypto";
 
-export type UploadNFTParams = Omit<MsgCreateNft, "creator">
+export type UploadNFTParams = Omit<MsgCreateNft, "creator" | "id">
 export type ChunkCallback = (chunk: number, length: number) => unknown
 
 export interface NftHelpers {
@@ -14,24 +15,20 @@ export const nftHelpers = (sdk: NftSdk) => ({
     uploadNft: uploadNft(sdk)
 })
 
-const uploadNft = (nft: NftSdk) => (params: UploadNFTParams, data: Uint8Array, cb?: ChunkCallback) => {
-    return nft.tx.CreateNft({
-        creator: nft.address,
-        ...params
+const uploadNft = (nft: NftSdk) => (params: UploadNFTParams, data: Uint8Array): Promise<MsgCreateNftResponse> => {
+    const hash = createHash("sha256")
+        .update("my-nft")
+        .digest("hex")
+    return fetch(nft.url, {
+        method: 'POST',
+        body: data,
+        mode: 'cors'
     })
-        .then(passThroughAwait(({id}) =>
-            Promise.all(chunk(data, 500000).map((chunk, idx) => {
-                    return nft.tx.Chunk({
-                        creator: nft.address,
-                        id,
-                        chunk: idx,
-                        data: new Uint8Array(chunk)
-                    })
-                        .then(() => cb && cb(idx, chunk.length))
-                }
-            ))
-
-        ))
+        .then(() => nft.tx.CreateNft({
+            id: hash,
+            creator: nft.address,
+            ...params
+        }))
 };
 
 

@@ -5,28 +5,20 @@ import _m0 from "protobufjs/minimal";
 export const protobufPackage = "bluzelle.curium.nft";
 
 /** this line is used by starport scaffolding # proto/tx/message */
-export interface MsgChunk {
-  creator: string;
-  id: number;
-  chunk: number;
-  data: Uint8Array;
-}
-
-export interface MsgChunkResponse {}
-
 export interface MsgCreateNft {
   creator: string;
   mime: string;
   meta: string;
+  id: string;
 }
 
 export interface MsgCreateNftResponse {
-  id: number;
+  id: string;
 }
 
 export interface MsgUpdateNft {
   creator: string;
-  id: number;
+  id: string;
   mime: string;
   meta: string;
 }
@@ -35,165 +27,12 @@ export interface MsgUpdateNftResponse {}
 
 export interface MsgDeleteNft {
   creator: string;
-  id: number;
+  id: string;
 }
 
 export interface MsgDeleteNftResponse {}
 
-const baseMsgChunk: object = { creator: "", id: 0, chunk: 0 };
-
-export const MsgChunk = {
-  encode(
-    message: MsgChunk,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    if (message.creator !== "") {
-      writer.uint32(10).string(message.creator);
-    }
-    if (message.id !== 0) {
-      writer.uint32(16).uint32(message.id);
-    }
-    if (message.chunk !== 0) {
-      writer.uint32(24).uint32(message.chunk);
-    }
-    if (message.data.length !== 0) {
-      writer.uint32(34).bytes(message.data);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgChunk {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseMsgChunk } as MsgChunk;
-    message.data = new Uint8Array();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.creator = reader.string();
-          break;
-        case 2:
-          message.id = reader.uint32();
-          break;
-        case 3:
-          message.chunk = reader.uint32();
-          break;
-        case 4:
-          message.data = reader.bytes();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): MsgChunk {
-    const message = { ...baseMsgChunk } as MsgChunk;
-    message.data = new Uint8Array();
-    if (object.creator !== undefined && object.creator !== null) {
-      message.creator = String(object.creator);
-    } else {
-      message.creator = "";
-    }
-    if (object.id !== undefined && object.id !== null) {
-      message.id = Number(object.id);
-    } else {
-      message.id = 0;
-    }
-    if (object.chunk !== undefined && object.chunk !== null) {
-      message.chunk = Number(object.chunk);
-    } else {
-      message.chunk = 0;
-    }
-    if (object.data !== undefined && object.data !== null) {
-      message.data = bytesFromBase64(object.data);
-    }
-    return message;
-  },
-
-  toJSON(message: MsgChunk): unknown {
-    const obj: any = {};
-    message.creator !== undefined && (obj.creator = message.creator);
-    message.id !== undefined && (obj.id = message.id);
-    message.chunk !== undefined && (obj.chunk = message.chunk);
-    message.data !== undefined &&
-      (obj.data = base64FromBytes(
-        message.data !== undefined ? message.data : new Uint8Array()
-      ));
-    return obj;
-  },
-
-  fromPartial(object: DeepPartial<MsgChunk>): MsgChunk {
-    const message = { ...baseMsgChunk } as MsgChunk;
-    if (object.creator !== undefined && object.creator !== null) {
-      message.creator = object.creator;
-    } else {
-      message.creator = "";
-    }
-    if (object.id !== undefined && object.id !== null) {
-      message.id = object.id;
-    } else {
-      message.id = 0;
-    }
-    if (object.chunk !== undefined && object.chunk !== null) {
-      message.chunk = object.chunk;
-    } else {
-      message.chunk = 0;
-    }
-    if (object.data !== undefined && object.data !== null) {
-      message.data = object.data;
-    } else {
-      message.data = new Uint8Array();
-    }
-    return message;
-  },
-};
-
-const baseMsgChunkResponse: object = {};
-
-export const MsgChunkResponse = {
-  encode(
-    _: MsgChunkResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgChunkResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseMsgChunkResponse } as MsgChunkResponse;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(_: any): MsgChunkResponse {
-    const message = { ...baseMsgChunkResponse } as MsgChunkResponse;
-    return message;
-  },
-
-  toJSON(_: MsgChunkResponse): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  fromPartial(_: DeepPartial<MsgChunkResponse>): MsgChunkResponse {
-    const message = { ...baseMsgChunkResponse } as MsgChunkResponse;
-    return message;
-  },
-};
-
-const baseMsgCreateNft: object = { creator: "", mime: "", meta: "" };
+const baseMsgCreateNft: object = { creator: "", mime: "", meta: "", id: "" };
 
 export const MsgCreateNft = {
   encode(
@@ -208,6 +47,9 @@ export const MsgCreateNft = {
     }
     if (message.meta !== "") {
       writer.uint32(26).string(message.meta);
+    }
+    if (message.id !== "") {
+      writer.uint32(34).string(message.id);
     }
     return writer;
   },
@@ -227,6 +69,9 @@ export const MsgCreateNft = {
           break;
         case 3:
           message.meta = reader.string();
+          break;
+        case 4:
+          message.id = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -253,6 +98,11 @@ export const MsgCreateNft = {
     } else {
       message.meta = "";
     }
+    if (object.id !== undefined && object.id !== null) {
+      message.id = String(object.id);
+    } else {
+      message.id = "";
+    }
     return message;
   },
 
@@ -261,6 +111,7 @@ export const MsgCreateNft = {
     message.creator !== undefined && (obj.creator = message.creator);
     message.mime !== undefined && (obj.mime = message.mime);
     message.meta !== undefined && (obj.meta = message.meta);
+    message.id !== undefined && (obj.id = message.id);
     return obj;
   },
 
@@ -281,19 +132,24 @@ export const MsgCreateNft = {
     } else {
       message.meta = "";
     }
+    if (object.id !== undefined && object.id !== null) {
+      message.id = object.id;
+    } else {
+      message.id = "";
+    }
     return message;
   },
 };
 
-const baseMsgCreateNftResponse: object = { id: 0 };
+const baseMsgCreateNftResponse: object = { id: "" };
 
 export const MsgCreateNftResponse = {
   encode(
     message: MsgCreateNftResponse,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.id !== 0) {
-      writer.uint32(8).uint32(message.id);
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
     }
     return writer;
   },
@@ -309,7 +165,7 @@ export const MsgCreateNftResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.id = reader.uint32();
+          message.id = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -322,9 +178,9 @@ export const MsgCreateNftResponse = {
   fromJSON(object: any): MsgCreateNftResponse {
     const message = { ...baseMsgCreateNftResponse } as MsgCreateNftResponse;
     if (object.id !== undefined && object.id !== null) {
-      message.id = Number(object.id);
+      message.id = String(object.id);
     } else {
-      message.id = 0;
+      message.id = "";
     }
     return message;
   },
@@ -340,13 +196,13 @@ export const MsgCreateNftResponse = {
     if (object.id !== undefined && object.id !== null) {
       message.id = object.id;
     } else {
-      message.id = 0;
+      message.id = "";
     }
     return message;
   },
 };
 
-const baseMsgUpdateNft: object = { creator: "", id: 0, mime: "", meta: "" };
+const baseMsgUpdateNft: object = { creator: "", id: "", mime: "", meta: "" };
 
 export const MsgUpdateNft = {
   encode(
@@ -356,8 +212,8 @@ export const MsgUpdateNft = {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
-    if (message.id !== 0) {
-      writer.uint32(16).uint32(message.id);
+    if (message.id !== "") {
+      writer.uint32(18).string(message.id);
     }
     if (message.mime !== "") {
       writer.uint32(26).string(message.mime);
@@ -379,7 +235,7 @@ export const MsgUpdateNft = {
           message.creator = reader.string();
           break;
         case 2:
-          message.id = reader.uint32();
+          message.id = reader.string();
           break;
         case 3:
           message.mime = reader.string();
@@ -403,9 +259,9 @@ export const MsgUpdateNft = {
       message.creator = "";
     }
     if (object.id !== undefined && object.id !== null) {
-      message.id = Number(object.id);
+      message.id = String(object.id);
     } else {
-      message.id = 0;
+      message.id = "";
     }
     if (object.mime !== undefined && object.mime !== null) {
       message.mime = String(object.mime);
@@ -439,7 +295,7 @@ export const MsgUpdateNft = {
     if (object.id !== undefined && object.id !== null) {
       message.id = object.id;
     } else {
-      message.id = 0;
+      message.id = "";
     }
     if (object.mime !== undefined && object.mime !== null) {
       message.mime = object.mime;
@@ -499,7 +355,7 @@ export const MsgUpdateNftResponse = {
   },
 };
 
-const baseMsgDeleteNft: object = { creator: "", id: 0 };
+const baseMsgDeleteNft: object = { creator: "", id: "" };
 
 export const MsgDeleteNft = {
   encode(
@@ -509,8 +365,8 @@ export const MsgDeleteNft = {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
-    if (message.id !== 0) {
-      writer.uint32(16).uint32(message.id);
+    if (message.id !== "") {
+      writer.uint32(18).string(message.id);
     }
     return writer;
   },
@@ -526,7 +382,7 @@ export const MsgDeleteNft = {
           message.creator = reader.string();
           break;
         case 2:
-          message.id = reader.uint32();
+          message.id = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -544,9 +400,9 @@ export const MsgDeleteNft = {
       message.creator = "";
     }
     if (object.id !== undefined && object.id !== null) {
-      message.id = Number(object.id);
+      message.id = String(object.id);
     } else {
-      message.id = 0;
+      message.id = "";
     }
     return message;
   },
@@ -568,7 +424,7 @@ export const MsgDeleteNft = {
     if (object.id !== undefined && object.id !== null) {
       message.id = object.id;
     } else {
-      message.id = 0;
+      message.id = "";
     }
     return message;
   },
@@ -621,7 +477,6 @@ export const MsgDeleteNftResponse = {
 /** Msg defines the Msg service. */
 export interface Msg {
   /** this line is used by starport scaffolding # proto/tx/rpc */
-  Chunk(request: MsgChunk): Promise<MsgChunkResponse>;
   CreateNft(request: MsgCreateNft): Promise<MsgCreateNftResponse>;
   UpdateNft(request: MsgUpdateNft): Promise<MsgUpdateNftResponse>;
   DeleteNft(request: MsgDeleteNft): Promise<MsgDeleteNftResponse>;
@@ -632,14 +487,6 @@ export class MsgClientImpl implements Msg {
   constructor(rpc: Rpc) {
     this.rpc = rpc;
   }
-  Chunk(request: MsgChunk): Promise<MsgChunkResponse> {
-    const data = MsgChunk.encode(request).finish();
-    const promise = this.rpc.request("bluzelle.curium.nft.Msg", "Chunk", data);
-    return promise.then((data) =>
-      MsgChunkResponse.decode(new _m0.Reader(data))
-    );
-  }
-
   CreateNft(request: MsgCreateNft): Promise<MsgCreateNftResponse> {
     const data = MsgCreateNft.encode(request).finish();
     const promise = this.rpc.request(
@@ -683,39 +530,6 @@ interface Rpc {
     method: string,
     data: Uint8Array
   ): Promise<Uint8Array>;
-}
-
-declare var self: any | undefined;
-declare var window: any | undefined;
-var globalThis: any = (() => {
-  if (typeof globalThis !== "undefined") return globalThis;
-  if (typeof self !== "undefined") return self;
-  if (typeof window !== "undefined") return window;
-  if (typeof global !== "undefined") return global;
-  throw "Unable to locate global object";
-})();
-
-const atob: (b64: string) => string =
-  globalThis.atob ||
-  ((b64) => globalThis.Buffer.from(b64, "base64").toString("binary"));
-function bytesFromBase64(b64: string): Uint8Array {
-  const bin = atob(b64);
-  const arr = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; ++i) {
-    arr[i] = bin.charCodeAt(i);
-  }
-  return arr;
-}
-
-const btoa: (bin: string) => string =
-  globalThis.btoa ||
-  ((bin) => globalThis.Buffer.from(bin, "binary").toString("base64"));
-function base64FromBytes(arr: Uint8Array): string {
-  const bin: string[] = [];
-  for (let i = 0; i < arr.byteLength; ++i) {
-    bin.push(String.fromCharCode(arr[i]));
-  }
-  return btoa(bin.join(""));
 }
 
 type Builtin =
