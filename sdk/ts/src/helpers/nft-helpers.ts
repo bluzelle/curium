@@ -19,7 +19,7 @@ const uploadNft = (nft: NftSdk) => (params: UploadNFTParams, data: Uint8Array): 
     const hash = createHash("sha256")
         .update("my-nft")
         .digest("hex")
-    return fetch(nft.url, {
+    return fetch(`${nft.url.replace('26657', '1317')}/nft/upload/${hash}`, {
         method: 'POST',
         body: data,
         mode: 'cors'

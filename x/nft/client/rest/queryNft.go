@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -23,29 +22,6 @@ func listNftHandler(clientCtx client.Context) http.HandlerFunc {
 		rest.PostProcessResponse(w, clientCtx, res)
 	}
 }
-
-func getNftDataHandler(clientCtx client.Context) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		id := mux.Vars(r)["id"]
-
-		data, _, err := clientCtx.QueryWithData(fmt.Sprintf("custom/%s/get-nft-data/%s", types.QuerierRoute, id), nil)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
-			return
-		}
-		nftBytes, _, err := clientCtx.QueryWithData(fmt.Sprintf("custom/%s/get-nft/%s", types.QuerierRoute, id), nil)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
-			return
-		}
-		var nft map[string]interface{}
-
-		json.Unmarshal(nftBytes, &nft)
-		w.Header().Set("content-type", nft["mime"].(string))
-		w.Write(data)
-	}
-}
-
 
 func getNftHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

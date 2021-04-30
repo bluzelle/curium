@@ -65,8 +65,7 @@ describe("Store and retriving a NFT", () => {
     })
 
     describe('Helpers', () => {
-        it('should store a largish file', () => {
-
+        it('should store a 100MB file', () => {
             return sdk.helpers.nft.uploadNft({
                     meta: '',
                     mime: 'image/tiff'
@@ -78,10 +77,10 @@ describe("Store and retriving a NFT", () => {
 });
 
 const getLargePayload = memoize<() => Uint8Array>(() =>
-    times(1000 * 500).reduce((arr, n, idx) => {
+    times(100 * 1024 * 1024).reduce((arr, n, idx) => {
         arr.set([n % 256], idx)
         return arr
-    }, new Uint8Array(1000 * 500))
+    }, new Uint8Array(100 * 1024 * 1024))
 );
 
 const fetchData = (id: string) =>

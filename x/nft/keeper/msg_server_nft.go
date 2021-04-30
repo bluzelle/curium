@@ -3,10 +3,10 @@ package keeper
 import (
 	"context"
 	"fmt"
-
 	"github.com/bluzelle/curium/x/nft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"os"
 )
 
 func (k msgServer) CreateNft(goCtx context.Context, msg *types.MsgCreateNft) (*types.MsgCreateNftResponse, error) {
@@ -19,6 +19,9 @@ func (k msgServer) CreateNft(goCtx context.Context, msg *types.MsgCreateNft) (*t
 		msg.Mime,
 		msg.Id,
 	)
+
+	os.MkdirAll(k.homeDir + "/nft", os.ModePerm)
+	os.Rename(k.homeDir + "/nft-upload/" + msg.Id, k.homeDir + "/nft/" + msg.Id)
 
 	return &types.MsgCreateNftResponse{
 		Id: msg.Id,
