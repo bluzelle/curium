@@ -17,6 +17,11 @@ func getNftDataHandler(clientCtx client.Context) http.HandlerFunc {
 		id := mux.Vars(r)["id"]
 
 		nftBytes, _, err := clientCtx.QueryWithData(fmt.Sprintf("custom/%s/get-nft/%s", types.QuerierRoute, id), nil)
+		if _, err := os.Stat("/path/to/whatever"); os.IsNotExist(err) {
+			rest.WriteErrorResponse(w, http.StatusNotFound, "File does not exist")
+			return
+		}
+
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return

@@ -17,7 +17,7 @@ export const nftHelpers = (sdk: NftSdk) => ({
 
 const uploadNft = (nft: NftSdk) => (params: UploadNFTParams, data: Uint8Array): Promise<MsgCreateNftResponse> => {
     const hash = createHash("sha256")
-        .update("my-nft")
+        .update(data)
         .digest("hex")
     return fetch(`${nft.url.replace('26657', '1317')}/nft/upload/${hash}`, {
         method: 'POST',

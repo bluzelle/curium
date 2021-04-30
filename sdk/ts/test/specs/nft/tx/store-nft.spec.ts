@@ -2,10 +2,12 @@ import {expect} from 'chai'
 import {getSdk} from "../../../helpers/client-helpers/sdk-helpers";
 import {BluzelleSdk} from "../../../../src/bz-sdk/bz-sdk";
 import {passThrough, passThroughAwait} from "promise-passthrough";
+
 global.fetch = require('node-fetch')
 import {memoize, times, chunk} from 'lodash'
 import {readFile} from "fs/promises";
 import {createHash} from 'crypto'
+import {Some} from "monet";
 
 describe("Store and retriving a NFT", () => {
 
@@ -39,7 +41,6 @@ describe("Store and retriving a NFT", () => {
                 .digest("hex")
 
 
-
             return sdk.nft.tx.CreateNft({
                 creator: sdk.nft.address,
                 meta: 'my-meta',
@@ -67,21 +68,31 @@ describe("Store and retriving a NFT", () => {
     describe('Helpers', () => {
         it('should store a 100MB file', () => {
             return sdk.helpers.nft.uploadNft({
-                    meta: '',
-                    mime: 'image/tiff'
-                }, getLargePayload())
-                    .then(({id}) => fetchData(id))
-                    .then(({body}) => expect(body).to.deep.equal(getLargePayload()))
+                meta: '',
+                mime: 'image/tiff'
+            }, getLargePayload(100))
+                .then(({id}) => fetchData(id))
+                .then(({body}) => expect(body).to.deep.equal(getLargePayload(100)))
         });
+
+        it('should store parallel files', () => {
+            const files = times(10).map(size => getLargePayload(size * 10 + 1));
+            return Promise.all(files.map(file =>
+                sdk.helpers.nft.uploadNft({
+                    meta: '',
+                    mime: 'my/file'
+                }, file)
+                    .then(({id}) => fetchData(id))
+                    .then(({body}) => expect(body).to.deep.equal(file))
+            ))
+        })
     });
+
 });
 
-const getLargePayload = memoize<() => Uint8Array>(() =>
-    times(100 * 1024 * 1024).reduce((arr, n, idx) => {
-        arr.set([n % 256], idx)
-        return arr
-    }, new Uint8Array(100 * 1024 * 1024))
-);
+const getLargePayload = memoize<(length: number) => Uint8Array>((length) => {
+    return new Uint8Array(length * 1024 * 1024).map((v, idx) => idx % 256)
+});
 
 const fetchData = (id: string) =>
     fetch(`http://localhost:1317/nft/data/${id}`)
