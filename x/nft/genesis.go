@@ -15,8 +15,6 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		k.SetNft(ctx, *elem)
 	}
 
-	// Set nft count
-	k.SetNftCount(ctx, uint32(len(genState.NftList)))
 
 	// this line is used by starport scaffolding # ibc/genesis/init
 }

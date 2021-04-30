@@ -55,6 +55,7 @@ protoc \
   "../../proto/crud/query.proto" \
   "../../proto/nft/tx.proto" \
   "../../proto/nft/query.proto" \
+  "../../proto/nft/nftUploadRequest.proto" \
   "./proto/gogoproto/gogo.proto" \
   "./proto/tendermint/types/types.proto" \
   "./proto/tendermint/types/validator.proto" \
@@ -68,5 +69,5 @@ protoc \
   "./proto/cosmos/bank/v1beta1/tx.proto" \
   "./proto/cosmos/staking/v1beta1/staking.proto" \
   "./proto/cosmos/staking/v1beta1/query.proto" \
-  "./proto/cosmos/staking/v1beta1/tx.proto" \
+  "./proto/cosmos/staking/v1beta1/tx.proto"
 

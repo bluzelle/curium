@@ -16,7 +16,12 @@ func RegisterRoutes(clientCtx client.Context, r *mux.Router) {
 	// this line is used by starport scaffolding # 2
 	registerQueryRoutes(clientCtx, r)
 	registerTxHandlers(clientCtx, r)
+	registerUploadHandlers(clientCtx, r)
 
+}
+
+func registerUploadHandlers(clientCtx client.Context, r *mux.Router) {
+	r.HandleFunc("/nft/upload/{hash}", uploadNftHandler(clientCtx)).Methods("POST")
 }
 
 func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {

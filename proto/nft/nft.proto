@@ -3,11 +3,10 @@ package bluzelle.curium.nft;
 
 option go_package = "github.com/bluzelle/curium/x/nft/types";
 
-//import "gogoproto/gogo.proto";
-
 message Nft {
   string creator = 1;
-  uint32 id = 2;
+  string id = 2;
   string mime = 3;
   string meta = 4;
 }
+

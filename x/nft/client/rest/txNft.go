@@ -2,7 +2,6 @@ package rest
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/bluzelle/curium/x/nft/types"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -62,10 +61,7 @@ type updateNftRequest struct {
 
 func updateNftHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.ParseUint(mux.Vars(r)["id"], 10, 32)
-		if err != nil {
-			return
-		}
+		id := mux.Vars(r)["id"]
 
 		var req updateNftRequest
 		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
@@ -78,7 +74,7 @@ func updateNftHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		_, err = sdk.AccAddressFromBech32(req.Creator)
+		_, err := sdk.AccAddressFromBech32(req.Creator)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -90,7 +86,7 @@ func updateNftHandler(clientCtx client.Context) http.HandlerFunc {
 
 		msg := types.NewMsgUpdateNft(
 			req.Creator,
-			uint32(id),
+			id,
 			parsedMeta,
 		)
 
@@ -105,10 +101,7 @@ type deleteNftRequest struct {
 
 func deleteNftHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.ParseUint(mux.Vars(r)["id"], 10, 32)
-		if err != nil {
-			return
-		}
+		id := mux.Vars(r)["id"]
 
 		var req deleteNftRequest
 		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
@@ -121,7 +114,7 @@ func deleteNftHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		_, err = sdk.AccAddressFromBech32(req.Creator)
+		_, err := sdk.AccAddressFromBech32(req.Creator)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -129,7 +122,7 @@ func deleteNftHandler(clientCtx client.Context) http.HandlerFunc {
 
 		msg := types.NewMsgDeleteNft(
 			req.Creator,
-			uint32(id),
+			id,
 		)
 
 		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)

@@ -12,15 +12,16 @@ import (
 func (k msgServer) CreateNft(goCtx context.Context, msg *types.MsgCreateNft) (*types.MsgCreateNftResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	id := k.AppendNft(
+	k.AppendNft(
 		ctx,
 		msg.Creator,
 		msg.Meta,
 		msg.Mime,
+		msg.Id,
 	)
 
 	return &types.MsgCreateNftResponse{
-		Id: id,
+		Id: msg.Id,
 	}, nil
 }
 

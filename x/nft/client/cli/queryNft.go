@@ -2,8 +2,6 @@ package cli
 
 import (
 	"context"
-	"strconv"
-
 	"github.com/bluzelle/curium/x/nft/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -52,13 +50,10 @@ func CmdShowNft() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			id, err := strconv.ParseUint(args[0], 10, 32)
-			if err != nil {
-				return err
-			}
+			id := args[0]
 
 			params := &types.QueryGetNftRequest{
-				Id: uint32(id),
+				Id: id,
 			}
 
 			res, err := queryClient.Nft(context.Background(), params)

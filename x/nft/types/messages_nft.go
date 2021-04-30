@@ -45,7 +45,7 @@ func (msg *MsgCreateNft) ValidateBasic() error {
 
 var _ sdk.Msg = &MsgUpdateNft{}
 
-func NewMsgUpdateNft(creator string, id uint32, meta string) *MsgUpdateNft {
+func NewMsgUpdateNft(creator string, id string, meta string) *MsgUpdateNft {
 	return &MsgUpdateNft{
 		Id:      id,
 		Creator: creator,
@@ -84,7 +84,7 @@ func (msg *MsgUpdateNft) ValidateBasic() error {
 
 var _ sdk.Msg = &MsgCreateNft{}
 
-func NewMsgDeleteNft(creator string, id uint32) *MsgDeleteNft {
+func NewMsgDeleteNft(creator string, id string) *MsgDeleteNft {
 	return &MsgDeleteNft{
 		Id:      id,
 		Creator: creator,

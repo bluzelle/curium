@@ -16,7 +16,7 @@ describe("Store and retriving a NFT", () => {
             return sdk.nft.tx.CreateNft({
                 creator: sdk.nft.address,
                 meta: 'my-meta',
-                mime: 'image/xxx'
+                mime: 'image/xxx',
             })
                 .then(({id}) => sdk.nft.q.Nft({id}))
                 .then(({Nft}) => {

@@ -1,6 +1,8 @@
 {
   "dependencies": {
-    "@bluzelle/sdk-js": "^1.0.7"
+    "@bluzelle/sdk-js": "^1.0.7",
+    "@types/node-fetch": "^2.5.10",
+    "node-fetch": "^2.6.1"
   },
   "scripts": {
     "start": "ts-node nft-demo.ts"

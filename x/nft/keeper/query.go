@@ -3,8 +3,6 @@ package keeper
 import (
 	// this line is used by starport scaffolding # 1
 	"github.com/bluzelle/curium/x/nft/types"
-	"strconv"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -20,19 +18,12 @@ func NewQuerier(k Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 		)
 
 		switch path[0] {
-		case "get-nft-data":
-			id, err := strconv.ParseUint(path[1], 10, 32)
-			if err != nil {
-				return nil, err
-			}
-			bz := k.GetNftData(ctx, uint32(id))
-			return bz, nil
 		case "get-nft":
-			id, err := strconv.ParseUint(path[1], 10, 32)
+			id := path[1]
 			if err != nil {
 				return nil, err
 			}
-			nft := k.GetNft(ctx, uint32(id))
+			nft := k.GetNft(ctx, id)
 			return k.cdc.MustMarshalJSON(&nft), nil
 
 

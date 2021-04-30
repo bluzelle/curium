@@ -1,13 +1,11 @@
 package cli
 
 import (
-	"github.com/spf13/cobra"
-	"strconv"
-
 	"github.com/bluzelle/curium/x/nft/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	"github.com/spf13/cobra"
 )
 
 func CmdCreateNft() *cobra.Command {
@@ -42,10 +40,7 @@ func CmdUpdateNft() *cobra.Command {
 		Short: "Update a nft",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			id, err := strconv.ParseUint(args[0], 10, 32)
-			if err != nil {
-				return err
-			}
+			id := args[0]
 			argsMeta := string(args[0])
 
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -53,7 +48,7 @@ func CmdUpdateNft() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgUpdateNft(clientCtx.GetFromAddress().String(), uint32(id), string(argsMeta))
+			msg := types.NewMsgUpdateNft(clientCtx.GetFromAddress().String(), id, string(argsMeta))
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -72,17 +67,14 @@ func CmdDeleteNft() *cobra.Command {
 		Short: "Delete a nft by id",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			id, err := strconv.ParseUint(args[0], 10, 32)
-			if err != nil {
-				return err
-			}
+			id := args[0]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgDeleteNft(clientCtx.GetFromAddress().String(), uint32(id))
+			msg := types.NewMsgDeleteNft(clientCtx.GetFromAddress().String(), id)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
