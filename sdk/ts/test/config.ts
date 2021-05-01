@@ -4,7 +4,7 @@ interface Config {
 }
 
 export const localChain: Config = {
-    mnemonic:  "cruise detect grid raise buzz use brush broken congress shell hood soul hour solar thunder equal dust fan scheme turtle priority awake skill daughter",
+    mnemonic:  "talent cheap sure then normal quote want follow electric lesson deputy health faint nuclear beach okay isolate salute umbrella list current garage throw shoe",
     endpoint: "http://localhost:26657"
 }
 

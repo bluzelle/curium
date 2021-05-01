@@ -22,7 +22,8 @@ describe("Store and retriving a NFT", () => {
                 creator: sdk.nft.address,
                 meta: 'my-meta',
                 mime: 'image/xxx',
-                id: hash
+                id: hash,
+                host: sdk.nft.url
             })
                 .then(({id}) => sdk.nft.q.Nft({id}))
                 .then(({Nft}) => {
@@ -42,7 +43,8 @@ describe("Store and retriving a NFT", () => {
                     creator: sdk.nft.address,
                     meta: 'my-meta',
                     mime: 'image/xxx',
-                    id: fakeHash
+                    id: fakeHash,
+                    host: sdk.nft.url
                 })).to.be.rejectedWith(/hash.*mismatch/))
         })
     });
@@ -58,14 +60,16 @@ describe("Store and retriving a NFT", () => {
                 creator: sdk.nft.address,
                 meta: 'my-meta',
                 mime: 'my-mime',
-                id: hash
+                id: hash,
+                host: sdk.nft.url
             })
                 .then(passThroughAwait(({id}) =>
                     sdk.nft.tx.UpdateNft({
                         id: id,
                         creator: sdk.nft.address,
                         meta: 'my-meta2',
-                        mime: 'my-mime2'
+                        mime: 'my-mime2',
+                        host: sdk.nft.url,
                     })
                 ))
                 .then(({id}) =>
@@ -82,7 +86,8 @@ describe("Store and retriving a NFT", () => {
         it('should store a 100MB file', () => {
             return sdk.helpers.nft.uploadNft({
                 meta: '',
-                mime: 'image/tiff'
+                mime: 'image/tiff',
+                host: sdk.nft.url
             }, getLargePayload(100))
                 .then(({id}) => fetchData(id))
                 .then(({body}) => expect(body).to.deep.equal(getLargePayload(100)))
@@ -93,7 +98,8 @@ describe("Store and retriving a NFT", () => {
             return Promise.all(files.map(file =>
                 sdk.helpers.nft.uploadNft({
                     meta: '',
-                    mime: 'my/file'
+                    mime: 'my/file',
+                    host: sdk.nft.url
                 }, file)
                     .then(({id}) => fetchData(id))
                     .then(({body}) => expect(body).to.deep.equal(file))

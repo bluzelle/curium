@@ -14,6 +14,7 @@ init:
   app:
     "minimum-gas-prices": "0.002ubnt"
     "api.address": "tcp://0.0.0.0:1317"
+    "api.rpc-max-body-bytes": 200000000
   config:
     "consensus.timeout_propose": "3s"
     "consensus.timeout_commit": "5s"

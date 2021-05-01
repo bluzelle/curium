@@ -2,13 +2,10 @@ package keeper
 
 import (
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
 	"github.com/bluzelle/curium/x/nft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"io"
 	"os"
 )
 
@@ -28,17 +25,6 @@ func (k msgServer) CreateNft(goCtx context.Context, msg *types.MsgCreateNft) (*t
 		return nil, sdkerrors.New("nft", 2, fmt.Sprintf("File not found: %s", msg.Id))
 	}
 	defer f.Close()
-
-	h := sha256.New()
-	if _, err := io.Copy(h, f); err != nil {
-		return nil, sdkerrors.New("nft", 2, fmt.Sprintf("Error calculating hash: %s", msg.Id))
-	}
-
-	hash := hex.EncodeToString(h.Sum(nil))
-	if msg.Id != hash {
-		return nil, sdkerrors.New("nft", 2, fmt.Sprintf("file hash/id mismatch: %s:%s", hash, msg.Id))
-	}
-
 
 	os.MkdirAll(k.homeDir + "/nft", os.ModePerm)
 	os.Rename(k.homeDir + "/nft-upload/" + msg.Id, k.homeDir + "/nft/" + msg.Id)
