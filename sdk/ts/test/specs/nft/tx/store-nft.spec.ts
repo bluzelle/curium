@@ -6,6 +6,7 @@ import {passThroughAwait} from "promise-passthrough";
 global.fetch = require('node-fetch')
 import {memoize, times} from 'lodash'
 import {createHash} from 'crypto'
+require('chai').use(require("chai-as-promised"));
 
 describe("Store and retriving a NFT", () => {
 
@@ -30,6 +31,20 @@ describe("Store and retriving a NFT", () => {
                     expect(Nft?.mime).to.equal('image/xxx');
                 });
         });
+
+        it('should fail if the checksum does not match', function() {
+            const fakeHash = Date.now().toString();
+            return fetch(`http://localhost:1317/nft/upload/${fakeHash}`, {
+                method: 'POST',
+                body: 'testing'
+            })
+                .then(() => expect(sdk.nft.tx.CreateNft({
+                    creator: sdk.nft.address,
+                    meta: 'my-meta',
+                    mime: 'image/xxx',
+                    id: fakeHash
+                })).to.be.rejectedWith(/hash.*mismatch/))
+        })
     });
 
     describe('UpdateNft()', () => {
