@@ -1,13 +1,11 @@
 import {expect} from 'chai'
 import {getSdk} from "../../../helpers/client-helpers/sdk-helpers";
 import {BluzelleSdk} from "../../../../src/bz-sdk/bz-sdk";
-import {passThrough, passThroughAwait} from "promise-passthrough";
+import {passThroughAwait} from "promise-passthrough";
 
 global.fetch = require('node-fetch')
-import {memoize, times, chunk} from 'lodash'
-import {readFile} from "fs/promises";
+import {memoize, times} from 'lodash'
 import {createHash} from 'crypto'
-import {Some} from "monet";
 
 describe("Store and retriving a NFT", () => {
 

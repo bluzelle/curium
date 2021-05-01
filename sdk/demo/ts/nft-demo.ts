@@ -14,8 +14,8 @@ bluzelle({
              .then(data => bz.helpers.nft.uploadNft({
                  mime: 'image/tiff',
                  meta: JSON.stringify({myMeta: 'something'})
-             }, data, (chunk, size) => console.log(chunk, size)))
-            // .then(({id}) => console.log('tiff id:', id))
+             }, data))
+             .then(({id}) => console.log('tiff id:', id))
 
             // .then(() => readFile('/Users/scott/Desktop/temp.mp4'))
             // .then(data => bz.helpers.nft.uploadNft({
