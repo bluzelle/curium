@@ -20,6 +20,10 @@ func (k msgServer) CreateNft(goCtx context.Context, msg *types.MsgCreateNft) (*t
 		msg.Id,
 	)
 
+
+	os.MkdirAll(k.homeDir + "/nft-upload/", os.ModePerm)
+
+
 	f, err := os.Open(k.homeDir + "/nft-upload/" + msg.Id)
 	if err != nil {
 		return nil, sdkerrors.New("nft", 2, fmt.Sprintf("File not found: %s", msg.Id))
