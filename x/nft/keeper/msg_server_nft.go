@@ -44,8 +44,8 @@ func (k msgServer) retrieveFile(ctx sdk.Context, msg *types.MsgCreateNft) {
 	}
 	defer resp.Body.Close()
 
-	os.MkdirAll(k.homeDir+"/nft-upload2/", os.ModePerm)
-	file, err := os.Create(k.homeDir+"/nft-upload2/" + msg.Id)
+	os.MkdirAll(k.homeDir+"/nft-upload/", os.ModePerm)
+	file, err := os.Create(k.homeDir+"/nft-upload/" + msg.Id)
 	if err != nil {
 		k.Logger(ctx).Error("unable to create file", "id", msg.Id, "err", err)
 		return
