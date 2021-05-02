@@ -21,7 +21,7 @@ func CmdCreateNft() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgCreateNft(clientCtx.GetFromAddress().String(),  string(argsMeta))
+			msg := types.NewMsgCreateNft(clientCtx.GetFromAddress().String(), string(argsMeta))
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

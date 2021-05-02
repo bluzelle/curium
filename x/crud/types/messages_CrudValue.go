@@ -45,7 +45,7 @@ func (msg *MsgCreate) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if msg.Lease.Seconds + msg.Lease.Minutes + msg.Lease.Hours + msg.Lease.Days + msg.Lease.Years == 0 {
+	if msg.Lease.Seconds+msg.Lease.Minutes+msg.Lease.Hours+msg.Lease.Days+msg.Lease.Years == 0 {
 		return sdkerrors.New("crud", 2, "Invalid lease time")
 	}
 

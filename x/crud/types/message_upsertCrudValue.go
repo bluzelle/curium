@@ -48,6 +48,5 @@ func (msg *MsgUpsert) ValidateBasic() error {
 		return sdkerrors.New("crud", 2, "Key cannot be empty")
 	}
 
-
 	return nil
 }

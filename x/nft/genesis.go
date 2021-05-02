@@ -15,7 +15,6 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		k.SetNft(ctx, *elem)
 	}
 
-
 	// this line is used by starport scaffolding # ibc/genesis/init
 }
 

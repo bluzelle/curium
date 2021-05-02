@@ -107,4 +107,3 @@ func GetNftIDBytes(id string) []byte {
 func GetNftIDFromBytes(bz []byte) uint32 {
 	return binary.BigEndian.Uint32(bz)
 }
-

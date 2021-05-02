@@ -6,7 +6,11 @@ import (
 	"github.com/bluzelle/curium/x/nft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"io"
+	"net/http"
 	"os"
+	"strings"
+	"time"
 )
 
 func (k msgServer) CreateNft(goCtx context.Context, msg *types.MsgCreateNft) (*types.MsgCreateNftResponse, error) {
@@ -20,22 +24,34 @@ func (k msgServer) CreateNft(goCtx context.Context, msg *types.MsgCreateNft) (*t
 		msg.Id,
 	)
 
-
-	os.MkdirAll(k.homeDir + "/nft-upload/", os.ModePerm)
-
-
 	f, err := os.Open(k.homeDir + "/nft-upload/" + msg.Id)
 	if err != nil {
-		return nil, sdkerrors.New("nft", 2, fmt.Sprintf("File not found: %s", msg.Id))
+		time.AfterFunc(time.Second, func() { k.retrieveFile(ctx, msg)})
 	}
 	defer f.Close()
-
-	os.MkdirAll(k.homeDir + "/nft", os.ModePerm)
-	os.Rename(k.homeDir + "/nft-upload/" + msg.Id, k.homeDir + "/nft/" + msg.Id)
 
 	return &types.MsgCreateNftResponse{
 		Id: msg.Id,
 	}, nil
+}
+
+func (k msgServer) retrieveFile(ctx sdk.Context, msg *types.MsgCreateNft) {
+	url := strings.Replace(msg.Host, "26657", "1317", 1)
+	url = url + "/nft/data/" + msg.Id
+	resp, err := http.Get(url)
+	if err != nil {
+		k.Logger(ctx).Error("unable to retrieve file", "id", msg.Id)
+	}
+	defer resp.Body.Close()
+
+	os.MkdirAll(k.homeDir+"/nft-upload2/", os.ModePerm)
+	file, err := os.Create(k.homeDir+"/nft-upload2/" + msg.Id)
+	if err != nil {
+		k.Logger(ctx).Error("unable to create file", "id", msg.Id, "err", err)
+		return
+	}
+	io.Copy(file, resp.Body)
+	fmt.Println(resp, err)
 }
 
 func (k msgServer) UpdateNft(goCtx context.Context, msg *types.MsgUpdateNft) (*types.MsgUpdateNftResponse, error) {

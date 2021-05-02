@@ -18,11 +18,11 @@ import (
 
 type (
 	Keeper struct {
-		cdc        codec.Marshaler
-		storeKey   sdk.StoreKey
-		memKey     sdk.StoreKey
-		AccKeeper  authkeeper.AccountKeeper
-		CrudKeeper crudkeeper.Keeper
+		cdc          codec.Marshaler
+		storeKey     sdk.StoreKey
+		memKey       sdk.StoreKey
+		AccKeeper    authkeeper.AccountKeeper
+		CrudKeeper   crudkeeper.Keeper
 		VotingKeeper votingkeeper.Keeper
 		CuriumKeeper curiumkeeper.Keeper
 		KeyringDir   string
@@ -42,11 +42,11 @@ func NewKeeper(
 	// this line is used by starport scaffolding # ibc/Keeper/parameter
 ) *Keeper {
 	return &Keeper{
-		cdc:        cdc,
-		storeKey:   storeKey,
-		memKey:     memKey,
-		AccKeeper:  AccKeeper,
-		CrudKeeper: CrudKeeper,
+		cdc:          cdc,
+		storeKey:     storeKey,
+		memKey:       memKey,
+		AccKeeper:    AccKeeper,
+		CrudKeeper:   CrudKeeper,
 		VotingKeeper: VotingKeeper,
 		CuriumKeeper: CuriumKeeper,
 		KeyringDir:   KeyringDir,

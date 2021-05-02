@@ -30,7 +30,7 @@ func NewKeeper(
 ) *Keeper {
 	return &Keeper{
 		cdc:      cdc,
-		homeDir: homeDir,
+		homeDir:  homeDir,
 		storeKey: storeKey,
 		memKey:   memKey,
 		// this line is used by starport scaffolding # ibc/keeper/return

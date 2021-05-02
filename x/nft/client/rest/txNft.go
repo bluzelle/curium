@@ -38,9 +38,7 @@ func createNftHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-
 		parsedMeta := req.Meta
-
 
 		msg := types.NewMsgCreateNft(
 			req.Creator,
@@ -80,9 +78,7 @@ func updateNftHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-
 		parsedMeta := req.Meta
-
 
 		msg := types.NewMsgUpdateNft(
 			req.Creator,

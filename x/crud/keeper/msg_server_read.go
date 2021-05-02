@@ -21,5 +21,4 @@ func (k msgServer) Read(goCtx context.Context, msg *types.MsgRead) (*types.MsgRe
 
 	return resp, nil
 
-
 }

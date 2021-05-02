@@ -10,19 +10,20 @@ import (
 )
 
 func uploadNftHandler(clientCtx client.Context) http.HandlerFunc {
-return func(w http.ResponseWriter, r *http.Request) {
-	hash := mux.Vars(r)["hash"]
+	return func(w http.ResponseWriter, r *http.Request) {
+		hash := mux.Vars(r)["hash"]
 
-	uploadPath := clientCtx.HomeDir + "/nft-upload"
-	os.MkdirAll(uploadPath, os.ModePerm)
+		uploadPath := clientCtx.HomeDir + "/nft-upload"
+		os.MkdirAll(uploadPath, os.ModePerm)
 
-	fileWriter, err := os.Create(uploadPath + "/" + hash)
-	defer fileWriter.Close()
-	if err != nil {
-		rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-		return
+		fileWriter, err := os.Create(uploadPath + "/" + hash)
+		defer fileWriter.Close()
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+		io.Copy(fileWriter, r.Body)
+		w.Write([]byte("ok"))
+
 	}
-	io.Copy(fileWriter, r.Body)
-	w.Write([]byte("ok"))
-
-}}
+}

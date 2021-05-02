@@ -26,8 +26,6 @@ func NewQuerier(k Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 			nft := k.GetNft(ctx, id)
 			return k.cdc.MustMarshalJSON(&nft), nil
 
-
-
 		// this line is used by starport scaffolding # 1
 		default:
 			err = sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown %s query endpoint: %s", types.ModuleName, path[0])
