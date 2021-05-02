@@ -360,6 +360,7 @@ func New(
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		keys[nfttypes.StoreKey],
 		keys[nfttypes.MemStoreKey],
+		&app.AccountKeeper,
 	)
 	nftModule := nft.NewAppModule(appCodec, app.nftKeeper)
 

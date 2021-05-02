@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 	"fmt"
+	"github.com/bluzelle/curium/x/curium"
 	"github.com/bluzelle/curium/x/nft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -26,13 +27,26 @@ func (k msgServer) CreateNft(goCtx context.Context, msg *types.MsgCreateNft) (*t
 
 	f, err := os.Open(k.homeDir + "/nft-upload/" + msg.Id)
 	if err != nil {
-		time.AfterFunc(time.Second, func() { k.retrieveFile(ctx, msg)})
+		time.AfterFunc(time.Second, func() {
+			k.retrieveFile(ctx, msg)
+			fileReceivedMsg := types.NewMsgFileReceived(msg.Creator, msg.Id, "my-node-id")
+			sendFileReceived(ctx, k, fileReceivedMsg)
+		})
 	}
 	defer f.Close()
 
 	return &types.MsgCreateNftResponse{
 		Id: msg.Id,
 	}, nil
+}
+
+func sendFileReceived(ctx sdk.Context, k msgServer, msg *types.MsgFileReceived, ) {
+	result, err := curium.BroadcastMessages(ctx, []sdk.Msg{msg}, k.accKeeper, "nft", k.homeDir)
+	if err != nil {
+		k.Logger(ctx).Error("Error sending msgFileReceived", "err", err)
+	}
+	fmt.Println(result, err)
+
 }
 
 func (k msgServer) retrieveFile(ctx sdk.Context, msg *types.MsgCreateNft) {

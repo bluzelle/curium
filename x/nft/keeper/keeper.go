@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 
 	"github.com/tendermint/tendermint/libs/log"
 
@@ -17,6 +18,7 @@ type (
 		homeDir  string
 		storeKey sdk.StoreKey
 		memKey   sdk.StoreKey
+		accKeeper *authkeeper.AccountKeeper
 		// this line is used by starport scaffolding # ibc/keeper/attribute
 	}
 )
@@ -26,6 +28,7 @@ func NewKeeper(
 	homeDir string,
 	storeKey,
 	memKey sdk.StoreKey,
+	accKeeper *authkeeper.AccountKeeper,
 	// this line is used by starport scaffolding # ibc/keeper/parameter
 ) *Keeper {
 	return &Keeper{
@@ -33,6 +36,7 @@ func NewKeeper(
 		homeDir:  homeDir,
 		storeKey: storeKey,
 		memKey:   memKey,
+		accKeeper: accKeeper,
 		// this line is used by starport scaffolding # ibc/keeper/return
 	}
 }

@@ -10,6 +10,7 @@ import (
 func (k msgServer) FileReceived(goCtx context.Context, msg *types.MsgFileReceived) (*types.MsgFileReceivedResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+
 	// TODO: Handling the message
 	_ = ctx
 
