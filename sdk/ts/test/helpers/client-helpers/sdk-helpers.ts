@@ -10,3 +10,10 @@ export const getSdk = (): Promise<BluzelleSdk> => {
         maxGas: 100000000
     })
 }
+
+export const encodeData = (data: string): Uint8Array =>
+    new TextEncoder().encode(data)
+
+export const decodeData = (array: Uint8Array): string =>
+    new TextDecoder().decode(array)
+

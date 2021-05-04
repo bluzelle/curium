@@ -1,11 +1,10 @@
 import {expect} from 'chai'
-import {API} from "../../../src/legacyAdapter/API";
-import {bluzelle} from "../../../src/legacyAdapter/bluzelle-node"
-import {createKeys, DEFAULT_TIMEOUT, defaultGasParams, sentryWithClient} from "../../helpers/client-helpers/client-helpers";
+import {API} from "../../../../src/legacyAdapter/API";
+import {bluzelle} from "../../../../src/legacyAdapter/bluzelle-node"
+import {createKeys, DEFAULT_TIMEOUT, defaultGasParams, sentryWithClient} from "../../../helpers/client-helpers/client-helpers";
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
 import {getPrintableChars} from "testing/lib/helpers/testHelpers";
 import * as fs from "fs";
-import {getTxRpcClient, mnemonicToAddress} from "../../../src/temp";
 import Long from "long";
 
 
@@ -32,7 +31,7 @@ describe('create()', function () {
         expect(await bz.read('key')).to.equal('');
     })
 
-    it('should handle large documents', async () => {
+    it.skip('should handle large documents', async () => {
         const json = fs.readFileSync(`${__dirname}/large-doc.json`).toString();
         await bz.create('key', json, {gas_price: .002, max_gas: 20000000});
         expect(await bz.read('key')).to.equal(json);
@@ -166,20 +165,6 @@ describe('create()', function () {
             .then(responses => expect(responses).to.deep.equal(['bar1', 'bar2', 'bar3', 'bar4']))
     );
 
-    it('should use tx rpc client to create', () => {
-        return getTxRpcClient()
-            .then(async (txClient) => txClient.Create({
-                key: "aven",
-                value: new TextEncoder().encode("dauz"),
-                uuid: bz.uuid,
-                creator: bz.address,
-                lease: Long.fromInt(3000),
-                metadata: new Uint8Array()
-            }))
-            .then(x => console.log(x))
-            .catch(e => console.log(e))
-
-    })
 
 
 });

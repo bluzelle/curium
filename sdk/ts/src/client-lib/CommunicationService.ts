@@ -175,7 +175,7 @@ const getSequence = (service: CommunicationService, cosmos: SigningStargateClien
 
 
 const checkErrors = (res: BroadcastTxFailure): BroadcastTxResponse => {
-    if (res.code > 0) {
+    if (!res.data) {
         throw res.rawLog
     }
     return res
