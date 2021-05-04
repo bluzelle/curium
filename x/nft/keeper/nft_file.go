@@ -12,9 +12,18 @@ func (k Keeper) GetNftFilesStore(ctx *sdk.Context) prefix.Store {
 
 func (k Keeper) NftFullyReplicated(ctx *sdk.Context, fileId string) bool {
 	// TODO: This is temporary. Get list of nodes and check that all nodes are in the store for this NFT
+	return k.countNodesWithNft(ctx, fileId) > 1
+}
+
+func (k Keeper) countNodesWithNft(ctx *sdk.Context, fileId string) uint64 {
+	var count uint64
 	store := k.GetNftFilesStore(ctx)
 	iterator := sdk.KVStorePrefixIterator(store, []byte(fileId))
-	return iterator.Valid()
+	for ; iterator.Valid(); iterator.Next() {
+		count++
+	}
+	return count
+
 }
 
 func MakeNftFilesKey(fileId string, nodeId string) []byte {
