@@ -27,6 +27,14 @@ export interface QueryAllNftResponse {
   pagination?: PageResponse;
 }
 
+export interface QueryIsNftFullyReplicatedRequest {
+  id: string;
+}
+
+export interface QueryIsNftFullyReplicatedResponse {
+  isReplicated: boolean;
+}
+
 const baseQueryGetNftRequest: object = { id: "" };
 
 export const QueryGetNftRequest = {
@@ -293,11 +301,153 @@ export const QueryAllNftResponse = {
   },
 };
 
+const baseQueryIsNftFullyReplicatedRequest: object = { id: "" };
+
+export const QueryIsNftFullyReplicatedRequest = {
+  encode(
+    message: QueryIsNftFullyReplicatedRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): QueryIsNftFullyReplicatedRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryIsNftFullyReplicatedRequest,
+    } as QueryIsNftFullyReplicatedRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryIsNftFullyReplicatedRequest {
+    const message = {
+      ...baseQueryIsNftFullyReplicatedRequest,
+    } as QueryIsNftFullyReplicatedRequest;
+    if (object.id !== undefined && object.id !== null) {
+      message.id = String(object.id);
+    } else {
+      message.id = "";
+    }
+    return message;
+  },
+
+  toJSON(message: QueryIsNftFullyReplicatedRequest): unknown {
+    const obj: any = {};
+    message.id !== undefined && (obj.id = message.id);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryIsNftFullyReplicatedRequest>
+  ): QueryIsNftFullyReplicatedRequest {
+    const message = {
+      ...baseQueryIsNftFullyReplicatedRequest,
+    } as QueryIsNftFullyReplicatedRequest;
+    if (object.id !== undefined && object.id !== null) {
+      message.id = object.id;
+    } else {
+      message.id = "";
+    }
+    return message;
+  },
+};
+
+const baseQueryIsNftFullyReplicatedResponse: object = { isReplicated: false };
+
+export const QueryIsNftFullyReplicatedResponse = {
+  encode(
+    message: QueryIsNftFullyReplicatedResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.isReplicated === true) {
+      writer.uint32(8).bool(message.isReplicated);
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): QueryIsNftFullyReplicatedResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryIsNftFullyReplicatedResponse,
+    } as QueryIsNftFullyReplicatedResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.isReplicated = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryIsNftFullyReplicatedResponse {
+    const message = {
+      ...baseQueryIsNftFullyReplicatedResponse,
+    } as QueryIsNftFullyReplicatedResponse;
+    if (object.isReplicated !== undefined && object.isReplicated !== null) {
+      message.isReplicated = Boolean(object.isReplicated);
+    } else {
+      message.isReplicated = false;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryIsNftFullyReplicatedResponse): unknown {
+    const obj: any = {};
+    message.isReplicated !== undefined &&
+      (obj.isReplicated = message.isReplicated);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryIsNftFullyReplicatedResponse>
+  ): QueryIsNftFullyReplicatedResponse {
+    const message = {
+      ...baseQueryIsNftFullyReplicatedResponse,
+    } as QueryIsNftFullyReplicatedResponse;
+    if (object.isReplicated !== undefined && object.isReplicated !== null) {
+      message.isReplicated = object.isReplicated;
+    } else {
+      message.isReplicated = false;
+    }
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** this line is used by starport scaffolding # 2 */
   Nft(request: QueryGetNftRequest): Promise<QueryGetNftResponse>;
   NftAll(request: QueryAllNftRequest): Promise<QueryAllNftResponse>;
+  IsNftFullyReplicated(
+    request: QueryIsNftFullyReplicatedRequest
+  ): Promise<QueryIsNftFullyReplicatedResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -322,6 +472,20 @@ export class QueryClientImpl implements Query {
     );
     return promise.then((data) =>
       QueryAllNftResponse.decode(new _m0.Reader(data))
+    );
+  }
+
+  IsNftFullyReplicated(
+    request: QueryIsNftFullyReplicatedRequest
+  ): Promise<QueryIsNftFullyReplicatedResponse> {
+    const data = QueryIsNftFullyReplicatedRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "bluzelle.curium.nft.Query",
+      "IsNftFullyReplicated",
+      data
+    );
+    return promise.then((data) =>
+      QueryIsNftFullyReplicatedResponse.decode(new _m0.Reader(data))
     );
   }
 }

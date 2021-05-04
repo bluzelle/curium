@@ -5,6 +5,21 @@ import _m0 from "protobufjs/minimal";
 export const protobufPackage = "bluzelle.curium.nft";
 
 /** this line is used by starport scaffolding # proto/tx/message */
+export interface MsgPublishFile {
+  creator: string;
+  id: string;
+}
+
+export interface MsgPublishFileResponse {}
+
+export interface MsgFileReceived {
+  creator: string;
+  id: string;
+  nodeId: string;
+}
+
+export interface MsgFileReceivedResponse {}
+
 export interface MsgCreateNft {
   id: string;
   creator: string;
@@ -33,6 +48,269 @@ export interface MsgDeleteNft {
 }
 
 export interface MsgDeleteNftResponse {}
+
+const baseMsgPublishFile: object = { creator: "", id: "" };
+
+export const MsgPublishFile = {
+  encode(
+    message: MsgPublishFile,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.id !== "") {
+      writer.uint32(18).string(message.id);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgPublishFile {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgPublishFile } as MsgPublishFile;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.id = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgPublishFile {
+    const message = { ...baseMsgPublishFile } as MsgPublishFile;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.id !== undefined && object.id !== null) {
+      message.id = String(object.id);
+    } else {
+      message.id = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgPublishFile): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.id !== undefined && (obj.id = message.id);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgPublishFile>): MsgPublishFile {
+    const message = { ...baseMsgPublishFile } as MsgPublishFile;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.id !== undefined && object.id !== null) {
+      message.id = object.id;
+    } else {
+      message.id = "";
+    }
+    return message;
+  },
+};
+
+const baseMsgPublishFileResponse: object = {};
+
+export const MsgPublishFileResponse = {
+  encode(
+    _: MsgPublishFileResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): MsgPublishFileResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgPublishFileResponse } as MsgPublishFileResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgPublishFileResponse {
+    const message = { ...baseMsgPublishFileResponse } as MsgPublishFileResponse;
+    return message;
+  },
+
+  toJSON(_: MsgPublishFileResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(_: DeepPartial<MsgPublishFileResponse>): MsgPublishFileResponse {
+    const message = { ...baseMsgPublishFileResponse } as MsgPublishFileResponse;
+    return message;
+  },
+};
+
+const baseMsgFileReceived: object = { creator: "", id: "", nodeId: "" };
+
+export const MsgFileReceived = {
+  encode(
+    message: MsgFileReceived,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.id !== "") {
+      writer.uint32(18).string(message.id);
+    }
+    if (message.nodeId !== "") {
+      writer.uint32(26).string(message.nodeId);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgFileReceived {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgFileReceived } as MsgFileReceived;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.id = reader.string();
+          break;
+        case 3:
+          message.nodeId = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgFileReceived {
+    const message = { ...baseMsgFileReceived } as MsgFileReceived;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.id !== undefined && object.id !== null) {
+      message.id = String(object.id);
+    } else {
+      message.id = "";
+    }
+    if (object.nodeId !== undefined && object.nodeId !== null) {
+      message.nodeId = String(object.nodeId);
+    } else {
+      message.nodeId = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgFileReceived): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.id !== undefined && (obj.id = message.id);
+    message.nodeId !== undefined && (obj.nodeId = message.nodeId);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgFileReceived>): MsgFileReceived {
+    const message = { ...baseMsgFileReceived } as MsgFileReceived;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.id !== undefined && object.id !== null) {
+      message.id = object.id;
+    } else {
+      message.id = "";
+    }
+    if (object.nodeId !== undefined && object.nodeId !== null) {
+      message.nodeId = object.nodeId;
+    } else {
+      message.nodeId = "";
+    }
+    return message;
+  },
+};
+
+const baseMsgFileReceivedResponse: object = {};
+
+export const MsgFileReceivedResponse = {
+  encode(
+    _: MsgFileReceivedResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): MsgFileReceivedResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseMsgFileReceivedResponse,
+    } as MsgFileReceivedResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgFileReceivedResponse {
+    const message = {
+      ...baseMsgFileReceivedResponse,
+    } as MsgFileReceivedResponse;
+    return message;
+  },
+
+  toJSON(_: MsgFileReceivedResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(
+    _: DeepPartial<MsgFileReceivedResponse>
+  ): MsgFileReceivedResponse {
+    const message = {
+      ...baseMsgFileReceivedResponse,
+    } as MsgFileReceivedResponse;
+    return message;
+  },
+};
 
 const baseMsgCreateNft: object = {
   id: "",
@@ -525,6 +803,8 @@ export const MsgDeleteNftResponse = {
 /** Msg defines the Msg service. */
 export interface Msg {
   /** this line is used by starport scaffolding # proto/tx/rpc */
+  PublishFile(request: MsgPublishFile): Promise<MsgPublishFileResponse>;
+  FileReceived(request: MsgFileReceived): Promise<MsgFileReceivedResponse>;
   CreateNft(request: MsgCreateNft): Promise<MsgCreateNftResponse>;
   UpdateNft(request: MsgUpdateNft): Promise<MsgUpdateNftResponse>;
   DeleteNft(request: MsgDeleteNft): Promise<MsgDeleteNftResponse>;
@@ -535,6 +815,30 @@ export class MsgClientImpl implements Msg {
   constructor(rpc: Rpc) {
     this.rpc = rpc;
   }
+  PublishFile(request: MsgPublishFile): Promise<MsgPublishFileResponse> {
+    const data = MsgPublishFile.encode(request).finish();
+    const promise = this.rpc.request(
+      "bluzelle.curium.nft.Msg",
+      "PublishFile",
+      data
+    );
+    return promise.then((data) =>
+      MsgPublishFileResponse.decode(new _m0.Reader(data))
+    );
+  }
+
+  FileReceived(request: MsgFileReceived): Promise<MsgFileReceivedResponse> {
+    const data = MsgFileReceived.encode(request).finish();
+    const promise = this.rpc.request(
+      "bluzelle.curium.nft.Msg",
+      "FileReceived",
+      data
+    );
+    return promise.then((data) =>
+      MsgFileReceivedResponse.decode(new _m0.Reader(data))
+    );
+  }
+
   CreateNft(request: MsgCreateNft): Promise<MsgCreateNftResponse> {
     const data = MsgCreateNft.encode(request).finish();
     const promise = this.rpc.request(

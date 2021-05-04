@@ -5,29 +5,8 @@ import (
 	"github.com/bluzelle/curium/x/nft/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"strconv"
 )
 
-// GetNftCount get the total number of nft
-func (k Keeper) GetNftCount(ctx sdk.Context) uint32 {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.NftCountKey))
-	byteKey := types.KeyPrefix(types.NftCountKey)
-	bz := store.Get(byteKey)
-
-	// Count doesn't exist: no element
-	if bz == nil {
-		return 0
-	}
-
-	// Parse bytes
-	count, err := strconv.ParseUint(string(bz), 10, 32)
-	if err != nil {
-		// Panic because the count should be always formattable to iint64
-		panic("cannot decode count")
-	}
-
-	return uint32(count)
-}
 
 // AppendNft appends a nft in the store with a new id and update the count
 func (k Keeper) AppendNft(

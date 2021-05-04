@@ -57,3 +57,14 @@ func (k Keeper) Nft(c context.Context, req *types.QueryGetNftRequest) (*types.Qu
 
 	return &types.QueryGetNftResponse{Nft: &nft}, nil
 }
+func (k Keeper) IsNftFullyReplicated(c context.Context, req *types.QueryIsNftFullyReplicatedRequest) (*types.QueryIsNftFullyReplicatedResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+	ctx := sdk.UnwrapSDKContext(c)
+
+	isReplicated := k.NftFullyReplicated(&ctx, req.Id)
+
+	return &types.QueryIsNftFullyReplicatedResponse{IsReplicated: isReplicated}, nil
+}
+

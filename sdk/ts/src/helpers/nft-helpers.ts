@@ -1,8 +1,8 @@
 import {MsgCreateNft, MsgCreateNftResponse} from "../codec/nft/tx";
-import {BluzelleSdk, NftSdk} from "../bz-sdk/bz-sdk";
+import {NftSdk} from "../bz-sdk/bz-sdk";
 import {passThroughAwait} from "promise-passthrough";
-import {chunk} from 'lodash'
 import {createHash} from "crypto";
+import delay from "delay";
 
 export type UploadNFTParams = Omit<MsgCreateNft, "creator" | "id">
 export type ChunkCallback = (chunk: number, length: number) => unknown
@@ -29,7 +29,13 @@ const uploadNft = (nft: NftSdk) => (params: UploadNFTParams, data: Uint8Array): 
             creator: nft.address,
             ...params
         }))
+        .then(passThroughAwait(waitForFullReplication(nft)))
 };
+
+const waitForFullReplication = (nft: NftSdk) => ({id}: MsgCreateNftResponse): Promise<unknown> =>
+    delay(500)
+        .then(() => nft.q.IsNftFullyReplicated({id}))
+        .then(response => response.isReplicated ? true : waitForFullReplication(nft)({id}))
 
 
 
