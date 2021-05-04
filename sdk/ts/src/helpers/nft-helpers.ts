@@ -30,12 +30,17 @@ const uploadNft = (nft: NftSdk) => (params: UploadNFTParams, data: Uint8Array): 
             ...params
         }))
         .then(passThroughAwait(waitForFullReplication(nft)))
+        .then(passThroughAwait(({id}) => nft.tx.PublishFile({id: id, creator: nft.address})))
 };
 
 const waitForFullReplication = (nft: NftSdk) => ({id}: MsgCreateNftResponse): Promise<unknown> =>
-    delay(500)
-        .then(() => nft.q.IsNftFullyReplicated({id}))
-        .then(response => response.isReplicated ? true : waitForFullReplication(nft)({id}))
+       nft.q.IsNftFullyReplicated({id})
+        .then(response => response.isReplicated ? (
+            true
+        ):(
+            delay(500)
+                .then(() => waitForFullReplication(nft)({id}))
+        ))
 
 
 
