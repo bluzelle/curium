@@ -3,10 +3,10 @@ import {readFile} from "fs/promises";
 import {localChain} from '../../../ts/test/config'
 import {contentType} from 'mime-types'
 import {readdir} from 'fs/promises'
-import {slice, forEach} from 'lodash/fp'
+import {slice} from 'lodash/fp'
 import {passThrough} from 'promise-passthrough'
 
-const NUM_OF_FILES = 4
+const NUM_OF_FILES = 5
 const MIN_FILE_SIZE = 1
 const META = JSON.stringify({something: 'foo'})
 
@@ -35,7 +35,6 @@ readdir('./nfts')
                 .then(nft => ({...nft, name: file.name}))
                 .then(passThrough(console.log))
         }))
-
     )
 
 
