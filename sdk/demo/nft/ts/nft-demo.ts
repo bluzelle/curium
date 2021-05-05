@@ -4,9 +4,10 @@ import {localChain} from '../../../ts/test/config'
 import {contentType} from 'mime-types'
 import {readdir} from 'fs/promises'
 import {slice, forEach} from 'lodash/fp'
+import {passThrough} from 'promise-passthrough'
 
-const NUM_OF_FILES = 1
-const MIN_FILE_SIZE = 60000
+const NUM_OF_FILES = 4
+const MIN_FILE_SIZE = 1
 const META = JSON.stringify({something: 'foo'})
 
 console.log('STARTING');
@@ -30,11 +31,11 @@ readdir('./nfts')
                 meta: META,
                 mime: file.mime
             }, file.data)
-                .then(({id}) => (
-                    {id, name: file.name}
-                ))
-                .then(console.log)
+                .then(({id}) => ctx.sdk.nft.q.Nft({id}))
+                .then(nft => ({...nft, name: file.name}))
+                .then(passThrough(console.log))
         }))
+
     )
 
 
