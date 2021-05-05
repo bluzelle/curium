@@ -10,6 +10,7 @@ export interface SDK<Q, M> {
     q: Q;
     tx: M;
     address: string;
+    url: string;
     withTransaction: (fn: () => unknown, options: {
         memo: string;
     }) => unknown;

@@ -3,8 +3,9 @@ import {NftSdk} from "../bz-sdk/bz-sdk";
 import {passThroughAwait} from "promise-passthrough";
 import {createHash} from "crypto";
 import delay from "delay";
+import fetch from 'node-fetch'
 
-export type UploadNFTParams = Omit<MsgCreateNft, "creator" | "id">
+export type UploadNFTParams = Omit<MsgCreateNft, "creator" | "id" | "host">
 export type ChunkCallback = (chunk: number, length: number) => unknown
 
 export interface NftHelpers {
@@ -27,6 +28,7 @@ const uploadNft = (nft: NftSdk) => (params: UploadNFTParams, data: Uint8Array): 
         .then(() => nft.tx.CreateNft({
             id: hash,
             creator: nft.address,
+            host: nft.url,
             ...params
         }))
         .then(passThroughAwait(waitForFullReplication(nft)))

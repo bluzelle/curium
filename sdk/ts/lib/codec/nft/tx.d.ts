@@ -2,49 +2,71 @@ import Long from "long";
 import _m0 from "protobufjs/minimal";
 export declare const protobufPackage = "bluzelle.curium.nft";
 /** this line is used by starport scaffolding # proto/tx/message */
-export interface MsgChunk {
+export interface MsgPublishFile {
     creator: string;
-    id: number;
-    chunk: number;
-    data: Uint8Array;
+    id: string;
 }
-export interface MsgChunkResponse {
+export interface MsgPublishFileResponse {
+}
+export interface MsgFileReceived {
+    creator: string;
+    id: string;
+    nodeId: string;
+}
+export interface MsgFileReceivedResponse {
 }
 export interface MsgCreateNft {
+    id: string;
     creator: string;
     mime: string;
     meta: string;
+    host: string;
 }
 export interface MsgCreateNftResponse {
-    id: number;
+    id: string;
 }
 export interface MsgUpdateNft {
+    id: string;
     creator: string;
-    id: number;
     mime: string;
     meta: string;
+    host: string;
 }
 export interface MsgUpdateNftResponse {
 }
 export interface MsgDeleteNft {
     creator: string;
-    id: number;
+    id: string;
 }
 export interface MsgDeleteNftResponse {
 }
-export declare const MsgChunk: {
-    encode(message: MsgChunk, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgChunk;
-    fromJSON(object: any): MsgChunk;
-    toJSON(message: MsgChunk): unknown;
-    fromPartial(object: DeepPartial<MsgChunk>): MsgChunk;
+export declare const MsgPublishFile: {
+    encode(message: MsgPublishFile, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgPublishFile;
+    fromJSON(object: any): MsgPublishFile;
+    toJSON(message: MsgPublishFile): unknown;
+    fromPartial(object: DeepPartial<MsgPublishFile>): MsgPublishFile;
 };
-export declare const MsgChunkResponse: {
-    encode(_: MsgChunkResponse, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgChunkResponse;
-    fromJSON(_: any): MsgChunkResponse;
-    toJSON(_: MsgChunkResponse): unknown;
-    fromPartial(_: DeepPartial<MsgChunkResponse>): MsgChunkResponse;
+export declare const MsgPublishFileResponse: {
+    encode(_: MsgPublishFileResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgPublishFileResponse;
+    fromJSON(_: any): MsgPublishFileResponse;
+    toJSON(_: MsgPublishFileResponse): unknown;
+    fromPartial(_: DeepPartial<MsgPublishFileResponse>): MsgPublishFileResponse;
+};
+export declare const MsgFileReceived: {
+    encode(message: MsgFileReceived, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgFileReceived;
+    fromJSON(object: any): MsgFileReceived;
+    toJSON(message: MsgFileReceived): unknown;
+    fromPartial(object: DeepPartial<MsgFileReceived>): MsgFileReceived;
+};
+export declare const MsgFileReceivedResponse: {
+    encode(_: MsgFileReceivedResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgFileReceivedResponse;
+    fromJSON(_: any): MsgFileReceivedResponse;
+    toJSON(_: MsgFileReceivedResponse): unknown;
+    fromPartial(_: DeepPartial<MsgFileReceivedResponse>): MsgFileReceivedResponse;
 };
 export declare const MsgCreateNft: {
     encode(message: MsgCreateNft, writer?: _m0.Writer): _m0.Writer;
@@ -91,7 +113,8 @@ export declare const MsgDeleteNftResponse: {
 /** Msg defines the Msg service. */
 export interface Msg {
     /** this line is used by starport scaffolding # proto/tx/rpc */
-    Chunk(request: MsgChunk): Promise<MsgChunkResponse>;
+    PublishFile(request: MsgPublishFile): Promise<MsgPublishFileResponse>;
+    FileReceived(request: MsgFileReceived): Promise<MsgFileReceivedResponse>;
     CreateNft(request: MsgCreateNft): Promise<MsgCreateNftResponse>;
     UpdateNft(request: MsgUpdateNft): Promise<MsgUpdateNftResponse>;
     DeleteNft(request: MsgDeleteNft): Promise<MsgDeleteNftResponse>;
@@ -99,7 +122,8 @@ export interface Msg {
 export declare class MsgClientImpl implements Msg {
     private readonly rpc;
     constructor(rpc: Rpc);
-    Chunk(request: MsgChunk): Promise<MsgChunkResponse>;
+    PublishFile(request: MsgPublishFile): Promise<MsgPublishFileResponse>;
+    FileReceived(request: MsgFileReceived): Promise<MsgFileReceivedResponse>;
     CreateNft(request: MsgCreateNft): Promise<MsgCreateNftResponse>;
     UpdateNft(request: MsgUpdateNft): Promise<MsgUpdateNftResponse>;
     DeleteNft(request: MsgDeleteNft): Promise<MsgDeleteNftResponse>;

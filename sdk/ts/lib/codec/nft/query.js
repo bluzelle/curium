@@ -3,18 +3,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.QueryClientImpl = exports.QueryAllNftResponse = exports.QueryAllNftRequest = exports.QueryGetNftResponse = exports.QueryGetNftRequest = exports.protobufPackage = void 0;
+exports.QueryClientImpl = exports.QueryIsNftFullyReplicatedResponse = exports.QueryIsNftFullyReplicatedRequest = exports.QueryAllNftResponse = exports.QueryAllNftRequest = exports.QueryGetNftResponse = exports.QueryGetNftRequest = exports.protobufPackage = void 0;
 /* eslint-disable */
 const long_1 = __importDefault(require("long"));
 const minimal_1 = __importDefault(require("protobufjs/minimal"));
 const nft_1 = require("../nft/nft");
 const pagination_1 = require("../cosmos/base/query/v1beta1/pagination");
 exports.protobufPackage = "bluzelle.curium.nft";
-const baseQueryGetNftRequest = { id: 0 };
+const baseQueryGetNftRequest = { id: "" };
 exports.QueryGetNftRequest = {
     encode(message, writer = minimal_1.default.Writer.create()) {
-        if (message.id !== 0) {
-            writer.uint32(8).uint32(message.id);
+        if (message.id !== "") {
+            writer.uint32(10).string(message.id);
         }
         return writer;
     },
@@ -26,7 +26,7 @@ exports.QueryGetNftRequest = {
             const tag = reader.uint32();
             switch (tag >>> 3) {
                 case 1:
-                    message.id = reader.uint32();
+                    message.id = reader.string();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -38,10 +38,10 @@ exports.QueryGetNftRequest = {
     fromJSON(object) {
         const message = { ...baseQueryGetNftRequest };
         if (object.id !== undefined && object.id !== null) {
-            message.id = Number(object.id);
+            message.id = String(object.id);
         }
         else {
-            message.id = 0;
+            message.id = "";
         }
         return message;
     },
@@ -56,7 +56,7 @@ exports.QueryGetNftRequest = {
             message.id = object.id;
         }
         else {
-            message.id = 0;
+            message.id = "";
         }
         return message;
     },
@@ -246,6 +246,121 @@ exports.QueryAllNftResponse = {
         return message;
     },
 };
+const baseQueryIsNftFullyReplicatedRequest = { id: "" };
+exports.QueryIsNftFullyReplicatedRequest = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        if (message.id !== "") {
+            writer.uint32(10).string(message.id);
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = {
+            ...baseQueryIsNftFullyReplicatedRequest,
+        };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.id = reader.string();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = {
+            ...baseQueryIsNftFullyReplicatedRequest,
+        };
+        if (object.id !== undefined && object.id !== null) {
+            message.id = String(object.id);
+        }
+        else {
+            message.id = "";
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.id !== undefined && (obj.id = message.id);
+        return obj;
+    },
+    fromPartial(object) {
+        const message = {
+            ...baseQueryIsNftFullyReplicatedRequest,
+        };
+        if (object.id !== undefined && object.id !== null) {
+            message.id = object.id;
+        }
+        else {
+            message.id = "";
+        }
+        return message;
+    },
+};
+const baseQueryIsNftFullyReplicatedResponse = { isReplicated: false };
+exports.QueryIsNftFullyReplicatedResponse = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        if (message.isReplicated === true) {
+            writer.uint32(8).bool(message.isReplicated);
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = {
+            ...baseQueryIsNftFullyReplicatedResponse,
+        };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.isReplicated = reader.bool();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = {
+            ...baseQueryIsNftFullyReplicatedResponse,
+        };
+        if (object.isReplicated !== undefined && object.isReplicated !== null) {
+            message.isReplicated = Boolean(object.isReplicated);
+        }
+        else {
+            message.isReplicated = false;
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.isReplicated !== undefined &&
+            (obj.isReplicated = message.isReplicated);
+        return obj;
+    },
+    fromPartial(object) {
+        const message = {
+            ...baseQueryIsNftFullyReplicatedResponse,
+        };
+        if (object.isReplicated !== undefined && object.isReplicated !== null) {
+            message.isReplicated = object.isReplicated;
+        }
+        else {
+            message.isReplicated = false;
+        }
+        return message;
+    },
+};
 class QueryClientImpl {
     constructor(rpc) {
         this.rpc = rpc;
@@ -259,6 +374,11 @@ class QueryClientImpl {
         const data = exports.QueryAllNftRequest.encode(request).finish();
         const promise = this.rpc.request("bluzelle.curium.nft.Query", "NftAll", data);
         return promise.then((data) => exports.QueryAllNftResponse.decode(new minimal_1.default.Reader(data)));
+    }
+    IsNftFullyReplicated(request) {
+        const data = exports.QueryIsNftFullyReplicatedRequest.encode(request).finish();
+        const promise = this.rpc.request("bluzelle.curium.nft.Query", "IsNftFullyReplicated", data);
+        return promise.then((data) => exports.QueryIsNftFullyReplicatedResponse.decode(new minimal_1.default.Reader(data)));
     }
 }
 exports.QueryClientImpl = QueryClientImpl;

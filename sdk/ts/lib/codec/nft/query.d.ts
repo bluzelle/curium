@@ -5,7 +5,7 @@ import { PageRequest, PageResponse } from "../cosmos/base/query/v1beta1/paginati
 export declare const protobufPackage = "bluzelle.curium.nft";
 /** this line is used by starport scaffolding # 3 */
 export interface QueryGetNftRequest {
-    id: number;
+    id: string;
 }
 export interface QueryGetNftResponse {
     Nft?: Nft;
@@ -16,6 +16,12 @@ export interface QueryAllNftRequest {
 export interface QueryAllNftResponse {
     Nft: Nft[];
     pagination?: PageResponse;
+}
+export interface QueryIsNftFullyReplicatedRequest {
+    id: string;
+}
+export interface QueryIsNftFullyReplicatedResponse {
+    isReplicated: boolean;
 }
 export declare const QueryGetNftRequest: {
     encode(message: QueryGetNftRequest, writer?: _m0.Writer): _m0.Writer;
@@ -45,17 +51,33 @@ export declare const QueryAllNftResponse: {
     toJSON(message: QueryAllNftResponse): unknown;
     fromPartial(object: DeepPartial<QueryAllNftResponse>): QueryAllNftResponse;
 };
+export declare const QueryIsNftFullyReplicatedRequest: {
+    encode(message: QueryIsNftFullyReplicatedRequest, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryIsNftFullyReplicatedRequest;
+    fromJSON(object: any): QueryIsNftFullyReplicatedRequest;
+    toJSON(message: QueryIsNftFullyReplicatedRequest): unknown;
+    fromPartial(object: DeepPartial<QueryIsNftFullyReplicatedRequest>): QueryIsNftFullyReplicatedRequest;
+};
+export declare const QueryIsNftFullyReplicatedResponse: {
+    encode(message: QueryIsNftFullyReplicatedResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryIsNftFullyReplicatedResponse;
+    fromJSON(object: any): QueryIsNftFullyReplicatedResponse;
+    toJSON(message: QueryIsNftFullyReplicatedResponse): unknown;
+    fromPartial(object: DeepPartial<QueryIsNftFullyReplicatedResponse>): QueryIsNftFullyReplicatedResponse;
+};
 /** Query defines the gRPC querier service. */
 export interface Query {
     /** this line is used by starport scaffolding # 2 */
     Nft(request: QueryGetNftRequest): Promise<QueryGetNftResponse>;
     NftAll(request: QueryAllNftRequest): Promise<QueryAllNftResponse>;
+    IsNftFullyReplicated(request: QueryIsNftFullyReplicatedRequest): Promise<QueryIsNftFullyReplicatedResponse>;
 }
 export declare class QueryClientImpl implements Query {
     private readonly rpc;
     constructor(rpc: Rpc);
     Nft(request: QueryGetNftRequest): Promise<QueryGetNftResponse>;
     NftAll(request: QueryAllNftRequest): Promise<QueryAllNftResponse>;
+    IsNftFullyReplicated(request: QueryIsNftFullyReplicatedRequest): Promise<QueryIsNftFullyReplicatedResponse>;
 }
 interface Rpc {
     request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;

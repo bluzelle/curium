@@ -18,6 +18,7 @@ const sdk = (options, qImpl, mImpl, msgTypes, cs) => {
         q: new qImpl(queryRpc),
         tx: new mImpl(txRpc),
         address,
+        url: options.url,
         withTransaction: (fn, options) => CommunicationService_1.withTransaction(cs, fn, options),
     }));
 };
