@@ -3,7 +3,7 @@ import {useChaiAsPromised} from "testing/lib/globalHelpers";
 import {DbSdk} from "../../../src/bz-sdk/bz-sdk";
 import {expect} from "chai";
 import {Lease} from "../../../src/codec/crud/lease";
-import {createKeys, defaultGasParams} from "../../helpers/client-helpers/client-helpers";
+import {createKeys} from "../../helpers/client-helpers/sdk-helpers";
 
 describe('sdk.tx.Delete()', function () {
     this.timeout(DEFAULT_TIMEOUT);
@@ -45,33 +45,53 @@ describe('sdk.tx.Delete()', function () {
             creator: sdk.address,
             uuid: 'uuid',
             key: 'myKeys'
-        })).to.be.rejectedWith( /key not found/);
+        })).to.be.rejectedWith(/key not found/);
     });
 
-    // it('should be able to delete an empty value', async () => {
-    //     await sdk.tx.Create({
-    //         creator: sdk.address,
-    //         uuid: 'uuid',
-    //         key: 'emptyValue',
-    //         value: encodeData(''),
-    //         lease: {days: 10} as Lease,
-    //         metadata: new Uint8Array()});
-    //
-    //     expect(await bz.has('key')).to.be.true;
-    //     await bz.delete('key', defaultGasParams());
-    //     expect(await bz.has('key')).to.be.false;
-    // })
-//
-//     it('should throw an error if a key does not exist', async () => {
-//         expect(
-//             await bz.delete('noKey', defaultGasParams()).catch(e => e)
-//         ).to.match(/Key does not exist/);
-//     });
-//
-//     it('should handle parallel deletes', async () => {
-//         const {keys} = await createKeys(bz, 5);
-//         await Promise.all(keys.map(key => bz.delete(key, defaultGasParams())));
-//         expect(await bz.keys()).to.have.length(0);
-//     })
-// });
+    it('should be able to delete an empty value', async () => {
+        await sdk.tx.Create({
+            creator: sdk.address,
+            uuid: 'uuid',
+            key: 'emptyValue',
+            value: encodeData(''),
+            lease: {days: 10} as Lease,
+            metadata: new Uint8Array()
+        });
+
+        await sdk.tx.Delete({
+            creator: sdk.address,
+            uuid: 'uuid',
+            key: 'emptyValue'
+        });
+
+        await expect(sdk.tx.Read({
+            creator: sdk.address,
+            uuid: 'uuid',
+            key: 'emptyValue'
+        })).to.be.rejectedWith(/key not found/);
+
+    })
+
+    it('should throw an error if a key does not exist', async () => {
+        expect(
+            sdk.tx.Delete({
+                creator: sdk.address,
+                uuid: 'uuid',
+                key: 'voided'
+            })
+        ).to.be.rejectedWith(/Key does not exist/);
+    });
+
+
+    it('should handle parallel deletes', async () => {
+        const {keys} = await createKeys(sdk, 5);
+        await Promise.all(keys.map(key => sdk.tx.Delete({
+            creator: sdk.address,
+            uuid: 'uuids',
+            key
+        })));
+        expect(await sdk.q.CrudValueAll({
+            uuid: 'uuids'
+        }).then(val => val.CrudValue)).to.have.length(0);
+    })
 });

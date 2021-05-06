@@ -4,9 +4,9 @@ import {expect} from 'chai'
 import {bluzelle, DbSdk} from "../../../src/bz-sdk/bz-sdk";
 import {Lease} from "../../../src/codec/crud/lease";
 import {getPrintableChars} from "testing/lib/helpers/testHelpers";
-import {defaultGasParams} from "../../helpers/client-helpers/client-helpers";
-import {Some} from "monet";
 import {localChain} from "../../config";
+
+const { spawn } = require('child_process');
 
 
 

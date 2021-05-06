@@ -669,13 +669,6 @@ export class API {
     //         })
 }
 
-const getRpcClient = (url: string): Promise<QueryClientImpl> => {
-    return Tendermint34Client.connect(url)
-        .then(tendermintClient => new QueryClient(tendermintClient))
-        .then(createProtobufRpcClient)
-        .then(rpcClient => new QueryClientImpl(rpcClient))
-}
-
 
 const MINUTE = 60
 const HOUR = MINUTE * 60
@@ -695,18 +688,4 @@ const standardTxResult = (res: MessageResponse<void>): TxResult => ({
     txhash: res.txhash,
     height: res.height,
 })
-
-const bz = new API({
-    url: "http://localhost:26657",
-    mnemonic: "loan arrow prison cloud rain diamond parrot culture marriage forget win brief kingdom response try image auto rather rare tone chef can shallow bus",
-    uuid: "uuid",
-    gasPrice: 0.002,
-    maxGas: 300000
-})
-
-bz.create('chicken', 'dauz')
-    .then(() => bz.create('chicken', 'john'))
-    .then(() => bz.update('superman', 'crazy'))
-    .then(x => x)
-    .catch(e => e)
 
