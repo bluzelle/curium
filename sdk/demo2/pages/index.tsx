@@ -1,10 +1,10 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
-import {ChangeEvent, SyntheticEvent, useState} from "react";
+import {ChangeEvent, useState} from "react";
 import {sha256} from 'js-sha256'
 import {passThrough, passThroughAwait} from "promise-passthrough";
 import {contentType} from 'mime-types'
-
+import React from 'react'
 
 export default function Home() {
     const [state, setState] = useState<string>('ready')
@@ -21,26 +21,30 @@ export default function Home() {
                 <h2 className={styles.title}>
                     Bluzelle NFT Reliable Storage
                 </h2>
-                <input id="image-file" type="file" onInput={uploadFile(setState)}/>
-                <div>{state.includes('done:') ? (
-                    <>
-                        <div>
-                            <a href={`http://localhost:1317/nft/data/${state.replace('done:', '')}`} target="_blank">
-                                node1
-                            </a>
-                        </div>
-                        <div>
-                            <a href={`http://localhost:1327/nft/data/${state.replace('done:', '')}`} target="_blank">
-                                node2
-                            </a>
-                        </div>
-                    </>
-                ) : (state)}</div>
+                <div style={{padding: 20}}>
+                    <input id="image-file" type="file" onInput={uploadFile(setState)}/>
+                </div>
+                <div style={{padding: 10}}>
+                    {state.includes('done:') ? (
+                        <>
+                            <NodeLink port={1317} id={state.replace('done:', '')}/>
+                            <NodeLink port={1327} id={state.replace('done:', '')}/>
+                        </>
+                    ) : (state)}
+                </div>
             </main>
 
         </div>
     )
 }
+
+const NodeLink: React.FC<{ port: number, id: string }> = ({port, id}) => (
+    <div style={{padding: 5}}>
+        <a href={`http://localhost:${port}/nft/data/${id}`} target="_blank">
+            node:{port}
+        </a>
+    </div>
+)
 
 const uploadFile = (setState: (state: string) => unknown) => (ev: ChangeEvent<HTMLInputElement>) => {
     setState('Uploading file');
@@ -58,13 +62,17 @@ const uploadFile = (setState: (state: string) => unknown) => (ev: ChangeEvent<HT
                 mime: contentType(ctx.name || '')
             })
         }).then(resp => resp.json()).then(({id}) => ({...ctx, id})))
-        .then(passThrough(ctx => setState('file uploaded, checking replication status')))
-        .then(ctx => fetch(`http://localhost:3000/api/waitForReplication`, {
+        .then(passThrough(() => setState('file uploaded, checking replication status')))
+        .then(passThroughAwait(ctx => fetch(`http://localhost:3000/api/waitForReplication`, {
             method: 'POST',
             body: JSON.stringify({id: ctx.id})
-        }))
-        .then(resp => resp.json())
-        .then(resp => setState(`done:${resp.id}`))
+        })))
+        .then(passThrough(() => setState('publishing')))
+        .then(passThroughAwait(ctx => fetch(`http://localhost:3000/api/publish`, {
+            method: 'POST',
+            body: JSON.stringify({id: ctx.id})
+        })))
+        .then(ctx => setState(`done:${ctx.id}`))
 }
 
 

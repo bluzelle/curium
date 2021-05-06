@@ -6,7 +6,7 @@ import {readdir} from 'fs/promises'
 import {slice} from 'lodash/fp'
 import {passThrough} from 'promise-passthrough'
 
-const NUM_OF_FILES = 5
+const NUM_OF_FILES = 1
 const MIN_FILE_SIZE = 1
 const META = JSON.stringify({something: 'foo'})
 
