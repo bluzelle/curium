@@ -31,16 +31,15 @@ func NewSetUpContextDecorator() SetUpContextDecorator {
 func (sud SetUpContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
 	// all transactions must implement GasTx
 	gasTx, ok := tx.(GasTx)
-	isFree := tx.GetMsgs()[0].Route() == "voting" || tx.GetMsgs()[0].Route() == "nft"
 
 	if !ok {
 		// Set a gas meter with limit 0 as to prevent an infinite gas meter attack
 		// during runTx.
-		newCtx = SetGasMeter(simulate, isFree, ctx, 0)
+		newCtx = SetGasMeter(simulate, ctx, 0)
 		return newCtx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be GasTx")
 	}
 
-	newCtx = SetGasMeter(simulate, isFree, ctx, gasTx.GetGas())
+	newCtx = SetGasMeter(simulate, ctx, gasTx.GetGas())
 
 	// Decorator will catch an OutOfGasPanic caused in the next antehandler
 	// AnteHandlers must have their own defer/recover in order for the BaseApp
@@ -66,15 +65,12 @@ func (sud SetUpContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate
 }
 
 // SetGasMeter returns a new context with a gas meter set from a given context.
-func SetGasMeter(simulate bool, isFree bool, ctx sdk.Context, gasLimit uint64) sdk.Context {
+func SetGasMeter(simulate bool, ctx sdk.Context, gasLimit uint64) sdk.Context {
 	// In various cases such as simulation and during the genesis block, we do not
 	// meter any gas utilization.
 	if simulate || ctx.BlockHeight() == 0 {
 		return ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 	}
 
-	if isFree {
-		return ctx.WithGasMeter(NewFreeGasMeter(gasLimit))
-	}
-	return ctx.WithGasMeter(sdk.NewGasMeter(gasLimit))
+	return ctx.WithGasMeter(NewBluzelleGasMeter(gasLimit))
 }

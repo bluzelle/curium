@@ -13,8 +13,8 @@ type FreeGasMeterTestSuite struct {
 }
 
 func (suite *FreeGasMeterTestSuite) SetupTest() {
-	suite.GasMeter = NewFreeGasMeter(1000)
-	suite.ZeroLimitGasMeter = NewFreeGasMeter(0)
+	suite.GasMeter = NewBluzelleGasMeter(1000)
+	suite.ZeroLimitGasMeter = NewBluzelleGasMeter(0)
 }
 
 func (suite *FreeGasMeterTestSuite) TestFreeGasMeter_GasConsumed() {
