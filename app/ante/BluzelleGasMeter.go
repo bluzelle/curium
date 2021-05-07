@@ -21,7 +21,7 @@ func NewBluzelleGasMeter(limit storetypes.Gas) storetypes.GasMeter {
 }
 
 func (g *bluzelleGasMeter) GasConsumed() storetypes.Gas {
-	return 0
+	return g.consumed
 }
 
 func (g *bluzelleGasMeter) Limit() storetypes.Gas {

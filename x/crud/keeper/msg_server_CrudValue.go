@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 	"fmt"
+	"github.com/bluzelle/curium/app/ante"
 	"github.com/bluzelle/curium/x/crud/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -25,6 +26,12 @@ func (k msgServer) Create(goCtx context.Context, msg *types.MsgCreate) (*types.M
 		msg.Lease,
 		ctx.BlockHeight(),
 	)
+
+	gasFromLease := CalculateGasForLease(*msg.Lease, len(msg.Uuid) + len(msg.Key) + len(msg.Value))
+
+	blzGasMeter := ctx.GasMeter().(ante.BluzelleGasMeterInterface)
+
+	blzGasMeter.ConsumeBillableGas(gasFromLease, "lease")
 
 	return &types.MsgCreateResponse{}, nil
 }
@@ -52,6 +59,12 @@ func (k msgServer) Update(goCtx context.Context, msg *types.MsgUpdate) (*types.M
 	}
 
 	k.SetCrudValue(&ctx, CrudValue)
+
+	gasFromLease := CalculateGasForLease(*msg.Lease, len(msg.Uuid) + len(msg.Key) + len(msg.Value))
+
+	blzGasMeter := ctx.GasMeter().(ante.BluzelleGasMeterInterface)
+
+	blzGasMeter.ConsumeBillableGas(gasFromLease, "lease")
 
 	return &types.MsgUpdateResponse{}, nil
 }
