@@ -19,7 +19,7 @@ import {phpProxy} from "./phpProxy";
 import {remoteProxy} from "./remoteProxy";
 import {cSharpProxy} from "./cSharpProxy";
 import {extend} from 'lodash'
-import {GasInfo} from '../../../lib/types/GasInfo'
+import {GasInfo} from '../../../../../sdk/ts/src/legacyAdapter/types/GasInfo'
 import {Some} from "monet";
 
 // Allow self signed certificates

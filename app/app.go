@@ -378,6 +378,12 @@ func New(
 		appCodec,
 		keys[crudtypes.StoreKey],
 		keys[crudtypes.MemStoreKey],
+		keys[crudtypes.StoreKey],
+		crudkeeper.MaxKeeperSizes{
+			MaxKeysSize:           0,
+			MaxKeyValuesSize:      0,
+			MaxDefaultLeaseBlocks: 0,
+		},
 	)
 	crudModule := crud.NewAppModule(appCodec, app.crudKeeper)
 
@@ -531,6 +537,7 @@ func (app *App) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.R
 
 // EndBlocker application updates every end block
 func (app *App) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
+	app.crudKeeper.ProcessLeasesAtBlockHeight(ctx, app.crudKeeper.GetKVStore(ctx), app.crudKeeper.GetLeaseStore(ctx), ctx.BlockHeight())
 	return app.mm.EndBlock(ctx, req)
 }
 

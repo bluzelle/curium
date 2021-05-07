@@ -1,4 +1,3 @@
-import {DEFAULT_TIMEOUT} from "../../helpers/client-helpers/client-helpers";
 import {expect} from "chai";
 import delay from "delay";
 import {DbSdk} from "../../../src/bz-sdk/bz-sdk";
@@ -7,7 +6,6 @@ import {decodeData, encodeData, getSdk} from "../../helpers/client-helpers/sdk-h
 import {Lease} from "../../../src/codec/crud/lease";
 
 describe('create', function () {
-    this.timeout(DEFAULT_TIMEOUT);
 
     let sdk: DbSdk;
 
@@ -23,21 +21,54 @@ describe('create', function () {
     //     })
     // });
 
-    it('should allow for lease time in multiple units', async () => {
+    it('should allow expire key-value beyond lease time', async () => {
         await sdk.tx.Create({
             creator: sdk.address,
             uuid: 'uuid',
-            key: 'myKey',
+            key: 'leaseKey',
             value: encodeData('myValue'),
-            lease:  {minutes: 30, hours: 1, days: 1, seconds: 30, years: 0},
+            lease:  {minutes: 1, hours: 0, days: 0, seconds: 0, years: 0},
             metadata: new Uint8Array()
         });
         expect(await sdk.tx.Read({
             creator: sdk.address,
-            key: 'myKey',
+            key: 'leaseKey',
             uuid: 'uuid'
-        }).then(resp => decodeData(resp.value))).to.equal('myValue');
-        expect(await bz.getLease('myKey')).to.be.closeTo(91830, 5);
+        }).then(resp => decodeData(resp.value))).to.equal('myValue')
+
+        await delay(60000);
+
+        expect(sdk.tx.Read({
+            creator: sdk.address,
+            key: 'leaseKey',
+            uuid: 'uuid'
+        })).to.be.rejectedWith(/key does not exist/)
+
+    });
+
+    it('should allow still read within lease time', async () => {
+        await sdk.tx.Create({
+            creator: sdk.address,
+            uuid: 'uuid',
+            key: 'leaseKey2',
+            value: encodeData('myValue'),
+            lease:  {minutes: 1, hours: 1, days: 0, seconds: 0, years: 0},
+            metadata: new Uint8Array()
+        });
+        expect(await sdk.tx.Read({
+            creator: sdk.address,
+            key: 'leaseKey2',
+            uuid: 'uuid'
+        }).then(resp => decodeData(resp.value))).to.equal('myValue')
+
+        await delay(60000);
+
+        expect(await sdk.tx.Read({
+            creator: sdk.address,
+            key: 'leaseKey2',
+            uuid: 'uuid'
+        }).then(resp => decodeData(resp.value))).to.equal('myValue')
+
     });
 
     // it('should allow for empty lease info', async () => {

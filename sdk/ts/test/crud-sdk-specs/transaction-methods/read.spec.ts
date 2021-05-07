@@ -9,7 +9,7 @@ describe('sdk.tx.Read()', function () {
 
     beforeEach(async () => {
         useChaiAsPromised();
-        sdk = await getSdk();
+        sdk = await getSdk().then(cl => cl.db);
     });
     it('should read a value from the db', () => {})
 });

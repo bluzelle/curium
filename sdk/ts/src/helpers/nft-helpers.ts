@@ -3,6 +3,7 @@ import {NftSdk} from "../bz-sdk/bz-sdk";
 import {passThroughAwait} from "promise-passthrough";
 import {createHash} from "crypto";
 import delay from "delay";
+// @ts-ignore
 import fetch from 'node-fetch'
 
 export type UploadNFTParams = Omit<MsgCreateNft, "creator" | "id" | "host">
@@ -32,7 +33,7 @@ const uploadNft = (nft: NftSdk) => (params: UploadNFTParams, data: Uint8Array): 
             ...params
         }))
         .then(passThroughAwait(waitForFullReplication(nft)))
-        .then(passThroughAwait(({id}) => nft.tx.PublishFile({id: id, creator: nft.address})))
+        .then(passThroughAwait(({id}: MsgCreateNftResponse) => nft.tx.PublishFile({id: id, creator: nft.address})))
 };
 
 const waitForFullReplication = (nft: NftSdk) => ({id}: MsgCreateNftResponse): Promise<unknown> =>
