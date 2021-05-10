@@ -26,4 +26,5 @@ export interface Bluzelle {
     newMnemonic: (entropy?: string) => string;
 }
 export declare const bluzelle: Bluzelle;
+export declare function newMnemonic(entropy?: string): string;
 //# sourceMappingURL=bz-sdk.d.ts.map

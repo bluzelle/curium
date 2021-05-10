@@ -1,5 +1,4 @@
-import {API} from "../../../src/legacyAdapter/API";
-import {BluzelleConfig} from "../../../src/legacyAdapter/types/BluzelleConfig";
+import {API, APIOptions} from "../../../src/legacyAdapter/API";
 import puppeteer from "puppeteer";
 import fs from "fs";
 import {resolve} from "path";
@@ -11,7 +10,7 @@ afterEach(() => currentBrowser?.close());
 
 const isDebug = () => process.argv.includes('--debug');
 
-export const browserProxy = async (bz: API, bluzelleConfig: BluzelleConfig): Promise<API> => {
+export const browserProxy = async (bz: API, bluzelleConfig: APIOptions): Promise<API> => {
     currentBrowser = await puppeteer.launch({devtools: isDebug()});
     const page = await currentBrowser.newPage();
 
@@ -54,8 +53,8 @@ export const browserProxy = async (bz: API, bluzelleConfig: BluzelleConfig): Pro
             })
     }
 
-    function instantiateBluzelleClientInBrowser(bluzelleConfig: BluzelleConfig) {
-        return page.evaluate((bluzelleConfig: BluzelleConfig) => {
+    function instantiateBluzelleClientInBrowser(bluzelleConfig: APIOptions) {
+        return page.evaluate((bluzelleConfig: APIOptions) => {
                 (window as any).bz = (window as any).bluzelle(bluzelleConfig)
         }, bluzelleConfig as any)
 

@@ -58,7 +58,7 @@ export const bluzelle: Bluzelle = (options: SDKOptions): Promise<BluzelleSdk> =>
 bluzelle.newMnemonic = newMnemonic;
 
 
-function newMnemonic(entropy: string = '' ): string {
+export function newMnemonic(entropy: string = '' ): string {
     return Right<string, string>(entropy)
         .flatMap(entropy => entropy.length === 0 || entropy.length === 64 ? Right(entropy) : Left(entropy))
         .map(entropy => entropy ? entropyToMnemonic(entropy as string) : generateMnemonic(256))

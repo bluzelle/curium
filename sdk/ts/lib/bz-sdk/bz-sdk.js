@@ -19,7 +19,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.bluzelle = void 0;
+exports.newMnemonic = exports.bluzelle = void 0;
 const rpc_1 = require("../client-lib/rpc");
 const query_1 = require("../codec/crud/query");
 const tx_1 = require("../codec/crud/tx");
@@ -62,6 +62,7 @@ function newMnemonic(entropy = '') {
         .leftMap(() => console.log("Entropy must be 64 char hex"))
         .cata(() => 'Invalid entropy', mnemonic => mnemonic);
 }
+exports.newMnemonic = newMnemonic;
 // Promise.resolve(bluzelle({
 //     mnemonic: "focus ill drift swift blood bitter move grace ensure diamond year tongue hint weekend bulb rebel avoid gas dose print remove receive yellow shoot",
 //     url: "http://localhost:26657",

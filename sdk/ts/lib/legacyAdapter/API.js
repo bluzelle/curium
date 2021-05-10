@@ -1,12 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.API = exports.legacyAdapter = void 0;
-const tendermint_rpc_1 = require("@cosmjs/tendermint-rpc");
 const lodash_1 = require("lodash");
 const Assert_1 = require("./Assert");
 const bip39_1 = require("bip39");
-const query_1 = require("../codec/crud/query");
-const stargate_1 = require("@cosmjs/stargate");
 const bz_sdk_1 = require("../bz-sdk/bz-sdk");
 // TEMP STUB
 const BLOCK_TIME_IN_SECONDS = 5.5;
@@ -16,33 +13,12 @@ exports.legacyAdapter = legacyAdapter;
 class API {
     constructor(config) {
         //
-        // deleteAll(gasInfo: GasInfo): Promise<TxResult> {
-        //     return sendMessage<DeleteAllMessage, void>(this.communicationService, {
-        //         type: 'crud/deleteall',
-        //         value: {
-        //             UUID: this.uuid,
-        //             Owner: this.address
-        //         }
-        //     }, gasInfo)
-        //         .then(standardTxResult)
-        // }
-        //
-        // getAddress(): Promise<string> {
-        //     return mnemonicToAddress(this.mnemonic);
-        // }
-        //
-        // getLease(key: string): Promise<number> {
-        //     return this.#abciQuery<QueryGetLeaseResult & { error: string }>(`/custom/crud/getlease/${this.uuid}/${key}`)
-        //         .then(x => x.result)
-        //         .then(res => Math.round(res.lease * BLOCK_TIME_IN_SECONDS))
-        //         .catch(res => {
-        //             throw res.error === 'Not Found' ? `key "${key}" not found` : res.error
-        //         })
-        // }
-        //
         this.generateBIP39Account = (entropy = '') => {
             Assert_1.assert(entropy.length === 0 || entropy.length === 64, 'Entropy must be 64 char hex');
             return entropy ? bip39_1.entropyToMnemonic(entropy) : bip39_1.generateMnemonic(256);
+        };
+        this.convertLeaseToSeconds = (lease) => {
+            return lease.years * 365 * 24 * 60 * 60 + lease.days * 24 * 60 * 60 + lease.hours * 60 * 60 + lease.minutes * 60 + lease.seconds;
         };
         this.config = config;
     }
@@ -153,6 +129,35 @@ class API {
             creator: client.db.address,
         }));
         //.then(standardTxResult)
+    }
+    //
+    // deleteAll(gasInfo: GasInfo): Promise<TxResult> {
+    //     return sendMessage<DeleteAllMessage, void>(this.communicationService, {
+    //         type: 'crud/deleteall',
+    //         value: {
+    //             UUID: this.uuid,
+    //             Owner: this.address
+    //         }
+    //     }, gasInfo)
+    //         .then(standardTxResult)
+    // }
+    //
+    // getAddress(): Promise<string> {
+    //     return mnemonicToAddress(this.mnemonic);
+    // }
+    //
+    getLease(key) {
+        return this.getClient()
+            .then(client => client.db.tx.GetLease({
+            creator: client.db.address,
+            uuid: this.config.uuid,
+            key
+        }))
+            .then(resp => resp.lease ? Math.round(this.convertLeaseToSeconds(resp.lease)) : 0);
+        // .then(res => Math.round(res.lease * BLOCK_TIME_IN_SECONDS))
+        // .catch(res => {
+        //     throw res.error === 'Not Found' ? `key "${key}" not found` : res.error
+        // })
     }
     //
     // async getNShortestLeases(count: number) {
@@ -508,12 +513,6 @@ class API {
     }
 }
 exports.API = API;
-const getRpcClient = (url) => {
-    return tendermint_rpc_1.Tendermint34Client.connect(url)
-        .then(tendermintClient => new stargate_1.QueryClient(tendermintClient))
-        .then(stargate_1.createProtobufRpcClient)
-        .then(rpcClient => new query_1.QueryClientImpl(rpcClient));
-};
 const MINUTE = 60;
 const HOUR = MINUTE * 60;
 const findMine = (res, condition) => {
@@ -530,16 +529,4 @@ const standardTxResult = (res) => ({
     txhash: res.txhash,
     height: res.height,
 });
-const bz = new API({
-    url: "http://localhost:26657",
-    mnemonic: "loan arrow prison cloud rain diamond parrot culture marriage forget win brief kingdom response try image auto rather rare tone chef can shallow bus",
-    uuid: "uuid",
-    gasPrice: 0.002,
-    maxGas: 300000
-});
-bz.create('chicken', 'dauz')
-    .then(() => bz.create('chicken', 'john'))
-    .then(() => bz.update('superman', 'crazy'))
-    .then(x => x)
-    .catch(e => e);
 //# sourceMappingURL=API.js.map

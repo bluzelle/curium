@@ -2,7 +2,7 @@ import {decodeData, DEFAULT_TIMEOUT, defaultLease, encodeData, getSdk} from "../
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
 import {bluzelle, DbSdk} from "../../../src/bz-sdk/bz-sdk";
 import {expect} from "chai";
-import {defaultGasParams} from "../../helpers/client-helpers/client-helpers";
+import {defaultLease} from "../../helpers/client-helpers/client-helpers";
 import {localChain} from "../../config";
 
 describe('sdk.tx.Update()', function () {

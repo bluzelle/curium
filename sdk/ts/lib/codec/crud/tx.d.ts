@@ -3,6 +3,14 @@ import _m0 from "protobufjs/minimal";
 import { Lease } from "../crud/lease";
 export declare const protobufPackage = "bluzelle.curium.crud";
 /** this line is used by starport scaffolding # proto/tx/message */
+export interface MsgGetLease {
+    creator: string;
+    uuid: string;
+    key: string;
+}
+export interface MsgGetLeaseResponse {
+    lease?: Lease;
+}
 export interface MsgRead {
     creator: string;
     uuid: string;
@@ -49,6 +57,20 @@ export interface MsgDelete {
 }
 export interface MsgDeleteResponse {
 }
+export declare const MsgGetLease: {
+    encode(message: MsgGetLease, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgGetLease;
+    fromJSON(object: any): MsgGetLease;
+    toJSON(message: MsgGetLease): unknown;
+    fromPartial(object: DeepPartial<MsgGetLease>): MsgGetLease;
+};
+export declare const MsgGetLeaseResponse: {
+    encode(message: MsgGetLeaseResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgGetLeaseResponse;
+    fromJSON(object: any): MsgGetLeaseResponse;
+    toJSON(message: MsgGetLeaseResponse): unknown;
+    fromPartial(object: DeepPartial<MsgGetLeaseResponse>): MsgGetLeaseResponse;
+};
 export declare const MsgRead: {
     encode(message: MsgRead, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgRead;
@@ -122,6 +144,7 @@ export declare const MsgDeleteResponse: {
 /** Msg defines the Msg service. */
 export interface Msg {
     /** this line is used by starport scaffolding # proto/tx/rpc */
+    GetLease(request: MsgGetLease): Promise<MsgGetLeaseResponse>;
     Read(request: MsgRead): Promise<MsgReadResponse>;
     Upsert(request: MsgUpsert): Promise<MsgUpsertResponse>;
     Create(request: MsgCreate): Promise<MsgCreateResponse>;
@@ -131,6 +154,7 @@ export interface Msg {
 export declare class MsgClientImpl implements Msg {
     private readonly rpc;
     constructor(rpc: Rpc);
+    GetLease(request: MsgGetLease): Promise<MsgGetLeaseResponse>;
     Read(request: MsgRead): Promise<MsgReadResponse>;
     Upsert(request: MsgUpsert): Promise<MsgUpsertResponse>;
     Create(request: MsgCreate): Promise<MsgCreateResponse>;

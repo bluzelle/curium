@@ -1,4 +1,4 @@
-import {defaultGasParams, sentryWithClient} from "../../helpers/client-helpers/client-helpers";
+import {defaultLease, sentryWithClient} from "../../helpers/client-helpers/client-helpers";
 import {expect} from 'chai'
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
 import {range} from 'lodash'
@@ -13,10 +13,10 @@ describe('high-load-test', function () {
         const bz = await sentryWithClient();
 
         await bz.withTransaction(() =>
-            range(0, 100).map(l => bz.create(`foo${l}`, 'x'.repeat(l), defaultGasParams()))
+            range(0, 100).map(l => bz.create(`foo${l}`, 'x'.repeat(l), defaultLease()))
         );
         await bz.withTransaction(() =>
-            range(100000, 200000, 20000).map(l => bz.create(`foo${l}`, 'x'.repeat(l), defaultGasParams()))
+            range(100000, 200000, 20000).map(l => bz.create(`foo${l}`, 'x'.repeat(l), defaultLease()))
         );
 
         const swarm2: Swarm | undefined | void = await bz.swarm?.export()

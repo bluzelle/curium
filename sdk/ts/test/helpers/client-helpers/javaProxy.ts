@@ -1,15 +1,14 @@
-import {API} from "../../../src/legacyAdapter/API";
-import {BluzelleConfig} from "../../../src/legacyAdapter/types/BluzelleConfig";
+import {API, APIOptions} from "../../../src/legacyAdapter/API";
 import {clientProxyFactory} from "./clientProxyFactory";
 import axios from 'axios';
 import {deleteProxyContainer, startProxyContainer} from "./dockerfiles/DockerManager";
 import {serializeRequests, waitForProxyUp} from "./client-helpers";
 
-export const javaProxy = async (bz: API, bluzelleConfig: BluzelleConfig): Promise<API> => {
+export const javaProxy = async (bz: API, bluzelleConfig: APIOptions): Promise<API> => {
 console.log(bluzelleConfig);
 const env = {
         MNEMONIC: bluzelleConfig.mnemonic,
-        ENDPOINT: bluzelleConfig.endpoint,
+        ENDPOINT: bluzelleConfig.url,
         UUID: bluzelleConfig.uuid
     } as any
 

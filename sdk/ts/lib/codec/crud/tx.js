@@ -3,12 +3,153 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MsgClientImpl = exports.MsgDeleteResponse = exports.MsgDelete = exports.MsgUpdateResponse = exports.MsgUpdate = exports.MsgCreateResponse = exports.MsgCreate = exports.MsgUpsertResponse = exports.MsgUpsert = exports.MsgReadResponse = exports.MsgRead = exports.protobufPackage = void 0;
+exports.MsgClientImpl = exports.MsgDeleteResponse = exports.MsgDelete = exports.MsgUpdateResponse = exports.MsgUpdate = exports.MsgCreateResponse = exports.MsgCreate = exports.MsgUpsertResponse = exports.MsgUpsert = exports.MsgReadResponse = exports.MsgRead = exports.MsgGetLeaseResponse = exports.MsgGetLease = exports.protobufPackage = void 0;
 /* eslint-disable */
 const long_1 = __importDefault(require("long"));
 const minimal_1 = __importDefault(require("protobufjs/minimal"));
 const lease_1 = require("../crud/lease");
 exports.protobufPackage = "bluzelle.curium.crud";
+const baseMsgGetLease = { creator: "", uuid: "", key: "" };
+exports.MsgGetLease = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        if (message.creator !== "") {
+            writer.uint32(10).string(message.creator);
+        }
+        if (message.uuid !== "") {
+            writer.uint32(18).string(message.uuid);
+        }
+        if (message.key !== "") {
+            writer.uint32(26).string(message.key);
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = { ...baseMsgGetLease };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.creator = reader.string();
+                    break;
+                case 2:
+                    message.uuid = reader.string();
+                    break;
+                case 3:
+                    message.key = reader.string();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = { ...baseMsgGetLease };
+        if (object.creator !== undefined && object.creator !== null) {
+            message.creator = String(object.creator);
+        }
+        else {
+            message.creator = "";
+        }
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = String(object.uuid);
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.key !== undefined && object.key !== null) {
+            message.key = String(object.key);
+        }
+        else {
+            message.key = "";
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.creator !== undefined && (obj.creator = message.creator);
+        message.uuid !== undefined && (obj.uuid = message.uuid);
+        message.key !== undefined && (obj.key = message.key);
+        return obj;
+    },
+    fromPartial(object) {
+        const message = { ...baseMsgGetLease };
+        if (object.creator !== undefined && object.creator !== null) {
+            message.creator = object.creator;
+        }
+        else {
+            message.creator = "";
+        }
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = object.uuid;
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.key !== undefined && object.key !== null) {
+            message.key = object.key;
+        }
+        else {
+            message.key = "";
+        }
+        return message;
+    },
+};
+const baseMsgGetLeaseResponse = {};
+exports.MsgGetLeaseResponse = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        if (message.lease !== undefined) {
+            lease_1.Lease.encode(message.lease, writer.uint32(10).fork()).ldelim();
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = { ...baseMsgGetLeaseResponse };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.lease = lease_1.Lease.decode(reader, reader.uint32());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = { ...baseMsgGetLeaseResponse };
+        if (object.lease !== undefined && object.lease !== null) {
+            message.lease = lease_1.Lease.fromJSON(object.lease);
+        }
+        else {
+            message.lease = undefined;
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.lease !== undefined &&
+            (obj.lease = message.lease ? lease_1.Lease.toJSON(message.lease) : undefined);
+        return obj;
+    },
+    fromPartial(object) {
+        const message = { ...baseMsgGetLeaseResponse };
+        if (object.lease !== undefined && object.lease !== null) {
+            message.lease = lease_1.Lease.fromPartial(object.lease);
+        }
+        else {
+            message.lease = undefined;
+        }
+        return message;
+    },
+};
 const baseMsgRead = { creator: "", uuid: "", key: "" };
 exports.MsgRead = {
     encode(message, writer = minimal_1.default.Writer.create()) {
@@ -829,6 +970,11 @@ exports.MsgDeleteResponse = {
 class MsgClientImpl {
     constructor(rpc) {
         this.rpc = rpc;
+    }
+    GetLease(request) {
+        const data = exports.MsgGetLease.encode(request).finish();
+        const promise = this.rpc.request("bluzelle.curium.crud.Msg", "GetLease", data);
+        return promise.then((data) => exports.MsgGetLeaseResponse.decode(new minimal_1.default.Reader(data)));
     }
     Read(request) {
         const data = exports.MsgRead.encode(request).finish();

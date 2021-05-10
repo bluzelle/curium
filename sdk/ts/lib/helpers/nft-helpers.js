@@ -7,6 +7,7 @@ exports.nftHelpers = void 0;
 const promise_passthrough_1 = require("promise-passthrough");
 const crypto_1 = require("crypto");
 const delay_1 = __importDefault(require("delay"));
+// @ts-ignore
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const nftHelpers = (sdk) => ({
     uploadNft: uploadNft(sdk)

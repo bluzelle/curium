@@ -1,14 +1,13 @@
-import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
+
 import {MessageResponse} from "./types/MessageResponse";
 import {pullAt} from 'lodash'
 import {TxResult} from "./types/TxResult";
 import {assert} from "./Assert";
 import {entropyToMnemonic, generateMnemonic} from "bip39";
-import {QueryClientImpl} from "../codec/crud/query";
-import {createProtobufRpcClient, QueryClient} from "@cosmjs/stargate";
 import {SDKOptions} from '../client-lib/rpc'
 import {bluzelle, BluzelleSdk} from "../bz-sdk/bz-sdk";
 import {Lease} from "../codec/crud/lease";
+
 
 // TEMP STUB
 const BLOCK_TIME_IN_SECONDS = 5.5;
@@ -75,9 +74,6 @@ export const legacyAdapter = (options: APIOptions): API => new API(options)
 
 
 export type APIOptions = SDKOptions & {uuid: string}
-
-
-
 
 export class API {
     config: APIOptions;
@@ -217,19 +213,28 @@ export class API {
     //     return mnemonicToAddress(this.mnemonic);
     // }
     //
-    // getLease(key: string): Promise<number> {
-    //     return this.#abciQuery<QueryGetLeaseResult & { error: string }>(`/custom/crud/getlease/${this.uuid}/${key}`)
-    //         .then(x => x.result)
-    //         .then(res => Math.round(res.lease * BLOCK_TIME_IN_SECONDS))
-    //         .catch(res => {
-    //             throw res.error === 'Not Found' ? `key "${key}" not found` : res.error
-    //         })
-    // }
+    getLease(key: string): Promise<number> {
+        return this.getClient()
+            .then(client => client.db.tx.GetLease({
+                creator: client.db.address,
+                uuid: this.config.uuid,
+                key
+            }))
+            .then(resp => Math.round(resp.leaseBlocks.toInt() * BLOCK_TIME_IN_SECONDS))
+            .catch(res => {
+                throw res.error === 'Not Found' ? `key "${key}" not found` : res.error
+            })
+    }
     //
     generateBIP39Account = (entropy: string = ''): string => {
         assert(entropy.length === 0 || entropy.length === 64, 'Entropy must be 64 char hex');
         return entropy ? entropyToMnemonic(entropy) : generateMnemonic(256);
     }
+
+    convertLeaseToSeconds = (lease: Lease): number => {
+        return lease.years * 365 * 24 * 60 * 60 + lease.days * 24 * 60 * 60 + lease.hours * 60 * 60 + lease.minutes * 60 + lease.seconds
+    }
+
     //
     // async getNShortestLeases(count: number) {
     //     assert(count >= 0, ClientErrors.INVALID_VALUE_SPECIFIED);

@@ -1,6 +1,6 @@
 import {expect} from 'chai'
-import {API} from '../../../src/legacyAdapter/API';
-import {createKeys, DEFAULT_TIMEOUT, defaultGasParams, sentryWithClient} from "../../helpers/client-helpers/client-helpers";
+import {API} from '../../../../src/legacyAdapter/API';
+import {createKeys, DEFAULT_TIMEOUT, defaultGasParams, sentryWithClient} from "../../../helpers/client-helpers/client-helpers";
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
 
 
@@ -14,12 +14,12 @@ describe('delete()', function () {
         bz = await sentryWithClient();
     });
 
-    it('should resolve to chain information', async () => {
-        await bz.create('myKey', 'someValue', defaultGasParams());
-        const result = await bz.delete('myKey', defaultGasParams())
-        expect(result.txhash).to.be.a('string');
-        expect(result.height).to.be.a('number');
-    });
+    // it('should resolve to chain information', async () => {
+    //     await bz.create('myKey', 'someValue', defaultGasParams());
+    //     const result = await bz.delete('myKey', defaultGasParams())
+    //     expect(result.txhash).to.be.a('string');
+    //     expect(result.height).to.be.a('number');
+    // });
 
     it('should delete a key in the database', async () => {
         await bz.create('myKey', 'someValue', defaultGasParams());

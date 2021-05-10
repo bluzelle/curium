@@ -2,7 +2,8 @@ import {Daemon, DaemonAuth} from "curium-control/daemon-manager/lib/Daemon";
 import {Swarm} from "curium-control/daemon-manager/lib/Swarm";
 import {bluzelle} from "../../../src/legacyAdapter/bluzelle-node";
 import {bluzelle as bluzelleJS} from '../../../src/legacyAdapter/bluzelle-js';
-import {API, APIOptions} from "../../../src/legacyAdapter/API";
+import {API} from "../../../src/legacyAdapter/API";
+import {APIOptions} from "../../../src/legacyAdapter/API";
 import {range} from 'lodash'
 import {getSwarm, SINGLE_SENTRY_SWARM} from "testing/lib/helpers/swarmHelpers";
 import {browserProxy} from "./browserProxy";
@@ -21,6 +22,7 @@ import {cSharpProxy} from "./cSharpProxy";
 import {extend} from 'lodash'
 import {GasInfo} from '../../../../../sdk/ts/src/legacyAdapter/types/GasInfo'
 import {Some} from "monet";
+import {newMnemonic} from "../../../src/bz-sdk/bz-sdk";
 
 // Allow self signed certificates
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -76,22 +78,22 @@ export const sentryWithClient = async (extra: Partial<APIOptions> = {}, sdk: boo
 
 };
 
-export const getClient = async (sentry: Daemon, validator: Daemon, extra: Partial<APIOptions>): Promise<API | SDK> => {
+export const getClient = async (sentry: Daemon, validator: Daemon, extra: Partial<APIOptions>): Promise<API> => {
     const auth: DaemonAuth = await validator.getAuth();
 
     const endpoint = ['ruby', 'python', 'go', 'java', 'php', 'c-sharp'].includes(getBluzelleClient() as string) ? `http://${await sentry.getIPAddress()}:1317` : `https://localhost:${sentry.getAdhocPort()}`;
 
-    const vuserBz = bluzelle({
+    const vuserBz = await bluzelle({
         mnemonic: auth.mnemonic,
         url: endpoint,
         gasPrice: 0.002,
         maxGas: 300000,
         uuid: 'uuid'
 
-    });
+    }).getClient();
 
     const bluzelleConfig: APIOptions = <APIOptions>{
-        mnemonic: vuserBz.generateBIP39Account(),
+        mnemonic: newMnemonic(),
         url: endpoint,
         gasPrice: 0.002,
         maxGas: 300000,
@@ -100,8 +102,8 @@ export const getClient = async (sentry: Daemon, validator: Daemon, extra: Partia
 
     let bz: API = bluzelle({...bluzelleConfig, url: `https://localhost:${sentry.getAdhocPort()}`});
 
-    await mnemonicToAddress(bz.config.mnemonic || '')
-        .then(address => vuserBz.transferTokensTo(address, 1000000, defaultGasParams()));
+    // await mnemonicToAddress(bz.config.mnemonic || '')
+    //     .then(address => vuserBz.transferTokensTo(address, 1000000, defaultGasParams()));
 
     getBluzelleClient() === 'c-sharp' && (bz = await cSharpProxy(bz, bluzelleConfig));
     getBluzelleClient() === 'php' && (bz = await phpProxy(bz, bluzelleConfig));
@@ -115,7 +117,7 @@ export const getClient = async (sentry: Daemon, validator: Daemon, extra: Partia
     return bz;
 };
 
-export const defaultGasParams = (gasInfo: GasInfo = {}): GasInfo => ({gas_price: 0.004, max_gas: 100000000, ...gasInfo})
+export const defaultLease = (gasInfo: GasInfo = {}): GasInfo => ({gas_price: 0.004, max_gas: 100000000, ...gasInfo})
 
 export const getBluzelleClient = (): string | undefined =>
     process.argv.find(it => it.includes('--bluzelle-client='))?.replace('--bluzelle-client=', '') || 'node';
@@ -127,7 +129,7 @@ export const getServerToUse = (): string | undefined =>
 export const createKeys = async (bz: API, count: number): Promise<{ keys: string[], values: string[] }> => {
     const keys = range(0, count).map(n => `key-${n}`);
     const values = range(0, count).map(n => `value-${n}`);
-    await bz.withTransaction(() => keys.map((key, idx) => bz.create(key, values[idx], defaultGasParams())));
+    //await bz.withTransaction(() => keys.map((key, idx) => bz.create(key, values[idx], defaultGasParams())));
     return {keys, values};
 };
 
@@ -175,7 +177,7 @@ export const newBzClient = (bz: API): Promise<API> =>
         }))
         .map(async (newBz: API) => {
             await mnemonicToAddress(newBz.config.mnemonic || '')
-                .then(address => bz.transferTokensTo(address, 1000, defaultGasParams()));
+                //.then(address => bz.transferTokensTo(address, 1000, defaultGasParams()));
             return newBz;
         })
         .join()

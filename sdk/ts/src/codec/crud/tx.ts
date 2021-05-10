@@ -6,6 +6,18 @@ import { Lease } from "../crud/lease";
 export const protobufPackage = "bluzelle.curium.crud";
 
 /** this line is used by starport scaffolding # proto/tx/message */
+export interface MsgGetLease {
+  creator: string;
+  uuid: string;
+  key: string;
+}
+
+export interface MsgGetLeaseResponse {
+  uuid: string;
+  key: string;
+  leaseBlocks: Long;
+}
+
 export interface MsgRead {
   creator: string;
   uuid: string;
@@ -57,6 +69,195 @@ export interface MsgDelete {
 }
 
 export interface MsgDeleteResponse {}
+
+const baseMsgGetLease: object = { creator: "", uuid: "", key: "" };
+
+export const MsgGetLease = {
+  encode(
+    message: MsgGetLease,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.uuid !== "") {
+      writer.uint32(18).string(message.uuid);
+    }
+    if (message.key !== "") {
+      writer.uint32(26).string(message.key);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgGetLease {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgGetLease } as MsgGetLease;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.uuid = reader.string();
+          break;
+        case 3:
+          message.key = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgGetLease {
+    const message = { ...baseMsgGetLease } as MsgGetLease;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = String(object.key);
+    } else {
+      message.key = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgGetLease): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    message.key !== undefined && (obj.key = message.key);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgGetLease>): MsgGetLease {
+    const message = { ...baseMsgGetLease } as MsgGetLease;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = object.key;
+    } else {
+      message.key = "";
+    }
+    return message;
+  },
+};
+
+const baseMsgGetLeaseResponse: object = {
+  uuid: "",
+  key: "",
+  leaseBlocks: Long.ZERO,
+};
+
+export const MsgGetLeaseResponse = {
+  encode(
+    message: MsgGetLeaseResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.uuid !== "") {
+      writer.uint32(10).string(message.uuid);
+    }
+    if (message.key !== "") {
+      writer.uint32(18).string(message.key);
+    }
+    if (!message.leaseBlocks.isZero()) {
+      writer.uint32(24).int64(message.leaseBlocks);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgGetLeaseResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgGetLeaseResponse } as MsgGetLeaseResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.uuid = reader.string();
+          break;
+        case 2:
+          message.key = reader.string();
+          break;
+        case 3:
+          message.leaseBlocks = reader.int64() as Long;
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgGetLeaseResponse {
+    const message = { ...baseMsgGetLeaseResponse } as MsgGetLeaseResponse;
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = String(object.key);
+    } else {
+      message.key = "";
+    }
+    if (object.leaseBlocks !== undefined && object.leaseBlocks !== null) {
+      message.leaseBlocks = Long.fromString(object.leaseBlocks);
+    } else {
+      message.leaseBlocks = Long.ZERO;
+    }
+    return message;
+  },
+
+  toJSON(message: MsgGetLeaseResponse): unknown {
+    const obj: any = {};
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    message.key !== undefined && (obj.key = message.key);
+    message.leaseBlocks !== undefined &&
+      (obj.leaseBlocks = (message.leaseBlocks || Long.ZERO).toString());
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgGetLeaseResponse>): MsgGetLeaseResponse {
+    const message = { ...baseMsgGetLeaseResponse } as MsgGetLeaseResponse;
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = object.key;
+    } else {
+      message.key = "";
+    }
+    if (object.leaseBlocks !== undefined && object.leaseBlocks !== null) {
+      message.leaseBlocks = object.leaseBlocks as Long;
+    } else {
+      message.leaseBlocks = Long.ZERO;
+    }
+    return message;
+  },
+};
 
 const baseMsgRead: object = { creator: "", uuid: "", key: "" };
 
@@ -937,6 +1138,7 @@ export const MsgDeleteResponse = {
 /** Msg defines the Msg service. */
 export interface Msg {
   /** this line is used by starport scaffolding # proto/tx/rpc */
+  GetLease(request: MsgGetLease): Promise<MsgGetLeaseResponse>;
   Read(request: MsgRead): Promise<MsgReadResponse>;
   Upsert(request: MsgUpsert): Promise<MsgUpsertResponse>;
   Create(request: MsgCreate): Promise<MsgCreateResponse>;
@@ -949,6 +1151,18 @@ export class MsgClientImpl implements Msg {
   constructor(rpc: Rpc) {
     this.rpc = rpc;
   }
+  GetLease(request: MsgGetLease): Promise<MsgGetLeaseResponse> {
+    const data = MsgGetLease.encode(request).finish();
+    const promise = this.rpc.request(
+      "bluzelle.curium.crud.Msg",
+      "GetLease",
+      data
+    );
+    return promise.then((data) =>
+      MsgGetLeaseResponse.decode(new _m0.Reader(data))
+    );
+  }
+
   Read(request: MsgRead): Promise<MsgReadResponse> {
     const data = MsgRead.encode(request).finish();
     const promise = this.rpc.request("bluzelle.curium.crud.Msg", "Read", data);

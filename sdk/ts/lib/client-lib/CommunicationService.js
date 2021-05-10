@@ -116,7 +116,7 @@ const getSequence = (service, cosmos) => (service.accountRequested ? (service.ac
     account: service.account
 }));
 const checkErrors = (res) => {
-    if (res.code > 0) {
+    if (!res.data) {
         throw res.rawLog;
     }
     return res;

@@ -21,7 +21,7 @@ describe('create', function () {
     //     })
     // });
 
-    it('should allow expire key-value beyond lease time', async () => {
+    it('should expire key-value beyond lease time', async () => {
         await sdk.tx.Create({
             creator: sdk.address,
             uuid: 'uuid',
@@ -69,6 +69,28 @@ describe('create', function () {
             uuid: 'uuid'
         }).then(resp => decodeData(resp.value))).to.equal('myValue')
 
+    });
+
+    it('getLease()', async () => {
+        await sdk.tx.Create({
+            creator: sdk.address,
+            uuid: 'uuid',
+            key: 'leaseKey12',
+            value: encodeData('myValue'),
+            lease:  {minutes: 1, hours: 2, days: 0, seconds: 0, years: 0},
+            metadata: new Uint8Array()
+        });
+        expect(await sdk.tx.Read({
+            creator: sdk.address,
+            key: 'leaseKey12',
+            uuid: 'uuid'
+        }).then(resp => decodeData(resp.value))).to.equal('myValue')
+
+        expect(await sdk.tx.GetLease({
+            creator: sdk.address,
+            key: 'leaseKey12',
+            uuid: 'uuid'
+        }).then(resp => resp.leaseBlocks.toInt() * 5.5)).to.be.closeTo(7260, 20)
     });
 
     // it('should allow for empty lease info', async () => {

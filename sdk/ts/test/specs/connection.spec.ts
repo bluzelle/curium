@@ -1,6 +1,6 @@
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
-import {APIAndSwarm, defaultGasParams, getBluzelleClient, sentryWithClient} from "../helpers/client-helpers/client-helpers";
+import {APIAndSwarm, defaultLease, getBluzelleClient, sentryWithClient} from "../helpers/client-helpers/client-helpers";
 import {times} from 'lodash'
 import {bluzelle} from '../../src/legacyAdapter/bluzelle-node'
 import {expect} from 'chai'
@@ -22,7 +22,7 @@ describe('connections tests', function () {
             uuid: bz.uuid
         });
 
-        return expect(bz2.create('key', 'value', defaultGasParams())).to.be.rejectedWith(/Invalid account/);
+        return expect(bz2.create('key', 'value', defaultLease())).to.be.rejectedWith(/Invalid account/);
 
     });
 
@@ -43,14 +43,14 @@ describe('connections tests', function () {
 
         console.log('Funding clients');
         await bz.withTransaction(() => clients.forEach(client =>
-            bz.transferTokensTo(client.address, COUNT_KEYS * 5, defaultGasParams({max_gas: 20000000}))
+            bz.transferTokensTo(client.address, COUNT_KEYS * 5, defaultLease({max_gas: 20000000}))
         ));
 
         console.log('creating keys');
         await Promise.all(clients.map(client =>
                 client.withTransaction(() =>
                     times(COUNT_KEYS, (n: number) =>
-                        client.create(`my-key-${n}`, 'foo', defaultGasParams())
+                        client.create(`my-key-${n}`, 'foo', defaultLease())
                     ))
             )
         );
@@ -59,7 +59,7 @@ describe('connections tests', function () {
         await Promise.all(clients.map(client =>
                 client.withTransaction(() =>
                     times(COUNT_KEYS, (n: number) =>
-                        client.txRead(`my-key-${n}`, defaultGasParams())
+                        client.txRead(`my-key-${n}`, defaultLease())
                             .then((res: any) => expect(res.value).to.equal('foo'))
                     ))
             )
@@ -73,9 +73,9 @@ describe('connections tests', function () {
             uuid: bz.uuid
         })
 
-        return bz.create('aven', 'dauz', defaultGasParams())
-            .then(() => bz2.create('scott', 'burch', defaultGasParams()))
-            .then(() => bz.create('neeraj', 'murarka', defaultGasParams()))
+        return bz.create('aven', 'dauz', defaultLease())
+            .then(() => bz2.create('scott', 'burch', defaultLease()))
+            .then(() => bz.create('neeraj', 'murarka', defaultLease()))
             .then(() => Promise.all([
                 bz.read('aven'),
                 bz.read('scott'),
@@ -91,10 +91,10 @@ describe('connections tests', function () {
             uuid: bz.uuid
         })
 
-        return bz.create('aven', 'dauz', defaultGasParams())
-            .then(() => bz2.create('scott', 'burch', defaultGasParams()))
-            .then(() => bz.create('neeraj', 'murarka', defaultGasParams()))
-            .then(() => bz.create('matthew', 'ilagan', defaultGasParams()))
+        return bz.create('aven', 'dauz', defaultLease())
+            .then(() => bz2.create('scott', 'burch', defaultLease()))
+            .then(() => bz.create('neeraj', 'murarka', defaultLease()))
+            .then(() => bz.create('matthew', 'ilagan', defaultLease()))
             .then(() => Promise.all([
                 bz.read('aven'),
                 bz.read('scott'),
@@ -111,10 +111,10 @@ describe('connections tests', function () {
             uuid: bz.uuid
         });
 
-        return bz.create('aven', 'dauz', defaultGasParams())
-            .then(() => bz2.create('jacob', 'creskoff', defaultGasParams()))
-            .then(() => bz2.create('addy', 'parsons', defaultGasParams()))
-            .then(() => bz.create('ali', 'savas', defaultGasParams()))
+        return bz.create('aven', 'dauz', defaultLease())
+            .then(() => bz2.create('jacob', 'creskoff', defaultLease()))
+            .then(() => bz2.create('addy', 'parsons', defaultLease()))
+            .then(() => bz.create('ali', 'savas', defaultLease()))
 
             .then(() => Promise.all([
                 bz.read('aven'),
@@ -133,11 +133,11 @@ describe('connections tests', function () {
         });
 
         return bz.withTransaction(() => {
-            bz.create('aven', 'dauz', defaultGasParams()),
-                bz.delete('aven', defaultGasParams())
+            bz.create('aven', 'dauz', defaultLease()),
+                bz.delete('aven', defaultLease())
         })
-            .then(() => bz2.create('neeraj', 'murarka', defaultGasParams()))
-            .then(() => bz.create('scott', 'burch', defaultGasParams()))
+            .then(() => bz2.create('neeraj', 'murarka', defaultLease()))
+            .then(() => bz.create('scott', 'burch', defaultLease()))
             .then(() => Promise.all([
                 bz.read('neeraj'),
                 bz.read('scott')
@@ -153,12 +153,12 @@ describe('connections tests', function () {
         });
 
         return bz.withTransaction(() => {
-            bz.create('aven', 'dauz', defaultGasParams()),
-                bz2.create('neeraj', 'murarka', defaultGasParams()),
-                bz.create('scott', 'burch', defaultGasParams())
+            bz.create('aven', 'dauz', defaultLease()),
+                bz2.create('neeraj', 'murarka', defaultLease()),
+                bz.create('scott', 'burch', defaultLease())
         })
-            .then(() => bz2.delete('scott', defaultGasParams()))
-            .then(() => bz.delete('aven', defaultGasParams()))
+            .then(() => bz2.delete('scott', defaultLease()))
+            .then(() => bz.delete('aven', defaultLease()))
             .then(() => bz.read('aven'))
             .then(() => expect(1).to.equal(2))
             .catch(e => expect(/unknown request: key not found/.test(e.error)))

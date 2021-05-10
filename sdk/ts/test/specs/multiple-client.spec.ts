@@ -2,7 +2,7 @@ import {bluzelle} from '../../src/legacyAdapter/bluzelle-node'
 import {API} from '../../src/legacyAdapter/API'
 import {Some} from "monet";
 import {pad, times, uniqueId} from 'lodash'
-import {DEFAULT_TIMEOUT, sentryWithClient, defaultGasParams} from "../helpers/client-helpers/client-helpers";
+import {DEFAULT_TIMEOUT, sentryWithClient, defaultLease} from "../helpers/client-helpers/client-helpers";
 import {expect} from 'chai'
 
 class Config {
@@ -40,7 +40,7 @@ const verifyKeys = (config: Config) => (accounts: API[]) =>
 
 const createKeys = (config: Config) => async (account: API): Promise<{account: API, time: number}> => {
     const start = Date.now()
-    await account.withTransaction(() => times(config.NUMBER_OF_KEYS, n => account.create(`key-${n}`, 'x'.repeat(config.VALUE_LENGTH), defaultGasParams())));
+    await account.withTransaction(() => times(config.NUMBER_OF_KEYS, n => account.create(`key-${n}`, 'x'.repeat(config.VALUE_LENGTH), defaultLease())));
     return {account, time: Date.now() - start}
 }
 
@@ -55,7 +55,7 @@ const fundAccounts = (from: API, config: Config) => (accounts: API[]): Promise<a
 
 const fundAccount = (from: API, config: Config, account: API): Promise<any> => account.getBNT()
     .then(amt => amt < config.NUMBER_OF_KEYS)
-    .then(needsFunding => needsFunding ? from.transferTokensTo(account.address, config.NUMBER_OF_KEYS * 30000, defaultGasParams()).then(() => account) : account)
+    .then(needsFunding => needsFunding ? from.transferTokensTo(account.address, config.NUMBER_OF_KEYS * 30000, defaultLease()).then(() => account) : account)
 
 
 const createAccounts = (bz: API, numOfAccounts: number): Promise<API[]> => Promise.all(times(numOfAccounts, (n) => createAccount(bz, n)))

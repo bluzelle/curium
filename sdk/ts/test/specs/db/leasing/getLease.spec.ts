@@ -1,8 +1,9 @@
-import {DEFAULT_TIMEOUT, sentryWithClient, defaultGasParams} from "../../helpers/client-helpers/client-helpers";
-import {API} from "../../../src/legacyAdapter/API";
+import {DEFAULT_TIMEOUT, sentryWithClient} from "../../../helpers/client-helpers/client-helpers";
+import {API} from "../../../../src/legacyAdapter/API";
 import {expect} from 'chai'
 import delay from "delay";
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
+import {defaultLease} from "../../../helpers/client-helpers/sdk-helpers";
 
 describe('getLease', function () {
     this.timeout(DEFAULT_TIMEOUT);
@@ -19,9 +20,9 @@ describe('getLease', function () {
     })
 
     it('should return the lease time left', async () => {
-        await bz.create('myKey', 'myValue', defaultGasParams(), {seconds: 30});
+        await bz.create('myKey55', 'myValue', {seconds: 30, minutes: 0, days: 0, hours: 0, years: 0});
         await delay(20000);
-        expect(await bz.getLease('myKey')).to.be.lessThan(20);
+        expect(await bz.getLease('myKey')).to.be.greaterThan(20);
     })
 
 });

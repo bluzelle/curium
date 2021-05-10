@@ -1,5 +1,5 @@
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
-import {createKeys, sentryWithClient, defaultGasParams} from "../helpers/client-helpers/client-helpers";
+import {createKeys, sentryWithClient, defaultLease} from "../helpers/client-helpers/client-helpers";
 import {API} from '../../src/legacyAdapter/API'
 import {expect} from 'chai'
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
@@ -16,25 +16,25 @@ describe('transactions', function () {
 
     it('should put a single message in a transaction by default', async () => {
         const results = await Promise.all([
-            bz.create('foo', 'bar', defaultGasParams()),
-            bz.create('foo2', 'bar', defaultGasParams())
+            bz.create('foo', 'bar', defaultLease),
+            bz.create('foo2', 'bar', defaultLease)
         ]);
         expect(results[0].txhash).not.to.equal(results[1].txhash);
     });
 
     it('should recover if a transaction fails', async () => {
         await Promise.all([
-            bz.create('foo1', 'bar1', defaultGasParams()),
-            bz.create('foo2', 'bar2', defaultGasParams()),
-            bz.create('foo3', 'bar3', defaultGasParams()),
+            bz.create('foo1', 'bar1', defaultLease),
+            bz.create('foo2', 'bar2', defaultLease),
+            bz.create('foo3', 'bar3', defaultLease),
         ]);
 
         const results = await Promise.all([
-            bz.txRead('foo1', defaultGasParams()),
-            bz.txRead('foo2', defaultGasParams()),
-            bz.create('foo1', 'bar', defaultGasParams())
+            bz.txRead('foo1', defaultLease()),
+            bz.txRead('foo2', defaultLease()),
+            bz.create('foo1', 'bar', defaultLease())
                 .catch(e => ({value: 'error'})),
-            bz.txRead('foo3', defaultGasParams())
+            bz.txRead('foo3', defaultLease())
         ]);
 
         expect(results.map(it => (it as any)?.value)).to.deep.equal(['bar1', 'bar2', 'error', 'bar3'])
@@ -46,8 +46,8 @@ describe('transactions', function () {
         it('it will operate transactionally', async () => {
             try {
                 await bz.withTransaction(() => {
-                    bz.create('foo', 'bar', defaultGasParams());
-                    bz.txRead('xxx', defaultGasParams());
+                    bz.create('foo', 'bar', defaultLease());
+                    bz.txRead('xxx', defaultLease());
                 })
             } catch (e) {
             }
@@ -55,10 +55,10 @@ describe('transactions', function () {
         });
 
         it('should preserve message and message response order', async () => {
-            await bz.create('first', 'transaction', defaultGasParams());
+            await bz.create('first', 'transaction', defaultLease());
             await bz.withTransaction(() => {
-                    bz.create('foo', 'bar', defaultGasParams());
-                    bz.txRead('first', defaultGasParams());
+                    bz.create('foo', 'bar', defaultLease());
+                    bz.txRead('first', defaultLease());
                 })
                 .then(x => x)
 
@@ -81,7 +81,7 @@ describe('transactions', function () {
             const COUNT = 1000;
             const {keys, values} = await createKeys(bz, COUNT)
             await bz.withTransaction(() =>
-                keys.forEach(key => bz.txRead(key, defaultGasParams()))
+                keys.forEach(key => bz.txRead(key, defaultLease()))
             )
                 .then(response => response.data.map((it: any) => it.value))
                 .then(vs => expect(vs).to.deep.equal(values))
@@ -89,7 +89,7 @@ describe('transactions', function () {
 
         it('should attach memo to transaction', () =>
             bz.withTransaction(() =>
-                    bz.create('aven', 'dauz', defaultGasParams())
+                    bz.create('aven', 'dauz', defaultLease())
                 , {memo: 'foo'})
                 .then(response => response.txhash)
                 .then(hash => bz.getTx(hash))
