@@ -1,5 +1,5 @@
-import {DEFAULT_TIMEOUT, defaultGasParams, sentryWithClient} from "../../helpers/client-helpers/client-helpers";
-import {API} from "../../../src/legacyAdapter/API";
+import {DEFAULT_TIMEOUT, defaultGasParams, sentryWithClient} from "../../../helpers/client-helpers/client-helpers";
+import {API} from "../../../../src/legacyAdapter/API";
 import {expect} from "chai";
 
 describe('renewLease', function () {

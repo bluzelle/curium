@@ -221,9 +221,9 @@ export class API {
                 key
             }))
             .then(resp => Math.round(resp.leaseBlocks.toInt() * BLOCK_TIME_IN_SECONDS))
-            .catch(res => {
-                throw res.error === 'Not Found' ? `key "${key}" not found` : res.error
-            })
+            // .catch(res => {
+            //     throw res.error === 'Not Found' ? `key "${key}" not found` : res.error
+            // })
     }
     //
     generateBIP39Account = (entropy: string = ''): string => {

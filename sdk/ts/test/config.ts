@@ -4,7 +4,7 @@ interface Config {
 }
 
 export const localChain: Config = {
-    mnemonic:  "unfair series outdoor bring resist rescue provide involve deal dial pink clown axis horror source seed tragic lizard tuna raw split attitude message crash",
+    mnemonic:  "tube mouse family void unknown replace bottom title mouse purchase giant tiger give alone water merit permit just trigger special safe soap upgrade push",
     endpoint: "http://localhost:26657"
 }
 

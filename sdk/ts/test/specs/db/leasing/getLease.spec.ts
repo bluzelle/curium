@@ -16,13 +16,13 @@ describe('getLease', function () {
     });
 
     it('should throw exception if key does not exist', async () => {
-        await expect(bz.getLease('myKey')).to.be.rejectedWith(/key not found/);
+        await expect(bz.getLease('myKey4')).to.be.rejectedWith(/key not found/);
     })
 
     it('should return the lease time left', async () => {
-        await bz.create('myKey55', 'myValue', {seconds: 30, minutes: 0, days: 0, hours: 0, years: 0});
+        await bz.create('myKey11', 'myValue', {seconds: 30, minutes: 0, days: 0, hours: 0, years: 0});
         await delay(20000);
-        expect(await bz.getLease('myKey')).to.be.greaterThan(20);
+        expect(await bz.getLease('myKey11')).to.be.lessThan(20);
     })
 
 });
