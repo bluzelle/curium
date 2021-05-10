@@ -1,9 +1,9 @@
 import {decodeData, DEFAULT_TIMEOUT, defaultLease, encodeData, getSdk} from "../../helpers/client-helpers/sdk-helpers";
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
-import {bluzelle, DbSdk} from "../../../src/bz-sdk/bz-sdk";
+import {DbSdk} from "../../../src/bz-sdk/bz-sdk";
 import {expect} from "chai";
-import {defaultLease} from "../../helpers/client-helpers/client-helpers";
-import {localChain} from "../../config";
+import delay from "delay";
+
 
 describe('sdk.tx.Update()', function () {
     this.timeout(DEFAULT_TIMEOUT);
@@ -63,11 +63,13 @@ describe('sdk.tx.Update()', function () {
             uuid: 'uuid',
             key: 'myKey'
         }).then(resp => decodeData(resp.value))).to.equal('firstValue');
+
         await sdk.tx.Update({
             creator: sdk.address,
             uuid: 'uuid',
             key: 'myKey',
             value: encodeData('secondValue'),
+            lease: defaultLease,
             metadata: new Uint8Array()
         });
         expect(await sdk.tx.Read({
@@ -87,6 +89,71 @@ describe('sdk.tx.Update()', function () {
         })).to.be.rejectedWith(/key does not exist/)
 
     });
+
+    it('should update lease', async () => {
+        await sdk.tx.Create({
+            creator: sdk.address,
+            uuid: 'uuid',
+            key: 'highLease7',
+            value: encodeData('firstValue'),
+            metadata: new Uint8Array(),
+            lease: defaultLease
+        });
+        expect(await sdk.tx.Read({
+            creator: sdk.address,
+            uuid: 'uuid',
+            key: 'highLease7'
+        }).then(resp => decodeData(resp.value))).to.equal('firstValue');
+
+        await sdk.tx.Update({
+            creator: sdk.address,
+            uuid: 'uuid',
+            key: 'highLease7',
+            value: encodeData('secondValue'),
+            lease: {seconds: 0, minutes: 3, hours: 0, days: 0, years: 0},
+            metadata: new Uint8Array()
+        });
+
+        expect(await sdk.tx.GetLease({
+            creator: sdk.address,
+            uuid: 'uuid',
+            key: 'highLease7'
+        }).then(resp => resp.leaseBlocks.toInt() * 5.5)).to.be.closeTo(3 * 60, 30)
+    });
+
+    it('should expire beyond updated lease time', async () => {
+        await sdk.tx.Create({
+            creator: sdk.address,
+            uuid: 'uuid',
+            key: 'highLease3',
+            value: encodeData('firstValue'),
+            metadata: new Uint8Array(),
+            lease: defaultLease
+        });
+        expect(await sdk.tx.Read({
+            creator: sdk.address,
+            uuid: 'uuid',
+            key: 'highLease3'
+        }).then(resp => decodeData(resp.value))).to.equal('firstValue');
+
+        await sdk.tx.Update({
+            creator: sdk.address,
+            uuid: 'uuid',
+            key: 'highLease3',
+            value: encodeData('secondValue'),
+            lease: {seconds: 20, minutes: 0, hours: 0, days: 0, years: 0},
+            metadata: new Uint8Array()
+        });
+
+        await delay(60000)
+
+        await expect(sdk.tx.Read({
+            creator: sdk.address,
+            uuid: 'uuid',
+            key: 'highLease3'
+        })).to.be.rejectedWith(/key does not exist/)
+    });
+
     //
     // it.skip('should charge if you increase the size of the data', async () => {
     //

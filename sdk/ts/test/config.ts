@@ -4,7 +4,7 @@ interface Config {
 }
 
 export const localChain: Config = {
-    mnemonic:  "assault dish hurdle knife south ship extra milk advance budget peasant adult drum match toast oak accuse beyond kind grocery poverty resemble crystal window",
+    mnemonic:  "unfair series outdoor bring resist rescue provide involve deal dial pink clown axis horror source seed tragic lizard tuna raw split attitude message crash",
     endpoint: "http://localhost:26657"
 }
 

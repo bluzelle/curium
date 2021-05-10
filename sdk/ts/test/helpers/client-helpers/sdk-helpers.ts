@@ -4,7 +4,7 @@ import {range} from "lodash";
 import {Lease} from "../../../src/codec/crud/lease";
 export const DEFAULT_TIMEOUT = 800000;
 export const defaultLease: Lease =  {minutes: 0, seconds: 0, years: 0, hours: 1, days: 0}
-
+export const zeroLease : Lease = {minutes: 0, seconds: 0, years: 0, hours: 0, days: 0}
 
 export const getSdk = (): Promise<BluzelleSdk> => {
     return bluzelle({
