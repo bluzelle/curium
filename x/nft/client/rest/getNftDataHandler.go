@@ -12,7 +12,6 @@ import (
 	"os"
 )
 
-
 func getNftDataHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := mux.Vars(r)["id"]

@@ -27,11 +27,13 @@ func (k msgServer) Create(goCtx context.Context, msg *types.MsgCreate) (*types.M
 		ctx.BlockHeight(),
 	)
 
-	gasFromLease := CalculateGasForLease(*msg.Lease, len(msg.Uuid) + len(msg.Key) + len(msg.Value))
+	gasFromLease := CalculateGasForLease(*msg.Lease, len(msg.Uuid)+len(msg.Key)+len(msg.Value))
 
 	blzGasMeter := ctx.GasMeter().(ante.BluzelleGasMeterInterface)
 
 	blzGasMeter.ConsumeBillableGas(gasFromLease, "lease")
+
+	k.SetLease(&ctx, msg.Uuid, msg.Key, ctx.BlockHeight(), msg.Lease)
 
 	return &types.MsgCreateResponse{}, nil
 }
@@ -59,12 +61,7 @@ func (k msgServer) Update(goCtx context.Context, msg *types.MsgUpdate) (*types.M
 	}
 
 	k.SetCrudValue(&ctx, CrudValue)
-
-	gasFromLease := CalculateGasForLease(*msg.Lease, len(msg.Uuid) + len(msg.Key) + len(msg.Value))
-
-	blzGasMeter := ctx.GasMeter().(ante.BluzelleGasMeterInterface)
-
-	blzGasMeter.ConsumeBillableGas(gasFromLease, "lease")
+	k.UpdateLease(&ctx, CrudValue.Uuid, CrudValue.Key, CrudValue.Lease)
 
 	return &types.MsgUpdateResponse{}, nil
 }

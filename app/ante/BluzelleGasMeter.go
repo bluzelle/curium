@@ -7,15 +7,15 @@ import (
 )
 
 type bluzelleGasMeter struct {
-	limit    storetypes.Gas
-	consumed storetypes.Gas
+	limit       storetypes.Gas
+	consumed    storetypes.Gas
 	billableGas storetypes.Gas
 }
 
 func NewBluzelleGasMeter(limit storetypes.Gas) storetypes.GasMeter {
 	return &bluzelleGasMeter{
-		limit:    limit,
-		consumed: 0,
+		limit:       limit,
+		consumed:    0,
 		billableGas: 0,
 	}
 }

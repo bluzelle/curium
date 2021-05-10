@@ -378,7 +378,6 @@ func New(
 		appCodec,
 		keys[crudtypes.StoreKey],
 		keys[crudtypes.MemStoreKey],
-		keys[crudtypes.StoreKey],
 		crudkeeper.MaxKeeperSizes{
 			MaxKeysSize:           0,
 			MaxKeyValuesSize:      0,
@@ -453,10 +452,10 @@ func New(
 	// NOTE: staking module is required if HistoricalEntries param > 0
 	app.mm.SetOrderBeginBlockers(
 		upgradetypes.ModuleName, minttypes.ModuleName, distrtypes.ModuleName, slashingtypes.ModuleName,
-		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName,
+		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName, crudtypes.ModuleName,
 	)
 
-	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, synchronizertypes.ModuleName, votingtypes.ModuleName)
+	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, synchronizertypes.ModuleName, votingtypes.ModuleName, crudtypes.ModuleName)
 
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
@@ -537,7 +536,6 @@ func (app *App) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.R
 
 // EndBlocker application updates every end block
 func (app *App) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
-	app.crudKeeper.ProcessLeasesAtBlockHeight(ctx, app.crudKeeper.GetKVStore(ctx), app.crudKeeper.GetLeaseStore(ctx), ctx.BlockHeight())
 	return app.mm.EndBlock(ctx, req)
 }
 

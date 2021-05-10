@@ -2,8 +2,9 @@ package keeper
 
 import (
 	"fmt"
+	"github.com/bluzelle/curium/app/ante"
+	"github.com/cosmos/cosmos-sdk/store/prefix"
 	"strconv"
-
 	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/bluzelle/curium/x/crud/types"
@@ -17,8 +18,7 @@ type (
 		cdc      codec.Marshaler
 		storeKey sdk.StoreKey
 		memKey   sdk.StoreKey
-		leaseKey sdk.StoreKey
-		mks MaxKeeperSizes
+		mks      MaxKeeperSizes
 		// this line is used by starport scaffolding # ibc/keeper/attribute
 	}
 )
@@ -39,9 +39,8 @@ func MakeLeaseKey(blockHeight int64, UUID string, key string) []byte {
 
 func NewKeeper(
 	cdc codec.Marshaler,
-	storeKey,
+	storeKey sdk.StoreKey,
 	memKey sdk.StoreKey,
-	leaseKey sdk.StoreKey,
 	mks MaxKeeperSizes,
 	// this line is used by starport scaffolding # ibc/keeper/parameter
 ) *Keeper {
@@ -49,8 +48,7 @@ func NewKeeper(
 		cdc:      cdc,
 		storeKey: storeKey,
 		memKey:   memKey,
-		leaseKey: leaseKey,
-		mks: mks,
+		mks:      mks,
 		// this line is used by starport scaffolding # ibc/keeper/return
 	}
 }
@@ -59,15 +57,11 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
-func (k Keeper) GetKVStore(ctx sdk.Context) sdk.KVStore {
-	return ctx.KVStore(k.storeKey)
-}
+func (k Keeper) SetLease(ctx *sdk.Context, UUID string, key string, blockHeight int64, lease *types.Lease) {
 
-func (k Keeper) GetLeaseStore(ctx sdk.Context) sdk.KVStore {
-	return ctx.KVStore(k.leaseKey)
-}
+	leaseStore := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LeaseValueKey))
+	leaseBlocks := k.ConvertLeaseToBlocks(lease)
 
-func (k Keeper) SetLease(leaseStore sdk.KVStore, UUID string, key string, blockHeight int64, leaseBlocks int64) {
 	if leaseBlocks == 0 {
 		leaseBlocks = k.mks.MaxDefaultLeaseBlocks
 	}
@@ -75,13 +69,20 @@ func (k Keeper) SetLease(leaseStore sdk.KVStore, UUID string, key string, blockH
 	leaseStore.Set(MakeLeaseKey(blockHeight+leaseBlocks, UUID, key), make([]byte, 0))
 }
 
-func (k Keeper) DeleteLease(leaseStore sdk.KVStore, UUID string, key string, blockHeight int64, leaseBlocks int64) {
-	leaseStore.Delete([]byte(MakeLeaseKey(blockHeight+leaseBlocks, UUID, key)))
+func (k Keeper) ConvertLeaseToBlocks(lease *types.Lease) int64 {
+	return int64(float64(lease.Seconds + lease.Minutes * 60 + lease.Hours * 3600 + lease.Days * 3600 * 24 + lease.Years * 365 * 3600 * 24) / 5.5)
 }
 
-func (k Keeper) ProcessLeasesAtBlockHeight(ctx sdk.Context, store sdk.KVStore, leaseStore sdk.KVStore, lease int64) {
-	prefix := strconv.FormatInt(lease, 10) + "\x00"
-	iterator := sdk.KVStorePrefixIterator(leaseStore, []byte(prefix))
+func (k Keeper) DeleteLease(ctx *sdk.Context, UUID string, key string, blockHeight int64, leaseBlocks int64) {
+	leaseStore := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.LeaseValueKey))
+	leaseStore.Delete(MakeLeaseKey(blockHeight+leaseBlocks, UUID, key))
+}
+
+func (k Keeper) ProcessLeasesAtBlockHeight(ctx sdk.Context, lease int64) {
+	leasePrefix := []byte(strconv.FormatInt(lease, 10) + "\x00")
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.CrudValueKey))
+	leaseStore := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.LeaseValueKey))
+	iterator := sdk.KVStorePrefixIterator(leaseStore, leasePrefix)
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
@@ -93,10 +94,50 @@ func (k Keeper) ProcessLeasesAtBlockHeight(ctx sdk.Context, store sdk.KVStore, l
 
 		//k.DeleteOwner(store, ownerStore, uuid, key)
 
-
 		// Delete lease
-		fmt.Printf("\n\tdeleting %s, %s\n", prefix, string(iterator.Key()))
-		store.Delete(iterator.Key()[len(prefix):])
+		fmt.Printf("\n\tdeleting %s, %s\n", leasePrefix, string(iterator.Key()))
+		store.Delete(iterator.Key()[len(leasePrefix):])
 		leaseStore.Delete(iterator.Key())
 	}
 }
+
+func (k Keeper) UpdateLease(ctx *sdk.Context, UUID string, key string, lease *types.Lease) {
+
+	blzValue := k.GetCrudValue(ctx, UUID, key)
+	curLeaseBlocks := k.ConvertLeaseToBlocks(blzValue.Lease)
+
+	k.DeleteLease(ctx, UUID, key, blzValue.Height, curLeaseBlocks)
+
+	calculateLeaseRefund := func() uint64 {
+		bytes := len(UUID) + len(key) + len(blzValue.Value)
+		unusedOriginalLease := blzValue.Height + curLeaseBlocks - ctx.BlockHeight()
+
+		if unusedOriginalLease <= 0 {
+			return 0
+		}
+
+		percentUnused := float64(unusedOriginalLease) / float64(curLeaseBlocks)
+		originalLeaseCost := CalculateGasForLease(*blzValue.Lease, bytes)
+		return uint64(float64(originalLeaseCost) * percentUnused)
+	}
+
+	// Charge for lease gas
+	func() {
+		gasForNewLease := CalculateGasForLease(*blzValue.Lease, len(UUID)+len(key)+len(blzValue.Value))
+
+		blzGasMeter := ctx.GasMeter().(ante.BluzelleGasMeterInterface)
+
+		gasRefund := calculateLeaseRefund()
+		if gasForNewLease > gasRefund {
+			gasForLease := gasForNewLease - gasRefund
+			//ctx.GasMeter().ConsumeGas(gasForLease, "lease")
+			blzGasMeter.ConsumeBillableGas(gasForLease, "lease")
+		}
+	}()
+
+	blzValue.Height = ctx.BlockHeight()
+	blzValue.Lease = lease
+	//keeper.SetValue(ctx, keeper.GetKVStore(ctx), UUID, key, blzValue)
+	k.SetLease(ctx, UUID, key, blzValue.Height, blzValue.Lease)
+}
+

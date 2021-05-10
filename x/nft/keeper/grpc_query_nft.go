@@ -67,4 +67,3 @@ func (k Keeper) IsNftFullyReplicated(c context.Context, req *types.QueryIsNftFul
 
 	return &types.QueryIsNftFullyReplicatedResponse{IsReplicated: isReplicated}, nil
 }
-

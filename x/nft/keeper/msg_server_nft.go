@@ -40,7 +40,7 @@ func (k msgServer) CreateNft(goCtx context.Context, msg *types.MsgCreateNft) (*t
 	}, nil
 }
 
-func sendFileReceived(ctx sdk.Context, k msgServer, msg *types.MsgFileReceived, ) {
+func sendFileReceived(ctx sdk.Context, k msgServer, msg *types.MsgFileReceived) {
 	result, err := curium.BroadcastMessages(ctx, []sdk.Msg{msg}, k.accKeeper, "nft", k.homeDir)
 	if err != nil {
 		k.Logger(ctx).Error("Error sending msgFileReceived", "err", err)
@@ -59,7 +59,7 @@ func (k msgServer) retrieveFile(ctx sdk.Context, msg *types.MsgCreateNft) {
 	defer resp.Body.Close()
 
 	os.MkdirAll(k.homeDir+"/nft-upload/", os.ModePerm)
-	file, err := os.Create(k.homeDir+"/nft-upload/" + msg.Id)
+	file, err := os.Create(k.homeDir + "/nft-upload/" + msg.Id)
 	if err != nil {
 		k.Logger(ctx).Error("unable to create file", "id", msg.Id, "err", err)
 		return

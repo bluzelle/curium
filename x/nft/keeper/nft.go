@@ -7,7 +7,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-
 // AppendNft appends a nft in the store with a new id and update the count
 func (k Keeper) AppendNft(
 	ctx sdk.Context,

@@ -36,6 +36,7 @@ func (k Keeper) AppendCrudValue(
 // SetCrudValue set a specific CrudValue in the store
 func (k Keeper) SetCrudValue(ctx *sdk.Context, CrudValue types.CrudValue) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CrudValueKey))
+
 	b := k.cdc.MustMarshalBinaryBare(&CrudValue)
 	store.Set(MakeCrudValueKey(CrudValue.Uuid, CrudValue.Key), b)
 }
