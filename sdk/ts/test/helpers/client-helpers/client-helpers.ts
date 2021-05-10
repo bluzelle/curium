@@ -117,7 +117,7 @@ export const getClient = async (sentry: Daemon, validator: Daemon, extra: Partia
     return bz;
 };
 
-export const defaultLease = (gasInfo: GasInfo = {}): GasInfo => ({gas_price: 0.004, max_gas: 100000000, ...gasInfo})
+export const defaultGasParams = (gasInfo: GasInfo = {}): GasInfo => ({gas_price: 0.004, max_gas: 100000000, ...gasInfo})
 
 export const getBluzelleClient = (): string | undefined =>
     process.argv.find(it => it.includes('--bluzelle-client='))?.replace('--bluzelle-client=', '') || 'node';

@@ -19,7 +19,7 @@ describe('sdk.tx.Update()', function () {
         await sdk.tx.Create({
             creator: sdk.address,
             uuid: 'uuid',
-            key: 'key!',
+            key: 'emptykey1',
             value: encodeData('value'),
             metadata: new Uint8Array(),
             lease: defaultLease
@@ -27,19 +27,20 @@ describe('sdk.tx.Update()', function () {
         expect(await sdk.tx.Read({
             creator: sdk.address,
             uuid: 'uuid',
-            key: 'key!'
+            key: 'emptykey1'
         }).then(resp => decodeData(resp.value))).to.equal('value');
         await sdk.tx.Update({
             creator: sdk.address,
             uuid: 'uuid',
-            key: 'key!',
+            key: 'emptykey1',
             value: encodeData(''),
-            metadata: new Uint8Array()
+            metadata: new Uint8Array(),
+            lease: defaultLease
         });
         expect(await sdk.tx.Read({
             creator: sdk.address,
             uuid: 'uuid',
-            key: 'key!'
+            key: 'emptykey1'
         }).then(resp => decodeData(resp.value))).to.equal('');
     })
 
@@ -125,7 +126,7 @@ describe('sdk.tx.Update()', function () {
         await sdk.tx.Create({
             creator: sdk.address,
             uuid: 'uuid',
-            key: 'highLease3',
+            key: 'highLease4',
             value: encodeData('firstValue'),
             metadata: new Uint8Array(),
             lease: defaultLease
@@ -133,13 +134,13 @@ describe('sdk.tx.Update()', function () {
         expect(await sdk.tx.Read({
             creator: sdk.address,
             uuid: 'uuid',
-            key: 'highLease3'
+            key: 'highLease4'
         }).then(resp => decodeData(resp.value))).to.equal('firstValue');
 
         await sdk.tx.Update({
             creator: sdk.address,
             uuid: 'uuid',
-            key: 'highLease3',
+            key: 'highLease4',
             value: encodeData('secondValue'),
             lease: {seconds: 20, minutes: 0, hours: 0, days: 0, years: 0},
             metadata: new Uint8Array()
@@ -150,8 +151,8 @@ describe('sdk.tx.Update()', function () {
         await expect(sdk.tx.Read({
             creator: sdk.address,
             uuid: 'uuid',
-            key: 'highLease3'
-        })).to.be.rejectedWith(/key does not exist/)
+            key: 'highLease4'
+        })).to.be.rejectedWith(/key highLease4 doesn't exist/)
     });
 
     //

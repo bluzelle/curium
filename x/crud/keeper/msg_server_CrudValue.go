@@ -27,7 +27,7 @@ func (k msgServer) Create(goCtx context.Context, msg *types.MsgCreate) (*types.M
 		ctx.BlockHeight(),
 	)
 
-	gasFromLease := CalculateGasForLease(*msg.Lease, len(msg.Uuid)+len(msg.Key)+len(msg.Value))
+	gasFromLease := CalculateGasForLease(msg.Lease, len(msg.Uuid)+len(msg.Key)+len(msg.Value))
 
 	blzGasMeter := ctx.GasMeter().(ante.BluzelleGasMeterInterface)
 

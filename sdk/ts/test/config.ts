@@ -4,7 +4,7 @@ interface Config {
 }
 
 export const localChain: Config = {
-    mnemonic:  "tube mouse family void unknown replace bottom title mouse purchase giant tiger give alone water merit permit just trigger special safe soap upgrade push",
+    mnemonic:  "lab involve clean frozen retreat flock large grit success brother squeeze verb increase thunder spend suffer settle decade accident cruise adjust chaos unlock harvest",
     endpoint: "http://localhost:26657"
 }
 

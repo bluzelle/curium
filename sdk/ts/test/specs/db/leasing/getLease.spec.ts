@@ -16,7 +16,7 @@ describe('getLease', function () {
     });
 
     it('should throw exception if key does not exist', async () => {
-        await expect(bz.getLease('myKey4')).to.be.rejectedWith(/key not found/);
+        await expect(bz.getLease('myKey4')).to.be.rejectedWith(/key myKey4 doesn't exist/);
     })
 
     it('should return the lease time left', async () => {
