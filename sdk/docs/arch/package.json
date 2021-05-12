@@ -1,0 +1,13 @@
+{
+  "name": "arch",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@bluzelle/sdk-js": "^1.0.7",
+    "@types/node": "^15.0.2",
+    "promise-passthrough": "^1.0.5",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4"
+  }
+}
