@@ -17,9 +17,12 @@ import {MsgClientImpl as StakingMsgClientImpl} from '../codec/cosmos/staking/v1b
 import * as StakingMsgTypes from '../codec/cosmos/staking/v1beta1/tx'
 
 import {newCommunicationService} from "../client-lib/CommunicationService";
-import {Left, Right, Some} from "monet";
+import {Left, Right} from "monet";
 import {entropyToMnemonic, generateMnemonic} from "bip39";
 import {nftHelpers, NftHelpers} from "../helpers/nft-helpers";
+import {account, CosmosAccount} from "../client-lib/cosmos";
+
+
 
 export type DbSdk = SDK<CrudQueryClientImpl, CrudMsgClientImpl>
 export type NftSdk = SDK<NftQueryClientImpl, NftMsgClientImpl>

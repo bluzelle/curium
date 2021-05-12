@@ -16,7 +16,8 @@ func CalculateGasFee(tx sdk.Tx, ctx sdk.Context) sdk.Coins {
 		gasPrice := float64(fee) / float64(gas)
 		gasPrices, _ = sdk.NewDecFromStr(fmt.Sprintf("%f", gasPrice))
 	}
-	gasConsumed := ctx.GasMeter().GasConsumed()
+	gasMeter := ctx.GasMeter().(BluzelleGasMeterInterface)
+	gasConsumed := gasMeter.BillableGasConsumed()
 	gasFee := gasPrices.MulInt64(int64(gasConsumed)).RoundInt64()
 	return sdk.NewCoins(sdk.NewCoin("ubnt", sdk.NewInt(gasFee)))
 }

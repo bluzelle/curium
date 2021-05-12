@@ -9,7 +9,9 @@ export interface MsgGetLease {
     key: string;
 }
 export interface MsgGetLeaseResponse {
-    lease?: Lease;
+    uuid: string;
+    key: string;
+    leaseBlocks: Long;
 }
 export interface MsgRead {
     creator: string;

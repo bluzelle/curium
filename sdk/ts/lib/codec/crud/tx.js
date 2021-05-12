@@ -98,11 +98,21 @@ exports.MsgGetLease = {
         return message;
     },
 };
-const baseMsgGetLeaseResponse = {};
+const baseMsgGetLeaseResponse = {
+    uuid: "",
+    key: "",
+    leaseBlocks: long_1.default.ZERO,
+};
 exports.MsgGetLeaseResponse = {
     encode(message, writer = minimal_1.default.Writer.create()) {
-        if (message.lease !== undefined) {
-            lease_1.Lease.encode(message.lease, writer.uint32(10).fork()).ldelim();
+        if (message.uuid !== "") {
+            writer.uint32(10).string(message.uuid);
+        }
+        if (message.key !== "") {
+            writer.uint32(18).string(message.key);
+        }
+        if (!message.leaseBlocks.isZero()) {
+            writer.uint32(24).int64(message.leaseBlocks);
         }
         return writer;
     },
@@ -114,7 +124,13 @@ exports.MsgGetLeaseResponse = {
             const tag = reader.uint32();
             switch (tag >>> 3) {
                 case 1:
-                    message.lease = lease_1.Lease.decode(reader, reader.uint32());
+                    message.uuid = reader.string();
+                    break;
+                case 2:
+                    message.key = reader.string();
+                    break;
+                case 3:
+                    message.leaseBlocks = reader.int64();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -125,27 +141,53 @@ exports.MsgGetLeaseResponse = {
     },
     fromJSON(object) {
         const message = { ...baseMsgGetLeaseResponse };
-        if (object.lease !== undefined && object.lease !== null) {
-            message.lease = lease_1.Lease.fromJSON(object.lease);
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = String(object.uuid);
         }
         else {
-            message.lease = undefined;
+            message.uuid = "";
+        }
+        if (object.key !== undefined && object.key !== null) {
+            message.key = String(object.key);
+        }
+        else {
+            message.key = "";
+        }
+        if (object.leaseBlocks !== undefined && object.leaseBlocks !== null) {
+            message.leaseBlocks = long_1.default.fromString(object.leaseBlocks);
+        }
+        else {
+            message.leaseBlocks = long_1.default.ZERO;
         }
         return message;
     },
     toJSON(message) {
         const obj = {};
-        message.lease !== undefined &&
-            (obj.lease = message.lease ? lease_1.Lease.toJSON(message.lease) : undefined);
+        message.uuid !== undefined && (obj.uuid = message.uuid);
+        message.key !== undefined && (obj.key = message.key);
+        message.leaseBlocks !== undefined &&
+            (obj.leaseBlocks = (message.leaseBlocks || long_1.default.ZERO).toString());
         return obj;
     },
     fromPartial(object) {
         const message = { ...baseMsgGetLeaseResponse };
-        if (object.lease !== undefined && object.lease !== null) {
-            message.lease = lease_1.Lease.fromPartial(object.lease);
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = object.uuid;
         }
         else {
-            message.lease = undefined;
+            message.uuid = "";
+        }
+        if (object.key !== undefined && object.key !== null) {
+            message.key = object.key;
+        }
+        else {
+            message.key = "";
+        }
+        if (object.leaseBlocks !== undefined && object.leaseBlocks !== null) {
+            message.leaseBlocks = object.leaseBlocks;
+        }
+        else {
+            message.leaseBlocks = long_1.default.ZERO;
         }
         return message;
     },

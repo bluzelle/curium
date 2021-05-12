@@ -1,55 +1,68 @@
-import {decodeData, DEFAULT_TIMEOUT, getSdk} from "../../helpers/client-helpers/sdk-helpers";
+import {decodeData, DEFAULT_TIMEOUT, defaultLease, getSdk} from "../../helpers/client-helpers/sdk-helpers";
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
 import {expect} from 'chai'
-import {bluzelle, DbSdk} from "../../../src/bz-sdk/bz-sdk";
+import {bluzelle, BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
 import {Lease} from "../../../src/codec/crud/lease";
 import {getPrintableChars} from "testing/lib/helpers/testHelpers";
 import {localChain} from "../../config";
-
-const { spawn } = require('child_process');
-
-
+import {CalculateGasForLease} from "../../helpers/client-helpers/client-helpers";
+import delay from "delay";
 
 describe('sdk.tx.Create()', function () {
     this.timeout(DEFAULT_TIMEOUT);
 
-    let sdk: DbSdk;
+    let sdk: BluzelleSdk;
 
     beforeEach(async () => {
         useChaiAsPromised();
-        sdk = await getSdk().then(client => sdk = client.db);
+        sdk = await getSdk();
     });
 
-    it('should create a key-value', () => {
+    it('should create a key-value', async () => {
 
-        return sdk.tx.Create({
-            creator: sdk.address,
-            uuid: 'uuid',
-            key: 'keysss',
+        const initialBal: number = await sdk.bank.q.Balance({
+                address: sdk.bank.address,
+                denom: 'ubnt'
+            }).then(resp => resp.balance? parseInt(resp.balance.amount): 0)
+
+        await sdk.db.tx.Create({
+            creator: sdk.db.address,
+            uuid: Date.now().toString(),
+            key: 'key',
             value: new TextEncoder().encode('value'),
-            lease: {days: 10} as Lease,
+            lease: defaultLease,
             metadata: new Uint8Array()
         })
-            .then(() => sdk.tx.Read({
-            creator: sdk.address,
+
+        await sdk.db.tx.Read({
+            creator: sdk.db.address,
             uuid: 'uuid',
-            key: 'keysss',
-        }))
+            key: 'key1',
+        })
             .then(resp => resp.value)
             .then(decodeData)
             .then(value => expect(value).to.equal('value'))
+
+        const finalBal: number = await sdk.bank.q.Balance({
+            address: sdk.bank.address,
+            denom: 'ubnt'
+        }).then(resp => resp.balance? parseInt(resp.balance.amount): 0)
+
+        await console.log(initialBal - finalBal)
+
+        await expect(finalBal).to.equal(initialBal - 0.002 * CalculateGasForLease(defaultLease, 'uuid'.length + 'key'.length + 'value'.length))
     });
     it('should throw an error if key already exists', () => {
-        return sdk.tx.Create({
-            creator: sdk.address,
+        return sdk.db.tx.Create({
+            creator: sdk.db.address,
             uuid: 'uuid',
             key: 'firstkeys',
             value: new TextEncoder().encode('firstvalue'),
             lease: {days: 10} as Lease,
             metadata: new Uint8Array()
         })
-            .then(() => expect(sdk.tx.Create({
-                creator: sdk.address,
+            .then(() => expect(sdk.db.tx.Create({
+                creator: sdk.db.address,
                 uuid: 'uuid',
                 key: 'firstkeys',
                 value: new TextEncoder().encode('secondvalue'),
@@ -60,16 +73,16 @@ describe('sdk.tx.Create()', function () {
 
     it('should handle long keys', async () => {
         const longKey = '012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012'
-        await sdk.tx.Create({
-            creator: sdk.address,
+        await sdk.db.tx.Create({
+            creator: sdk.db.address,
             uuid: 'uuid',
             key: longKey,
             value: new TextEncoder().encode('longvalue'),
             lease: {days: 10} as Lease,
             metadata: new Uint8Array()
         })
-        await sdk.tx.Read({
-            creator: sdk.address,
+        await sdk.db.tx.Read({
+            creator: sdk.db.address,
             uuid: 'uuid',
             key: longKey
         })
@@ -80,16 +93,16 @@ describe('sdk.tx.Create()', function () {
 
     it('should handle values with symbols', async () => {
         const symbols = getPrintableChars();
-        await sdk.tx.Create({
-            creator: sdk.address,
+        await sdk.db.tx.Create({
+            creator: sdk.db.address,
             uuid: 'uuid',
             key: 'symbolskeys',
             value: new TextEncoder().encode(symbols),
             lease: {days: 10} as Lease,
             metadata: new Uint8Array()
         })
-        await sdk.tx.Read({
-            creator: sdk.address,
+        await sdk.db.tx.Read({
+            creator: sdk.db.address,
             uuid: 'uuid',
             key: 'symbolskeys'})
             .then(resp => resp.value)
@@ -98,8 +111,8 @@ describe('sdk.tx.Create()', function () {
     });
 
     it('should throw an error if key is empty', () => {
-        return expect(sdk.tx.Create({
-            creator: sdk.address,
+        return expect(sdk.db.tx.Create({
+            creator: sdk.db.address,
             uuid: 'uuid',
             key: '',
             value: new TextEncoder().encode('emptyvalue'),
@@ -111,15 +124,15 @@ describe('sdk.tx.Create()', function () {
 
     it('can store json', async () => {
         const json = JSON.stringify({foo: 10, bar: 'baz', t: true, arr: [1, 2, 3]});
-        await sdk.tx.Create({creator: sdk.address,
+        await sdk.db.tx.Create({creator: sdk.db.address,
             uuid: 'uuid',
             key: 'jsonskeys',
             value: new TextEncoder().encode(json),
             lease: {days: 10} as Lease,
             metadata: new Uint8Array()})
 
-        await sdk.tx.Read({
-            creator: sdk.address,
+        await sdk.db.tx.Read({
+            creator: sdk.db.address,
             uuid: 'uuid',
             key: 'jsonskeys'
         })
@@ -136,8 +149,8 @@ describe('sdk.tx.Create()', function () {
             gasPrice: 0.002,
             maxGas: 100000000
         })
-        await sdk.tx.Create({
-            creator: sdk.address,
+        await sdk.db.tx.Create({
+            creator: sdk.db.address,
             uuid: 'uuid',
             key: 'mykeyss',
             value: new TextEncoder().encode('myvalue'),
@@ -156,8 +169,8 @@ describe('sdk.tx.Create()', function () {
     })
 
     it.skip('should include tx hash and tx height in MsgCreateResponse', () => {
-        return sdk.tx.Create({
-            creator: sdk.address,
+        return sdk.db.tx.Create({
+            creator: sdk.db.address,
             uuid: 'uuid',
             key: 'dumbojumbo1',
             value: new TextEncoder().encode('elephant'),

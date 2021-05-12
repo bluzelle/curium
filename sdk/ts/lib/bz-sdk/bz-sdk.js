@@ -37,18 +37,21 @@ const CommunicationService_1 = require("../client-lib/CommunicationService");
 const monet_1 = require("monet");
 const bip39_1 = require("bip39");
 const nft_helpers_1 = require("../helpers/nft-helpers");
+const cosmos_1 = require("../client-lib/cosmos");
 const bluzelle = (options) => Promise.resolve(CommunicationService_1.newCommunicationService(options.url, options.mnemonic || ''))
     .then(cs => Promise.all([
     rpc_1.sdk(options, query_1.QueryClientImpl, tx_1.MsgClientImpl, CrudMsgTypes, cs),
     rpc_1.sdk(options, query_2.QueryClientImpl, tx_2.MsgClientImpl, NftMsgTypes, cs),
     rpc_1.sdk(options, query_3.QueryClientImpl, tx_3.MsgClientImpl, BankMsgTypes, cs),
     rpc_1.sdk(options, query_4.QueryClientImpl, tx_4.MsgClientImpl, StakingMsgTypes, cs),
+    cosmos_1.account(options)
 ]))
-    .then(([db, nft, bank, staking]) => ({
+    .then(([db, nft, bank, staking, account]) => ({
     db,
     nft,
     bank,
     staking,
+    account,
     helpers: {
         nft: nft_helpers_1.nftHelpers(nft)
     }

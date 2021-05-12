@@ -43,12 +43,12 @@ describe('create()', function () {
     //     expect(await bz.read(longKey)).to.equal('value');
     // })
 
-    it('should handle keys with symbols', async function () {
-        const symbols = getPrintableChars();
-        await bz.create(symbols, 'value', defaultLease);
-        expect(await bz.keys()).to.contain(symbols);
-        expect(await bz.read(symbols)).to.equal('value');
-    });
+    // it('should handle keys with symbols', async function () {
+    //     const symbols = getPrintableChars();
+    //     await bz.create(symbols, 'value', defaultLease);
+    //     expect(await bz.keys()).to.contain(symbols);
+    //     expect(await bz.read(symbols)).to.equal('value');
+    // });
 
     it('should throw an error if key is empty', async () => {
         await expect(bz.create('', 'xx', defaultLease))
@@ -104,17 +104,17 @@ describe('create()', function () {
     //     expect(caught).to.be.true;
     // });
 
-    it('should throw an error if assigned insufficient gas price', async () => {
-        expect(
-            await bz.create('myKey', 'myValue', {gas_price: .0001}).catch(e => e.error)
-        ).to.equal('insufficient fees');
-    });
-
-    it('should throw an error if assigned insufficient gas', async () => {
-        expect(
-            await bz.create('myKey', 'myValue', {max_gas: 1}).catch(e => e.error)
-        ).to.equal('insufficient fees');
-    });
+    // it('should throw an error if assigned insufficient gas price', async () => {
+    //     expect(
+    //         await bz.create('myKey', 'myValue', {gas_price: .0001}).catch(e => e.error)
+    //     ).to.equal('insufficient fees');
+    // });
+    //
+    // it('should throw an error if assigned insufficient gas', async () => {
+    //     expect(
+    //         await bz.create('myKey', 'myValue', {max_gas: 1}).catch(e => e.error)
+    //     ).to.equal('insufficient fees');
+    // });
 
     it.skip('should throw an error if assigned insufficient max fee', async () => {
         expect(

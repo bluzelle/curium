@@ -33,11 +33,10 @@ class API {
     //     // This is here for backward compatibility - delete later
     // }
     //
-    // account(address: string = this.address): Promise<AccountResult> {
-    //     return getCosmos(this)
-    //         .then(cosmos => cosmos.getAccounts(address))
-    //         .then((x: AccountsResult) => x.result.value);
-    // }
+    account(address) {
+        return this.getClient()
+            .then(client => client.account.getAccount(address));
+    }
     //
     // isExistingAccount(): Promise<boolean> {
     //     return this.account()
@@ -153,8 +152,7 @@ class API {
             uuid: this.config.uuid,
             key
         }))
-            .then(resp => resp.lease ? Math.round(this.convertLeaseToSeconds(resp.lease)) : 0);
-        // .then(res => Math.round(res.lease * BLOCK_TIME_IN_SECONDS))
+            .then(resp => Math.round(resp.leaseBlocks.toInt() * BLOCK_TIME_IN_SECONDS));
         // .catch(res => {
         //     throw res.error === 'Not Found' ? `key "${key}" not found` : res.error
         // })

@@ -62,17 +62,16 @@ func (g *bluzelleGasMeter) ConsumeGas(amount storetypes.Gas, descriptor string) 
 func (g *bluzelleGasMeter) ConsumeBillableGas(amount storetypes.Gas, descriptor string) {
 	var overflow bool
 	// TODO: Should we set the consumed field after overflow checking?
-	g.consumed, overflow = addUint64Overflow(g.consumed, amount)
+	g.billableGas, overflow = addUint64Overflow(g.billableGas, amount)
 
 	if overflow && g.limit != 0 {
 		panic(storetypes.ErrorGasOverflow{descriptor})
 	}
 
-	if g.consumed > g.limit && g.limit != 0 {
+	if g.billableGas > g.limit && g.limit != 0 {
 		panic(storetypes.ErrorOutOfGas{descriptor})
 	}
 
-	g.billableGas, _ = addUint64Overflow(g.billableGas, amount)
 }
 
 func (g *bluzelleGasMeter) BillableGasConsumed() storetypes.Gas {
@@ -88,5 +87,5 @@ func (g *bluzelleGasMeter) IsOutOfGas() bool {
 }
 
 func (g *bluzelleGasMeter) String() string {
-	return fmt.Sprintf("FreeGasMeter:\n  limit: %d\n  consumed: %d", g.limit, g.consumed)
+	return fmt.Sprintf("BluzelleGasMeter:\n  limit: %d\n  consumed: %d", g.limit, g.consumed)
 }

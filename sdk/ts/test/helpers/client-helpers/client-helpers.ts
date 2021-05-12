@@ -12,6 +12,7 @@ import {rubyProxy} from "./rubyProxy";
 import {goProxy} from "./goProxy";
 import {localChain} from "../../config"
 import {mnemonicToAddress, SDK} from "../../../src/client-lib/rpc"
+
 export const DEFAULT_TIMEOUT = 800000;
 import axios from 'axios'
 import delay from "delay";
@@ -23,6 +24,8 @@ import {extend} from 'lodash'
 import {GasInfo} from '../../../../../sdk/ts/src/legacyAdapter/types/GasInfo'
 import {Some} from "monet";
 import {newMnemonic} from "../../../src/bz-sdk/bz-sdk";
+import {types} from "util";
+import {Lease} from "../../../src/codec/crud/lease";
 
 // Allow self signed certificates
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -177,7 +180,29 @@ export const newBzClient = (bz: API): Promise<API> =>
         }))
         .map(async (newBz: API) => {
             await mnemonicToAddress(newBz.config.mnemonic || '')
-                //.then(address => bz.transferTokensTo(address, 1000, defaultGasParams()));
+            //.then(address => bz.transferTokensTo(address, 1000, defaultGasParams()));
             return newBz;
         })
         .join()
+
+
+const LeaseGasRateDefaultValue = 1
+const LeaseGasRateMaximumValue = 3
+const LeaseGasRateParamB = 2.5
+const LeaseGasRateParamC = 75
+const LeaseGasRateParamG = 3
+
+export const CalculateGasForLease = (lease: Lease, bytes: number): number => {
+    const leaseDays = LeaseInDays(lease)
+    const gasRate = leaseGasRatePerByte(leaseDays)
+    return Math.round(gasRate * leaseDays * Math.max(bytes, 200000))
+}
+const LeaseInDays = (lease: Lease): number => {
+    return (lease.days + lease.hours / 24 + lease.minutes / 60 + lease.seconds / 3600 + lease.years * 365) * 5.5
+}
+
+const leaseGasRatePerByte = (days: number) => {
+    return LeaseGasRateDefaultValue + (LeaseGasRateMaximumValue - LeaseGasRateDefaultValue) /
+        Math.pow(1.0 + Math.pow(days / LeaseGasRateParamC, LeaseGasRateParamB), LeaseGasRateParamG)
+}
+

@@ -7,6 +7,7 @@ import {entropyToMnemonic, generateMnemonic} from "bip39";
 import {SDKOptions} from '../client-lib/rpc'
 import {bluzelle, BluzelleSdk} from "../bz-sdk/bz-sdk";
 import {Lease} from "../codec/crud/lease";
+import {AccountResult} from "./types/cosmos/AccountResult";
 
 
 // TEMP STUB
