@@ -9,11 +9,13 @@ The .proto files can be found in /proto.
 There is a script in the JS client that downloads 
 all of the needed support .proto files.
 
-Please use the JS client as an example of how we
-are building the client.  
+Please use the TS client as an example of how we
+are building the client.  /sdk/ts  
 
 There is a demo.ts file in this directory that 
 demonstrates how withTransaction() works.  
+To run type 
+`yarn; yarn start` in that directory.
 
 You will find the TS client files in sdk/ts.
 
