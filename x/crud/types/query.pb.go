@@ -30,23 +30,23 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // this line is used by starport scaffolding # 3
-type QueryGetCrudValueRequest struct {
+type QueryReadRequest struct {
 	Uuid string `protobuf:"bytes,1,opt,name=uuid,proto3" json:"uuid,omitempty"`
 	Key  string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
 }
 
-func (m *QueryGetCrudValueRequest) Reset()         { *m = QueryGetCrudValueRequest{} }
-func (m *QueryGetCrudValueRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryGetCrudValueRequest) ProtoMessage()    {}
-func (*QueryGetCrudValueRequest) Descriptor() ([]byte, []int) {
+func (m *QueryReadRequest) Reset()         { *m = QueryReadRequest{} }
+func (m *QueryReadRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryReadRequest) ProtoMessage()    {}
+func (*QueryReadRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_766d4a8cfa5b40b7, []int{0}
 }
-func (m *QueryGetCrudValueRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryReadRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetCrudValueRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryReadRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetCrudValueRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryReadRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -56,48 +56,48 @@ func (m *QueryGetCrudValueRequest) XXX_Marshal(b []byte, deterministic bool) ([]
 		return b[:n], nil
 	}
 }
-func (m *QueryGetCrudValueRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetCrudValueRequest.Merge(m, src)
+func (m *QueryReadRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryReadRequest.Merge(m, src)
 }
-func (m *QueryGetCrudValueRequest) XXX_Size() int {
+func (m *QueryReadRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetCrudValueRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetCrudValueRequest.DiscardUnknown(m)
+func (m *QueryReadRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryReadRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetCrudValueRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryReadRequest proto.InternalMessageInfo
 
-func (m *QueryGetCrudValueRequest) GetUuid() string {
+func (m *QueryReadRequest) GetUuid() string {
 	if m != nil {
 		return m.Uuid
 	}
 	return ""
 }
 
-func (m *QueryGetCrudValueRequest) GetKey() string {
+func (m *QueryReadRequest) GetKey() string {
 	if m != nil {
 		return m.Key
 	}
 	return ""
 }
 
-type QueryGetCrudValueResponse struct {
-	CrudValue *CrudValue `protobuf:"bytes,1,opt,name=CrudValue,proto3" json:"CrudValue,omitempty"`
+type QueryReadResponse struct {
+	Value []byte `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
 }
 
-func (m *QueryGetCrudValueResponse) Reset()         { *m = QueryGetCrudValueResponse{} }
-func (m *QueryGetCrudValueResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryGetCrudValueResponse) ProtoMessage()    {}
-func (*QueryGetCrudValueResponse) Descriptor() ([]byte, []int) {
+func (m *QueryReadResponse) Reset()         { *m = QueryReadResponse{} }
+func (m *QueryReadResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryReadResponse) ProtoMessage()    {}
+func (*QueryReadResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_766d4a8cfa5b40b7, []int{1}
 }
-func (m *QueryGetCrudValueResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryReadResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetCrudValueResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryReadResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetCrudValueResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryReadResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -107,42 +107,42 @@ func (m *QueryGetCrudValueResponse) XXX_Marshal(b []byte, deterministic bool) ([
 		return b[:n], nil
 	}
 }
-func (m *QueryGetCrudValueResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetCrudValueResponse.Merge(m, src)
+func (m *QueryReadResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryReadResponse.Merge(m, src)
 }
-func (m *QueryGetCrudValueResponse) XXX_Size() int {
+func (m *QueryReadResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetCrudValueResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetCrudValueResponse.DiscardUnknown(m)
+func (m *QueryReadResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryReadResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetCrudValueResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryReadResponse proto.InternalMessageInfo
 
-func (m *QueryGetCrudValueResponse) GetCrudValue() *CrudValue {
+func (m *QueryReadResponse) GetValue() []byte {
 	if m != nil {
-		return m.CrudValue
+		return m.Value
 	}
 	return nil
 }
 
-type QueryAllCrudValueRequest struct {
+type QueryKeysRequest struct {
 	Uuid       string             `protobuf:"bytes,1,opt,name=uuid,proto3" json:"uuid,omitempty"`
 	Pagination *query.PageRequest `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
-func (m *QueryAllCrudValueRequest) Reset()         { *m = QueryAllCrudValueRequest{} }
-func (m *QueryAllCrudValueRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryAllCrudValueRequest) ProtoMessage()    {}
-func (*QueryAllCrudValueRequest) Descriptor() ([]byte, []int) {
+func (m *QueryKeysRequest) Reset()         { *m = QueryKeysRequest{} }
+func (m *QueryKeysRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryKeysRequest) ProtoMessage()    {}
+func (*QueryKeysRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_766d4a8cfa5b40b7, []int{2}
 }
-func (m *QueryAllCrudValueRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryKeysRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryAllCrudValueRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryKeysRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryAllCrudValueRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryKeysRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -152,49 +152,49 @@ func (m *QueryAllCrudValueRequest) XXX_Marshal(b []byte, deterministic bool) ([]
 		return b[:n], nil
 	}
 }
-func (m *QueryAllCrudValueRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryAllCrudValueRequest.Merge(m, src)
+func (m *QueryKeysRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryKeysRequest.Merge(m, src)
 }
-func (m *QueryAllCrudValueRequest) XXX_Size() int {
+func (m *QueryKeysRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryAllCrudValueRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryAllCrudValueRequest.DiscardUnknown(m)
+func (m *QueryKeysRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryKeysRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryAllCrudValueRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryKeysRequest proto.InternalMessageInfo
 
-func (m *QueryAllCrudValueRequest) GetUuid() string {
+func (m *QueryKeysRequest) GetUuid() string {
 	if m != nil {
 		return m.Uuid
 	}
 	return ""
 }
 
-func (m *QueryAllCrudValueRequest) GetPagination() *query.PageRequest {
+func (m *QueryKeysRequest) GetPagination() *query.PageRequest {
 	if m != nil {
 		return m.Pagination
 	}
 	return nil
 }
 
-type QueryAllCrudValueResponse struct {
-	CrudValue  []*CrudValue        `protobuf:"bytes,1,rep,name=CrudValue,proto3" json:"CrudValue,omitempty"`
+type QueryKeysResponse struct {
+	Key        []string            `protobuf:"bytes,1,rep,name=key,proto3" json:"key,omitempty"`
 	Pagination *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
-func (m *QueryAllCrudValueResponse) Reset()         { *m = QueryAllCrudValueResponse{} }
-func (m *QueryAllCrudValueResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryAllCrudValueResponse) ProtoMessage()    {}
-func (*QueryAllCrudValueResponse) Descriptor() ([]byte, []int) {
+func (m *QueryKeysResponse) Reset()         { *m = QueryKeysResponse{} }
+func (m *QueryKeysResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryKeysResponse) ProtoMessage()    {}
+func (*QueryKeysResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_766d4a8cfa5b40b7, []int{3}
 }
-func (m *QueryAllCrudValueResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryKeysResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryAllCrudValueResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryKeysResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryAllCrudValueResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryKeysResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -204,26 +204,26 @@ func (m *QueryAllCrudValueResponse) XXX_Marshal(b []byte, deterministic bool) ([
 		return b[:n], nil
 	}
 }
-func (m *QueryAllCrudValueResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryAllCrudValueResponse.Merge(m, src)
+func (m *QueryKeysResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryKeysResponse.Merge(m, src)
 }
-func (m *QueryAllCrudValueResponse) XXX_Size() int {
+func (m *QueryKeysResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryAllCrudValueResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryAllCrudValueResponse.DiscardUnknown(m)
+func (m *QueryKeysResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryKeysResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryAllCrudValueResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryKeysResponse proto.InternalMessageInfo
 
-func (m *QueryAllCrudValueResponse) GetCrudValue() []*CrudValue {
+func (m *QueryKeysResponse) GetKey() []string {
 	if m != nil {
-		return m.CrudValue
+		return m.Key
 	}
 	return nil
 }
 
-func (m *QueryAllCrudValueResponse) GetPagination() *query.PageResponse {
+func (m *QueryKeysResponse) GetPagination() *query.PageResponse {
 	if m != nil {
 		return m.Pagination
 	}
@@ -231,43 +231,42 @@ func (m *QueryAllCrudValueResponse) GetPagination() *query.PageResponse {
 }
 
 func init() {
-	proto.RegisterType((*QueryGetCrudValueRequest)(nil), "bluzelle.curium.crud.QueryGetCrudValueRequest")
-	proto.RegisterType((*QueryGetCrudValueResponse)(nil), "bluzelle.curium.crud.QueryGetCrudValueResponse")
-	proto.RegisterType((*QueryAllCrudValueRequest)(nil), "bluzelle.curium.crud.QueryAllCrudValueRequest")
-	proto.RegisterType((*QueryAllCrudValueResponse)(nil), "bluzelle.curium.crud.QueryAllCrudValueResponse")
+	proto.RegisterType((*QueryReadRequest)(nil), "bluzelle.curium.crud.QueryReadRequest")
+	proto.RegisterType((*QueryReadResponse)(nil), "bluzelle.curium.crud.QueryReadResponse")
+	proto.RegisterType((*QueryKeysRequest)(nil), "bluzelle.curium.crud.QueryKeysRequest")
+	proto.RegisterType((*QueryKeysResponse)(nil), "bluzelle.curium.crud.QueryKeysResponse")
 }
 
 func init() { proto.RegisterFile("crud/query.proto", fileDescriptor_766d4a8cfa5b40b7) }
 
 var fileDescriptor_766d4a8cfa5b40b7 = []byte{
-	// 421 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x93, 0xcf, 0xae, 0x12, 0x31,
-	0x14, 0xc6, 0x29, 0xa8, 0x09, 0xc5, 0x05, 0x69, 0x58, 0x20, 0x31, 0x83, 0xce, 0x42, 0x8c, 0x31,
-	0x6d, 0x40, 0xb7, 0x26, 0xa2, 0x89, 0x6c, 0x95, 0x85, 0x0b, 0x76, 0x9d, 0xa1, 0x19, 0x27, 0x94,
-	0xe9, 0x30, 0x6d, 0x89, 0x23, 0x61, 0xe3, 0x13, 0x98, 0xb8, 0x71, 0xad, 0x0f, 0xa3, 0x4b, 0x12,
-	0x37, 0x2e, 0x0d, 0xf8, 0x20, 0x66, 0xda, 0xe1, 0x5f, 0xee, 0x5c, 0xe0, 0xee, 0x9a, 0xf6, 0x7c,
-	0xdf, 0xf9, 0x7d, 0xe7, 0xcc, 0xc0, 0xba, 0x9f, 0xe8, 0x31, 0x99, 0x69, 0x96, 0xa4, 0x38, 0x4e,
-	0x84, 0x12, 0xa8, 0xe1, 0x71, 0xfd, 0x89, 0x71, 0xce, 0xb0, 0xaf, 0x93, 0x50, 0x4f, 0x71, 0x56,
-	0xd1, 0xba, 0x1f, 0x08, 0x11, 0x70, 0x46, 0x68, 0x1c, 0x12, 0x1a, 0x45, 0x42, 0x51, 0x15, 0x8a,
-	0x48, 0x5a, 0x4d, 0xeb, 0x89, 0x2f, 0xe4, 0x54, 0x48, 0xe2, 0x51, 0xc9, 0xac, 0x19, 0x99, 0x77,
-	0x3d, 0xa6, 0x68, 0x97, 0xc4, 0x34, 0x08, 0x23, 0x53, 0x9c, 0xd7, 0x36, 0x4c, 0xc7, 0xd7, 0x89,
-	0x1e, 0xbf, 0xa7, 0x5c, 0x33, 0x7b, 0xeb, 0xbe, 0x84, 0xcd, 0x77, 0x99, 0x6e, 0xc0, 0xd4, 0xee,
-	0x69, 0xc8, 0x66, 0x9a, 0x49, 0x85, 0x10, 0xbc, 0xa5, 0x75, 0x38, 0x6e, 0x82, 0x07, 0xe0, 0x71,
-	0x75, 0x68, 0xce, 0xa8, 0x0e, 0x2b, 0x13, 0x96, 0x36, 0xcb, 0xe6, 0x2a, 0x3b, 0xba, 0x23, 0x78,
-	0xaf, 0xc0, 0x41, 0xc6, 0x22, 0x92, 0x0c, 0xbd, 0x80, 0xd5, 0xdd, 0xa5, 0xf1, 0xa9, 0xf5, 0xda,
-	0xb8, 0x28, 0x28, 0xde, 0x6b, 0xf7, 0x0a, 0x77, 0x9e, 0xd3, 0xf5, 0x39, 0xbf, 0x88, 0xee, 0x0d,
-	0x84, 0xfb, 0xdc, 0x06, 0xb2, 0xd6, 0x7b, 0x84, 0xed, 0x90, 0x70, 0x36, 0x24, 0x6c, 0x27, 0x9e,
-	0x0f, 0x09, 0xbf, 0xa5, 0xc1, 0xd6, 0x6f, 0x78, 0xa0, 0x74, 0x7f, 0x80, 0x3c, 0xd4, 0x71, 0xe3,
-	0xe2, 0x50, 0x95, 0x9b, 0x85, 0x42, 0x83, 0x02, 0xc8, 0xce, 0x59, 0x48, 0xdb, 0xfb, 0x90, 0xb2,
-	0xf7, 0xb3, 0x0c, 0x6f, 0x1b, 0x4a, 0xf4, 0x1d, 0x1c, 0x20, 0x21, 0x5c, 0x0c, 0x73, 0xdd, 0x9e,
-	0x5b, 0xe4, 0xe2, 0x7a, 0x0b, 0xe1, 0x3e, 0xff, 0xfc, 0xfb, 0xdf, 0xd7, 0x32, 0x46, 0x4f, 0xc9,
-	0x56, 0x48, 0xac, 0x90, 0x1c, 0x7f, 0x63, 0x64, 0x91, 0x6d, 0x65, 0x49, 0x16, 0x13, 0x96, 0x2e,
-	0xd1, 0x37, 0x00, 0xef, 0xee, 0x9e, 0xfa, 0x9c, 0x9f, 0xe4, 0x2c, 0xd8, 0xf8, 0x49, 0xce, 0xa2,
-	0x45, 0xb9, 0x1d, 0xc3, 0xf9, 0x10, 0xb5, 0xcf, 0x70, 0xbe, 0xea, 0xff, 0x5a, 0x3b, 0x60, 0xb5,
-	0x76, 0xc0, 0xdf, 0xb5, 0x03, 0xbe, 0x6c, 0x9c, 0xd2, 0x6a, 0xe3, 0x94, 0xfe, 0x6c, 0x9c, 0xd2,
-	0xa8, 0x13, 0x84, 0xea, 0x83, 0xf6, 0xb0, 0x2f, 0xa6, 0x57, 0x4c, 0x3e, 0x5a, 0x1b, 0x95, 0xc6,
-	0x4c, 0x7a, 0x77, 0xcc, 0xff, 0xf4, 0xec, 0x7f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x53, 0x24, 0xc9,
-	0x89, 0xd9, 0x03, 0x00, 0x00,
+	// 411 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x92, 0xbf, 0xeb, 0xd3, 0x40,
+	0x18, 0xc6, 0x7b, 0xfd, 0xb6, 0x82, 0xa7, 0x43, 0x3d, 0x3a, 0x94, 0x22, 0xb1, 0x66, 0x68, 0x54,
+	0xe4, 0x8e, 0x56, 0x07, 0x57, 0x15, 0x74, 0x70, 0xd1, 0x0c, 0x0e, 0x6e, 0x97, 0xe4, 0x25, 0x86,
+	0xa6, 0xb9, 0x34, 0x97, 0x2b, 0xc6, 0x52, 0x10, 0x77, 0x41, 0x70, 0xf3, 0x2f, 0x72, 0x2c, 0xb8,
+	0x38, 0x4a, 0xeb, 0x1f, 0x22, 0xf7, 0x43, 0x8c, 0x7e, 0x4b, 0xbb, 0x5d, 0x8e, 0xf7, 0x79, 0x3e,
+	0xcf, 0xfb, 0x5c, 0xf0, 0x20, 0xae, 0x54, 0xc2, 0x56, 0x0a, 0xaa, 0x86, 0x96, 0x95, 0xa8, 0x05,
+	0x19, 0x46, 0xb9, 0x7a, 0x0f, 0x79, 0x0e, 0x34, 0x56, 0x55, 0xa6, 0x96, 0x54, 0x4f, 0x8c, 0x6f,
+	0xa6, 0x42, 0xa4, 0x39, 0x30, 0x5e, 0x66, 0x8c, 0x17, 0x85, 0xa8, 0x79, 0x9d, 0x89, 0x42, 0x5a,
+	0xcd, 0xf8, 0x5e, 0x2c, 0xe4, 0x52, 0x48, 0x16, 0x71, 0x09, 0xd6, 0x8c, 0xad, 0x67, 0x11, 0xd4,
+	0x7c, 0xc6, 0x4a, 0x9e, 0x66, 0x85, 0x19, 0x76, 0xb3, 0x43, 0x43, 0x7c, 0x5a, 0xa9, 0xe4, 0x35,
+	0xcf, 0x15, 0xd8, 0x5b, 0xff, 0x11, 0x1e, 0xbc, 0xd2, 0xba, 0x10, 0x78, 0x12, 0xc2, 0x4a, 0x81,
+	0xac, 0x09, 0xc1, 0x3d, 0xa5, 0xb2, 0x64, 0x84, 0x26, 0xe8, 0xce, 0xd5, 0xd0, 0x9c, 0xc9, 0x00,
+	0x5f, 0x2c, 0xa0, 0x19, 0x75, 0xcd, 0x95, 0x3e, 0xfa, 0x77, 0xf1, 0x8d, 0x96, 0x52, 0x96, 0xa2,
+	0x90, 0x40, 0x86, 0xb8, 0xbf, 0xd6, 0xee, 0x46, 0x7b, 0x3d, 0xb4, 0x1f, 0x7e, 0xe1, 0x20, 0x2f,
+	0xa0, 0x91, 0xa7, 0x20, 0xcf, 0x30, 0xfe, 0x1b, 0xdb, 0xb0, 0xae, 0xcd, 0xa7, 0xd4, 0xee, 0x48,
+	0xf5, 0x8e, 0xd4, 0x16, 0xe6, 0x76, 0xa4, 0x2f, 0x79, 0x0a, 0xce, 0x2f, 0x6c, 0x29, 0xfd, 0xc2,
+	0x45, 0xb3, 0x3c, 0x17, 0xcd, 0x6d, 0x80, 0x26, 0x17, 0x6e, 0x03, 0xf2, 0xfc, 0x08, 0x2e, 0x38,
+	0x8b, 0xb3, 0x76, 0x6d, 0xde, 0xfc, 0x6b, 0x17, 0xf7, 0x0d, 0x90, 0x7c, 0x42, 0xb8, 0xa7, 0x0b,
+	0x21, 0x53, 0x7a, 0xec, 0x39, 0xe9, 0xff, 0x5d, 0x8f, 0x83, 0xb3, 0x73, 0x96, 0xe7, 0x3f, 0xfc,
+	0xf8, 0xfd, 0xd7, 0x97, 0x2e, 0x25, 0xf7, 0xd9, 0x1f, 0x01, 0xb3, 0x02, 0xf6, 0xef, 0xbb, 0xb2,
+	0x8d, 0xae, 0x72, 0xcb, 0x36, 0x0b, 0x68, 0xb6, 0xe4, 0x03, 0xc2, 0x3d, 0xdd, 0xc2, 0xc9, 0x3c,
+	0xad, 0x67, 0x39, 0x99, 0xa7, 0x5d, 0xa7, 0x1f, 0x98, 0x3c, 0xb7, 0xc9, 0xad, 0x33, 0x79, 0x9e,
+	0x3c, 0xfe, 0xb6, 0xf7, 0xd0, 0x6e, 0xef, 0xa1, 0x9f, 0x7b, 0x0f, 0x7d, 0x3e, 0x78, 0x9d, 0xdd,
+	0xc1, 0xeb, 0xfc, 0x38, 0x78, 0x9d, 0x37, 0x41, 0x9a, 0xd5, 0x6f, 0x55, 0x44, 0x63, 0xb1, 0xbc,
+	0x64, 0xf2, 0xce, 0xda, 0xd4, 0x4d, 0x09, 0x32, 0xba, 0x62, 0xfe, 0xd5, 0x07, 0xbf, 0x03, 0x00,
+	0x00, 0xff, 0xff, 0x5c, 0xf3, 0xcb, 0xc6, 0x35, 0x03, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -283,8 +282,8 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type QueryClient interface {
 	// this line is used by starport scaffolding # 2
-	CrudValue(ctx context.Context, in *QueryGetCrudValueRequest, opts ...grpc.CallOption) (*QueryGetCrudValueResponse, error)
-	CrudValueAll(ctx context.Context, in *QueryAllCrudValueRequest, opts ...grpc.CallOption) (*QueryAllCrudValueResponse, error)
+	Read(ctx context.Context, in *QueryReadRequest, opts ...grpc.CallOption) (*QueryReadResponse, error)
+	Keys(ctx context.Context, in *QueryKeysRequest, opts ...grpc.CallOption) (*QueryKeysResponse, error)
 }
 
 type queryClient struct {
@@ -295,18 +294,18 @@ func NewQueryClient(cc grpc1.ClientConn) QueryClient {
 	return &queryClient{cc}
 }
 
-func (c *queryClient) CrudValue(ctx context.Context, in *QueryGetCrudValueRequest, opts ...grpc.CallOption) (*QueryGetCrudValueResponse, error) {
-	out := new(QueryGetCrudValueResponse)
-	err := c.cc.Invoke(ctx, "/bluzelle.curium.crud.Query/CrudValue", in, out, opts...)
+func (c *queryClient) Read(ctx context.Context, in *QueryReadRequest, opts ...grpc.CallOption) (*QueryReadResponse, error) {
+	out := new(QueryReadResponse)
+	err := c.cc.Invoke(ctx, "/bluzelle.curium.crud.Query/Read", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *queryClient) CrudValueAll(ctx context.Context, in *QueryAllCrudValueRequest, opts ...grpc.CallOption) (*QueryAllCrudValueResponse, error) {
-	out := new(QueryAllCrudValueResponse)
-	err := c.cc.Invoke(ctx, "/bluzelle.curium.crud.Query/CrudValueAll", in, out, opts...)
+func (c *queryClient) Keys(ctx context.Context, in *QueryKeysRequest, opts ...grpc.CallOption) (*QueryKeysResponse, error) {
+	out := new(QueryKeysResponse)
+	err := c.cc.Invoke(ctx, "/bluzelle.curium.crud.Query/Keys", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -316,57 +315,57 @@ func (c *queryClient) CrudValueAll(ctx context.Context, in *QueryAllCrudValueReq
 // QueryServer is the server API for Query service.
 type QueryServer interface {
 	// this line is used by starport scaffolding # 2
-	CrudValue(context.Context, *QueryGetCrudValueRequest) (*QueryGetCrudValueResponse, error)
-	CrudValueAll(context.Context, *QueryAllCrudValueRequest) (*QueryAllCrudValueResponse, error)
+	Read(context.Context, *QueryReadRequest) (*QueryReadResponse, error)
+	Keys(context.Context, *QueryKeysRequest) (*QueryKeysResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
 type UnimplementedQueryServer struct {
 }
 
-func (*UnimplementedQueryServer) CrudValue(ctx context.Context, req *QueryGetCrudValueRequest) (*QueryGetCrudValueResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CrudValue not implemented")
+func (*UnimplementedQueryServer) Read(ctx context.Context, req *QueryReadRequest) (*QueryReadResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Read not implemented")
 }
-func (*UnimplementedQueryServer) CrudValueAll(ctx context.Context, req *QueryAllCrudValueRequest) (*QueryAllCrudValueResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CrudValueAll not implemented")
+func (*UnimplementedQueryServer) Keys(ctx context.Context, req *QueryKeysRequest) (*QueryKeysResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Keys not implemented")
 }
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
 	s.RegisterService(&_Query_serviceDesc, srv)
 }
 
-func _Query_CrudValue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetCrudValueRequest)
+func _Query_Read_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryReadRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).CrudValue(ctx, in)
+		return srv.(QueryServer).Read(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/bluzelle.curium.crud.Query/CrudValue",
+		FullMethod: "/bluzelle.curium.crud.Query/Read",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).CrudValue(ctx, req.(*QueryGetCrudValueRequest))
+		return srv.(QueryServer).Read(ctx, req.(*QueryReadRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_CrudValueAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryAllCrudValueRequest)
+func _Query_Keys_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryKeysRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).CrudValueAll(ctx, in)
+		return srv.(QueryServer).Keys(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/bluzelle.curium.crud.Query/CrudValueAll",
+		FullMethod: "/bluzelle.curium.crud.Query/Keys",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).CrudValueAll(ctx, req.(*QueryAllCrudValueRequest))
+		return srv.(QueryServer).Keys(ctx, req.(*QueryKeysRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -376,19 +375,19 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*QueryServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CrudValue",
-			Handler:    _Query_CrudValue_Handler,
+			MethodName: "Read",
+			Handler:    _Query_Read_Handler,
 		},
 		{
-			MethodName: "CrudValueAll",
-			Handler:    _Query_CrudValueAll_Handler,
+			MethodName: "Keys",
+			Handler:    _Query_Keys_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "crud/query.proto",
 }
 
-func (m *QueryGetCrudValueRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryReadRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -398,12 +397,12 @@ func (m *QueryGetCrudValueRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetCrudValueRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryReadRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetCrudValueRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryReadRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -425,7 +424,7 @@ func (m *QueryGetCrudValueRequest) MarshalToSizedBuffer(dAtA []byte) (int, error
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetCrudValueResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryReadResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -435,32 +434,27 @@ func (m *QueryGetCrudValueResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetCrudValueResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryReadResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetCrudValueResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryReadResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.CrudValue != nil {
-		{
-			size, err := m.CrudValue.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintQuery(dAtA, i, uint64(size))
-		}
+	if len(m.Value) > 0 {
+		i -= len(m.Value)
+		copy(dAtA[i:], m.Value)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.Value)))
 		i--
 		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryAllCrudValueRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryKeysRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -470,12 +464,12 @@ func (m *QueryAllCrudValueRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryAllCrudValueRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryKeysRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryAllCrudValueRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryKeysRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -502,7 +496,7 @@ func (m *QueryAllCrudValueRequest) MarshalToSizedBuffer(dAtA []byte) (int, error
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryAllCrudValueResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryKeysResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -512,12 +506,12 @@ func (m *QueryAllCrudValueResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryAllCrudValueResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryKeysResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryAllCrudValueResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryKeysResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -534,16 +528,11 @@ func (m *QueryAllCrudValueResponse) MarshalToSizedBuffer(dAtA []byte) (int, erro
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.CrudValue) > 0 {
-		for iNdEx := len(m.CrudValue) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.CrudValue[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintQuery(dAtA, i, uint64(size))
-			}
+	if len(m.Key) > 0 {
+		for iNdEx := len(m.Key) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Key[iNdEx])
+			copy(dAtA[i:], m.Key[iNdEx])
+			i = encodeVarintQuery(dAtA, i, uint64(len(m.Key[iNdEx])))
 			i--
 			dAtA[i] = 0xa
 		}
@@ -562,7 +551,7 @@ func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *QueryGetCrudValueRequest) Size() (n int) {
+func (m *QueryReadRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -579,20 +568,20 @@ func (m *QueryGetCrudValueRequest) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetCrudValueResponse) Size() (n int) {
+func (m *QueryReadResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.CrudValue != nil {
-		l = m.CrudValue.Size()
+	l = len(m.Value)
+	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
 	}
 	return n
 }
 
-func (m *QueryAllCrudValueRequest) Size() (n int) {
+func (m *QueryKeysRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -609,15 +598,15 @@ func (m *QueryAllCrudValueRequest) Size() (n int) {
 	return n
 }
 
-func (m *QueryAllCrudValueResponse) Size() (n int) {
+func (m *QueryKeysResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if len(m.CrudValue) > 0 {
-		for _, e := range m.CrudValue {
-			l = e.Size()
+	if len(m.Key) > 0 {
+		for _, s := range m.Key {
+			l = len(s)
 			n += 1 + l + sovQuery(uint64(l))
 		}
 	}
@@ -634,7 +623,7 @@ func sovQuery(x uint64) (n int) {
 func sozQuery(x uint64) (n int) {
 	return sovQuery(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *QueryGetCrudValueRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryReadRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -657,10 +646,10 @@ func (m *QueryGetCrudValueRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetCrudValueRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryReadRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetCrudValueRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryReadRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -748,7 +737,7 @@ func (m *QueryGetCrudValueRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetCrudValueResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryReadResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -771,17 +760,17 @@ func (m *QueryGetCrudValueResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetCrudValueResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryReadResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetCrudValueResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryReadResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CrudValue", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
 			}
-			var msglen int
+			var byteLen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowQuery
@@ -791,26 +780,24 @@ func (m *QueryGetCrudValueResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				byteLen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if msglen < 0 {
+			if byteLen < 0 {
 				return ErrInvalidLengthQuery
 			}
-			postIndex := iNdEx + msglen
+			postIndex := iNdEx + byteLen
 			if postIndex < 0 {
 				return ErrInvalidLengthQuery
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.CrudValue == nil {
-				m.CrudValue = &CrudValue{}
-			}
-			if err := m.CrudValue.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
+			m.Value = append(m.Value[:0], dAtA[iNdEx:postIndex]...)
+			if m.Value == nil {
+				m.Value = []byte{}
 			}
 			iNdEx = postIndex
 		default:
@@ -834,7 +821,7 @@ func (m *QueryGetCrudValueResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryAllCrudValueRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryKeysRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -857,10 +844,10 @@ func (m *QueryAllCrudValueRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryAllCrudValueRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryKeysRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryAllCrudValueRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryKeysRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -952,7 +939,7 @@ func (m *QueryAllCrudValueRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryAllCrudValueResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryKeysResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -975,17 +962,17 @@ func (m *QueryAllCrudValueResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryAllCrudValueResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryKeysResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryAllCrudValueResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryKeysResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CrudValue", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
 			}
-			var msglen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowQuery
@@ -995,25 +982,23 @@ func (m *QueryAllCrudValueResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if msglen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthQuery
 			}
-			postIndex := iNdEx + msglen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthQuery
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CrudValue = append(m.CrudValue, &CrudValue{})
-			if err := m.CrudValue[len(m.CrudValue)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.Key = append(m.Key, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {

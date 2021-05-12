@@ -12,12 +12,12 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) CrudValueAll(goCtx context.Context, req *types.QueryAllCrudValueRequest) (*types.QueryAllCrudValueResponse, error) {
+func (k Keeper) Keys(goCtx context.Context, req *types.QueryKeysRequest) (*types.QueryKeysResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
-	var CrudValues []*types.CrudValue
+	var keys []string
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	store := ctx.KVStore(k.storeKey)
@@ -29,7 +29,7 @@ func (k Keeper) CrudValueAll(goCtx context.Context, req *types.QueryAllCrudValue
 			return err
 		}
 
-		CrudValues = append(CrudValues, &CrudValue)
+		keys = append(keys, CrudValue.GetKey())
 		return nil
 	})
 
@@ -37,10 +37,10 @@ func (k Keeper) CrudValueAll(goCtx context.Context, req *types.QueryAllCrudValue
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &types.QueryAllCrudValueResponse{CrudValue: CrudValues, Pagination: pageRes}, nil
+	return &types.QueryKeysResponse{Key: keys, Pagination: pageRes}, nil
 }
 
-func (k Keeper) CrudValue(c context.Context, req *types.QueryGetCrudValueRequest) (*types.QueryGetCrudValueResponse, error) {
+func (k Keeper) Read(c context.Context, req *types.QueryReadRequest) (*types.QueryReadResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -55,5 +55,5 @@ func (k Keeper) CrudValue(c context.Context, req *types.QueryGetCrudValueRequest
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CrudValueKey))
 	k.cdc.MustUnmarshalBinaryBare(store.Get(MakeCrudValueKey(req.Uuid, req.Key)), &CrudValue)
 
-	return &types.QueryGetCrudValueResponse{CrudValue: &CrudValue}, nil
+	return &types.QueryReadResponse{Value: CrudValue.GetValue()}, nil
 }

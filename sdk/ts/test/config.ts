@@ -4,7 +4,7 @@ interface Config {
 }
 
 export const localChain: Config = {
-    mnemonic: "region correct episode artefact lock depart blush conduct truck poet profit behave vacuum notable cable abandon team example dignity advice tag long home grid",
+    mnemonic: "wish predict there silver avocado junk avocado below deposit account until produce crumble hope calm that camera grab pyramid area tank dress noise approve",
     endpoint: "http://localhost:26657"
 }
 

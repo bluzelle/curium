@@ -345,11 +345,11 @@ export class API {
     //
     read(key: string): Promise<string> {
         return this.getClient()
-            .then(client => client.db.q.CrudValue({
+            .then(client => client.db.q.Read({
                 uuid: this.config.uuid,
                 key
             }))
-            .then(x => x.CrudValue?.value)
+            .then(resp => resp.value)
             .then(x => new TextDecoder().decode(x))
     }
     //

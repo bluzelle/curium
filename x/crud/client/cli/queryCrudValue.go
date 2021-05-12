@@ -22,11 +22,11 @@ func CmdListCrudValue() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryAllCrudValueRequest{
+			params := &types.QueryKeysRequest{
 				Pagination: pageReq,
 			}
 
-			res, err := queryClient.CrudValueAll(context.Background(), params)
+			res, err := queryClient.Keys(context.Background(), params)
 			if err != nil {
 				return err
 			}
@@ -50,12 +50,12 @@ func CmdShowCrudValue() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryGetCrudValueRequest{
+			params := &types.QueryReadRequest{
 				Uuid: args[0],
 				Key:  args[1],
 			}
 
-			res, err := queryClient.CrudValue(context.Background(), params)
+			res, err := queryClient.Read(context.Background(), params)
 			if err != nil {
 				return err
 			}

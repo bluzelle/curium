@@ -1,7 +1,6 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { CrudValue } from "../crud/CrudValue";
 import {
   PageRequest,
   PageResponse,
@@ -10,30 +9,30 @@ import {
 export const protobufPackage = "bluzelle.curium.crud";
 
 /** this line is used by starport scaffolding # 3 */
-export interface QueryGetCrudValueRequest {
+export interface QueryReadRequest {
   uuid: string;
   key: string;
 }
 
-export interface QueryGetCrudValueResponse {
-  CrudValue?: CrudValue;
+export interface QueryReadResponse {
+  value: Uint8Array;
 }
 
-export interface QueryAllCrudValueRequest {
+export interface QueryKeysRequest {
   uuid: string;
   pagination?: PageRequest;
 }
 
-export interface QueryAllCrudValueResponse {
-  CrudValue: CrudValue[];
+export interface QueryKeysResponse {
+  key: string[];
   pagination?: PageResponse;
 }
 
-const baseQueryGetCrudValueRequest: object = { uuid: "", key: "" };
+const baseQueryReadRequest: object = { uuid: "", key: "" };
 
-export const QueryGetCrudValueRequest = {
+export const QueryReadRequest = {
   encode(
-    message: QueryGetCrudValueRequest,
+    message: QueryReadRequest,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.uuid !== "") {
@@ -45,15 +44,10 @@ export const QueryGetCrudValueRequest = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): QueryGetCrudValueRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryReadRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryGetCrudValueRequest,
-    } as QueryGetCrudValueRequest;
+    const message = { ...baseQueryReadRequest } as QueryReadRequest;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -71,10 +65,8 @@ export const QueryGetCrudValueRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetCrudValueRequest {
-    const message = {
-      ...baseQueryGetCrudValueRequest,
-    } as QueryGetCrudValueRequest;
+  fromJSON(object: any): QueryReadRequest {
+    const message = { ...baseQueryReadRequest } as QueryReadRequest;
     if (object.uuid !== undefined && object.uuid !== null) {
       message.uuid = String(object.uuid);
     } else {
@@ -88,19 +80,15 @@ export const QueryGetCrudValueRequest = {
     return message;
   },
 
-  toJSON(message: QueryGetCrudValueRequest): unknown {
+  toJSON(message: QueryReadRequest): unknown {
     const obj: any = {};
     message.uuid !== undefined && (obj.uuid = message.uuid);
     message.key !== undefined && (obj.key = message.key);
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<QueryGetCrudValueRequest>
-  ): QueryGetCrudValueRequest {
-    const message = {
-      ...baseQueryGetCrudValueRequest,
-    } as QueryGetCrudValueRequest;
+  fromPartial(object: DeepPartial<QueryReadRequest>): QueryReadRequest {
+    const message = { ...baseQueryReadRequest } as QueryReadRequest;
     if (object.uuid !== undefined && object.uuid !== null) {
       message.uuid = object.uuid;
     } else {
@@ -115,33 +103,29 @@ export const QueryGetCrudValueRequest = {
   },
 };
 
-const baseQueryGetCrudValueResponse: object = {};
+const baseQueryReadResponse: object = {};
 
-export const QueryGetCrudValueResponse = {
+export const QueryReadResponse = {
   encode(
-    message: QueryGetCrudValueResponse,
+    message: QueryReadResponse,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.CrudValue !== undefined) {
-      CrudValue.encode(message.CrudValue, writer.uint32(10).fork()).ldelim();
+    if (message.value.length !== 0) {
+      writer.uint32(10).bytes(message.value);
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): QueryGetCrudValueResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryReadResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryGetCrudValueResponse,
-    } as QueryGetCrudValueResponse;
+    const message = { ...baseQueryReadResponse } as QueryReadResponse;
+    message.value = new Uint8Array();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.CrudValue = CrudValue.decode(reader, reader.uint32());
+          message.value = reader.bytes();
           break;
         default:
           reader.skipType(tag & 7);
@@ -151,47 +135,40 @@ export const QueryGetCrudValueResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetCrudValueResponse {
-    const message = {
-      ...baseQueryGetCrudValueResponse,
-    } as QueryGetCrudValueResponse;
-    if (object.CrudValue !== undefined && object.CrudValue !== null) {
-      message.CrudValue = CrudValue.fromJSON(object.CrudValue);
-    } else {
-      message.CrudValue = undefined;
+  fromJSON(object: any): QueryReadResponse {
+    const message = { ...baseQueryReadResponse } as QueryReadResponse;
+    message.value = new Uint8Array();
+    if (object.value !== undefined && object.value !== null) {
+      message.value = bytesFromBase64(object.value);
     }
     return message;
   },
 
-  toJSON(message: QueryGetCrudValueResponse): unknown {
+  toJSON(message: QueryReadResponse): unknown {
     const obj: any = {};
-    message.CrudValue !== undefined &&
-      (obj.CrudValue = message.CrudValue
-        ? CrudValue.toJSON(message.CrudValue)
-        : undefined);
+    message.value !== undefined &&
+      (obj.value = base64FromBytes(
+        message.value !== undefined ? message.value : new Uint8Array()
+      ));
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<QueryGetCrudValueResponse>
-  ): QueryGetCrudValueResponse {
-    const message = {
-      ...baseQueryGetCrudValueResponse,
-    } as QueryGetCrudValueResponse;
-    if (object.CrudValue !== undefined && object.CrudValue !== null) {
-      message.CrudValue = CrudValue.fromPartial(object.CrudValue);
+  fromPartial(object: DeepPartial<QueryReadResponse>): QueryReadResponse {
+    const message = { ...baseQueryReadResponse } as QueryReadResponse;
+    if (object.value !== undefined && object.value !== null) {
+      message.value = object.value;
     } else {
-      message.CrudValue = undefined;
+      message.value = new Uint8Array();
     }
     return message;
   },
 };
 
-const baseQueryAllCrudValueRequest: object = { uuid: "" };
+const baseQueryKeysRequest: object = { uuid: "" };
 
-export const QueryAllCrudValueRequest = {
+export const QueryKeysRequest = {
   encode(
-    message: QueryAllCrudValueRequest,
+    message: QueryKeysRequest,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.uuid !== "") {
@@ -203,15 +180,10 @@ export const QueryAllCrudValueRequest = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): QueryAllCrudValueRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryKeysRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryAllCrudValueRequest,
-    } as QueryAllCrudValueRequest;
+    const message = { ...baseQueryKeysRequest } as QueryKeysRequest;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -229,10 +201,8 @@ export const QueryAllCrudValueRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryAllCrudValueRequest {
-    const message = {
-      ...baseQueryAllCrudValueRequest,
-    } as QueryAllCrudValueRequest;
+  fromJSON(object: any): QueryKeysRequest {
+    const message = { ...baseQueryKeysRequest } as QueryKeysRequest;
     if (object.uuid !== undefined && object.uuid !== null) {
       message.uuid = String(object.uuid);
     } else {
@@ -246,7 +216,7 @@ export const QueryAllCrudValueRequest = {
     return message;
   },
 
-  toJSON(message: QueryAllCrudValueRequest): unknown {
+  toJSON(message: QueryKeysRequest): unknown {
     const obj: any = {};
     message.uuid !== undefined && (obj.uuid = message.uuid);
     message.pagination !== undefined &&
@@ -256,12 +226,8 @@ export const QueryAllCrudValueRequest = {
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<QueryAllCrudValueRequest>
-  ): QueryAllCrudValueRequest {
-    const message = {
-      ...baseQueryAllCrudValueRequest,
-    } as QueryAllCrudValueRequest;
+  fromPartial(object: DeepPartial<QueryKeysRequest>): QueryKeysRequest {
+    const message = { ...baseQueryKeysRequest } as QueryKeysRequest;
     if (object.uuid !== undefined && object.uuid !== null) {
       message.uuid = object.uuid;
     } else {
@@ -276,15 +242,15 @@ export const QueryAllCrudValueRequest = {
   },
 };
 
-const baseQueryAllCrudValueResponse: object = {};
+const baseQueryKeysResponse: object = { key: "" };
 
-export const QueryAllCrudValueResponse = {
+export const QueryKeysResponse = {
   encode(
-    message: QueryAllCrudValueResponse,
+    message: QueryKeysResponse,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    for (const v of message.CrudValue) {
-      CrudValue.encode(v!, writer.uint32(10).fork()).ldelim();
+    for (const v of message.key) {
+      writer.uint32(10).string(v!);
     }
     if (message.pagination !== undefined) {
       PageResponse.encode(
@@ -295,21 +261,16 @@ export const QueryAllCrudValueResponse = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): QueryAllCrudValueResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryKeysResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryAllCrudValueResponse,
-    } as QueryAllCrudValueResponse;
-    message.CrudValue = [];
+    const message = { ...baseQueryKeysResponse } as QueryKeysResponse;
+    message.key = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.CrudValue.push(CrudValue.decode(reader, reader.uint32()));
+          message.key.push(reader.string());
           break;
         case 2:
           message.pagination = PageResponse.decode(reader, reader.uint32());
@@ -322,14 +283,12 @@ export const QueryAllCrudValueResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryAllCrudValueResponse {
-    const message = {
-      ...baseQueryAllCrudValueResponse,
-    } as QueryAllCrudValueResponse;
-    message.CrudValue = [];
-    if (object.CrudValue !== undefined && object.CrudValue !== null) {
-      for (const e of object.CrudValue) {
-        message.CrudValue.push(CrudValue.fromJSON(e));
+  fromJSON(object: any): QueryKeysResponse {
+    const message = { ...baseQueryKeysResponse } as QueryKeysResponse;
+    message.key = [];
+    if (object.key !== undefined && object.key !== null) {
+      for (const e of object.key) {
+        message.key.push(String(e));
       }
     }
     if (object.pagination !== undefined && object.pagination !== null) {
@@ -340,14 +299,12 @@ export const QueryAllCrudValueResponse = {
     return message;
   },
 
-  toJSON(message: QueryAllCrudValueResponse): unknown {
+  toJSON(message: QueryKeysResponse): unknown {
     const obj: any = {};
-    if (message.CrudValue) {
-      obj.CrudValue = message.CrudValue.map((e) =>
-        e ? CrudValue.toJSON(e) : undefined
-      );
+    if (message.key) {
+      obj.key = message.key.map((e) => e);
     } else {
-      obj.CrudValue = [];
+      obj.key = [];
     }
     message.pagination !== undefined &&
       (obj.pagination = message.pagination
@@ -356,16 +313,12 @@ export const QueryAllCrudValueResponse = {
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<QueryAllCrudValueResponse>
-  ): QueryAllCrudValueResponse {
-    const message = {
-      ...baseQueryAllCrudValueResponse,
-    } as QueryAllCrudValueResponse;
-    message.CrudValue = [];
-    if (object.CrudValue !== undefined && object.CrudValue !== null) {
-      for (const e of object.CrudValue) {
-        message.CrudValue.push(CrudValue.fromPartial(e));
+  fromPartial(object: DeepPartial<QueryKeysResponse>): QueryKeysResponse {
+    const message = { ...baseQueryKeysResponse } as QueryKeysResponse;
+    message.key = [];
+    if (object.key !== undefined && object.key !== null) {
+      for (const e of object.key) {
+        message.key.push(e);
       }
     }
     if (object.pagination !== undefined && object.pagination !== null) {
@@ -380,12 +333,8 @@ export const QueryAllCrudValueResponse = {
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** this line is used by starport scaffolding # 2 */
-  CrudValue(
-    request: QueryGetCrudValueRequest
-  ): Promise<QueryGetCrudValueResponse>;
-  CrudValueAll(
-    request: QueryAllCrudValueRequest
-  ): Promise<QueryAllCrudValueResponse>;
+  Read(request: QueryReadRequest): Promise<QueryReadResponse>;
+  Keys(request: QueryKeysRequest): Promise<QueryKeysResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -393,31 +342,27 @@ export class QueryClientImpl implements Query {
   constructor(rpc: Rpc) {
     this.rpc = rpc;
   }
-  CrudValue(
-    request: QueryGetCrudValueRequest
-  ): Promise<QueryGetCrudValueResponse> {
-    const data = QueryGetCrudValueRequest.encode(request).finish();
+  Read(request: QueryReadRequest): Promise<QueryReadResponse> {
+    const data = QueryReadRequest.encode(request).finish();
     const promise = this.rpc.request(
       "bluzelle.curium.crud.Query",
-      "CrudValue",
+      "Read",
       data
     );
     return promise.then((data) =>
-      QueryGetCrudValueResponse.decode(new _m0.Reader(data))
+      QueryReadResponse.decode(new _m0.Reader(data))
     );
   }
 
-  CrudValueAll(
-    request: QueryAllCrudValueRequest
-  ): Promise<QueryAllCrudValueResponse> {
-    const data = QueryAllCrudValueRequest.encode(request).finish();
+  Keys(request: QueryKeysRequest): Promise<QueryKeysResponse> {
+    const data = QueryKeysRequest.encode(request).finish();
     const promise = this.rpc.request(
       "bluzelle.curium.crud.Query",
-      "CrudValueAll",
+      "Keys",
       data
     );
     return promise.then((data) =>
-      QueryAllCrudValueResponse.decode(new _m0.Reader(data))
+      QueryKeysResponse.decode(new _m0.Reader(data))
     );
   }
 }
@@ -428,6 +373,39 @@ interface Rpc {
     method: string,
     data: Uint8Array
   ): Promise<Uint8Array>;
+}
+
+declare var self: any | undefined;
+declare var window: any | undefined;
+var globalThis: any = (() => {
+  if (typeof globalThis !== "undefined") return globalThis;
+  if (typeof self !== "undefined") return self;
+  if (typeof window !== "undefined") return window;
+  if (typeof global !== "undefined") return global;
+  throw "Unable to locate global object";
+})();
+
+const atob: (b64: string) => string =
+  globalThis.atob ||
+  ((b64) => globalThis.Buffer.from(b64, "base64").toString("binary"));
+function bytesFromBase64(b64: string): Uint8Array {
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; ++i) {
+    arr[i] = bin.charCodeAt(i);
+  }
+  return arr;
+}
+
+const btoa: (bin: string) => string =
+  globalThis.btoa ||
+  ((bin) => globalThis.Buffer.from(bin, "binary").toString("base64"));
+function base64FromBytes(arr: Uint8Array): string {
+  const bin: string[] = [];
+  for (let i = 0; i < arr.byteLength; ++i) {
+    bin.push(String.fromCharCode(arr[i]));
+  }
+  return btoa(bin.join(""));
 }
 
 type Builtin =

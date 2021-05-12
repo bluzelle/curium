@@ -11,31 +11,32 @@ option go_package = "github.com/bluzelle/curium/x/crud/types";
 // Query defines the gRPC querier service.
 service Query {
     // this line is used by starport scaffolding # 2
-	rpc CrudValue(QueryGetCrudValueRequest) returns (QueryGetCrudValueResponse) {
+	rpc Read(QueryReadRequest) returns (QueryReadResponse) {
 		option (google.api.http).get = "/bluzelle/curium/crud/CrudValue/{uuid}/{key}";
 	}
-	rpc CrudValueAll(QueryAllCrudValueRequest) returns (QueryAllCrudValueResponse) {
+	rpc Keys(QueryKeysRequest) returns (QueryKeysResponse) {
 		option (google.api.http).get = "/bluzelle/curium/crud/CrudValue";
 	}
-
 }
 
 // this line is used by starport scaffolding # 3
-message QueryGetCrudValueRequest {
+message QueryReadRequest {
 	string uuid = 1;
 	string key = 2;
 }
 
-message QueryGetCrudValueResponse {
-	CrudValue CrudValue = 1;
+message QueryReadResponse {
+	bytes value = 1;
 }
 
-message QueryAllCrudValueRequest {
+message QueryKeysRequest {
 	string uuid = 1;
 	cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
-message QueryAllCrudValueResponse {
-	repeated CrudValue CrudValue = 1;
+message QueryKeysResponse {
+	repeated string key = 1;
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
+
+

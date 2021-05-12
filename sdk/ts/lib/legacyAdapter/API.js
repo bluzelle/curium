@@ -33,10 +33,11 @@ class API {
     //     // This is here for backward compatibility - delete later
     // }
     //
-    account(address) {
-        return this.getClient()
-            .then(client => client.account.getAccount(address));
-    }
+    // account(address: string = this.address): Promise<AccountResult> {
+    //     return getCosmos(this)
+    //         .then(cosmos => cosmos.getAccounts(address))
+    //         .then((x: AccountsResult) => x.result.value);
+    // }
     //
     // isExistingAccount(): Promise<boolean> {
     //     return this.account()
@@ -266,11 +267,11 @@ class API {
     //
     read(key) {
         return this.getClient()
-            .then(client => client.db.q.CrudValue({
+            .then(client => client.db.q.Read({
             uuid: this.config.uuid,
             key
         }))
-            .then(x => { var _a; return (_a = x.CrudValue) === null || _a === void 0 ? void 0 : _a.value; })
+            .then(resp => resp.value)
             .then(x => new TextDecoder().decode(x));
     }
     //

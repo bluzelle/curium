@@ -1,63 +1,62 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { CrudValue } from "../crud/CrudValue";
 import { PageRequest, PageResponse } from "../cosmos/base/query/v1beta1/pagination";
 export declare const protobufPackage = "bluzelle.curium.crud";
 /** this line is used by starport scaffolding # 3 */
-export interface QueryGetCrudValueRequest {
+export interface QueryReadRequest {
     uuid: string;
     key: string;
 }
-export interface QueryGetCrudValueResponse {
-    CrudValue?: CrudValue;
+export interface QueryReadResponse {
+    value: Uint8Array;
 }
-export interface QueryAllCrudValueRequest {
+export interface QueryKeysRequest {
     uuid: string;
     pagination?: PageRequest;
 }
-export interface QueryAllCrudValueResponse {
-    CrudValue: CrudValue[];
+export interface QueryKeysResponse {
+    key: string[];
     pagination?: PageResponse;
 }
-export declare const QueryGetCrudValueRequest: {
-    encode(message: QueryGetCrudValueRequest, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryGetCrudValueRequest;
-    fromJSON(object: any): QueryGetCrudValueRequest;
-    toJSON(message: QueryGetCrudValueRequest): unknown;
-    fromPartial(object: DeepPartial<QueryGetCrudValueRequest>): QueryGetCrudValueRequest;
+export declare const QueryReadRequest: {
+    encode(message: QueryReadRequest, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryReadRequest;
+    fromJSON(object: any): QueryReadRequest;
+    toJSON(message: QueryReadRequest): unknown;
+    fromPartial(object: DeepPartial<QueryReadRequest>): QueryReadRequest;
 };
-export declare const QueryGetCrudValueResponse: {
-    encode(message: QueryGetCrudValueResponse, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryGetCrudValueResponse;
-    fromJSON(object: any): QueryGetCrudValueResponse;
-    toJSON(message: QueryGetCrudValueResponse): unknown;
-    fromPartial(object: DeepPartial<QueryGetCrudValueResponse>): QueryGetCrudValueResponse;
+export declare const QueryReadResponse: {
+    encode(message: QueryReadResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryReadResponse;
+    fromJSON(object: any): QueryReadResponse;
+    toJSON(message: QueryReadResponse): unknown;
+    fromPartial(object: DeepPartial<QueryReadResponse>): QueryReadResponse;
 };
-export declare const QueryAllCrudValueRequest: {
-    encode(message: QueryAllCrudValueRequest, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryAllCrudValueRequest;
-    fromJSON(object: any): QueryAllCrudValueRequest;
-    toJSON(message: QueryAllCrudValueRequest): unknown;
-    fromPartial(object: DeepPartial<QueryAllCrudValueRequest>): QueryAllCrudValueRequest;
+export declare const QueryKeysRequest: {
+    encode(message: QueryKeysRequest, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryKeysRequest;
+    fromJSON(object: any): QueryKeysRequest;
+    toJSON(message: QueryKeysRequest): unknown;
+    fromPartial(object: DeepPartial<QueryKeysRequest>): QueryKeysRequest;
 };
-export declare const QueryAllCrudValueResponse: {
-    encode(message: QueryAllCrudValueResponse, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryAllCrudValueResponse;
-    fromJSON(object: any): QueryAllCrudValueResponse;
-    toJSON(message: QueryAllCrudValueResponse): unknown;
-    fromPartial(object: DeepPartial<QueryAllCrudValueResponse>): QueryAllCrudValueResponse;
+export declare const QueryKeysResponse: {
+    encode(message: QueryKeysResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryKeysResponse;
+    fromJSON(object: any): QueryKeysResponse;
+    toJSON(message: QueryKeysResponse): unknown;
+    fromPartial(object: DeepPartial<QueryKeysResponse>): QueryKeysResponse;
 };
 /** Query defines the gRPC querier service. */
 export interface Query {
     /** this line is used by starport scaffolding # 2 */
-    CrudValue(request: QueryGetCrudValueRequest): Promise<QueryGetCrudValueResponse>;
-    CrudValueAll(request: QueryAllCrudValueRequest): Promise<QueryAllCrudValueResponse>;
+    Read(request: QueryReadRequest): Promise<QueryReadResponse>;
+    Keys(request: QueryKeysRequest): Promise<QueryKeysResponse>;
 }
 export declare class QueryClientImpl implements Query {
     private readonly rpc;
     constructor(rpc: Rpc);
-    CrudValue(request: QueryGetCrudValueRequest): Promise<QueryGetCrudValueResponse>;
-    CrudValueAll(request: QueryAllCrudValueRequest): Promise<QueryAllCrudValueResponse>;
+    Read(request: QueryReadRequest): Promise<QueryReadResponse>;
+    Keys(request: QueryKeysRequest): Promise<QueryKeysResponse>;
 }
 interface Rpc {
     request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;

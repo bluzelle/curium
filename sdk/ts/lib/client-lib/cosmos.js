@@ -5,9 +5,9 @@ const rpc_1 = require("./rpc");
 const lodash_1 = require("lodash");
 const promise_passthrough_1 = require("promise-passthrough");
 const cosmosjs = require('@cosmostation/cosmosjs');
-const account = (options) => Promise.all([
-    rpc_1.mnemonicToAddress(options.mnemonic || ''),
-    getCosmos(options.url)
+const account = (ctx) => Promise.all([
+    rpc_1.mnemonicToAddress(ctx.mnemonic || ''),
+    getCosmos(ctx.url)
 ])
     .then(([address, cosmos]) => ({
     getBNT: getBNT(address, cosmos),
@@ -29,7 +29,9 @@ const isExistingAccount = (address, cosmos) => () => {
     return getAccount(address, cosmos)(address)
         .then(x => !!x.coins.length);
 };
-const getCosmos = lodash_1.memoize((url) => fetch(`${url}/node_info`)
+const getCosmos = lodash_1.memoize((url) => 
+// url input temporary
+fetch(`http://localhost:1317/node_info`)
     .then(x => x.json())
     .then(x => x.node_info.network)
     .then(chainId => cosmosjs.network(url, chainId))
