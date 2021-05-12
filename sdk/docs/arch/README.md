@@ -2,6 +2,7 @@
 
 * Install starport `https://docs.starport.network/intro/install.html` with the recommended dependencies (except for nodeJS, not necessary for the curium project)
 * `git clone https://github.com/bluzelle/curium.git`
+* `git checkout stargate`  
 * `cd curium`
 * `starport serve`
 
