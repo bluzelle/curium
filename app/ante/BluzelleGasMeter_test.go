@@ -57,7 +57,7 @@ func (suite *FreeGasMeterTestSuite) TestFreeGasMeter_ConsumeGas() {
 	})
 }
 
-func (suite * FreeGasMeterTestSuite) TestFreeGasMeter_ConsumeBillableGas() {
+func (suite *FreeGasMeterTestSuite) TestFreeGasMeter_ConsumeBillableGas() {
 	suite.Run("should consume gas and update billableGas", func() {
 		gasMeter := suite.GasMeter.(BluzelleGasMeterInterface)
 		gasMeter.ConsumeBillableGas(1000, "just right")

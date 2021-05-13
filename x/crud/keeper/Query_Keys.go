@@ -38,5 +38,3 @@ func (k Keeper) Keys(goCtx context.Context, req *types.QueryKeysRequest) (*types
 
 	return &types.QueryKeysResponse{Key: keys, Pagination: pageRes}, nil
 }
-
-

@@ -3,6 +3,14 @@ import _m0 from "protobufjs/minimal";
 import { Lease } from "../crud/lease";
 export declare const protobufPackage = "bluzelle.curium.crud";
 /** this line is used by starport scaffolding # proto/tx/message */
+export interface MsgHas {
+    creator: string;
+    uuid: string;
+    key: string;
+}
+export interface MsgHasResponse {
+    has: boolean;
+}
 export interface MsgGetLease {
     creator: string;
     uuid: string;
@@ -59,6 +67,20 @@ export interface MsgDelete {
 }
 export interface MsgDeleteResponse {
 }
+export declare const MsgHas: {
+    encode(message: MsgHas, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgHas;
+    fromJSON(object: any): MsgHas;
+    toJSON(message: MsgHas): unknown;
+    fromPartial(object: DeepPartial<MsgHas>): MsgHas;
+};
+export declare const MsgHasResponse: {
+    encode(message: MsgHasResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgHasResponse;
+    fromJSON(object: any): MsgHasResponse;
+    toJSON(message: MsgHasResponse): unknown;
+    fromPartial(object: DeepPartial<MsgHasResponse>): MsgHasResponse;
+};
 export declare const MsgGetLease: {
     encode(message: MsgGetLease, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgGetLease;
@@ -146,6 +168,7 @@ export declare const MsgDeleteResponse: {
 /** Msg defines the Msg service. */
 export interface Msg {
     /** this line is used by starport scaffolding # proto/tx/rpc */
+    Has(request: MsgHas): Promise<MsgHasResponse>;
     GetLease(request: MsgGetLease): Promise<MsgGetLeaseResponse>;
     Read(request: MsgRead): Promise<MsgReadResponse>;
     Upsert(request: MsgUpsert): Promise<MsgUpsertResponse>;
@@ -156,6 +179,7 @@ export interface Msg {
 export declare class MsgClientImpl implements Msg {
     private readonly rpc;
     constructor(rpc: Rpc);
+    Has(request: MsgHas): Promise<MsgHasResponse>;
     GetLease(request: MsgGetLease): Promise<MsgGetLeaseResponse>;
     Read(request: MsgRead): Promise<MsgReadResponse>;
     Upsert(request: MsgUpsert): Promise<MsgUpsertResponse>;

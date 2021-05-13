@@ -36,7 +36,3 @@ func (k msgServer) Create(goCtx context.Context, msg *types.MsgCreate) (*types.M
 
 	return &types.MsgCreateResponse{}, nil
 }
-
-
-
-

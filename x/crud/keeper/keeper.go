@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/bluzelle/curium/app/ante"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
-	"strconv"
 	"github.com/tendermint/tendermint/libs/log"
+	"strconv"
 
 	"github.com/bluzelle/curium/x/crud/types"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -70,7 +70,7 @@ func (k Keeper) SetLease(ctx *sdk.Context, UUID string, key string, blockHeight 
 }
 
 func (k Keeper) ConvertLeaseToBlocks(lease *types.Lease) int64 {
-	return int64(float64(lease.GetSeconds() + lease.GetMinutes() * 60 + lease.GetHours() * 3600 + lease.GetDays() * 3600 * 24 + lease.GetYears() * 365 * 3600 * 24) / 5.5)
+	return int64(float64(lease.GetSeconds()+lease.GetMinutes()*60+lease.GetHours()*3600+lease.GetDays()*3600*24+lease.GetYears()*365*3600*24) / 5.5)
 }
 
 func (k Keeper) DeleteLease(ctx *sdk.Context, UUID string, key string, blockHeight int64, leaseBlocks int64) {
@@ -139,4 +139,3 @@ func (k Keeper) UpdateLease(ctx *sdk.Context, UUID string, key string, lease *ty
 	//keeper.SetValue(ctx, keeper.GetKVStore(ctx), UUID, key, blzValue)
 	k.SetLease(ctx, UUID, key, blzValue.Height, lease)
 }
-

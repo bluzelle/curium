@@ -30,7 +30,7 @@ func UuidPrefix(p string, uuid string) []byte {
 }
 
 const (
-	CrudValueKey = "CrudValue-value-"
+	CrudValueKey  = "CrudValue-value-"
 	LeaseValueKey = "LeaseValue-value-"
 	OwnerValueKey = "OwnerValue-value-"
 )

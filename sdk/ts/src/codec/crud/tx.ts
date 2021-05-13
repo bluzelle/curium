@@ -6,6 +6,16 @@ import { Lease } from "../crud/lease";
 export const protobufPackage = "bluzelle.curium.crud";
 
 /** this line is used by starport scaffolding # proto/tx/message */
+export interface MsgHas {
+  creator: string;
+  uuid: string;
+  key: string;
+}
+
+export interface MsgHasResponse {
+  has: boolean;
+}
+
 export interface MsgGetLease {
   creator: string;
   uuid: string;
@@ -69,6 +79,156 @@ export interface MsgDelete {
 }
 
 export interface MsgDeleteResponse {}
+
+const baseMsgHas: object = { creator: "", uuid: "", key: "" };
+
+export const MsgHas = {
+  encode(
+    message: MsgHas,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.uuid !== "") {
+      writer.uint32(18).string(message.uuid);
+    }
+    if (message.key !== "") {
+      writer.uint32(26).string(message.key);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgHas {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgHas } as MsgHas;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.uuid = reader.string();
+          break;
+        case 3:
+          message.key = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgHas {
+    const message = { ...baseMsgHas } as MsgHas;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = String(object.key);
+    } else {
+      message.key = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgHas): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    message.key !== undefined && (obj.key = message.key);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgHas>): MsgHas {
+    const message = { ...baseMsgHas } as MsgHas;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = object.key;
+    } else {
+      message.key = "";
+    }
+    return message;
+  },
+};
+
+const baseMsgHasResponse: object = { has: false };
+
+export const MsgHasResponse = {
+  encode(
+    message: MsgHasResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.has === true) {
+      writer.uint32(8).bool(message.has);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgHasResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgHasResponse } as MsgHasResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.has = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgHasResponse {
+    const message = { ...baseMsgHasResponse } as MsgHasResponse;
+    if (object.has !== undefined && object.has !== null) {
+      message.has = Boolean(object.has);
+    } else {
+      message.has = false;
+    }
+    return message;
+  },
+
+  toJSON(message: MsgHasResponse): unknown {
+    const obj: any = {};
+    message.has !== undefined && (obj.has = message.has);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgHasResponse>): MsgHasResponse {
+    const message = { ...baseMsgHasResponse } as MsgHasResponse;
+    if (object.has !== undefined && object.has !== null) {
+      message.has = object.has;
+    } else {
+      message.has = false;
+    }
+    return message;
+  },
+};
 
 const baseMsgGetLease: object = { creator: "", uuid: "", key: "" };
 
@@ -1138,6 +1298,7 @@ export const MsgDeleteResponse = {
 /** Msg defines the Msg service. */
 export interface Msg {
   /** this line is used by starport scaffolding # proto/tx/rpc */
+  Has(request: MsgHas): Promise<MsgHasResponse>;
   GetLease(request: MsgGetLease): Promise<MsgGetLeaseResponse>;
   Read(request: MsgRead): Promise<MsgReadResponse>;
   Upsert(request: MsgUpsert): Promise<MsgUpsertResponse>;
@@ -1151,6 +1312,12 @@ export class MsgClientImpl implements Msg {
   constructor(rpc: Rpc) {
     this.rpc = rpc;
   }
+  Has(request: MsgHas): Promise<MsgHasResponse> {
+    const data = MsgHas.encode(request).finish();
+    const promise = this.rpc.request("bluzelle.curium.crud.Msg", "Has", data);
+    return promise.then((data) => MsgHasResponse.decode(new _m0.Reader(data)));
+  }
+
   GetLease(request: MsgGetLease): Promise<MsgGetLeaseResponse> {
     const data = MsgGetLease.encode(request).finish();
     const promise = this.rpc.request(

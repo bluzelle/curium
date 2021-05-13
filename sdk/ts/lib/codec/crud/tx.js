@@ -3,12 +3,152 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MsgClientImpl = exports.MsgDeleteResponse = exports.MsgDelete = exports.MsgUpdateResponse = exports.MsgUpdate = exports.MsgCreateResponse = exports.MsgCreate = exports.MsgUpsertResponse = exports.MsgUpsert = exports.MsgReadResponse = exports.MsgRead = exports.MsgGetLeaseResponse = exports.MsgGetLease = exports.protobufPackage = void 0;
+exports.MsgClientImpl = exports.MsgDeleteResponse = exports.MsgDelete = exports.MsgUpdateResponse = exports.MsgUpdate = exports.MsgCreateResponse = exports.MsgCreate = exports.MsgUpsertResponse = exports.MsgUpsert = exports.MsgReadResponse = exports.MsgRead = exports.MsgGetLeaseResponse = exports.MsgGetLease = exports.MsgHasResponse = exports.MsgHas = exports.protobufPackage = void 0;
 /* eslint-disable */
 const long_1 = __importDefault(require("long"));
 const minimal_1 = __importDefault(require("protobufjs/minimal"));
 const lease_1 = require("../crud/lease");
 exports.protobufPackage = "bluzelle.curium.crud";
+const baseMsgHas = { creator: "", uuid: "", key: "" };
+exports.MsgHas = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        if (message.creator !== "") {
+            writer.uint32(10).string(message.creator);
+        }
+        if (message.uuid !== "") {
+            writer.uint32(18).string(message.uuid);
+        }
+        if (message.key !== "") {
+            writer.uint32(26).string(message.key);
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = { ...baseMsgHas };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.creator = reader.string();
+                    break;
+                case 2:
+                    message.uuid = reader.string();
+                    break;
+                case 3:
+                    message.key = reader.string();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = { ...baseMsgHas };
+        if (object.creator !== undefined && object.creator !== null) {
+            message.creator = String(object.creator);
+        }
+        else {
+            message.creator = "";
+        }
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = String(object.uuid);
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.key !== undefined && object.key !== null) {
+            message.key = String(object.key);
+        }
+        else {
+            message.key = "";
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.creator !== undefined && (obj.creator = message.creator);
+        message.uuid !== undefined && (obj.uuid = message.uuid);
+        message.key !== undefined && (obj.key = message.key);
+        return obj;
+    },
+    fromPartial(object) {
+        const message = { ...baseMsgHas };
+        if (object.creator !== undefined && object.creator !== null) {
+            message.creator = object.creator;
+        }
+        else {
+            message.creator = "";
+        }
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = object.uuid;
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.key !== undefined && object.key !== null) {
+            message.key = object.key;
+        }
+        else {
+            message.key = "";
+        }
+        return message;
+    },
+};
+const baseMsgHasResponse = { has: false };
+exports.MsgHasResponse = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        if (message.has === true) {
+            writer.uint32(8).bool(message.has);
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = { ...baseMsgHasResponse };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.has = reader.bool();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = { ...baseMsgHasResponse };
+        if (object.has !== undefined && object.has !== null) {
+            message.has = Boolean(object.has);
+        }
+        else {
+            message.has = false;
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.has !== undefined && (obj.has = message.has);
+        return obj;
+    },
+    fromPartial(object) {
+        const message = { ...baseMsgHasResponse };
+        if (object.has !== undefined && object.has !== null) {
+            message.has = object.has;
+        }
+        else {
+            message.has = false;
+        }
+        return message;
+    },
+};
 const baseMsgGetLease = { creator: "", uuid: "", key: "" };
 exports.MsgGetLease = {
     encode(message, writer = minimal_1.default.Writer.create()) {
@@ -1012,6 +1152,11 @@ exports.MsgDeleteResponse = {
 class MsgClientImpl {
     constructor(rpc) {
         this.rpc = rpc;
+    }
+    Has(request) {
+        const data = exports.MsgHas.encode(request).finish();
+        const promise = this.rpc.request("bluzelle.curium.crud.Msg", "Has", data);
+        return promise.then((data) => exports.MsgHasResponse.decode(new minimal_1.default.Reader(data)));
     }
     GetLease(request) {
         const data = exports.MsgGetLease.encode(request).finish();
