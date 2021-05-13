@@ -149,12 +149,21 @@ describe('sdk.tx.Create()', function () {
             gasPrice: 0.002,
             maxGas: 100000000
         })
+
+        await sdk.bank.tx.Send({
+            toAddress: sdk2.bank.address,
+            fromAddress: sdk.bank.address,
+            amount: [{
+                amount: '100',
+                denom: 'ubnt'
+            }]
+        })
         await sdk.db.tx.Create({
             creator: sdk.db.address,
             uuid: 'uuid',
             key: 'mykeyss',
             value: new TextEncoder().encode('myvalue'),
-            lease: {days: 10} as Lease,
+            lease: defaultLease,
             metadata: new Uint8Array()});
 
         await expect(sdk2.db.tx.Create({
@@ -162,7 +171,7 @@ describe('sdk.tx.Create()', function () {
             uuid: 'uuid',
             key: 'yourkeyss',
             value: new TextEncoder().encode('yourvalue'),
-            lease: {days: 10} as Lease,
+            lease: defaultLease,
             metadata: new Uint8Array()
         })).to.be.rejectedWith('Invalid account: check your mnemonic')
 

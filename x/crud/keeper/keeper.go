@@ -78,7 +78,7 @@ func (k Keeper) DeleteLease(ctx *sdk.Context, UUID string, key string, blockHeig
 	leaseStore.Delete(MakeLeaseKey(blockHeight+leaseBlocks, UUID, key))
 }
 
-func (k Keeper) ProcessLeasesAtBlockHeight(ctx sdk.Context, lease int64) {
+func (k Keeper) ProcessLeasesAtBlockHeight(ctx *sdk.Context, lease int64) {
 	leasePrefix := []byte(strconv.FormatInt(lease, 10) + "\x00")
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.CrudValueKey))
 	leaseStore := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.LeaseValueKey))
