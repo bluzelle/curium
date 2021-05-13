@@ -4,7 +4,7 @@ interface Config {
 }
 
 export const localChain: Config = {
-    mnemonic: "wish predict there silver avocado junk avocado below deposit account until produce crumble hope calm that camera grab pyramid area tank dress noise approve",
+    mnemonic: "misery float alcohol annual tank blind coral latin ordinary suit feed ginger curious item swallow seek problem staff frog false oak act mercy adapt",
     endpoint: "http://localhost:26657"
 }
 

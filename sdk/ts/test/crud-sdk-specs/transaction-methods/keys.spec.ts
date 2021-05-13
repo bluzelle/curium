@@ -22,7 +22,7 @@ describe('keys()', function () {
         await sdk.db.withTransaction(() => {
             sdk.db.tx.Create({
                 creator: sdk.db.address,
-                uuid: 'uuid',
+                uuid: 'uuid3',
                 key: 'key3',
                 value: new TextEncoder().encode('value1'),
                 lease: defaultLease,
@@ -30,7 +30,7 @@ describe('keys()', function () {
             });
             sdk.db.tx.Create({
                 creator: sdk.db.address,
-                uuid: 'uuid',
+                uuid: 'uuid3',
                 key: 'key4',
                 value: new TextEncoder().encode(''),
                 lease: defaultLease,
@@ -38,7 +38,7 @@ describe('keys()', function () {
             });
         }, {memo: ''})
         expect(await sdk.db.q.Keys({
-            uuid: 'uuid'
+            uuid: 'uuid3'
         }).then(resp => resp.key)).to.deep.equal(['key3', 'key4']);
     })
     //
