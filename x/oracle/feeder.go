@@ -184,11 +184,11 @@ func generateVoteMsg(cdc *codec.Codec, source SourceAndValue) (types.MsgOracleVo
 
 func getCurrentBatchId() string {
 	t := time.Date(
-		time.Now().Year(),
-		time.Now().Month(),
-		time.Now().Day(),
-		time.Now().Hour(),
-		time.Now().Minute(),
+		time.Now().UTC().Year(),
+		time.Now().UTC().Month(),
+		time.Now().UTC().Day(),
+		time.Now().UTC().Hour(),
+		time.Now().UTC().Minute(),
 		0,
 		0,
 		time.UTC,
