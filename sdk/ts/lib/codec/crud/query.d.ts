@@ -27,6 +27,14 @@ export interface QueryMyKeysResponse {
     key: string[];
     pagination?: PageResponse;
 }
+export interface QueryCountRequest {
+    address: string;
+    uuid: string;
+}
+export interface QueryCountResponse {
+    uuid: string;
+    count: Long;
+}
 export declare const QueryReadRequest: {
     encode(message: QueryReadRequest, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryReadRequest;
@@ -69,12 +77,27 @@ export declare const QueryMyKeysResponse: {
     toJSON(message: QueryMyKeysResponse): unknown;
     fromPartial(object: DeepPartial<QueryMyKeysResponse>): QueryMyKeysResponse;
 };
+export declare const QueryCountRequest: {
+    encode(message: QueryCountRequest, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryCountRequest;
+    fromJSON(object: any): QueryCountRequest;
+    toJSON(message: QueryCountRequest): unknown;
+    fromPartial(object: DeepPartial<QueryCountRequest>): QueryCountRequest;
+};
+export declare const QueryCountResponse: {
+    encode(message: QueryCountResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryCountResponse;
+    fromJSON(object: any): QueryCountResponse;
+    toJSON(message: QueryCountResponse): unknown;
+    fromPartial(object: DeepPartial<QueryCountResponse>): QueryCountResponse;
+};
 /** Query defines the gRPC querier service. */
 export interface Query {
     /** this line is used by starport scaffolding # 2 */
     Read(request: QueryReadRequest): Promise<QueryReadResponse>;
     Keys(request: QueryKeysRequest): Promise<QueryKeysResponse>;
     MyKeys(request: QueryMyKeysRequest): Promise<QueryMyKeysResponse>;
+    Count(request: QueryCountRequest): Promise<QueryCountResponse>;
 }
 export declare class QueryClientImpl implements Query {
     private readonly rpc;
@@ -82,6 +105,7 @@ export declare class QueryClientImpl implements Query {
     Read(request: QueryReadRequest): Promise<QueryReadResponse>;
     Keys(request: QueryKeysRequest): Promise<QueryKeysResponse>;
     MyKeys(request: QueryMyKeysRequest): Promise<QueryMyKeysResponse>;
+    Count(request: QueryCountRequest): Promise<QueryCountResponse>;
 }
 interface Rpc {
     request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;

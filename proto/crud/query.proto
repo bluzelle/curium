@@ -19,6 +19,9 @@ service Query {
 	rpc MyKeys(QueryMyKeysRequest) returns (QueryMyKeysResponse) {
 		option (google.api.http).get = "/bluzelle/curium/crud/CrudValue/{address}/{uuid}";
 	}
+	rpc Count(QueryCountRequest) returns (QueryCountResponse) {
+		option (google.api.http).get = "/bluzelle/curium/crud/CrudValue/{uuid}";
+	}
 }
 
 // this line is used by starport scaffolding # 3
@@ -50,6 +53,16 @@ message QueryMyKeysRequest {
 message QueryMyKeysResponse {
 	repeated string key = 1;
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryCountRequest {
+	string address = 1;
+	string uuid = 2;
+}
+
+message QueryCountResponse {
+	string uuid = 1;
+	int64 count = 2;
 }
 
 

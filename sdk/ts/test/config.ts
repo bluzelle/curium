@@ -4,7 +4,7 @@ interface Config {
 }
 
 export const localChain: Config = {
-    mnemonic: "curious dinner phrase purity million toy boy trap round tornado absurd under hungry engine magnet hazard siren vanish install tunnel vacant time derive loud",
+    mnemonic: "program trial tackle expire egg practice riot cruel bind vocal click sentence there universe more connect alter copy tackle spread road leaf eye lend",
     endpoint: "http://localhost:26657"
 }
 

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.QueryClientImpl = exports.QueryMyKeysResponse = exports.QueryMyKeysRequest = exports.QueryKeysResponse = exports.QueryKeysRequest = exports.QueryReadResponse = exports.QueryReadRequest = exports.protobufPackage = void 0;
+exports.QueryClientImpl = exports.QueryCountResponse = exports.QueryCountRequest = exports.QueryMyKeysResponse = exports.QueryMyKeysRequest = exports.QueryKeysResponse = exports.QueryKeysRequest = exports.QueryReadResponse = exports.QueryReadRequest = exports.protobufPackage = void 0;
 /* eslint-disable */
 const long_1 = __importDefault(require("long"));
 const minimal_1 = __importDefault(require("protobufjs/minimal"));
@@ -453,6 +453,147 @@ exports.QueryMyKeysResponse = {
         return message;
     },
 };
+const baseQueryCountRequest = { address: "", uuid: "" };
+exports.QueryCountRequest = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        if (message.address !== "") {
+            writer.uint32(10).string(message.address);
+        }
+        if (message.uuid !== "") {
+            writer.uint32(18).string(message.uuid);
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = { ...baseQueryCountRequest };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.address = reader.string();
+                    break;
+                case 2:
+                    message.uuid = reader.string();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = { ...baseQueryCountRequest };
+        if (object.address !== undefined && object.address !== null) {
+            message.address = String(object.address);
+        }
+        else {
+            message.address = "";
+        }
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = String(object.uuid);
+        }
+        else {
+            message.uuid = "";
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.address !== undefined && (obj.address = message.address);
+        message.uuid !== undefined && (obj.uuid = message.uuid);
+        return obj;
+    },
+    fromPartial(object) {
+        const message = { ...baseQueryCountRequest };
+        if (object.address !== undefined && object.address !== null) {
+            message.address = object.address;
+        }
+        else {
+            message.address = "";
+        }
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = object.uuid;
+        }
+        else {
+            message.uuid = "";
+        }
+        return message;
+    },
+};
+const baseQueryCountResponse = { uuid: "", count: long_1.default.ZERO };
+exports.QueryCountResponse = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        if (message.uuid !== "") {
+            writer.uint32(10).string(message.uuid);
+        }
+        if (!message.count.isZero()) {
+            writer.uint32(16).int64(message.count);
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = { ...baseQueryCountResponse };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.uuid = reader.string();
+                    break;
+                case 2:
+                    message.count = reader.int64();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = { ...baseQueryCountResponse };
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = String(object.uuid);
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.count !== undefined && object.count !== null) {
+            message.count = long_1.default.fromString(object.count);
+        }
+        else {
+            message.count = long_1.default.ZERO;
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.uuid !== undefined && (obj.uuid = message.uuid);
+        message.count !== undefined &&
+            (obj.count = (message.count || long_1.default.ZERO).toString());
+        return obj;
+    },
+    fromPartial(object) {
+        const message = { ...baseQueryCountResponse };
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = object.uuid;
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.count !== undefined && object.count !== null) {
+            message.count = object.count;
+        }
+        else {
+            message.count = long_1.default.ZERO;
+        }
+        return message;
+    },
+};
 class QueryClientImpl {
     constructor(rpc) {
         this.rpc = rpc;
@@ -471,6 +612,11 @@ class QueryClientImpl {
         const data = exports.QueryMyKeysRequest.encode(request).finish();
         const promise = this.rpc.request("bluzelle.curium.crud.Query", "MyKeys", data);
         return promise.then((data) => exports.QueryMyKeysResponse.decode(new minimal_1.default.Reader(data)));
+    }
+    Count(request) {
+        const data = exports.QueryCountRequest.encode(request).finish();
+        const promise = this.rpc.request("bluzelle.curium.crud.Query", "Count", data);
+        return promise.then((data) => exports.QueryCountResponse.decode(new minimal_1.default.Reader(data)));
     }
 }
 exports.QueryClientImpl = QueryClientImpl;

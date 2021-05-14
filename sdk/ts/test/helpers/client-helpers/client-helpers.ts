@@ -26,6 +26,7 @@ import {Some} from "monet";
 import {newMnemonic} from "../../../src/bz-sdk/bz-sdk";
 import {types} from "util";
 import {Lease} from "../../../src/codec/crud/lease";
+import {passThroughAwait} from "promise-passthrough";
 
 // Allow self signed certificates
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -179,8 +180,16 @@ export const newBzClient = (bz: API): Promise<API> =>
             maxGas: 300000,
         }))
         .map(async (newBz: API) => {
+            const sdk = await bz.getClient();
             await mnemonicToAddress(newBz.config.mnemonic || '')
-            //.then(address => bz.transferTokensTo(address, 1000, defaultGasParams()));
+                .then(address => sdk.bank.tx.Send({
+                    fromAddress: sdk.bank.address,
+                    toAddress: address,
+                    amount: [{
+                        amount: '1000',
+                        denom: 'ubnt'
+                    }]
+                }))
             return newBz;
         })
         .join()

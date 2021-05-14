@@ -105,6 +105,22 @@ func (k Keeper) GetAllMyKeys(ctx *sdk.Context, owner string, uuid string) ([]str
 	return keys, nil
 }
 
+func (k Keeper) GetNumKeysOwned(ctx *sdk.Context, uuid string, owner string) (int, error) {
+	uuidPrefix := "\x00" + uuid + "\x00"
+	store := ctx.KVStore(k.storeKey)
+	OwnerStore := prefix.NewStore(store, types.OwnerPrefix(types.OwnerValueKey, owner))
+
+	iterator := sdk.KVStorePrefixIterator(OwnerStore, []byte(uuidPrefix))
+	defer iterator.Close()
+	numKeys := 0
+
+	for ; iterator.Valid(); iterator.Next() {
+		numKeys += 1;
+	}
+
+	return numKeys, nil
+}
+
 func (k Keeper) GetAllKeyValues(ctx *sdk.Context, uuid string) (list []*types.KeyValue) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CrudValueKey))
 	iterator := sdk.KVStorePrefixIterator(store, []byte(uuid))

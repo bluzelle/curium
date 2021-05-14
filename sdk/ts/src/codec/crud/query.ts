@@ -39,6 +39,16 @@ export interface QueryMyKeysResponse {
   pagination?: PageResponse;
 }
 
+export interface QueryCountRequest {
+  address: string;
+  uuid: string;
+}
+
+export interface QueryCountResponse {
+  uuid: string;
+  count: Long;
+}
+
 const baseQueryReadRequest: object = { uuid: "", key: "" };
 
 export const QueryReadRequest = {
@@ -524,12 +534,164 @@ export const QueryMyKeysResponse = {
   },
 };
 
+const baseQueryCountRequest: object = { address: "", uuid: "" };
+
+export const QueryCountRequest = {
+  encode(
+    message: QueryCountRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.address !== "") {
+      writer.uint32(10).string(message.address);
+    }
+    if (message.uuid !== "") {
+      writer.uint32(18).string(message.uuid);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryCountRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryCountRequest } as QueryCountRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.address = reader.string();
+          break;
+        case 2:
+          message.uuid = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryCountRequest {
+    const message = { ...baseQueryCountRequest } as QueryCountRequest;
+    if (object.address !== undefined && object.address !== null) {
+      message.address = String(object.address);
+    } else {
+      message.address = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    return message;
+  },
+
+  toJSON(message: QueryCountRequest): unknown {
+    const obj: any = {};
+    message.address !== undefined && (obj.address = message.address);
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<QueryCountRequest>): QueryCountRequest {
+    const message = { ...baseQueryCountRequest } as QueryCountRequest;
+    if (object.address !== undefined && object.address !== null) {
+      message.address = object.address;
+    } else {
+      message.address = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    return message;
+  },
+};
+
+const baseQueryCountResponse: object = { uuid: "", count: Long.ZERO };
+
+export const QueryCountResponse = {
+  encode(
+    message: QueryCountResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.uuid !== "") {
+      writer.uint32(10).string(message.uuid);
+    }
+    if (!message.count.isZero()) {
+      writer.uint32(16).int64(message.count);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryCountResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryCountResponse } as QueryCountResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.uuid = reader.string();
+          break;
+        case 2:
+          message.count = reader.int64() as Long;
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryCountResponse {
+    const message = { ...baseQueryCountResponse } as QueryCountResponse;
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.count !== undefined && object.count !== null) {
+      message.count = Long.fromString(object.count);
+    } else {
+      message.count = Long.ZERO;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryCountResponse): unknown {
+    const obj: any = {};
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    message.count !== undefined &&
+      (obj.count = (message.count || Long.ZERO).toString());
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<QueryCountResponse>): QueryCountResponse {
+    const message = { ...baseQueryCountResponse } as QueryCountResponse;
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.count !== undefined && object.count !== null) {
+      message.count = object.count as Long;
+    } else {
+      message.count = Long.ZERO;
+    }
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** this line is used by starport scaffolding # 2 */
   Read(request: QueryReadRequest): Promise<QueryReadResponse>;
   Keys(request: QueryKeysRequest): Promise<QueryKeysResponse>;
   MyKeys(request: QueryMyKeysRequest): Promise<QueryMyKeysResponse>;
+  Count(request: QueryCountRequest): Promise<QueryCountResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -570,6 +732,18 @@ export class QueryClientImpl implements Query {
     );
     return promise.then((data) =>
       QueryMyKeysResponse.decode(new _m0.Reader(data))
+    );
+  }
+
+  Count(request: QueryCountRequest): Promise<QueryCountResponse> {
+    const data = QueryCountRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "bluzelle.curium.crud.Query",
+      "Count",
+      data
+    );
+    return promise.then((data) =>
+      QueryCountResponse.decode(new _m0.Reader(data))
     );
   }
 }
