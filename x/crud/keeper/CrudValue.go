@@ -7,6 +7,24 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+func (k Keeper) NewCrudValue(
+	creator string,
+	uuid string,
+	key string,
+	value []byte,
+	lease *types.Lease,
+	height int64,) types.CrudValue{
+
+	return types.CrudValue{
+		Creator: creator,
+		Uuid: uuid,
+		Key: key,
+		Value: value,
+		Lease: lease,
+		Height: height,
+	}
+}
+
 // AppendCrudValue appends a CrudValue in the store with a new id and update the count
 func (k Keeper) AppendCrudValue(
 	ctx sdk.Context,
@@ -115,7 +133,7 @@ func (k Keeper) GetNumKeysOwned(ctx *sdk.Context, uuid string, owner string) (in
 	numKeys := 0
 
 	for ; iterator.Valid(); iterator.Next() {
-		numKeys += 1;
+		numKeys += 1
 	}
 
 	return numKeys, nil

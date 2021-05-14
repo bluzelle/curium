@@ -55,3 +55,4 @@ describe('multiUpdate()', function () {
         expect(await bz.read(keys[2])).to.equal('newValue2');
     })
 });
+

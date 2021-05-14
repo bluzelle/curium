@@ -7,6 +7,14 @@ import { KeyValue } from "../crud/KeyValue";
 export const protobufPackage = "bluzelle.curium.crud";
 
 /** this line is used by starport scaffolding # proto/tx/message */
+export interface MsgMultiUpdate {
+  creator: string;
+  uuid: string;
+  keyValues: KeyValue[];
+}
+
+export interface MsgMultiUpdateResponse {}
+
 export interface MsgDeleteAll {
   creator: string;
   uuid: string;
@@ -96,6 +104,151 @@ export interface MsgDelete {
 }
 
 export interface MsgDeleteResponse {}
+
+const baseMsgMultiUpdate: object = { creator: "", uuid: "" };
+
+export const MsgMultiUpdate = {
+  encode(
+    message: MsgMultiUpdate,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.uuid !== "") {
+      writer.uint32(18).string(message.uuid);
+    }
+    for (const v of message.keyValues) {
+      KeyValue.encode(v!, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgMultiUpdate {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgMultiUpdate } as MsgMultiUpdate;
+    message.keyValues = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.uuid = reader.string();
+          break;
+        case 3:
+          message.keyValues.push(KeyValue.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgMultiUpdate {
+    const message = { ...baseMsgMultiUpdate } as MsgMultiUpdate;
+    message.keyValues = [];
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.keyValues !== undefined && object.keyValues !== null) {
+      for (const e of object.keyValues) {
+        message.keyValues.push(KeyValue.fromJSON(e));
+      }
+    }
+    return message;
+  },
+
+  toJSON(message: MsgMultiUpdate): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    if (message.keyValues) {
+      obj.keyValues = message.keyValues.map((e) =>
+        e ? KeyValue.toJSON(e) : undefined
+      );
+    } else {
+      obj.keyValues = [];
+    }
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgMultiUpdate>): MsgMultiUpdate {
+    const message = { ...baseMsgMultiUpdate } as MsgMultiUpdate;
+    message.keyValues = [];
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.keyValues !== undefined && object.keyValues !== null) {
+      for (const e of object.keyValues) {
+        message.keyValues.push(KeyValue.fromPartial(e));
+      }
+    }
+    return message;
+  },
+};
+
+const baseMsgMultiUpdateResponse: object = {};
+
+export const MsgMultiUpdateResponse = {
+  encode(
+    _: MsgMultiUpdateResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): MsgMultiUpdateResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgMultiUpdateResponse } as MsgMultiUpdateResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgMultiUpdateResponse {
+    const message = { ...baseMsgMultiUpdateResponse } as MsgMultiUpdateResponse;
+    return message;
+  },
+
+  toJSON(_: MsgMultiUpdateResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(_: DeepPartial<MsgMultiUpdateResponse>): MsgMultiUpdateResponse {
+    const message = { ...baseMsgMultiUpdateResponse } as MsgMultiUpdateResponse;
+    return message;
+  },
+};
 
 const baseMsgDeleteAll: object = { creator: "", uuid: "" };
 
@@ -1579,6 +1732,7 @@ export const MsgDeleteResponse = {
 /** Msg defines the Msg service. */
 export interface Msg {
   /** this line is used by starport scaffolding # proto/tx/rpc */
+  MultiUpdate(request: MsgMultiUpdate): Promise<MsgMultiUpdateResponse>;
   DeleteAll(request: MsgDeleteAll): Promise<MsgDeleteAllResponse>;
   KeyValues(request: MsgKeyValues): Promise<MsgKeyValuesResponse>;
   Has(request: MsgHas): Promise<MsgHasResponse>;
@@ -1595,6 +1749,18 @@ export class MsgClientImpl implements Msg {
   constructor(rpc: Rpc) {
     this.rpc = rpc;
   }
+  MultiUpdate(request: MsgMultiUpdate): Promise<MsgMultiUpdateResponse> {
+    const data = MsgMultiUpdate.encode(request).finish();
+    const promise = this.rpc.request(
+      "bluzelle.curium.crud.Msg",
+      "MultiUpdate",
+      data
+    );
+    return promise.then((data) =>
+      MsgMultiUpdateResponse.decode(new _m0.Reader(data))
+    );
+  }
+
   DeleteAll(request: MsgDeleteAll): Promise<MsgDeleteAllResponse> {
     const data = MsgDeleteAll.encode(request).finish();
     const promise = this.rpc.request(

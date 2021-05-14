@@ -4,6 +4,13 @@ import { Lease } from "../crud/lease";
 import { KeyValue } from "../crud/KeyValue";
 export declare const protobufPackage = "bluzelle.curium.crud";
 /** this line is used by starport scaffolding # proto/tx/message */
+export interface MsgMultiUpdate {
+    creator: string;
+    uuid: string;
+    keyValues: KeyValue[];
+}
+export interface MsgMultiUpdateResponse {
+}
 export interface MsgDeleteAll {
     creator: string;
     uuid: string;
@@ -81,6 +88,20 @@ export interface MsgDelete {
 }
 export interface MsgDeleteResponse {
 }
+export declare const MsgMultiUpdate: {
+    encode(message: MsgMultiUpdate, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgMultiUpdate;
+    fromJSON(object: any): MsgMultiUpdate;
+    toJSON(message: MsgMultiUpdate): unknown;
+    fromPartial(object: DeepPartial<MsgMultiUpdate>): MsgMultiUpdate;
+};
+export declare const MsgMultiUpdateResponse: {
+    encode(_: MsgMultiUpdateResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgMultiUpdateResponse;
+    fromJSON(_: any): MsgMultiUpdateResponse;
+    toJSON(_: MsgMultiUpdateResponse): unknown;
+    fromPartial(_: DeepPartial<MsgMultiUpdateResponse>): MsgMultiUpdateResponse;
+};
 export declare const MsgDeleteAll: {
     encode(message: MsgDeleteAll, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgDeleteAll;
@@ -210,6 +231,7 @@ export declare const MsgDeleteResponse: {
 /** Msg defines the Msg service. */
 export interface Msg {
     /** this line is used by starport scaffolding # proto/tx/rpc */
+    MultiUpdate(request: MsgMultiUpdate): Promise<MsgMultiUpdateResponse>;
     DeleteAll(request: MsgDeleteAll): Promise<MsgDeleteAllResponse>;
     KeyValues(request: MsgKeyValues): Promise<MsgKeyValuesResponse>;
     Has(request: MsgHas): Promise<MsgHasResponse>;
@@ -223,6 +245,7 @@ export interface Msg {
 export declare class MsgClientImpl implements Msg {
     private readonly rpc;
     constructor(rpc: Rpc);
+    MultiUpdate(request: MsgMultiUpdate): Promise<MsgMultiUpdateResponse>;
     DeleteAll(request: MsgDeleteAll): Promise<MsgDeleteAllResponse>;
     KeyValues(request: MsgKeyValues): Promise<MsgKeyValuesResponse>;
     Has(request: MsgHas): Promise<MsgHasResponse>;
