@@ -28,6 +28,17 @@ export interface QueryKeysResponse {
   pagination?: PageResponse;
 }
 
+export interface QueryMyKeysRequest {
+  address: string;
+  uuid: string;
+  pagination?: PageRequest;
+}
+
+export interface QueryMyKeysResponse {
+  key: string[];
+  pagination?: PageResponse;
+}
+
 const baseQueryReadRequest: object = { uuid: "", key: "" };
 
 export const QueryReadRequest = {
@@ -330,11 +341,195 @@ export const QueryKeysResponse = {
   },
 };
 
+const baseQueryMyKeysRequest: object = { address: "", uuid: "" };
+
+export const QueryMyKeysRequest = {
+  encode(
+    message: QueryMyKeysRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.address !== "") {
+      writer.uint32(10).string(message.address);
+    }
+    if (message.uuid !== "") {
+      writer.uint32(18).string(message.uuid);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryMyKeysRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryMyKeysRequest } as QueryMyKeysRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.address = reader.string();
+          break;
+        case 2:
+          message.uuid = reader.string();
+          break;
+        case 3:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryMyKeysRequest {
+    const message = { ...baseQueryMyKeysRequest } as QueryMyKeysRequest;
+    if (object.address !== undefined && object.address !== null) {
+      message.address = String(object.address);
+    } else {
+      message.address = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryMyKeysRequest): unknown {
+    const obj: any = {};
+    message.address !== undefined && (obj.address = message.address);
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PageRequest.toJSON(message.pagination)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<QueryMyKeysRequest>): QueryMyKeysRequest {
+    const message = { ...baseQueryMyKeysRequest } as QueryMyKeysRequest;
+    if (object.address !== undefined && object.address !== null) {
+      message.address = object.address;
+    } else {
+      message.address = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+};
+
+const baseQueryMyKeysResponse: object = { key: "" };
+
+export const QueryMyKeysResponse = {
+  encode(
+    message: QueryMyKeysResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    for (const v of message.key) {
+      writer.uint32(10).string(v!);
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(
+        message.pagination,
+        writer.uint32(18).fork()
+      ).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryMyKeysResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryMyKeysResponse } as QueryMyKeysResponse;
+    message.key = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.key.push(reader.string());
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryMyKeysResponse {
+    const message = { ...baseQueryMyKeysResponse } as QueryMyKeysResponse;
+    message.key = [];
+    if (object.key !== undefined && object.key !== null) {
+      for (const e of object.key) {
+        message.key.push(String(e));
+      }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryMyKeysResponse): unknown {
+    const obj: any = {};
+    if (message.key) {
+      obj.key = message.key.map((e) => e);
+    } else {
+      obj.key = [];
+    }
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PageResponse.toJSON(message.pagination)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<QueryMyKeysResponse>): QueryMyKeysResponse {
+    const message = { ...baseQueryMyKeysResponse } as QueryMyKeysResponse;
+    message.key = [];
+    if (object.key !== undefined && object.key !== null) {
+      for (const e of object.key) {
+        message.key.push(e);
+      }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** this line is used by starport scaffolding # 2 */
   Read(request: QueryReadRequest): Promise<QueryReadResponse>;
   Keys(request: QueryKeysRequest): Promise<QueryKeysResponse>;
+  MyKeys(request: QueryMyKeysRequest): Promise<QueryMyKeysResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -363,6 +558,18 @@ export class QueryClientImpl implements Query {
     );
     return promise.then((data) =>
       QueryKeysResponse.decode(new _m0.Reader(data))
+    );
+  }
+
+  MyKeys(request: QueryMyKeysRequest): Promise<QueryMyKeysResponse> {
+    const data = QueryMyKeysRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "bluzelle.curium.crud.Query",
+      "MyKeys",
+      data
+    );
+    return promise.then((data) =>
+      QueryMyKeysResponse.decode(new _m0.Reader(data))
     );
   }
 }

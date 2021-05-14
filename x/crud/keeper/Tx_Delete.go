@@ -21,5 +21,7 @@ func (k msgServer) Delete(goCtx context.Context, msg *types.MsgDelete) (*types.M
 
 	k.RemoveCrudValue(&ctx, msg.Uuid, msg.Key)
 
+	k.DeleteOwner(&ctx, msg.Creator, msg.Uuid, msg.Key)
+
 	return &types.MsgDeleteResponse{}, nil
 }

@@ -379,7 +379,7 @@ func New(
 		keys[crudtypes.StoreKey],
 		keys[crudtypes.MemStoreKey],
 		crudkeeper.MaxKeeperSizes{
-			MaxKeysSize:           0,
+			MaxKeysSize:           100,
 			MaxKeyValuesSize:      0,
 			MaxDefaultLeaseBlocks: 0,
 		},

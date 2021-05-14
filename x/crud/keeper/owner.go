@@ -10,7 +10,7 @@ func MakeOwnerKey (owner string, uuid string, key string) []byte {
 	return []byte(owner + "\x00" + uuid + "\x00" + key)
 }
 
-func (k Keeper) SetOwnerInLeaseStore (ctx *sdk.Context, uuid string, key string, owner string) {
+func (k Keeper) SetOwner(ctx *sdk.Context, uuid string, key string, owner string) {
 
 	ownerStore := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.OwnerValueKey))
 
@@ -20,5 +20,12 @@ func (k Keeper) SetOwnerInLeaseStore (ctx *sdk.Context, uuid string, key string,
 
 func (k Keeper) IsOwner (ctx *sdk.Context, owner string, uuid string, key string) bool {
 	return k.GetOwner(ctx, uuid, key) == owner
+}
+
+func (k Keeper) DeleteOwner (ctx *sdk.Context, owner string, uuid string, key string) {
+	ownerStore := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.OwnerValueKey))
+
+	ownerStore.Delete(MakeOwnerKey(owner, uuid, key))
+
 }
 

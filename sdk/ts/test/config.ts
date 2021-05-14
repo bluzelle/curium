@@ -4,7 +4,7 @@ interface Config {
 }
 
 export const localChain: Config = {
-    mnemonic: "frog lizard record claw wrap among cable mass tooth gift whip swing turkey gaze brisk empty hungry embrace august genius dove cash left crime",
+    mnemonic: "subject left lazy twenty winter rely midnight motion pelican shop system space accident happy accuse limb spend differ gorilla soup leopard rifle surround rate",
     endpoint: "http://localhost:26657"
 }
 

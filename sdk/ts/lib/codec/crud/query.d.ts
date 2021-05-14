@@ -18,6 +18,15 @@ export interface QueryKeysResponse {
     key: string[];
     pagination?: PageResponse;
 }
+export interface QueryMyKeysRequest {
+    address: string;
+    uuid: string;
+    pagination?: PageRequest;
+}
+export interface QueryMyKeysResponse {
+    key: string[];
+    pagination?: PageResponse;
+}
 export declare const QueryReadRequest: {
     encode(message: QueryReadRequest, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryReadRequest;
@@ -46,17 +55,33 @@ export declare const QueryKeysResponse: {
     toJSON(message: QueryKeysResponse): unknown;
     fromPartial(object: DeepPartial<QueryKeysResponse>): QueryKeysResponse;
 };
+export declare const QueryMyKeysRequest: {
+    encode(message: QueryMyKeysRequest, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryMyKeysRequest;
+    fromJSON(object: any): QueryMyKeysRequest;
+    toJSON(message: QueryMyKeysRequest): unknown;
+    fromPartial(object: DeepPartial<QueryMyKeysRequest>): QueryMyKeysRequest;
+};
+export declare const QueryMyKeysResponse: {
+    encode(message: QueryMyKeysResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryMyKeysResponse;
+    fromJSON(object: any): QueryMyKeysResponse;
+    toJSON(message: QueryMyKeysResponse): unknown;
+    fromPartial(object: DeepPartial<QueryMyKeysResponse>): QueryMyKeysResponse;
+};
 /** Query defines the gRPC querier service. */
 export interface Query {
     /** this line is used by starport scaffolding # 2 */
     Read(request: QueryReadRequest): Promise<QueryReadResponse>;
     Keys(request: QueryKeysRequest): Promise<QueryKeysResponse>;
+    MyKeys(request: QueryMyKeysRequest): Promise<QueryMyKeysResponse>;
 }
 export declare class QueryClientImpl implements Query {
     private readonly rpc;
     constructor(rpc: Rpc);
     Read(request: QueryReadRequest): Promise<QueryReadResponse>;
     Keys(request: QueryKeysRequest): Promise<QueryKeysResponse>;
+    MyKeys(request: QueryMyKeysRequest): Promise<QueryMyKeysResponse>;
 }
 interface Rpc {
     request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;

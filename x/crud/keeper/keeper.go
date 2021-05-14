@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/bluzelle/curium/app/ante"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
@@ -88,11 +89,13 @@ func (k Keeper) ProcessLeasesAtBlockHeight(ctx *sdk.Context, lease int64) {
 	for ; iterator.Valid(); iterator.Next() {
 
 		// Delete from owner index
-		//parts := bytes.Split(iterator.Key()[len(prefix):], []byte("\x00"))
-		//uuid := string(parts[0])
-		//key := string(parts[1])
+		parts := bytes.Split(iterator.Key()[len(leasePrefix):], []byte("\x00"))
+		uuid := string(parts[0])
+		key := string(parts[1])
 
-		//k.DeleteOwner(store, ownerStore, uuid, key)
+		owner := k.GetOwner(ctx, uuid, key)
+
+		k.DeleteOwner(ctx, owner, uuid, key)
 
 		// Delete lease
 		fmt.Printf("\n\tdeleting %s, %s\n", leasePrefix, string(iterator.Key()))

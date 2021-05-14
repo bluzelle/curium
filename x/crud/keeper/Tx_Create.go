@@ -34,5 +34,7 @@ func (k msgServer) Create(goCtx context.Context, msg *types.MsgCreate) (*types.M
 
 	k.SetLease(&ctx, msg.Uuid, msg.Key, ctx.BlockHeight(), msg.Lease)
 
+	k.SetOwner(&ctx, msg.Uuid, msg.Key, msg.Creator)
+
 	return &types.MsgCreateResponse{}, nil
 }
