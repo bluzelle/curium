@@ -82,6 +82,25 @@ func (k Keeper) GetAllCrudValue(ctx *sdk.Context) (list []types.CrudValue) {
 	return
 }
 
+func (k Keeper) GetAllKeyValues(ctx *sdk.Context, uuid string)  (list []*types.KeyValue) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CrudValueKey))
+	iterator := sdk.KVStorePrefixIterator(store, []byte(uuid))
+
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var val types.CrudValue
+		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &val)
+		KV := &types.KeyValue{
+			val.Key,
+			val.Value,
+		}
+		list = append(list, KV)
+	}
+
+	return
+}
+
 // GetCrudValueIDBytes returns the byte representation of the ID
 func GetCrudValueIDBytes(id uint64) []byte {
 	bz := make([]byte, 8)

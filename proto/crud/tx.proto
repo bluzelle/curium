@@ -5,10 +5,11 @@ package bluzelle.curium.crud;
 
 option go_package = "github.com/bluzelle/curium/x/crud/types";
 import "crud/lease.proto";
-
+import "crud/KeyValue.proto";
 // Msg defines the Msg service.
 service Msg {
     // this line is used by starport scaffolding # proto/tx/rpc
+  rpc KeyValues(MsgKeyValues) returns (MsgKeyValuesResponse);
   rpc Has(MsgHas) returns (MsgHasResponse);
   rpc GetLease(MsgGetLease) returns (MsgGetLeaseResponse);
   rpc Read(MsgRead) returns (MsgReadResponse);
@@ -19,6 +20,15 @@ service Msg {
 }
 
 // this line is used by starport scaffolding # proto/tx/message
+message MsgKeyValues {
+  string creator = 1;
+  string uuid = 2;
+}
+
+message MsgKeyValuesResponse {
+  repeated KeyValue keyValues = 1;
+}
+
 message MsgHas {
   string creator = 1;
   string uuid = 2;

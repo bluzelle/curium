@@ -1,0 +1,10 @@
+syntax = "proto3";
+package bluzelle.curium.crud;
+
+option go_package = "github.com/bluzelle/curium/x/crud/types";
+
+
+message KeyValue {
+  string key = 1;
+  bytes value = 2;
+}

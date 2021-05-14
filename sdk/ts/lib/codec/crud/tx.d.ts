@@ -1,8 +1,16 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { Lease } from "../crud/lease";
+import { KeyValue } from "../crud/KeyValue";
 export declare const protobufPackage = "bluzelle.curium.crud";
 /** this line is used by starport scaffolding # proto/tx/message */
+export interface MsgKeyValues {
+    creator: string;
+    uuid: string;
+}
+export interface MsgKeyValuesResponse {
+    keyValues: KeyValue[];
+}
 export interface MsgHas {
     creator: string;
     uuid: string;
@@ -67,6 +75,20 @@ export interface MsgDelete {
 }
 export interface MsgDeleteResponse {
 }
+export declare const MsgKeyValues: {
+    encode(message: MsgKeyValues, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgKeyValues;
+    fromJSON(object: any): MsgKeyValues;
+    toJSON(message: MsgKeyValues): unknown;
+    fromPartial(object: DeepPartial<MsgKeyValues>): MsgKeyValues;
+};
+export declare const MsgKeyValuesResponse: {
+    encode(message: MsgKeyValuesResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgKeyValuesResponse;
+    fromJSON(object: any): MsgKeyValuesResponse;
+    toJSON(message: MsgKeyValuesResponse): unknown;
+    fromPartial(object: DeepPartial<MsgKeyValuesResponse>): MsgKeyValuesResponse;
+};
 export declare const MsgHas: {
     encode(message: MsgHas, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgHas;
@@ -168,6 +190,7 @@ export declare const MsgDeleteResponse: {
 /** Msg defines the Msg service. */
 export interface Msg {
     /** this line is used by starport scaffolding # proto/tx/rpc */
+    KeyValues(request: MsgKeyValues): Promise<MsgKeyValuesResponse>;
     Has(request: MsgHas): Promise<MsgHasResponse>;
     GetLease(request: MsgGetLease): Promise<MsgGetLeaseResponse>;
     Read(request: MsgRead): Promise<MsgReadResponse>;
@@ -179,6 +202,7 @@ export interface Msg {
 export declare class MsgClientImpl implements Msg {
     private readonly rpc;
     constructor(rpc: Rpc);
+    KeyValues(request: MsgKeyValues): Promise<MsgKeyValuesResponse>;
     Has(request: MsgHas): Promise<MsgHasResponse>;
     GetLease(request: MsgGetLease): Promise<MsgGetLeaseResponse>;
     Read(request: MsgRead): Promise<MsgReadResponse>;
