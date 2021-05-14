@@ -9,6 +9,7 @@ import "crud/KeyValue.proto";
 // Msg defines the Msg service.
 service Msg {
     // this line is used by starport scaffolding # proto/tx/rpc
+  rpc DeleteAll(MsgDeleteAll) returns (MsgDeleteAllResponse);
   rpc KeyValues(MsgKeyValues) returns (MsgKeyValuesResponse);
   rpc Has(MsgHas) returns (MsgHasResponse);
   rpc GetLease(MsgGetLease) returns (MsgGetLeaseResponse);
@@ -20,6 +21,14 @@ service Msg {
 }
 
 // this line is used by starport scaffolding # proto/tx/message
+message MsgDeleteAll {
+  string creator = 1;
+  string uuid = 2;
+}
+
+message MsgDeleteAllResponse {
+}
+
 message MsgKeyValues {
   string creator = 1;
   string uuid = 2;

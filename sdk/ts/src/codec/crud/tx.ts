@@ -7,6 +7,13 @@ import { KeyValue } from "../crud/KeyValue";
 export const protobufPackage = "bluzelle.curium.crud";
 
 /** this line is used by starport scaffolding # proto/tx/message */
+export interface MsgDeleteAll {
+  creator: string;
+  uuid: string;
+}
+
+export interface MsgDeleteAllResponse {}
+
 export interface MsgKeyValues {
   creator: string;
   uuid: string;
@@ -89,6 +96,125 @@ export interface MsgDelete {
 }
 
 export interface MsgDeleteResponse {}
+
+const baseMsgDeleteAll: object = { creator: "", uuid: "" };
+
+export const MsgDeleteAll = {
+  encode(
+    message: MsgDeleteAll,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.uuid !== "") {
+      writer.uint32(18).string(message.uuid);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgDeleteAll {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgDeleteAll } as MsgDeleteAll;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.uuid = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgDeleteAll {
+    const message = { ...baseMsgDeleteAll } as MsgDeleteAll;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgDeleteAll): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgDeleteAll>): MsgDeleteAll {
+    const message = { ...baseMsgDeleteAll } as MsgDeleteAll;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    return message;
+  },
+};
+
+const baseMsgDeleteAllResponse: object = {};
+
+export const MsgDeleteAllResponse = {
+  encode(
+    _: MsgDeleteAllResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): MsgDeleteAllResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgDeleteAllResponse } as MsgDeleteAllResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgDeleteAllResponse {
+    const message = { ...baseMsgDeleteAllResponse } as MsgDeleteAllResponse;
+    return message;
+  },
+
+  toJSON(_: MsgDeleteAllResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(_: DeepPartial<MsgDeleteAllResponse>): MsgDeleteAllResponse {
+    const message = { ...baseMsgDeleteAllResponse } as MsgDeleteAllResponse;
+    return message;
+  },
+};
 
 const baseMsgKeyValues: object = { creator: "", uuid: "" };
 
@@ -1453,6 +1579,7 @@ export const MsgDeleteResponse = {
 /** Msg defines the Msg service. */
 export interface Msg {
   /** this line is used by starport scaffolding # proto/tx/rpc */
+  DeleteAll(request: MsgDeleteAll): Promise<MsgDeleteAllResponse>;
   KeyValues(request: MsgKeyValues): Promise<MsgKeyValuesResponse>;
   Has(request: MsgHas): Promise<MsgHasResponse>;
   GetLease(request: MsgGetLease): Promise<MsgGetLeaseResponse>;
@@ -1468,6 +1595,18 @@ export class MsgClientImpl implements Msg {
   constructor(rpc: Rpc) {
     this.rpc = rpc;
   }
+  DeleteAll(request: MsgDeleteAll): Promise<MsgDeleteAllResponse> {
+    const data = MsgDeleteAll.encode(request).finish();
+    const promise = this.rpc.request(
+      "bluzelle.curium.crud.Msg",
+      "DeleteAll",
+      data
+    );
+    return promise.then((data) =>
+      MsgDeleteAllResponse.decode(new _m0.Reader(data))
+    );
+  }
+
   KeyValues(request: MsgKeyValues): Promise<MsgKeyValuesResponse> {
     const data = MsgKeyValues.encode(request).finish();
     const promise = this.rpc.request(

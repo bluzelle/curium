@@ -82,7 +82,30 @@ func (k Keeper) GetAllCrudValue(ctx *sdk.Context) (list []types.CrudValue) {
 	return
 }
 
-func (k Keeper) GetAllKeyValues(ctx *sdk.Context, uuid string)  (list []*types.KeyValue) {
+func (k Keeper) GetAllMyKeys(ctx *sdk.Context, owner string, uuid string) ([]string, error) {
+	uuidPrefix := "\x00" + uuid + "\x00"
+	store := ctx.KVStore(k.storeKey)
+	OwnerStore := prefix.NewStore(store, types.OwnerPrefix(types.OwnerValueKey, owner))
+
+	iterator := sdk.KVStorePrefixIterator(OwnerStore, []byte(uuidPrefix))
+	defer iterator.Close()
+	keys := make([]string, 0)
+
+	keysSize := uint64(0)
+	for ; iterator.Valid(); iterator.Next() {
+		key := string(iterator.Key()[len(uuidPrefix):])
+		keysSize = uint64(len(key)) + keysSize
+
+		if keysSize < k.mks.MaxKeysSize {
+			keys = append(keys, key)
+		} else {
+			return keys, nil
+		}
+	}
+	return keys, nil
+}
+
+func (k Keeper) GetAllKeyValues(ctx *sdk.Context, uuid string) (list []*types.KeyValue) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CrudValueKey))
 	iterator := sdk.KVStorePrefixIterator(store, []byte(uuid))
 

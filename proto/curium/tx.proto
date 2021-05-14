@@ -8,6 +8,14 @@ option go_package = "github.com/bluzelle/curium/x/curium/types";
 // Msg defines the Msg service.
 service Msg {
     // this line is used by starport scaffolding # proto/tx/rpc
+  rpc DeleteAll(MsgDeleteAll) returns (MsgDeleteAllResponse);
 }
 
 // this line is used by starport scaffolding # proto/tx/message
+message MsgDeleteAll {
+  string creator = 1;
+  string uuid = 2;
+}
+
+message MsgDeleteAllResponse {
+}

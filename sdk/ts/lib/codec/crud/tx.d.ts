@@ -4,6 +4,12 @@ import { Lease } from "../crud/lease";
 import { KeyValue } from "../crud/KeyValue";
 export declare const protobufPackage = "bluzelle.curium.crud";
 /** this line is used by starport scaffolding # proto/tx/message */
+export interface MsgDeleteAll {
+    creator: string;
+    uuid: string;
+}
+export interface MsgDeleteAllResponse {
+}
 export interface MsgKeyValues {
     creator: string;
     uuid: string;
@@ -75,6 +81,20 @@ export interface MsgDelete {
 }
 export interface MsgDeleteResponse {
 }
+export declare const MsgDeleteAll: {
+    encode(message: MsgDeleteAll, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgDeleteAll;
+    fromJSON(object: any): MsgDeleteAll;
+    toJSON(message: MsgDeleteAll): unknown;
+    fromPartial(object: DeepPartial<MsgDeleteAll>): MsgDeleteAll;
+};
+export declare const MsgDeleteAllResponse: {
+    encode(_: MsgDeleteAllResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgDeleteAllResponse;
+    fromJSON(_: any): MsgDeleteAllResponse;
+    toJSON(_: MsgDeleteAllResponse): unknown;
+    fromPartial(_: DeepPartial<MsgDeleteAllResponse>): MsgDeleteAllResponse;
+};
 export declare const MsgKeyValues: {
     encode(message: MsgKeyValues, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgKeyValues;
@@ -190,6 +210,7 @@ export declare const MsgDeleteResponse: {
 /** Msg defines the Msg service. */
 export interface Msg {
     /** this line is used by starport scaffolding # proto/tx/rpc */
+    DeleteAll(request: MsgDeleteAll): Promise<MsgDeleteAllResponse>;
     KeyValues(request: MsgKeyValues): Promise<MsgKeyValuesResponse>;
     Has(request: MsgHas): Promise<MsgHasResponse>;
     GetLease(request: MsgGetLease): Promise<MsgGetLeaseResponse>;
@@ -202,6 +223,7 @@ export interface Msg {
 export declare class MsgClientImpl implements Msg {
     private readonly rpc;
     constructor(rpc: Rpc);
+    DeleteAll(request: MsgDeleteAll): Promise<MsgDeleteAllResponse>;
     KeyValues(request: MsgKeyValues): Promise<MsgKeyValuesResponse>;
     Has(request: MsgHas): Promise<MsgHasResponse>;
     GetLease(request: MsgGetLease): Promise<MsgGetLeaseResponse>;
