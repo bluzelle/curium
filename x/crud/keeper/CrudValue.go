@@ -13,15 +13,15 @@ func (k Keeper) NewCrudValue(
 	key string,
 	value []byte,
 	lease *types.Lease,
-	height int64,) types.CrudValue{
+	height int64) types.CrudValue {
 
 	return types.CrudValue{
 		Creator: creator,
-		Uuid: uuid,
-		Key: key,
-		Value: value,
-		Lease: lease,
-		Height: height,
+		Uuid:    uuid,
+		Key:     key,
+		Value:   value,
+		Lease:   lease,
+		Height:  height,
 	}
 }
 

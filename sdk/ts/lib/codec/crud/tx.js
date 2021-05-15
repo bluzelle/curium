@@ -3,13 +3,153 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MsgClientImpl = exports.MsgDeleteResponse = exports.MsgDelete = exports.MsgUpdateResponse = exports.MsgUpdate = exports.MsgCreateResponse = exports.MsgCreate = exports.MsgUpsertResponse = exports.MsgUpsert = exports.MsgReadResponse = exports.MsgRead = exports.MsgGetLeaseResponse = exports.MsgGetLease = exports.MsgHasResponse = exports.MsgHas = exports.MsgKeyValuesResponse = exports.MsgKeyValues = exports.MsgDeleteAllResponse = exports.MsgDeleteAll = exports.MsgMultiUpdateResponse = exports.MsgMultiUpdate = exports.protobufPackage = void 0;
+exports.MsgClientImpl = exports.MsgDeleteResponse = exports.MsgDelete = exports.MsgUpdateResponse = exports.MsgUpdate = exports.MsgCreateResponse = exports.MsgCreate = exports.MsgUpsertResponse = exports.MsgUpsert = exports.MsgReadResponse = exports.MsgRead = exports.MsgGetLeaseResponse = exports.MsgGetLease = exports.MsgHasResponse = exports.MsgHas = exports.MsgKeyValuesResponse = exports.MsgKeyValues = exports.MsgDeleteAllResponse = exports.MsgDeleteAll = exports.MsgMultiUpdateResponse = exports.MsgMultiUpdate = exports.MsgRenameResponse = exports.MsgRename = exports.protobufPackage = void 0;
 /* eslint-disable */
 const long_1 = __importDefault(require("long"));
 const minimal_1 = __importDefault(require("protobufjs/minimal"));
 const lease_1 = require("../crud/lease");
 const KeyValue_1 = require("../crud/KeyValue");
 exports.protobufPackage = "bluzelle.curium.crud";
+const baseMsgRename = { creator: "", uuid: "", key: "", newKey: "" };
+exports.MsgRename = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        if (message.creator !== "") {
+            writer.uint32(10).string(message.creator);
+        }
+        if (message.uuid !== "") {
+            writer.uint32(18).string(message.uuid);
+        }
+        if (message.key !== "") {
+            writer.uint32(26).string(message.key);
+        }
+        if (message.newKey !== "") {
+            writer.uint32(34).string(message.newKey);
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = { ...baseMsgRename };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.creator = reader.string();
+                    break;
+                case 2:
+                    message.uuid = reader.string();
+                    break;
+                case 3:
+                    message.key = reader.string();
+                    break;
+                case 4:
+                    message.newKey = reader.string();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = { ...baseMsgRename };
+        if (object.creator !== undefined && object.creator !== null) {
+            message.creator = String(object.creator);
+        }
+        else {
+            message.creator = "";
+        }
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = String(object.uuid);
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.key !== undefined && object.key !== null) {
+            message.key = String(object.key);
+        }
+        else {
+            message.key = "";
+        }
+        if (object.newKey !== undefined && object.newKey !== null) {
+            message.newKey = String(object.newKey);
+        }
+        else {
+            message.newKey = "";
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.creator !== undefined && (obj.creator = message.creator);
+        message.uuid !== undefined && (obj.uuid = message.uuid);
+        message.key !== undefined && (obj.key = message.key);
+        message.newKey !== undefined && (obj.newKey = message.newKey);
+        return obj;
+    },
+    fromPartial(object) {
+        const message = { ...baseMsgRename };
+        if (object.creator !== undefined && object.creator !== null) {
+            message.creator = object.creator;
+        }
+        else {
+            message.creator = "";
+        }
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = object.uuid;
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.key !== undefined && object.key !== null) {
+            message.key = object.key;
+        }
+        else {
+            message.key = "";
+        }
+        if (object.newKey !== undefined && object.newKey !== null) {
+            message.newKey = object.newKey;
+        }
+        else {
+            message.newKey = "";
+        }
+        return message;
+    },
+};
+const baseMsgRenameResponse = {};
+exports.MsgRenameResponse = {
+    encode(_, writer = minimal_1.default.Writer.create()) {
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = { ...baseMsgRenameResponse };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(_) {
+        const message = { ...baseMsgRenameResponse };
+        return message;
+    },
+    toJSON(_) {
+        const obj = {};
+        return obj;
+    },
+    fromPartial(_) {
+        const message = { ...baseMsgRenameResponse };
+        return message;
+    },
+};
 const baseMsgMultiUpdate = { creator: "", uuid: "" };
 exports.MsgMultiUpdate = {
     encode(message, writer = minimal_1.default.Writer.create()) {
@@ -1509,6 +1649,11 @@ exports.MsgDeleteResponse = {
 class MsgClientImpl {
     constructor(rpc) {
         this.rpc = rpc;
+    }
+    Rename(request) {
+        const data = exports.MsgRename.encode(request).finish();
+        const promise = this.rpc.request("bluzelle.curium.crud.Msg", "Rename", data);
+        return promise.then((data) => exports.MsgRenameResponse.decode(new minimal_1.default.Reader(data)));
     }
     MultiUpdate(request) {
         const data = exports.MsgMultiUpdate.encode(request).finish();

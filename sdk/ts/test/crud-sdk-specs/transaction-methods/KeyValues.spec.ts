@@ -20,7 +20,7 @@ describe('KeyValues()', function () {
                 creator: sdk.db.address,
                 uuid,
                 key: 'key1',
-                value: new TextEncoder().encode('value1'),
+                value: encodeData('value1'),
                 lease: defaultLease,
                 metadata: new Uint8Array()
             });

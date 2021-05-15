@@ -4,6 +4,14 @@ import { Lease } from "../crud/lease";
 import { KeyValue } from "../crud/KeyValue";
 export declare const protobufPackage = "bluzelle.curium.crud";
 /** this line is used by starport scaffolding # proto/tx/message */
+export interface MsgRename {
+    creator: string;
+    uuid: string;
+    key: string;
+    newKey: string;
+}
+export interface MsgRenameResponse {
+}
 export interface MsgMultiUpdate {
     creator: string;
     uuid: string;
@@ -88,6 +96,20 @@ export interface MsgDelete {
 }
 export interface MsgDeleteResponse {
 }
+export declare const MsgRename: {
+    encode(message: MsgRename, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgRename;
+    fromJSON(object: any): MsgRename;
+    toJSON(message: MsgRename): unknown;
+    fromPartial(object: DeepPartial<MsgRename>): MsgRename;
+};
+export declare const MsgRenameResponse: {
+    encode(_: MsgRenameResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgRenameResponse;
+    fromJSON(_: any): MsgRenameResponse;
+    toJSON(_: MsgRenameResponse): unknown;
+    fromPartial(_: DeepPartial<MsgRenameResponse>): MsgRenameResponse;
+};
 export declare const MsgMultiUpdate: {
     encode(message: MsgMultiUpdate, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgMultiUpdate;
@@ -231,6 +253,7 @@ export declare const MsgDeleteResponse: {
 /** Msg defines the Msg service. */
 export interface Msg {
     /** this line is used by starport scaffolding # proto/tx/rpc */
+    Rename(request: MsgRename): Promise<MsgRenameResponse>;
     MultiUpdate(request: MsgMultiUpdate): Promise<MsgMultiUpdateResponse>;
     DeleteAll(request: MsgDeleteAll): Promise<MsgDeleteAllResponse>;
     KeyValues(request: MsgKeyValues): Promise<MsgKeyValuesResponse>;
@@ -245,6 +268,7 @@ export interface Msg {
 export declare class MsgClientImpl implements Msg {
     private readonly rpc;
     constructor(rpc: Rpc);
+    Rename(request: MsgRename): Promise<MsgRenameResponse>;
     MultiUpdate(request: MsgMultiUpdate): Promise<MsgMultiUpdateResponse>;
     DeleteAll(request: MsgDeleteAll): Promise<MsgDeleteAllResponse>;
     KeyValues(request: MsgKeyValues): Promise<MsgKeyValuesResponse>;

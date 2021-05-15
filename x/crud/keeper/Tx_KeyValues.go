@@ -10,7 +10,6 @@ import (
 func (k msgServer) KeyValues(goCtx context.Context, msg *types.MsgKeyValues) (*types.MsgKeyValuesResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// TODO: Handling the message
 	list := k.GetAllKeyValues(&ctx, msg.Uuid)
 
 	return &types.MsgKeyValuesResponse{KeyValues: list}, nil

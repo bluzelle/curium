@@ -38,13 +38,11 @@ func (k msgServer) MultiUpdate(goCtx context.Context, msg *types.MsgMultiUpdate)
 			msg.KeyValues[i].Value,
 			oldCrudValue.GetLease(),
 			oldCrudValue.GetHeight(),
-			)
-
+		)
 
 		k.SetCrudValue(&ctx, newCrudValue)
 		k.UpdateLease(&ctx, newCrudValue.Uuid, newCrudValue.Key, newCrudValue.Lease)
 	}
-
 
 	return &types.MsgMultiUpdateResponse{}, nil
 }

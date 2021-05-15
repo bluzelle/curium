@@ -143,7 +143,7 @@ describe('myKeys()', function () {
     });
 
     // it('should not show keys after a deleteAll', async () => {
-    //     const otherBz = bluzelle({
+    //     const ot = bluzelle({
     //         mnemonic: bz.generateBIP39Account(),
     //         endpoint: bz.url,
     //         uuid: bz.uuid
@@ -164,6 +164,59 @@ describe('myKeys()', function () {
     //     expect(await otherBz.myKeys()).to.deep.equal(['other']);
     //     await otherBz.deleteAll(defaultGasParams());
     //     expect(await otherBz.myKeys()).to.deep.equal([]);
+    //
+    //     const otherSdk = await bluzelle({
+    //         mnemonic: bluzelle.newMnemonic(),
+    //         url: sdk.db.url,
+    //         gasPrice: 0.002,
+    //         maxGas: 30000000
+    //     });
+    //
+    //     await sdk.bank.tx.Send({
+    //         toAddress: otherSdk.bank.address,
+    //         fromAddress: sdk.bank.address,
+    //         amount: [{
+    //             amount: '1000',
+    //             denom: 'ubnt'
+    //         }]
+    //     })
+    //
+    //     await sdk.db.withTransaction(() => {
+    //         sdk.db.tx.Create({
+    //             creator: sdk.db.address,
+    //             uuid: 'uuid9',
+    //             key: 'my14',
+    //             value: encodeData('value'),
+    //             metadata: new Uint8Array(),
+    //             lease: defaultLease
+    //         });
+    //         sdk.db.tx.Create({
+    //             creator: sdk.db.address,
+    //             uuid: 'uuid9',
+    //             key: 'my24',
+    //             value: encodeData('value'),
+    //             metadata: new Uint8Array(),
+    //             lease: defaultLease
+    //         });
+    //
+    //         otherSdk.db.tx.Create({
+    //             creator: sdk.db.address,
+    //             uuid: 'uuid9',
+    //             key: 'other4',
+    //             value: encodeData('value'),
+    //             metadata: new Uint8Array(),
+    //             lease: defaultLease
+    //         });
+    //     }, {memo: ''});
+    //
+    //     expect(await sdk.db.q.MyKeys({
+    //         address: sdk.db.address,
+    //         uuid: 'uuid9'
+    //     }).then(resp => resp.key)).to.deep.equal(['my14', 'my24']);
+    //     expect(await otherSdk.db.q.MyKeys({
+    //         address: otherSdk.db.address,
+    //         uuid: 'uuid9'
+    //     }).then(resp => resp.key)).to.deep.equal(['other4']);
     // });
     //
     // it('should show the right keys if you rename a key', async () => {

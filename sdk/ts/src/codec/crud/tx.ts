@@ -7,6 +7,15 @@ import { KeyValue } from "../crud/KeyValue";
 export const protobufPackage = "bluzelle.curium.crud";
 
 /** this line is used by starport scaffolding # proto/tx/message */
+export interface MsgRename {
+  creator: string;
+  uuid: string;
+  key: string;
+  newKey: string;
+}
+
+export interface MsgRenameResponse {}
+
 export interface MsgMultiUpdate {
   creator: string;
   uuid: string;
@@ -104,6 +113,156 @@ export interface MsgDelete {
 }
 
 export interface MsgDeleteResponse {}
+
+const baseMsgRename: object = { creator: "", uuid: "", key: "", newKey: "" };
+
+export const MsgRename = {
+  encode(
+    message: MsgRename,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.uuid !== "") {
+      writer.uint32(18).string(message.uuid);
+    }
+    if (message.key !== "") {
+      writer.uint32(26).string(message.key);
+    }
+    if (message.newKey !== "") {
+      writer.uint32(34).string(message.newKey);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgRename {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgRename } as MsgRename;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.uuid = reader.string();
+          break;
+        case 3:
+          message.key = reader.string();
+          break;
+        case 4:
+          message.newKey = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgRename {
+    const message = { ...baseMsgRename } as MsgRename;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = String(object.key);
+    } else {
+      message.key = "";
+    }
+    if (object.newKey !== undefined && object.newKey !== null) {
+      message.newKey = String(object.newKey);
+    } else {
+      message.newKey = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgRename): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    message.key !== undefined && (obj.key = message.key);
+    message.newKey !== undefined && (obj.newKey = message.newKey);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgRename>): MsgRename {
+    const message = { ...baseMsgRename } as MsgRename;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = object.key;
+    } else {
+      message.key = "";
+    }
+    if (object.newKey !== undefined && object.newKey !== null) {
+      message.newKey = object.newKey;
+    } else {
+      message.newKey = "";
+    }
+    return message;
+  },
+};
+
+const baseMsgRenameResponse: object = {};
+
+export const MsgRenameResponse = {
+  encode(
+    _: MsgRenameResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgRenameResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgRenameResponse } as MsgRenameResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgRenameResponse {
+    const message = { ...baseMsgRenameResponse } as MsgRenameResponse;
+    return message;
+  },
+
+  toJSON(_: MsgRenameResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(_: DeepPartial<MsgRenameResponse>): MsgRenameResponse {
+    const message = { ...baseMsgRenameResponse } as MsgRenameResponse;
+    return message;
+  },
+};
 
 const baseMsgMultiUpdate: object = { creator: "", uuid: "" };
 
@@ -1732,6 +1891,7 @@ export const MsgDeleteResponse = {
 /** Msg defines the Msg service. */
 export interface Msg {
   /** this line is used by starport scaffolding # proto/tx/rpc */
+  Rename(request: MsgRename): Promise<MsgRenameResponse>;
   MultiUpdate(request: MsgMultiUpdate): Promise<MsgMultiUpdateResponse>;
   DeleteAll(request: MsgDeleteAll): Promise<MsgDeleteAllResponse>;
   KeyValues(request: MsgKeyValues): Promise<MsgKeyValuesResponse>;
@@ -1749,6 +1909,18 @@ export class MsgClientImpl implements Msg {
   constructor(rpc: Rpc) {
     this.rpc = rpc;
   }
+  Rename(request: MsgRename): Promise<MsgRenameResponse> {
+    const data = MsgRename.encode(request).finish();
+    const promise = this.rpc.request(
+      "bluzelle.curium.crud.Msg",
+      "Rename",
+      data
+    );
+    return promise.then((data) =>
+      MsgRenameResponse.decode(new _m0.Reader(data))
+    );
+  }
+
   MultiUpdate(request: MsgMultiUpdate): Promise<MsgMultiUpdateResponse> {
     const data = MsgMultiUpdate.encode(request).finish();
     const promise = this.rpc.request(

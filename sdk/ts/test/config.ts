@@ -4,7 +4,7 @@ interface Config {
 }
 
 export const localChain: Config = {
-    mnemonic: "merge north burden exist fury resemble hurt monkey bottom elephant session bar voice whip machine fire arrange impulse subject exotic junk maid refuse drip",
+    mnemonic: "source deposit gesture mandate good giraffe mosquito admit easy clever rebel wine tenant seat hurdle divide staff hub mother always anchor antique plastic grid",
     endpoint: "http://localhost:26657"
 }
 

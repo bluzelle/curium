@@ -1,20 +1,21 @@
 import {expect} from "chai";
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
 import {bluzelle, BluzelleSdk, DbSdk, newMnemonic} from "../../../src/bz-sdk/bz-sdk";
-import {defaultLease, getSdk} from "../../helpers/client-helpers/sdk-helpers";
+import {createKeys, defaultLease, getSdk} from "../../helpers/client-helpers/sdk-helpers";
 
 
 describe('keys()', function () {
     this.timeout(DEFAULT_TIMEOUT);
     let sdk: BluzelleSdk ;
-
+    let uuid: string;
     beforeEach(async () => {
-        sdk = await getSdk()
+        sdk = await getSdk();
+        uuid = Date.now().toString()
     });
 
     it('should return a empty list if there are no keys', async () => {
         expect(await sdk.db.q.Keys({
-            uuid: Date.now().toString(),
+            uuid,
         }).then(resp => resp.key)).to.have.length(0);
     });
 
@@ -22,7 +23,7 @@ describe('keys()', function () {
         await sdk.db.withTransaction(() => {
             sdk.db.tx.Create({
                 creator: sdk.db.address,
-                uuid: 'uuid3',
+                uuid,
                 key: 'key3',
                 value: new TextEncoder().encode('value1'),
                 lease: defaultLease,
@@ -30,7 +31,7 @@ describe('keys()', function () {
             });
             sdk.db.tx.Create({
                 creator: sdk.db.address,
-                uuid: 'uuid3',
+                uuid,
                 key: 'key4',
                 value: new TextEncoder().encode(''),
                 lease: defaultLease,
@@ -38,14 +39,16 @@ describe('keys()', function () {
             });
         }, {memo: ''})
         expect(await sdk.db.q.Keys({
-            uuid: 'uuid3'
+            uuid
         }).then(resp => resp.key)).to.deep.equal(['key3', 'key4']);
     })
-    //
-    // it('should return a list of keys', async () => {
-    //     const {keys} = await createKeys(bz, 5);
-    //     expect(await bz.keys()).to.deep.equal(keys);
-    // });
+
+    it('should return a list of keys', async () => {
+        const {keys} = await createKeys(sdk.db, 5, uuid);
+        expect(await sdk.db.q.Keys({
+            uuid
+        }).then(resp => resp.key)).to.deep.equal(keys);
+    });
 
     it.skip('should return all keys including ones that are not mine', async () => {    // uuid ownership violation
 
@@ -68,7 +71,7 @@ describe('keys()', function () {
         await sdk.db.withTransaction(() => {
             sdk.db.tx.Create({
                 creator: sdk.db.address,
-                uuid: 'uuid2',
+                uuid,
                 key: 'key1',
                 value: new TextEncoder().encode('my1'),
                 lease: defaultLease,
@@ -76,7 +79,7 @@ describe('keys()', function () {
             });
             sdk.db.tx.Create({
                 creator: sdk.db.address,
-                uuid: 'uuid2',
+                uuid,
                 key: 'key2',
                 value: new TextEncoder().encode('my2'),
                 lease: defaultLease,
@@ -84,7 +87,7 @@ describe('keys()', function () {
             });
             otherSdk.db.tx.Create({
                 creator: sdk.db.address,
-                uuid: 'uuid2',
+                uuid,
                 key: 'key3',
                 value: new TextEncoder().encode('other'),
                 lease: defaultLease,
@@ -93,7 +96,7 @@ describe('keys()', function () {
         }, {memo: ''});
 
         expect(await sdk.db.q.Keys({
-            uuid: 'uuid2'
+            uuid
         }).then(resp => resp.key)).to.deep.equal(['my1', 'my2', 'other']);
 
     })
