@@ -14,11 +14,13 @@ func (k Keeper) AppendNft(
 	meta string,
 	mime string,
 	id string,
+	hash string,
 ) {
 	// Create the nft
 	var nft = types.Nft{
 		Creator: creator,
 		Id:      id,
+		Hash:    hash,
 		Meta:    meta,
 		Mime:    mime,
 	}

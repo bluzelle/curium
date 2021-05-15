@@ -12,11 +12,12 @@ import (
 func uploadNftHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		hash := mux.Vars(r)["hash"]
+		chunkNum := mux.Vars(r)["chunkNum"]
 
 		uploadPath := clientCtx.HomeDir + "/nft-upload"
 		os.MkdirAll(uploadPath, os.ModePerm)
 
-		fileWriter, err := os.Create(uploadPath + "/" + hash)
+		fileWriter, err := os.Create(uploadPath + "/" + hash + "-" + chunkNum)
 		defer fileWriter.Close()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

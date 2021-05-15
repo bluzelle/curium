@@ -21,7 +21,7 @@ func RegisterRoutes(clientCtx client.Context, r *mux.Router) {
 }
 
 func registerUploadHandlers(clientCtx client.Context, r *mux.Router) {
-	r.HandleFunc("/nft/upload/{hash}", uploadNftHandler(clientCtx)).Methods("POST")
+	r.HandleFunc("/nft/upload/{hash}/{chunkNum}", uploadNftHandler(clientCtx)).Methods("POST")
 }
 
 func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {
@@ -33,7 +33,7 @@ func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {
 
 func registerTxHandlers(clientCtx client.Context, r *mux.Router) {
 	// this line is used by starport scaffolding # 4
-	r.HandleFunc("/nft/nfts", createNftHandler(clientCtx)).Methods("POST")
+//	r.HandleFunc("/nft/nfts", createNftHandler(clientCtx)).Methods("POST")
 	r.HandleFunc("/nft/nfts/{id}", updateNftHandler(clientCtx)).Methods("POST")
 	r.HandleFunc("/nft/nfts/{id}", deleteNftHandler(clientCtx)).Methods("POST")
 

@@ -7,10 +7,11 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
   getSdk()
       .then((sdk: BluzelleSdk) => sdk.nft.tx.CreateNft({
           id: body.id,
+          hash: body.hash,
           mime: body.mime,
           meta: 'whatever metadata you want',
           creator: sdk.nft.address,
-          host: sdk.nft.url
       }))
       .then((result: any) => res.end(JSON.stringify(result)))
+      .catch(e => e)
 }

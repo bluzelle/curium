@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@types/lodash": "^4.14.169",
     "@types/mime-types": "^2.1.0",
     "@types/node": "^15.0.2",
     "delay": "^5.0.0",

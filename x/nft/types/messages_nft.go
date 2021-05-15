@@ -7,9 +7,12 @@ import (
 
 var _ sdk.Msg = &MsgCreateNft{}
 
-func NewMsgCreateNft(creator string, meta string) *MsgCreateNft {
+func NewMsgCreateNft(id string, hash string, creator string, meta string, mime string) *MsgCreateNft {
 	return &MsgCreateNft{
+		Id:      id,
+		Hash:    hash,
 		Creator: creator,
+		Mime:    mime,
 		Meta:    meta,
 	}
 }

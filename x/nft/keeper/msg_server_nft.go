@@ -7,11 +7,9 @@ import (
 	"github.com/bluzelle/curium/x/nft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"io"
-	"net/http"
 	"os"
-	"strings"
-	"time"
+	"path/filepath"
+	"regexp"
 )
 
 func (k msgServer) CreateNft(goCtx context.Context, msg *types.MsgCreateNft) (*types.MsgCreateNftResponse, error) {
@@ -23,21 +21,59 @@ func (k msgServer) CreateNft(goCtx context.Context, msg *types.MsgCreateNft) (*t
 		msg.Meta,
 		msg.Mime,
 		msg.Id,
+		msg.Hash,
 	)
-
-	f, err := os.Open(k.homeDir + "/nft-upload/" + msg.Id)
+	err := assembleNftFile(k.homeDir + "/nft-upload", k.homeDir + "/nft", msg)
 	if err != nil {
-		time.AfterFunc(time.Second, func() {
-			k.retrieveFile(ctx, msg)
-			fileReceivedMsg := types.NewMsgFileReceived(msg.Creator, msg.Id, "my-node-id")
-			sendFileReceived(ctx, k, fileReceivedMsg)
-		})
+		k.Logger(ctx).Error("unable to move nft files", "hash", msg.Hash)
 	}
-	defer f.Close()
 
 	return &types.MsgCreateNftResponse{
 		Id: msg.Id,
 	}, nil
+}
+
+func assembleNftFile(uploadDir string, nftDir string, msg *types.MsgCreateNft) error {
+	uploadRegEx, err := regexp.Compile(fmt.Sprintf("^%s-", msg.Hash))
+	if err != nil {
+		return err
+	}
+	filenameReplaceRegEx, err := regexp.Compile("-.*")
+
+	err = filepath.Walk(uploadDir, func(path string, info os.FileInfo, err error) error {
+		if err == nil && uploadRegEx.MatchString(info.Name()) {
+			filename := filenameReplaceRegEx.ReplaceAllString(info.Name(), "")
+			fmt.Println(path)
+			if path != uploadDir {
+				data, err := os.ReadFile(path)
+				if err != nil {
+					return err
+				}
+				err = os.MkdirAll(nftDir, 0755)
+				if err != nil {
+					return err
+				}
+				f, err := os.OpenFile(nftDir+"/"+filename, os.O_APPEND | os.O_WRONLY | os.O_CREATE, 0744)
+				if err != nil {
+					return err
+				}
+				defer f.Close()
+				_, err = f.Write(data)
+				if err != nil {
+					return err
+				}
+				err = os.Remove(path)
+				if err != nil {
+					return err
+				}
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func sendFileReceived(ctx sdk.Context, k msgServer, msg *types.MsgFileReceived) {
@@ -49,24 +85,6 @@ func sendFileReceived(ctx sdk.Context, k msgServer, msg *types.MsgFileReceived) 
 
 }
 
-func (k msgServer) retrieveFile(ctx sdk.Context, msg *types.MsgCreateNft) {
-	url := strings.Replace(msg.Host, "26657", "1317", 1)
-	url = url + "/nft/data/" + msg.Id
-	resp, err := http.Get(url)
-	if err != nil {
-		k.Logger(ctx).Error("unable to retrieve file", "id", msg.Id)
-	}
-	defer resp.Body.Close()
-
-	os.MkdirAll(k.homeDir+"/nft-upload/", os.ModePerm)
-	file, err := os.Create(k.homeDir + "/nft-upload/" + msg.Id)
-	if err != nil {
-		k.Logger(ctx).Error("unable to create file", "id", msg.Id, "err", err)
-		return
-	}
-	io.Copy(file, resp.Body)
-	fmt.Println(resp, err)
-}
 
 func (k msgServer) UpdateNft(goCtx context.Context, msg *types.MsgUpdateNft) (*types.MsgUpdateNftResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)

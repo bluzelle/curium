@@ -28,7 +28,6 @@ const uploadNft = (nft: NftSdk) => (params: UploadNFTParams, data: Uint8Array): 
         .then(() => nft.tx.CreateNft({
             id: hash,
             creator: nft.address,
-            host: nft.url,
             ...params
         }))
         .then(passThroughAwait(waitForFullReplication(nft)))

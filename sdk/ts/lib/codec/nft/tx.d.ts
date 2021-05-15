@@ -17,10 +17,10 @@ export interface MsgFileReceivedResponse {
 }
 export interface MsgCreateNft {
     id: string;
+    hash: string;
     creator: string;
     mime: string;
     meta: string;
-    host: string;
 }
 export interface MsgCreateNftResponse {
     id: string;
@@ -30,7 +30,6 @@ export interface MsgUpdateNft {
     creator: string;
     mime: string;
     meta: string;
-    host: string;
 }
 export interface MsgUpdateNftResponse {
 }

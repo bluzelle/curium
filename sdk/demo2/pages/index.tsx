@@ -5,6 +5,7 @@ import {sha256} from 'js-sha256'
 import {passThrough, passThroughAwait} from "promise-passthrough";
 import {contentType} from 'mime-types'
 import React from 'react'
+import {times} from 'lodash'
 
 export default function Home() {
     const [state, setState] = useState<string>('ready')
@@ -46,32 +47,47 @@ const NodeLink: React.FC<{ port: number, id: string }> = ({port, id}) => (
     </div>
 )
 
+interface Context {
+    id: string
+    name: string
+    data: ArrayBuffer
+    chunks: ArrayBuffer[]
+}
+
+const splitDataIntoChunks = (ctx: Context): Context => {
+    const CHUNK_SIZE = 500 * 1024;
+    ctx.chunks = times(Math.ceil((ctx.data as ArrayBuffer).byteLength / CHUNK_SIZE)).map(chunkNum => {
+        console.log(CHUNK_SIZE * chunkNum, CHUNK_SIZE * chunkNum + CHUNK_SIZE)
+            return ctx.data.slice(CHUNK_SIZE * chunkNum, CHUNK_SIZE * chunkNum + CHUNK_SIZE)
+        }
+    )
+    return ctx
+}
+
+
 const uploadFile = (setState: (state: string) => unknown) => (ev: ChangeEvent<HTMLInputElement>) => {
     setState('Uploading file');
     ev.target.files?.[0].arrayBuffer()
-        .then(data => ({data, name: ev.target.files?.[0].name}))
+        .then(data => ({data, name: ev.target.files?.[0].name} as Context))
+        .then(splitDataIntoChunks)
+        .then(passThrough(x => console.log(x)))
         .then(ctx => ({...ctx, hash: sha256(ctx.data)}))
-        .then(passThroughAwait(ctx => fetch(`http://localhost:1317/nft/upload/${ctx.hash}`, {
-            method: 'POST',
-            body: ctx.data
-        })))
+        .then(passThroughAwait(ctx =>
+            Promise.all(ctx.chunks.map((chunk, chunkNum) =>
+                fetch(`http://localhost:1317/nft/upload/${ctx.hash}/${chunkNum}`, {
+                    method: 'POST',
+                    body: chunk
+                })
+            ))
+        ))
         .then(ctx => fetch(`http://localhost:3000/api/createNft`, {
             method: 'POST',
             body: JSON.stringify({
                 id: ctx.hash,
+                hash: ctx.hash,
                 mime: contentType(ctx.name || '')
             })
         }).then(resp => resp.json()).then(({id}) => ({...ctx, id})))
-        .then(passThrough(() => setState('file uploaded, checking replication status')))
-        .then(passThroughAwait(ctx => fetch(`http://localhost:3000/api/waitForReplication`, {
-            method: 'POST',
-            body: JSON.stringify({id: ctx.id})
-        })))
-        .then(passThrough(() => setState('publishing')))
-        .then(passThroughAwait(ctx => fetch(`http://localhost:3000/api/publish`, {
-            method: 'POST',
-            body: JSON.stringify({id: ctx.id})
-        })))
         .then(ctx => setState(`done:${ctx.id}`))
 }
 

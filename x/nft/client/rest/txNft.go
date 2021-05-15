@@ -19,35 +19,36 @@ type createNftRequest struct {
 	Data    string       `json:"data"`
 }
 
-func createNftHandler(clientCtx client.Context) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var req createNftRequest
-		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
-			return
-		}
-
-		baseReq := req.BaseReq.Sanitize()
-		if !baseReq.ValidateBasic(w) {
-			return
-		}
-
-		_, err := sdk.AccAddressFromBech32(req.Creator)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		parsedMeta := req.Meta
-
-		msg := types.NewMsgCreateNft(
-			req.Creator,
-			parsedMeta,
-		)
-
-		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
-	}
-}
+//func createNftHandler(clientCtx client.Context) http.HandlerFunc {
+//	return func(w http.ResponseWriter, r *http.Request) {
+//		var req createNftRequest
+//		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
+//			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
+//			return
+//		}
+//
+//		baseReq := req.BaseReq.Sanitize()
+//		if !baseReq.ValidateBasic(w) {
+//			return
+//		}
+//
+//		_, err := sdk.AccAddressFromBech32(req.Creator)
+//		if err != nil {
+//			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+//			return
+//		}
+//
+//		parsedMeta := req.Meta
+//
+//		msg := types.NewMsgCreateNft(
+//
+//			req.Creator,
+//			parsedMeta,
+//		)
+//
+//		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
+//	}
+//}
 
 type updateNftRequest struct {
 	BaseReq rest.BaseReq `json:"base_req"`

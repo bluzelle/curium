@@ -22,10 +22,10 @@ export interface MsgFileReceivedResponse {}
 
 export interface MsgCreateNft {
   id: string;
+  hash: string;
   creator: string;
   mime: string;
   meta: string;
-  host: string;
 }
 
 export interface MsgCreateNftResponse {
@@ -37,7 +37,6 @@ export interface MsgUpdateNft {
   creator: string;
   mime: string;
   meta: string;
-  host: string;
 }
 
 export interface MsgUpdateNftResponse {}
@@ -314,10 +313,10 @@ export const MsgFileReceivedResponse = {
 
 const baseMsgCreateNft: object = {
   id: "",
+  hash: "",
   creator: "",
   mime: "",
   meta: "",
-  host: "",
 };
 
 export const MsgCreateNft = {
@@ -328,17 +327,17 @@ export const MsgCreateNft = {
     if (message.id !== "") {
       writer.uint32(10).string(message.id);
     }
+    if (message.hash !== "") {
+      writer.uint32(18).string(message.hash);
+    }
     if (message.creator !== "") {
-      writer.uint32(18).string(message.creator);
+      writer.uint32(26).string(message.creator);
     }
     if (message.mime !== "") {
-      writer.uint32(26).string(message.mime);
+      writer.uint32(34).string(message.mime);
     }
     if (message.meta !== "") {
-      writer.uint32(34).string(message.meta);
-    }
-    if (message.host !== "") {
-      writer.uint32(42).string(message.host);
+      writer.uint32(42).string(message.meta);
     }
     return writer;
   },
@@ -354,16 +353,16 @@ export const MsgCreateNft = {
           message.id = reader.string();
           break;
         case 2:
-          message.creator = reader.string();
+          message.hash = reader.string();
           break;
         case 3:
-          message.mime = reader.string();
+          message.creator = reader.string();
           break;
         case 4:
-          message.meta = reader.string();
+          message.mime = reader.string();
           break;
         case 5:
-          message.host = reader.string();
+          message.meta = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -380,6 +379,11 @@ export const MsgCreateNft = {
     } else {
       message.id = "";
     }
+    if (object.hash !== undefined && object.hash !== null) {
+      message.hash = String(object.hash);
+    } else {
+      message.hash = "";
+    }
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = String(object.creator);
     } else {
@@ -395,21 +399,16 @@ export const MsgCreateNft = {
     } else {
       message.meta = "";
     }
-    if (object.host !== undefined && object.host !== null) {
-      message.host = String(object.host);
-    } else {
-      message.host = "";
-    }
     return message;
   },
 
   toJSON(message: MsgCreateNft): unknown {
     const obj: any = {};
     message.id !== undefined && (obj.id = message.id);
+    message.hash !== undefined && (obj.hash = message.hash);
     message.creator !== undefined && (obj.creator = message.creator);
     message.mime !== undefined && (obj.mime = message.mime);
     message.meta !== undefined && (obj.meta = message.meta);
-    message.host !== undefined && (obj.host = message.host);
     return obj;
   },
 
@@ -419,6 +418,11 @@ export const MsgCreateNft = {
       message.id = object.id;
     } else {
       message.id = "";
+    }
+    if (object.hash !== undefined && object.hash !== null) {
+      message.hash = object.hash;
+    } else {
+      message.hash = "";
     }
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = object.creator;
@@ -434,11 +438,6 @@ export const MsgCreateNft = {
       message.meta = object.meta;
     } else {
       message.meta = "";
-    }
-    if (object.host !== undefined && object.host !== null) {
-      message.host = object.host;
-    } else {
-      message.host = "";
     }
     return message;
   },
@@ -505,13 +504,7 @@ export const MsgCreateNftResponse = {
   },
 };
 
-const baseMsgUpdateNft: object = {
-  id: "",
-  creator: "",
-  mime: "",
-  meta: "",
-  host: "",
-};
+const baseMsgUpdateNft: object = { id: "", creator: "", mime: "", meta: "" };
 
 export const MsgUpdateNft = {
   encode(
@@ -529,9 +522,6 @@ export const MsgUpdateNft = {
     }
     if (message.meta !== "") {
       writer.uint32(34).string(message.meta);
-    }
-    if (message.host !== "") {
-      writer.uint32(42).string(message.host);
     }
     return writer;
   },
@@ -554,9 +544,6 @@ export const MsgUpdateNft = {
           break;
         case 4:
           message.meta = reader.string();
-          break;
-        case 5:
-          message.host = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -588,11 +575,6 @@ export const MsgUpdateNft = {
     } else {
       message.meta = "";
     }
-    if (object.host !== undefined && object.host !== null) {
-      message.host = String(object.host);
-    } else {
-      message.host = "";
-    }
     return message;
   },
 
@@ -602,7 +584,6 @@ export const MsgUpdateNft = {
     message.creator !== undefined && (obj.creator = message.creator);
     message.mime !== undefined && (obj.mime = message.mime);
     message.meta !== undefined && (obj.meta = message.meta);
-    message.host !== undefined && (obj.host = message.host);
     return obj;
   },
 
@@ -627,11 +608,6 @@ export const MsgUpdateNft = {
       message.meta = object.meta;
     } else {
       message.meta = "";
-    }
-    if (object.host !== undefined && object.host !== null) {
-      message.host = object.host;
-    } else {
-      message.host = "";
     }
     return message;
   },

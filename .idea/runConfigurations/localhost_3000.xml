@@ -1,0 +1,6 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="localhost:3000" type="JavascriptDebugType" nameIsGenerated="true" uri="http://localhost:3000">
+    <mapping url="http://http:" local-file="$PROJECT_DIR$/sdk/demo2/pages" />
+    <method v="2" />
+  </configuration>
+</component>
