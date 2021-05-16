@@ -12,10 +12,11 @@ describe('sdk.tx.Create()', function () {
     this.timeout(DEFAULT_TIMEOUT);
 
     let sdk: BluzelleSdk;
-
+    let uuid: string;
     beforeEach(async () => {
         useChaiAsPromised();
         sdk = await getSdk();
+        uuid = Date.now().toString()
     });
 
     it('should create a key-value', async () => {
@@ -27,7 +28,7 @@ describe('sdk.tx.Create()', function () {
 
         await sdk.db.tx.Create({
             creator: sdk.db.address,
-            uuid: Date.now().toString(),
+            uuid,
             key: 'key',
             value: new TextEncoder().encode('value'),
             lease: defaultLease,
@@ -36,7 +37,7 @@ describe('sdk.tx.Create()', function () {
 
         await sdk.db.tx.Read({
             creator: sdk.db.address,
-            uuid: 'uuid',
+            uuid,
             key: 'key1',
         })
             .then(resp => resp.value)
@@ -55,7 +56,7 @@ describe('sdk.tx.Create()', function () {
     it('should throw an error if key already exists', () => {
         return sdk.db.tx.Create({
             creator: sdk.db.address,
-            uuid: 'uuid',
+            uuid,
             key: 'firstkeys',
             value: new TextEncoder().encode('firstvalue'),
             lease: {days: 10} as Lease,
@@ -63,7 +64,7 @@ describe('sdk.tx.Create()', function () {
         })
             .then(() => expect(sdk.db.tx.Create({
                 creator: sdk.db.address,
-                uuid: 'uuid',
+                uuid,
                 key: 'firstkeys',
                 value: new TextEncoder().encode('secondvalue'),
                 lease: {days: 10} as Lease,
@@ -75,7 +76,7 @@ describe('sdk.tx.Create()', function () {
         const longKey = '012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012'
         await sdk.db.tx.Create({
             creator: sdk.db.address,
-            uuid: 'uuid',
+            uuid,
             key: longKey,
             value: new TextEncoder().encode('longvalue'),
             lease: {days: 10} as Lease,
@@ -83,7 +84,7 @@ describe('sdk.tx.Create()', function () {
         })
         await sdk.db.tx.Read({
             creator: sdk.db.address,
-            uuid: 'uuid',
+            uuid,
             key: longKey
         })
             .then(resp => resp.value)
@@ -95,7 +96,7 @@ describe('sdk.tx.Create()', function () {
         const symbols = getPrintableChars();
         await sdk.db.tx.Create({
             creator: sdk.db.address,
-            uuid: 'uuid',
+            uuid,
             key: 'symbolskeys',
             value: new TextEncoder().encode(symbols),
             lease: {days: 10} as Lease,
@@ -103,7 +104,7 @@ describe('sdk.tx.Create()', function () {
         })
         await sdk.db.tx.Read({
             creator: sdk.db.address,
-            uuid: 'uuid',
+            uuid,
             key: 'symbolskeys'})
             .then(resp => resp.value)
             .then(decodeData)
@@ -113,7 +114,7 @@ describe('sdk.tx.Create()', function () {
     it('should throw an error if key is empty', () => {
         return expect(sdk.db.tx.Create({
             creator: sdk.db.address,
-            uuid: 'uuid',
+            uuid,
             key: '',
             value: new TextEncoder().encode('emptyvalue'),
             lease: {days: 10} as Lease,
@@ -125,7 +126,7 @@ describe('sdk.tx.Create()', function () {
     it('can store json', async () => {
         const json = JSON.stringify({foo: 10, bar: 'baz', t: true, arr: [1, 2, 3]});
         await sdk.db.tx.Create({creator: sdk.db.address,
-            uuid: 'uuid',
+            uuid,
             key: 'jsonskeys',
             value: new TextEncoder().encode(json),
             lease: {days: 10} as Lease,
@@ -133,7 +134,7 @@ describe('sdk.tx.Create()', function () {
 
         await sdk.db.tx.Read({
             creator: sdk.db.address,
-            uuid: 'uuid',
+            uuid,
             key: 'jsonskeys'
         })
             .then(resp => resp.value)
@@ -160,7 +161,7 @@ describe('sdk.tx.Create()', function () {
         })
         await sdk.db.tx.Create({
             creator: sdk.db.address,
-            uuid: 'uuid',
+            uuid,
             key: 'mykeyss',
             value: new TextEncoder().encode('myvalue'),
             lease: defaultLease,
@@ -168,19 +169,19 @@ describe('sdk.tx.Create()', function () {
 
         await expect(sdk2.db.tx.Create({
             creator: sdk2.db.address,
-            uuid: 'uuid',
+            uuid,
             key: 'yourkeyss',
             value: new TextEncoder().encode('yourvalue'),
             lease: defaultLease,
             metadata: new Uint8Array()
-        })).to.be.rejectedWith('Invalid account: check your mnemonic')
+        })).to.be.rejectedWith(/incorrect owner/)
 
     })
 
     it.skip('should include tx hash and tx height in MsgCreateResponse', () => {
         return sdk.db.tx.Create({
             creator: sdk.db.address,
-            uuid: 'uuid',
+            uuid,
             key: 'dumbojumbo1',
             value: new TextEncoder().encode('elephant'),
             lease: {} as Lease,

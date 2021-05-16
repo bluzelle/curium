@@ -1,6 +1,6 @@
 import {decodeData, DEFAULT_TIMEOUT, defaultLease, encodeData, getSdk} from "../../helpers/client-helpers/sdk-helpers";
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
-import {DbSdk} from "../../../src/bz-sdk/bz-sdk";
+import {bluzelle, BluzelleSdk, DbSdk} from "../../../src/bz-sdk/bz-sdk";
 import {expect} from "chai";
 import delay from "delay";
 
@@ -8,38 +8,39 @@ import delay from "delay";
 describe('sdk.tx.Update()', function () {
     this.timeout(DEFAULT_TIMEOUT);
 
-    let sdk: DbSdk;
-
+    let sdk: BluzelleSdk;
+    let uuid: string;
     beforeEach(async () => {
         useChaiAsPromised();
-        sdk = await getSdk().then(client => client.db);
+        sdk = await getSdk();
+        uuid = Date.now().toString()
     });
 
     it('should work with empty value', async () => {
-        await sdk.tx.Create({
-            creator: sdk.address,
-            uuid: 'uuid',
+        await sdk.db.tx.Create({
+            creator: sdk.db.address,
+            uuid,
             key: 'emptykey1',
             value: encodeData('value'),
             metadata: new Uint8Array(),
             lease: defaultLease
         });
-        expect(await sdk.tx.Read({
-            creator: sdk.address,
-            uuid: 'uuid',
+        expect(await sdk.db.tx.Read({
+            creator: sdk.db.address,
+            uuid,
             key: 'emptykey1'
         }).then(resp => decodeData(resp.value))).to.equal('value');
-        await sdk.tx.Update({
-            creator: sdk.address,
-            uuid: 'uuid',
+        await sdk.db.tx.Update({
+            creator: sdk.db.address,
+            uuid,
             key: 'emptykey1',
             value: encodeData(''),
             metadata: new Uint8Array(),
             lease: defaultLease
         });
-        expect(await sdk.tx.Read({
-            creator: sdk.address,
-            uuid: 'uuid',
+        expect(await sdk.db.tx.Read({
+            creator: sdk.db.address,
+            uuid,
             key: 'emptykey1'
         }).then(resp => decodeData(resp.value))).to.equal('');
     })
@@ -51,39 +52,39 @@ describe('sdk.tx.Update()', function () {
     // });
 
     it('should update a value for a given key', async () => {
-        await sdk.tx.Create({
-            creator: sdk.address,
-            uuid: 'uuid',
+        await sdk.db.tx.Create({
+            creator: sdk.db.address,
+            uuid,
             key: 'myKey',
             value: encodeData('firstValue'),
             metadata: new Uint8Array(),
             lease: defaultLease
         });
-        expect(await sdk.tx.Read({
-            creator: sdk.address,
-            uuid: 'uuid',
+        expect(await sdk.db.tx.Read({
+            creator: sdk.db.address,
+            uuid,
             key: 'myKey'
         }).then(resp => decodeData(resp.value))).to.equal('firstValue');
 
-        await sdk.tx.Update({
-            creator: sdk.address,
-            uuid: 'uuid',
+        await sdk.db.tx.Update({
+            creator: sdk.db.address,
+            uuid,
             key: 'myKey',
             value: encodeData('secondValue'),
             lease: defaultLease,
             metadata: new Uint8Array()
         });
-        expect(await sdk.tx.Read({
-            creator: sdk.address,
-            uuid: 'uuid',
+        expect(await sdk.db.tx.Read({
+            creator: sdk.db.address,
+            uuid,
             key: 'myKey'
         }).then(resp => decodeData(resp.value))).to.equal('secondValue');
     });
 
     it('should throw error if key does not exist', function () {
-        expect(sdk.tx.Update({
-            creator: sdk.address,
-            uuid: 'uuid',
+        expect(sdk.db.tx.Update({
+            creator: sdk.db.address,
+            uuid,
             key: 'nonExistingKey',
             value: encodeData('nonExistingValue'),
             metadata: new Uint8Array()
@@ -92,54 +93,54 @@ describe('sdk.tx.Update()', function () {
     });
 
     it('should update lease', async () => {
-        await sdk.tx.Create({
-            creator: sdk.address,
-            uuid: 'uuid',
+        await sdk.db.tx.Create({
+            creator: sdk.db.address,
+            uuid,
             key: 'highLease7',
             value: encodeData('firstValue'),
             metadata: new Uint8Array(),
             lease: defaultLease
         });
-        expect(await sdk.tx.Read({
-            creator: sdk.address,
-            uuid: 'uuid',
+        expect(await sdk.db.tx.Read({
+            creator: sdk.db.address,
+            uuid,
             key: 'highLease7'
         }).then(resp => decodeData(resp.value))).to.equal('firstValue');
 
-        await sdk.tx.Update({
-            creator: sdk.address,
-            uuid: 'uuid',
+        await sdk.db.tx.Update({
+            creator: sdk.db.address,
+            uuid,
             key: 'highLease7',
             value: encodeData('secondValue'),
             lease: {seconds: 0, minutes: 3, hours: 0, days: 0, years: 0},
             metadata: new Uint8Array()
         });
 
-        expect(await sdk.tx.GetLease({
-            creator: sdk.address,
-            uuid: 'uuid',
+        expect(await sdk.db.tx.GetLease({
+            creator: sdk.db.address,
+            uuid,
             key: 'highLease7'
         }).then(resp => resp.leaseBlocks.toInt() * 5.5)).to.be.closeTo(3 * 60, 30)
     });
 
     it('should expire beyond updated lease time', async () => {
-        await sdk.tx.Create({
-            creator: sdk.address,
-            uuid: 'uuid',
+        await sdk.db.tx.Create({
+            creator: sdk.db.address,
+            uuid,
             key: 'highLease4',
             value: encodeData('firstValue'),
             metadata: new Uint8Array(),
             lease: defaultLease
         });
-        expect(await sdk.tx.Read({
-            creator: sdk.address,
-            uuid: 'uuid',
+        expect(await sdk.db.tx.Read({
+            creator: sdk.db.address,
+            uuid,
             key: 'highLease4'
         }).then(resp => decodeData(resp.value))).to.equal('firstValue');
 
-        await sdk.tx.Update({
-            creator: sdk.address,
-            uuid: 'uuid',
+        await sdk.db.tx.Update({
+            creator: sdk.db.address,
+            uuid,
             key: 'highLease4',
             value: encodeData('secondValue'),
             lease: {seconds: 20, minutes: 0, hours: 0, days: 0, years: 0},
@@ -148,9 +149,9 @@ describe('sdk.tx.Update()', function () {
 
         await delay(60000)
 
-        await expect(sdk.tx.Read({
-            creator: sdk.address,
-            uuid: 'uuid',
+        await expect(sdk.db.tx.Read({
+            creator: sdk.db.address,
+            uuid,
             key: 'highLease4'
         })).to.be.rejectedWith(/key highLease4 doesn't exist/)
     });
@@ -174,21 +175,39 @@ describe('sdk.tx.Update()', function () {
     //     //     .to.equal(update.gasUsed - calculateLeaseCost(leaseRate20, 10))
     // });
     //
-    // it('should only allow the original owner to update a key', async function() {
-    //
-    //     const otherSdk = bluzelle({
-    //         mnemonic: bluzelle.newMnemonic(),
-    //         url: localChain.endpoint,
-    //         gasPrice: 0.002,
-    //         maxGas: 100000000
-    //     });
-    //
-    //     bz.transferTokensTo(otherBz.address, 10, defaultGasParams());
-    //
-    //     await bz.create('myKey', 'value', defaultGasParams());
-    //
-    //     await otherBz.update('myKey', 'otherValue', defaultGasParams())
-    //         .then(() => this.fail('should have thrown "Incorrect Owner"'))
-    //         .catch(e => expect(e.error).to.match(/Incorrect Owner/));
-    // })
+    it('should only allow the original owner to update a key', async function() {
+        const otherSdk = await bluzelle({
+            mnemonic: bluzelle.newMnemonic(),
+            url: sdk.db.url,
+            gasPrice: 0.002,
+            maxGas: 300000
+        });
+
+        await sdk.bank.tx.Send({
+            fromAddress: sdk.bank.address,
+            toAddress: otherSdk.bank.address,
+            amount: [{
+                amount: '1000',
+                denom: 'ubnt'
+            }]
+        })
+
+        await sdk.db.tx.Create({
+            creator: sdk.db.address,
+            uuid,
+            key: 'myKey',
+            value: encodeData('myValue'),
+            metadata: new Uint8Array(),
+            lease: defaultLease
+        });
+
+        await expect(otherSdk.db.tx.Update({
+            creator: otherSdk.db.address,
+            uuid,
+            key: 'myKey',
+            value: encodeData('imposter'),
+            lease: defaultLease,
+            metadata: new Uint8Array()
+        })).to.be.rejectedWith(/incorrect owner/);
+    })
 });

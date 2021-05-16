@@ -25,7 +25,7 @@ func (k msgServer) Update(goCtx context.Context, msg *types.MsgUpdate) (*types.M
 	}
 
 
-	if k.IsOwner(&ctx, msg.Creator, msg.Uuid, msg.Key) {
+	if !k.IsOwner(&ctx, msg.Creator, msg.Uuid, msg.Key) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
 	}
 

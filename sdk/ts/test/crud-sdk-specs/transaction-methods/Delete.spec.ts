@@ -9,10 +9,11 @@ describe('sdk.tx.Delete()', function () {
     this.timeout(DEFAULT_TIMEOUT);
 
     let sdk: DbSdk;
-
+    let uuid: string;
     beforeEach(async () => {
         useChaiAsPromised();
         sdk = await getSdk().then(client => sdk = client.db);
+        uuid = Date.now().toString()
     });
 
     // it('should resolve to chain information', async () => {
@@ -25,7 +26,7 @@ describe('sdk.tx.Delete()', function () {
     it('should delete a key in the database', async () => {
         await sdk.tx.Create({
             creator: sdk.address,
-            uuid: 'uuid',
+            uuid,
             key: 'myKeys',
             value: new TextEncoder().encode('myValue'),
             lease: {days: 10} as Lease,
@@ -33,17 +34,17 @@ describe('sdk.tx.Delete()', function () {
         });
         expect(await sdk.tx.Read({
             creator: sdk.address,
-            uuid: 'uuid',
+           uuid,
             key: 'myKeys'
         }).then(resp => resp.value).then(decodeData)).to.equal('myValue');
         await sdk.tx.Delete({
             creator: sdk.address,
-            uuid: 'uuid',
+            uuid,
             key: 'myKeys'
         });
         await expect(sdk.tx.Delete({
             creator: sdk.address,
-            uuid: 'uuid',
+            uuid,
             key: 'myKeys'
         })).to.be.rejectedWith(/key not found/);
     });
@@ -51,7 +52,7 @@ describe('sdk.tx.Delete()', function () {
     it('should be able to delete an empty value', async () => {
         await sdk.tx.Create({
             creator: sdk.address,
-            uuid: 'uuid',
+           uuid,
             key: 'emptyValue',
             value: encodeData(''),
             lease: {days: 10} as Lease,
@@ -60,13 +61,13 @@ describe('sdk.tx.Delete()', function () {
 
         await sdk.tx.Delete({
             creator: sdk.address,
-            uuid: 'uuid',
+            uuid,
             key: 'emptyValue'
         });
 
         await expect(sdk.tx.Read({
             creator: sdk.address,
-            uuid: 'uuid',
+            uuid,
             key: 'emptyValue'
         })).to.be.rejectedWith(/key not found/);
 
@@ -76,7 +77,7 @@ describe('sdk.tx.Delete()', function () {
         expect(
             sdk.tx.Delete({
                 creator: sdk.address,
-                uuid: 'uuid',
+                uuid,
                 key: 'voided'
             })
         ).to.be.rejectedWith(/Key does not exist/);
@@ -84,14 +85,15 @@ describe('sdk.tx.Delete()', function () {
 
 
     it('should handle parallel deletes', async () => {
-        const {keys} = await createKeys(sdk, 5);
+        const {keys} = await createKeys(sdk, 5, uuid);
         await Promise.all(keys.map(key => sdk.tx.Delete({
             creator: sdk.address,
-            uuid: 'uuids',
+            uuid,
             key
         })));
-        expect(await sdk.q.CrudValueAll({
-            uuid: 'uuids'
-        }).then(val => val.CrudValue)).to.have.length(0);
+        expect(await sdk.tx.KeyValues({
+            creator: sdk.address,
+            uuid,
+        }).then(val => val.keyValues)).to.have.length(0);
     })
 });

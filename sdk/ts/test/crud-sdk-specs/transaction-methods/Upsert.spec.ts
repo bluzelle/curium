@@ -1,44 +1,48 @@
-import {decodeData, DEFAULT_TIMEOUT, encodeData, getSdk} from "../../helpers/client-helpers/sdk-helpers";
+import {decodeData, DEFAULT_TIMEOUT, defaultLease, encodeData, getSdk} from "../../helpers/client-helpers/sdk-helpers";
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
-import {DbSdk} from "../../../src/bz-sdk/bz-sdk";
+import {bluzelle, BluzelleSdk, DbSdk} from "../../../src/bz-sdk/bz-sdk";
 import {expect} from "chai";
 import fs from "fs";
+import {defaultGasParams} from "../../helpers/client-helpers/client-helpers";
 
 describe('sdk.tx.Upsert()', function () {
     this.timeout(DEFAULT_TIMEOUT);
 
-    let sdk: DbSdk;
-
+    let sdk: BluzelleSdk;
+    let uuid: string;
     beforeEach(async () => {
         useChaiAsPromised();
-        sdk = await getSdk().then(client => client.db);
+        sdk = await getSdk();
+        uuid = Date.now().toString()
     });
     it('should work with empty value', async () => {
-        await sdk.tx.Upsert({
-            creator: sdk.address,
-            uuid: 'uuid',
+        await sdk.db.tx.Upsert({
+            creator: sdk.db.address,
+            uuid,
             key: 'key1',
             value: encodeData('value'),
-            metadata: new Uint8Array()
+            metadata: new Uint8Array(),
+            lease: defaultLease
         })
 
-        expect(await sdk.tx.Read({
-            creator: sdk.address,
-            uuid: 'uuid',
+        expect(await sdk.db.tx.Read({
+            creator: sdk.db.address,
+            uuid,
             key: 'key1'
         }).then(resp => decodeData(resp.value))).to.equal('value');
 
-        await sdk.tx.Upsert({
-            creator: sdk.address,
-            uuid: 'uuid',
+        await sdk.db.tx.Upsert({
+            creator: sdk.db.address,
+            uuid,
             key: 'key1',
             value: encodeData(''),
-            metadata: new Uint8Array()
+            metadata: new Uint8Array(),
+            lease: defaultLease
         })
 
-        expect(await sdk.tx.Read({
-            creator: sdk.address,
-            uuid: 'uuid',
+        expect(await sdk.db.tx.Read({
+            creator: sdk.db.address,
+            uuid,
             key: 'key1'
         }).then(resp => decodeData(resp.value))).to.equal('');
     })
@@ -52,66 +56,90 @@ describe('sdk.tx.Upsert()', function () {
     //
     it('should update a value for a given key', async () => {
 
-        await sdk.tx.Upsert({
-            creator: sdk.address,
-            uuid: 'uuid',
+        await sdk.db.tx.Upsert({
+            creator: sdk.db.address,
+            uuid,
             key: 'myKey',
             value: encodeData('firstValue'),
-            metadata: new Uint8Array()
+            metadata: new Uint8Array(),
+            lease: defaultLease
         })
 
-        expect(await sdk.tx.Read({
-            creator: sdk.address,
-            uuid: 'uuid',
+        expect(await sdk.db.tx.Read({
+            creator: sdk.db.address,
+            uuid,
             key: 'myKey'
         }).then(resp => decodeData(resp.value))).to.equal('firstValue');
 
-        await sdk.tx.Upsert({
-            creator: sdk.address,
-            uuid: 'uuid',
+        await sdk.db.tx.Upsert({
+            creator: sdk.db.address,
+            uuid,
             key: 'myKey',
             value: encodeData('secondValue'),
-            metadata: new Uint8Array()
+            metadata: new Uint8Array(),
+            lease: defaultLease
         })
 
-        expect(await sdk.tx.Read({
-            creator: sdk.address,
-            uuid: 'uuid',
+        expect(await sdk.db.tx.Read({
+            creator: sdk.db.address,
+            uuid,
             key: 'myKey'
         }).then(resp => decodeData(resp.value))).to.equal('secondValue');
     });
 
     it('should create a key if it does not exist', async function () {
-        await sdk.tx.Upsert({
-            creator: sdk.address,
-            uuid: 'uuid',
+        await sdk.db.tx.Upsert({
+            creator: sdk.db.address,
+            uuid,
             key: 'nonExistingKey',
             value: encodeData('aValue'),
-            metadata: new Uint8Array()
+            metadata: new Uint8Array(),
+            lease: defaultLease
         })
 
-        expect(await sdk.tx.Read({
-            creator: sdk.address,
-            uuid: 'uuid',
+        expect(await sdk.db.tx.Read({
+            creator: sdk.db.address,
+            uuid,
             key: 'nonExistingKey'
         }).then(resp => decodeData(resp.value))).to.equal('aValue');
     });
 
-    // it('should only allow the original owner to update a key', async function() {
-    //     const otherBz = bluzelle({
-    //         mnemonic: bz.generateBIP39Account(),
-    //         uuid: bz.uuid,
-    //         endpoint: bz.url
-    //     });
-    //
-    //     bz.transferTokensTo(otherBz.address, 10, defaultGasParams());
-    //
-    //     await bz.upsert('myKey', 'value', defaultGasParams());
-    //
-    //     await otherBz.upsert('myKey', 'otherValue', defaultGasParams())
-    //         .then(() => this.fail('should have thrown "Incorrect Owner"'))
-    //         .catch(e => expect(e.error).to.match(/Incorrect Owner/));
-    // });
+    it('should only allow the original owner to update a key', async function() {
+        const otherSdk = await bluzelle({
+            mnemonic: bluzelle.newMnemonic(),
+            url: sdk.db.url,
+            gasPrice: 0.002,
+            maxGas: 300000
+        });
+
+        await sdk.bank.tx.Send({
+            fromAddress: sdk.bank.address,
+            toAddress: otherSdk.bank.address,
+            amount: [{
+                amount: '1000',
+                denom: 'ubnt'
+            }]
+        })
+
+        await sdk.db.tx.Upsert({
+            creator: sdk.db.address,
+            uuid,
+            key: 'myKey',
+            value: encodeData('myValue'),
+            metadata: new Uint8Array(),
+            lease: defaultLease
+        });
+
+        await expect(otherSdk.db.tx.Upsert({
+            creator: otherSdk.db.address,
+            uuid,
+            key: 'myKey',
+            value: encodeData('imposter'),
+            lease: defaultLease,
+            metadata: new Uint8Array()
+        })).to.be.rejectedWith(/incorrect owner/);
+
+    });
     //
     // it('should work renewing with a shorter lease', async () => {
     //     await bz.upsert('myKey', 'myValue', defaultGasParams());
@@ -119,26 +147,28 @@ describe('sdk.tx.Upsert()', function () {
     // });
 
     it('should throw an error if key is empty', () => {
-        return expect(sdk.tx.Upsert({
-            creator: sdk.address,
-            uuid: 'uuid',
+        return expect(sdk.db.tx.Upsert({
+            creator: sdk.db.address,
+            uuid,
             key: '',
             value: encodeData('emptyKey'),
-            metadata: new Uint8Array()
+            metadata: new Uint8Array(),
+            lease: defaultLease
         })).to.be.rejectedWith('Key cannot be empty')
     });
 
     it('should allow / in the key', () => {
-        return sdk.tx.Upsert({
-            creator: sdk.address,
-            uuid: 'uuid',
+        return sdk.db.tx.Upsert({
+            creator: sdk.db.address,
+            uuid,
             key: '/',
             value: encodeData('slashKey'),
-            metadata: new Uint8Array()
+            metadata: new Uint8Array(),
+            lease: defaultLease
         })
-            .then(async () => expect(await sdk.tx.Read({
-                creator: sdk.address,
-                uuid: 'uuid',
+            .then(async () => expect(await sdk.db.tx.Read({
+                creator: sdk.db.address,
+                uuid,
                 key: '/'
             }).then(resp => decodeData(resp.value))).to.equal('slashKey'))
     });
