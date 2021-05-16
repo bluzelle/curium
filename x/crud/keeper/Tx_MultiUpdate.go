@@ -16,7 +16,6 @@ func (k msgServer) MultiUpdate(goCtx context.Context, msg *types.MsgMultiUpdate)
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
 	}
 
-	// we're past basic validation, now scan owners & if the keys exist...
 	for i := range msg.KeyValues[:] {
 
 		if !k.HasCrudValue(&ctx, msg.Uuid, msg.KeyValues[i].Key) {
@@ -31,8 +30,8 @@ func (k msgServer) MultiUpdate(goCtx context.Context, msg *types.MsgMultiUpdate)
 
 		oldCrudValue := k.GetCrudValue(&ctx, msg.Uuid, msg.KeyValues[i].Key)
 
-		newCrudValue := k.NewCrudValue(
-			oldCrudValue.GetCreator(),
+		newCrudValue := *k.NewCrudValue(
+			msg.Creator,
 			msg.Uuid,
 			msg.KeyValues[i].Key,
 			msg.KeyValues[i].Value,
@@ -41,7 +40,7 @@ func (k msgServer) MultiUpdate(goCtx context.Context, msg *types.MsgMultiUpdate)
 		)
 
 		k.SetCrudValue(&ctx, newCrudValue)
-		k.UpdateLease(&ctx, newCrudValue.Uuid, newCrudValue.Key, newCrudValue.Lease)
+		k.UpdateLease(&ctx, &newCrudValue)
 	}
 
 	return &types.MsgMultiUpdateResponse{}, nil

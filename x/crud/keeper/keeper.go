@@ -74,9 +74,20 @@ func (k Keeper) ConvertLeaseToBlocks(lease *types.Lease) int64 {
 	return int64(float64(lease.GetSeconds()+lease.GetMinutes()*60+lease.GetHours()*3600+lease.GetDays()*3600*24+lease.GetYears()*365*3600*24) / 5.5)
 }
 
-func (k Keeper) DeleteLease(ctx *sdk.Context, UUID string, key string, blockHeight int64, leaseBlocks int64) {
+func (k Keeper) GetRemainingLeaseBlocks(ctx *sdk.Context, uuid string, key string) int64 {
+	crudValue := k.GetCrudValue(ctx, uuid, key)
+
+	return k.ConvertLeaseToBlocks(crudValue.Lease) + crudValue.Height - ctx.BlockHeight()
+}
+
+func (k Keeper) DeleteLease(ctx *sdk.Context, uuid string, key string) {
 	leaseStore := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.LeaseValueKey))
-	leaseStore.Delete(MakeLeaseKey(blockHeight+leaseBlocks, UUID, key))
+
+	crudValue := k.GetCrudValue(ctx, uuid, key)
+
+	expiryBlock := crudValue.Height + k.ConvertLeaseToBlocks(crudValue.Lease)
+
+	leaseStore.Delete(MakeLeaseKey(expiryBlock, uuid, key))
 }
 
 func (k Keeper) ProcessLeasesAtBlockHeight(ctx *sdk.Context, lease int64) {
@@ -104,29 +115,28 @@ func (k Keeper) ProcessLeasesAtBlockHeight(ctx *sdk.Context, lease int64) {
 	}
 }
 
-func (k Keeper) UpdateLease(ctx *sdk.Context, UUID string, key string, lease *types.Lease) {
+func (k Keeper) UpdateLease(ctx *sdk.Context, crudValue *types.CrudValue) {
 
-	blzValue := k.GetCrudValue(ctx, UUID, key)
-	curLeaseBlocks := k.ConvertLeaseToBlocks(blzValue.Lease)
+	curLeaseBlocks := k.ConvertLeaseToBlocks(crudValue.Lease)
 
-	k.DeleteLease(ctx, UUID, key, blzValue.Height, curLeaseBlocks)
+	k.DeleteLease(ctx, crudValue.Uuid, crudValue.Key)
 
 	calculateLeaseRefund := func() uint64 {
-		bytes := len(UUID) + len(key) + len(blzValue.Value)
-		unusedOriginalLease := blzValue.Height + curLeaseBlocks - ctx.BlockHeight()
+		bytes := len(crudValue.Uuid) + len(crudValue.Key) + len(crudValue.Value)
+		unusedOriginalLease := crudValue.Height + curLeaseBlocks - ctx.BlockHeight()
 
 		if unusedOriginalLease <= 0 {
 			return 0
 		}
 
 		percentUnused := float64(unusedOriginalLease) / float64(curLeaseBlocks)
-		originalLeaseCost := CalculateGasForLease(blzValue.Lease, bytes)
+		originalLeaseCost := CalculateGasForLease(crudValue.Lease, bytes)
 		return uint64(float64(originalLeaseCost) * percentUnused)
 	}
 
 	// Charge for lease gas
 	func() {
-		gasForNewLease := CalculateGasForLease(blzValue.Lease, len(UUID)+len(key)+len(blzValue.Value))
+		gasForNewLease := CalculateGasForLease(crudValue.Lease, len(crudValue.Uuid)+len(crudValue.Key)+len(crudValue.Value))
 
 		blzGasMeter := ctx.GasMeter().(ante.BluzelleGasMeterInterface)
 
@@ -138,7 +148,7 @@ func (k Keeper) UpdateLease(ctx *sdk.Context, UUID string, key string, lease *ty
 		}
 	}()
 
-	blzValue.Height = ctx.BlockHeight()
+	crudValue.Height = ctx.BlockHeight()
 	//keeper.SetValue(ctx, keeper.GetKVStore(ctx), UUID, key, blzValue)
-	k.SetLease(ctx, UUID, key, blzValue.Height, lease)
+	k.SetLease(ctx, crudValue.Uuid, crudValue.Key, crudValue.Height, crudValue.Lease)
 }

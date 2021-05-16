@@ -16,9 +16,7 @@ func (k msgServer) GetLease(goCtx context.Context, msg *types.MsgGetLease) (*typ
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %s doesn't exist", msg.Key))
 	}
 
-	crudValue := k.GetCrudValue(&ctx, msg.Uuid, msg.Key)
-
-	lease := k.ConvertLeaseToBlocks(crudValue.Lease) + crudValue.Height - ctx.BlockHeight()
+	lease := k.GetRemainingLeaseBlocks(&ctx, msg.Uuid, msg.Key)
 
 	return &types.MsgGetLeaseResponse{Uuid: msg.Uuid, Key: msg.Key, LeaseBlocks: lease}, nil
 }

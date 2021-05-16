@@ -11,7 +11,7 @@ import (
 func (k msgServer) Update(goCtx context.Context, msg *types.MsgUpdate) (*types.MsgUpdateResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	var CrudValue = types.CrudValue{
+	var CrudValue = &types.CrudValue{
 		Creator: msg.Creator,
 		Uuid:    msg.Uuid,
 		Key:     msg.Key,
@@ -20,18 +20,17 @@ func (k msgServer) Update(goCtx context.Context, msg *types.MsgUpdate) (*types.M
 		Height:  ctx.BlockHeight(),
 	}
 
-	// Checks that the element exists
 	if !k.HasCrudValue(&ctx, msg.Uuid, msg.Key) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %s doesn't exist", msg.Key))
 	}
 
-	// Checks if the the msg sender is the same as the current owner
-	if msg.Creator != k.GetOwner(&ctx, msg.Uuid, msg.Key) {
+
+	if k.IsOwner(&ctx, msg.Creator, msg.Uuid, msg.Key) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
 	}
 
-	k.SetCrudValue(&ctx, CrudValue)
-	k.UpdateLease(&ctx, CrudValue.Uuid, CrudValue.Key, CrudValue.Lease)
+	k.SetCrudValue(&ctx, *CrudValue)
+	k.UpdateLease(&ctx, CrudValue)
 
 	return &types.MsgUpdateResponse{}, nil
 }

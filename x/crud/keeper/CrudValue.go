@@ -13,9 +13,9 @@ func (k Keeper) NewCrudValue(
 	key string,
 	value []byte,
 	lease *types.Lease,
-	height int64) types.CrudValue {
+	height int64) *types.CrudValue {
 
-	return types.CrudValue{
+	return &types.CrudValue{
 		Creator: creator,
 		Uuid:    uuid,
 		Key:     key,
@@ -60,7 +60,7 @@ func (k Keeper) SetCrudValue(ctx *sdk.Context, CrudValue types.CrudValue) {
 }
 
 // GetCrudValue returns a CrudValue from its id
-func (k Keeper) GetCrudValue(ctx *sdk.Context, uuid, key string) types.CrudValue {
+func (k Keeper) GetCrudValue(ctx *sdk.Context, uuid string, key string) types.CrudValue {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CrudValueKey))
 	var CrudValue types.CrudValue
 	k.cdc.MustUnmarshalBinaryBare(store.Get(MakeCrudValueKey(uuid, key)), &CrudValue)
@@ -126,9 +126,9 @@ func (k Keeper) GetAllMyKeys(ctx *sdk.Context, owner string, uuid string) ([]str
 func (k Keeper) GetNumKeysOwned(ctx *sdk.Context, uuid string, owner string) (int, error) {
 	uuidPrefix := "\x00" + uuid + "\x00"
 	store := ctx.KVStore(k.storeKey)
-	OwnerStore := prefix.NewStore(store, types.OwnerPrefix(types.OwnerValueKey, owner))
+	OwnerStore := prefix.NewStore(store, types.OwnerPrefix(types.OwnerValueKey, owner + uuidPrefix))
 
-	iterator := sdk.KVStorePrefixIterator(OwnerStore, []byte(uuidPrefix))
+	iterator := OwnerStore.Iterator(nil, nil)
 	defer iterator.Close()
 	numKeys := 0
 
@@ -139,23 +139,23 @@ func (k Keeper) GetNumKeysOwned(ctx *sdk.Context, uuid string, owner string) (in
 	return numKeys, nil
 }
 
-func (k Keeper) GetAllKeyValues(ctx *sdk.Context, uuid string) (list []*types.KeyValue) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CrudValueKey))
-	iterator := sdk.KVStorePrefixIterator(store, []byte(uuid))
-
+func (k Keeper) GetAllKeyValues(ctx *sdk.Context, uuid string) []*types.KeyValue {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.UuidPrefix(types.CrudValueKey, uuid))
+	iterator := store.Iterator(nil,nil)
+	var list []*types.KeyValue
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
 		var val types.CrudValue
 		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &val)
-		KV := &types.KeyValue{
-			val.Key,
-			val.Value,
+		kv := &types.KeyValue{
+			Key: val.Key,
+			Value: val.Value,
 		}
-		list = append(list, KV)
+		list = append(list, kv)
 	}
 
-	return
+	return list
 }
 
 // GetCrudValueIDBytes returns the byte representation of the ID

@@ -15,12 +15,14 @@ func (k msgServer) Delete(goCtx context.Context, msg *types.MsgDelete) (*types.M
 	if !k.HasCrudValue(&ctx, msg.Uuid, msg.Key) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %s doesn't exist", msg.Key))
 	}
-	if msg.Creator != k.GetOwner(&ctx, msg.Uuid, msg.Key) {
+	if !k.IsOwner(&ctx, msg.Creator, msg.Uuid, msg.Key) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
 	}
 
-	k.RemoveCrudValue(&ctx, msg.Uuid, msg.Key)
 
+
+	k.RemoveCrudValue(&ctx, msg.Uuid, msg.Key)
+	k.DeleteLease(&ctx, msg.Uuid, msg.Key)
 	k.DeleteOwner(&ctx, msg.Creator, msg.Uuid, msg.Key)
 
 	return &types.MsgDeleteResponse{}, nil
