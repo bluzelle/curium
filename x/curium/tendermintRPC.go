@@ -14,16 +14,39 @@ type NetInfo struct {
 	Peers []struct {
 		Ip       string `json:"remote_ip"`
 		NodeInfo struct {
-			Id string `json"id"`
+			Id      string `json"id"`
 			Moniker string `json:"moniker"`
 		} `json:"node_info"`
 	} `json:"peers"`
 }
 
-func GetNetInfo() (*NetInfo, error) {
-	info, err := httpGet("https://client.sentry.testnet.private.bluzelle.com:26657/net_info")
+type StatusResult struct {
+	Result Status `json:"result"`
+}
+type Status struct {
+	NodeInfo struct {
+		Id      string `json:"id""`
+		Moniker string `json:"moniker"`
+	} `json:"node_info"`
+}
+
+func GetStatus() (*Status, error) {
+	status, err := httpGet("http://localhost:26657/status")
 	if err != nil {
-		return &NetInfo{}, err
+		return nil, err
+	}
+
+	var statusResult StatusResult
+
+	json.Unmarshal(status, &statusResult)
+	s := statusResult.Result
+	return &s, nil
+}
+
+func GetNetInfo() (*NetInfo, error) {
+	info, err := httpGet("http://localhost:26657/net_info")
+	if err != nil {
+		return nil, err
 	}
 
 	var netInfoResult NetInfoResult
