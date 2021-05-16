@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-var seederPort = 7768
+var seederPort = 7754
 
 func main() {
 
@@ -15,7 +15,9 @@ func main() {
 		panic(err)
 	}
 
-	meta, err := seeder.SeedFile("PXL_20210319_171016803.jpg")
+	meta, err := seeder.TorrentFromFile("PXL_20210319_171016803.jpg")
+	if err != nil {panic(err)}
+	err = seeder.SeedFile(meta)
 	if err != nil {
 		panic(err)
 	}
@@ -26,7 +28,7 @@ func main() {
 		panic(err)
 	}
 
-	leacher.AddPeer("192.168.43.64", seederPort)
+	leacher.AddPeer("127.0.0.1", seederPort)
 	leacher.RetrieveFile(meta)
 	// Watch the progress
 	for range time.Tick(time.Second) {

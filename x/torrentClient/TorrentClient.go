@@ -50,7 +50,7 @@ func (tc *TorrentClient) RetrieveFile(metaInfo *metainfo.MetaInfo) {
 	}()
 }
 
-func (tc *TorrentClient) SeedFile(filePath string) (*metainfo.MetaInfo, error) {
+func (tc TorrentClient) TorrentFromFile(filePath string) (*metainfo.MetaInfo, error) {
 	private := true
 	info := metainfo.Info{
 		PieceLength: 32 * 1024,
@@ -74,11 +74,14 @@ func (tc *TorrentClient) SeedFile(filePath string) (*metainfo.MetaInfo, error) {
 		Encoding:     "utf-8",
 		UrlList:      nil,
 	}
+	return meta, nil
+}
 
+func (tc *TorrentClient) SeedFile(meta *metainfo.MetaInfo) error {
 	tor, _ := tc.Client.AddTorrent(meta)
 	tc.Torrents = append(tc.Torrents, tor)
 	tor.AddPeers(tc.Peers)
-	return meta, nil
+	return nil
 }
 
 func (tc *TorrentClient) AddPeer(ip string, port int) {
