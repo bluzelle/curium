@@ -365,6 +365,7 @@ func New(
 		int(appOpts.Get("nft-p2p-port").(int64)),
 		msgBroadcaster,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
+		curium.NewKeyRingReader(DefaultNodeHome),
 	)
 
 	nftModule := nft.NewAppModule(appCodec, app.nftKeeper)

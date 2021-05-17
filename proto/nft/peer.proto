@@ -1,0 +1,11 @@
+syntax = "proto3";
+package bluzelle.curium.nft;
+
+option go_package = "github.com/bluzelle/curium/x/nft/types";
+
+message Peer {
+  string id = 1;
+  string address = 2;
+  uint64 port = 3;
+}
+

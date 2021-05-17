@@ -27,5 +27,6 @@ func KeyPrefix(p string) []byte {
 
 const (
 	NftKey   = "Nft-"
-	FilesKey = "Nft-files"
+	FileKey = "file-"
+	PeerKey = "peer-"
 )

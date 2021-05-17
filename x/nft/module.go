@@ -164,7 +164,7 @@ func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
 // returns no validator updates.
 func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
 	if endBlockerCount == 2 {
-		go func() {am.keeper.RegisterBtPeer(ctx)}()
+		go func() {am.keeper.BroadcastRegisterBtPeer(ctx)}()
 	}
 	endBlockerCount++
 	return []abci.ValidatorUpdate{}

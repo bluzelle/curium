@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/bluzelle/curium/x/curium"
 	"github.com/bluzelle/curium/x/torrentClient"
+	"github.com/cosmos/cosmos-sdk/store/prefix"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/tendermint/tendermint/libs/log"
 
@@ -23,6 +25,7 @@ type (
 		btPort      int
 		msgBroadcaster curium.MsgBroadcaster
 		homeDir string
+		keyringReader *curium.KeyRingReader
 		// this line is used by starport scaffolding # ibc/keeper/attribute
 	}
 )
@@ -35,6 +38,7 @@ func NewKeeper(
 	btPort int,
 	msgBroadcaster curium.MsgBroadcaster,
 	homeDir string,
+	keyringReader *curium.KeyRingReader,
 	// this line is used by starport scaffolding # ibc/keeper/parameter
 ) *Keeper {
 	btClient, err := torrentClient.NewTorrentClient(btDirectory, btPort)
@@ -50,6 +54,7 @@ func NewKeeper(
 		btPort:      btPort,
 		msgBroadcaster: msgBroadcaster,
 		homeDir: homeDir,
+		keyringReader: keyringReader,
 		// this line is used by starport scaffolding # ibc/keeper/return
 	}
 }
@@ -58,7 +63,22 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
-func (k Keeper) RegisterBtPeer(ctx sdk.Context) {
+func (k Keeper) GetPeerStore(ctx sdk.Context) prefix.Store {
+	return prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.PeerKey))
+}
+
+func (k Keeper) CheckIsNftAdmin(address string) error{
+	nftAdmin, err := k.keyringReader.GetAddress("nft")
+	if err !=  nil {
+		return sdkerrors.New("nft", 1, fmt.Sprintf("peer request with invalid admin: %s", err.Error()))
+	}
+	if address != nftAdmin.String() {
+		return sdkerrors.New("nft", 1, fmt.Sprintf("peer request with invalid admin: %s", address))
+	}
+	return nil
+}
+
+func (k Keeper) BroadcastRegisterBtPeer(ctx sdk.Context) {
 	status, err := curium.GetStatus()
 	if err != nil {
 		k.Logger(ctx).Error("unable to get node id", err)
@@ -70,13 +90,20 @@ func (k Keeper) RegisterBtPeer(ctx sdk.Context) {
 		k.Logger(ctx).Error("unable to get my ip", err)
 	}
 
+	creator, err := k.keyringReader.GetAddress("nft")
+	if err != nil {
+		k.Logger(ctx).Error("unable to get address of nft account")
+	}
 	msg := types.MsgRegisterPeer{
-		Creator: "",
+		Creator: creator.String(),
 		Id:      nodeId,
 		Address: myIp,
 		Port:    uint64(k.btPort),
 	}
 	result, err := k.msgBroadcaster(ctx, []sdk.Msg{&msg}, "nft")
+	if err != nil {
+		k.Logger(ctx).Error("unable to broadcast register peer message")
+	}
 	fmt.Println(result)
 }
 

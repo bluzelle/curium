@@ -17,8 +17,27 @@ import (
 	"time"
 )
 
-type MsgBroadcaster func (ctx sdk.Context, msgs []types.Msg, from string) (*coretypes.ResultBroadcastTxCommit, error)
+type KeyRingReader struct {keyringDir string}
+func NewKeyRingReader(keyringDir string) *KeyRingReader {
+	return &KeyRingReader{
+		keyringDir: keyringDir,
+	}
+}
+func (krr KeyRingReader) GetAddress(name string) (sdk.AccAddress, error) {
+	kr, err := keyring.New("curium", keyring.BackendTest, krr.keyringDir, nil)
+	if err != nil {
+		return nil, err
+	}
+	keys, err := kr.Key(name)
+	if err != nil {
+		return nil, err
+	}
+	return keys.GetAddress(), nil
 
+}
+
+
+type MsgBroadcaster func (ctx sdk.Context, msgs []types.Msg, from string) (*coretypes.ResultBroadcastTxCommit, error)
 func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) func(ctx sdk.Context, msgs []types.Msg, from string)(*coretypes.ResultBroadcastTxCommit, error) {
 	return func (ctx sdk.Context, msgs []types.Msg, from string) (*tx2.BroadcastTxResponse, error) {
 		// Choose your codec: Amino or Protobuf. Here, we use Protobuf, given by the
