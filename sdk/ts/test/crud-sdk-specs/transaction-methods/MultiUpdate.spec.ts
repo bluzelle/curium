@@ -177,4 +177,20 @@ describe('multiUpdate()', function () {
         }).then(resp => decodeData(resp.value))).to.equal('value1');
     });
 
+    it('should fail all updates if one fails', async () => {
+
+        const {keys} = await createKeys(sdk.db, 3, uuid);
+        await expect(sdk.db.tx.MultiUpdate({
+            creator: sdk.db.address,
+            uuid,
+            keyValues: encodeKeyValues([{key: keys[0], value: 'newValue1'}, {key: 'nonExistingKey', value: 'badValue'}, {key: keys[2], value: 'newValue2'}])
+        })).to.be.rejectedWith(/key not found/)
+
+        expect(await sdk.db.tx.KeyValues({
+            creator: sdk.db.address,
+            uuid
+        }).then(resp => resp.keyValues
+            .map(({key}) => key))).to.deep.equal(keys)
+    });
+
 });
