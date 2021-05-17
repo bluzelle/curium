@@ -1,14 +1,23 @@
 import {expect} from "chai";
 import {BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
 import {defaultGasParams, newBzClient} from "../../helpers/client-helpers/client-helpers";
-import {createKeys, defaultLease, encodeData, getSdk, newSdkClient} from "../../helpers/client-helpers/sdk-helpers";
+import {
+    createKeys,
+    decodeData,
+    defaultLease,
+    encodeData,
+    getSdk,
+    newSdkClient
+} from "../../helpers/client-helpers/sdk-helpers";
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
+import {useChaiAsPromised} from "testing/lib/globalHelpers";
 
 describe('deleteAll()', function () {
     this.timeout(DEFAULT_TIMEOUT);
     let sdk: BluzelleSdk;
     let uuid: string
     beforeEach(async () => {
+        useChaiAsPromised()
         sdk = await getSdk();
         uuid = Date.now().toString()
     });
@@ -127,6 +136,59 @@ describe('deleteAll()', function () {
             uuid: otherUuid
         }).then(resp => resp.key)).to.deep.equal(['otherKey'])
     });
+
+    it("should free up uuid space after uuid is emptied, claim ownership", async () => {
+        const otherSdk = await newSdkClient(sdk);
+
+        await createKeys(sdk.db, 10, uuid);
+
+        await sdk.db.tx.DeleteAll({
+            creator: sdk.db.address,
+            uuid
+        });
+
+        expect(await otherSdk.db.tx.Create({
+            creator: otherSdk.db.address,
+            uuid,
+            key: 'I took this uuid',
+            value: encodeData('my uuid'),
+            lease: defaultLease,
+            metadata: new Uint8Array()
+        }));
+
+        expect(await otherSdk.db.tx.KeyValues({
+            creator: otherSdk.db.address,
+            uuid,
+        }).then(resp => resp.keyValues)).to.deep.equal([{key: 'I took this uuid', value: encodeData('my uuid')}]);
+
+        await expect(sdk.db.tx.Create({
+            creator: sdk.db.address,
+            uuid,
+            key: 'newKey',
+            value: encodeData('firstValue'),
+            lease: defaultLease,
+            metadata: new Uint8Array()
+        })).to.be.rejectedWith(/incorrect owner of uuid/);
+
+    });
+
+    it('should only allow owner of uuid to deleteAll', async () => {
+
+        const otherSdk = await newSdkClient(sdk);
+
+        const {keys} = await createKeys(sdk.db, 10, uuid);
+
+        await expect(otherSdk.db.tx.DeleteAll({
+            creator: otherSdk.db.address,
+            uuid
+        })).to.be.rejectedWith(/incorrect owner of uuid/);
+
+        expect(await sdk.db.q.Count({
+            uuid,
+            address: sdk.db.address
+        }).then(resp => resp.count.toInt())).to.equal(keys.length)
+
+    })
 });
 
 

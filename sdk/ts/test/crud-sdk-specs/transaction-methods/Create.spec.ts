@@ -12,6 +12,7 @@ import {Lease} from "../../../src/codec/crud/lease";
 import {getPrintableChars} from "testing/lib/helpers/testHelpers";
 import {localChain} from "../../config";
 import {CalculateGasForLease} from "../../helpers/client-helpers/client-helpers";
+import {isAminoMsgVote} from "@cosmjs/stargate";
 
 
 describe('sdk.tx.Create()', function () {
@@ -234,6 +235,50 @@ describe('sdk.tx.Create()', function () {
             lease: {} as Lease,
             metadata: new Uint8Array()
         })
+    });
+
+    it("should free up uuid space after uuid is emptied, claim ownership", async () => {
+        const otherSdk = await newSdkClient(sdk);
+
+        await sdk.db.tx.Create({
+            creator: sdk.db.address,
+            uuid,
+            key: 'firstKey',
+            value: encodeData('firstValue'),
+            lease: defaultLease,
+            metadata: new Uint8Array()
+        });
+
+        await sdk.db.tx.Delete({
+            creator: sdk.db.address,
+            uuid,
+            key: 'firstKey'
+        });
+
+        expect(await otherSdk.db.tx.Create({
+            creator: otherSdk.db.address,
+            uuid,
+            key: 'I took this uuid',
+            value: encodeData('my uuid'),
+            lease: defaultLease,
+            metadata: new Uint8Array()
+        }));
+
+        expect(await otherSdk.db.tx.Read({
+            creator: otherSdk.db.address,
+            uuid,
+            key: 'I took this uuid'
+        }).then(resp => decodeData(resp.value))).to.equal('my uuid');
+
+        await expect(sdk.db.tx.Create({
+            creator: sdk.db.address,
+            uuid,
+            key: 'newKey',
+            value: encodeData('firstValue'),
+            lease: defaultLease,
+            metadata: new Uint8Array()
+        })).to.be.rejectedWith(/incorrect owner of uuid/);
+
     });
 })
 
