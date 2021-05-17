@@ -1,7 +1,14 @@
 import {expect} from "chai";
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
 import {bluzelle, BluzelleSdk, DbSdk, newMnemonic} from "../../../src/bz-sdk/bz-sdk";
-import {createKeys, defaultLease, encodeData, getSdk, zeroLease} from "../../helpers/client-helpers/sdk-helpers";
+import {
+    createKeys,
+    decodeData,
+    defaultLease,
+    encodeData,
+    getSdk,
+    zeroLease
+} from "../../helpers/client-helpers/sdk-helpers";
 import Long from 'long'
 import delay from "delay";
 
@@ -102,28 +109,34 @@ describe('q.Keys()', function () {
     });
 
     it('should pass back correct number of keys below pagination', async () => {
-        const keysValues = await createKeys(sdk.db, 101, uuid);
-        expect(await sdk.db.q.Keys({
+        const {keys, values} = await createKeys(sdk.db, 101, uuid);
+        await sdk.db.q.Keys({
             uuid,
             pagination: {
-                key: new Uint8Array(),
-                offset: Long.fromInt(1),
+                key: encodeData(keys[101]),
+                offset: Long.fromInt(0),
                 limit: Long.fromInt(100),
                 countTotal: true,
                 reverse: false
             }
-        }).then(resp => resp.key)).to.have.length(keysValues.keys.length -1)
+        }).then(resp => {
+            expect(resp.key).to.have.length(keys.length - 1)
+            expect(decodeData(resp.pagination?.nextKey || new Uint8Array())).to.equal(keys[99])
+        })
 
-        expect(await sdk.db.q.Keys({
+        await sdk.db.q.Keys({
             uuid,
             pagination: {
-                key: new Uint8Array(),
-                offset: Long.fromInt(1),
-                limit: Long.fromInt(99),
+                key: encodeData(keys[11]),
+                offset: Long.fromInt(0),
+                limit: Long.fromInt(5),
                 countTotal: true,
                 reverse: false
             }
-        }).then(resp => resp.key)).to.have.length(keysValues.keys.length - 2)
+        }).then(resp => {
+            expect(resp.key).to.have.length(5)
+            expect(decodeData(resp.pagination?.nextKey || new Uint8Array())).to.equal('key-16')
+        })
     });
 
     it('should not pick up expired keys', async () => {

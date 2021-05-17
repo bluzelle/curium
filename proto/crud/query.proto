@@ -78,4 +78,9 @@ message QueryHasResponse {
 	bool has = 1;
 }
 
+message QuerySearchResponse {
+	string searchString = 1;
+
+}
+
 
