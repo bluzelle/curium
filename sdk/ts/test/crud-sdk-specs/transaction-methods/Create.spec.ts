@@ -1,4 +1,10 @@
-import {decodeData, DEFAULT_TIMEOUT, defaultLease, getSdk} from "../../helpers/client-helpers/sdk-helpers";
+import {
+    decodeData,
+    DEFAULT_TIMEOUT,
+    defaultLease, encodeData,
+    getSdk,
+    newSdkClient
+} from "../../helpers/client-helpers/sdk-helpers";
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
 import {expect} from 'chai'
 import {bluzelle, BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
@@ -6,7 +12,7 @@ import {Lease} from "../../../src/codec/crud/lease";
 import {getPrintableChars} from "testing/lib/helpers/testHelpers";
 import {localChain} from "../../config";
 import {CalculateGasForLease} from "../../helpers/client-helpers/client-helpers";
-import delay from "delay";
+
 
 describe('sdk.tx.Create()', function () {
     this.timeout(DEFAULT_TIMEOUT);
@@ -29,7 +35,7 @@ describe('sdk.tx.Create()', function () {
         await sdk.db.tx.Create({
             creator: sdk.db.address,
             uuid,
-            key: 'key',
+            key: 'key1',
             value: new TextEncoder().encode('value'),
             lease: defaultLease,
             metadata: new Uint8Array()
@@ -176,6 +182,47 @@ describe('sdk.tx.Create()', function () {
             metadata: new Uint8Array()
         })).to.be.rejectedWith(/incorrect owner/)
 
+    });
+
+    it("should throw an error if creating in another's uuid", async () => {
+        const otherSdk = await newSdkClient(sdk);
+
+        await sdk.db.tx.Create({
+            creator: sdk.db.address,
+            uuid,
+            key: `firstEntryto ${uuid}`,
+            value: encodeData('myValue'),
+            lease: defaultLease,
+            metadata: new Uint8Array()
+        })
+
+        await expect(otherSdk.db.tx.Create({
+            creator: otherSdk.db.address,
+            uuid,
+            key: `imposterEntry to ${uuid}`,
+            value: encodeData('imposterValue'),
+            lease: defaultLease,
+            metadata: new Uint8Array()
+        })).to.be.rejectedWith(/incorrect owner of uuid/)
+
+        await expect(sdk.db.tx.Read({
+            creator: sdk.db.address,
+            uuid,
+            key: `imposterEntry to ${uuid}`
+        })).to.be.rejectedWith(/key not found/)
+    });
+
+    it("should throw an error if creating with another address", async () => {
+        const otherSdk = await newSdkClient(sdk);
+
+        await expect(sdk.db.tx.Create({
+            creator: otherSdk.db.address,
+            uuid,
+            key: `firstEntryto ${uuid}`,
+            value: encodeData('myValue'),
+            lease: defaultLease,
+            metadata: new Uint8Array()
+        })).to.be.rejectedWith(/invalid pubkey/)
     })
 
     it.skip('should include tx hash and tx height in MsgCreateResponse', () => {

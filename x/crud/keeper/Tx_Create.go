@@ -11,9 +11,12 @@ import (
 func (k msgServer) Create(goCtx context.Context, msg *types.MsgCreate) (*types.MsgCreateResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// Checks that the element exists
 	if k.HasCrudValue(&ctx, msg.Uuid, msg.Key) {
 		return nil, sdkerrors.New("crud", 0, "key already exists")
+	}
+
+	if !k.OwnsUuid(&ctx, msg.Uuid, msg.Creator) {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner of uuid")
 	}
 
 	k.AppendCrudValue(

@@ -1,8 +1,8 @@
 import {expect} from "chai";
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
 import {bluzelle, BluzelleSdk, DbSdk, newMnemonic} from "../../../src/bz-sdk/bz-sdk";
-import {createKeys, defaultLease, getSdk} from "../../helpers/client-helpers/sdk-helpers";
-
+import {createKeys, defaultLease, encodeData, getSdk} from "../../helpers/client-helpers/sdk-helpers";
+import Long from 'long'
 
 describe('keys()', function () {
     this.timeout(DEFAULT_TIMEOUT);
@@ -98,6 +98,30 @@ describe('keys()', function () {
         expect(await sdk.db.q.Keys({
             uuid
         }).then(resp => resp.key)).to.deep.equal(['my1', 'my2', 'other']);
+    });
 
+    it('should pass back correct number of keys below pagination', async () => {
+        const keysValues = await createKeys(sdk.db, 101, uuid);
+        expect(await sdk.db.q.Keys({
+            uuid,
+            pagination: {
+                key: new Uint8Array(),
+                offset: Long.fromInt(1),
+                limit: Long.fromInt(100),
+                countTotal: true,
+                reverse: false
+            }
+        }).then(resp => resp.key)).to.have.length(keysValues.keys.length -1)
+
+        expect(await sdk.db.q.Keys({
+            uuid,
+            pagination: {
+                key: new Uint8Array(),
+                offset: Long.fromInt(1),
+                limit: Long.fromInt(99),
+                countTotal: true,
+                reverse: false
+            }
+        }).then(resp => resp.key)).to.have.length(keysValues.keys.length - 2)
     })
 });

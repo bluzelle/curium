@@ -1,4 +1,11 @@
-import {decodeData, DEFAULT_TIMEOUT, defaultLease, encodeData, getSdk} from "../../helpers/client-helpers/sdk-helpers";
+import {
+    decodeData,
+    DEFAULT_TIMEOUT,
+    defaultLease,
+    encodeData,
+    getSdk,
+    newSdkClient
+} from "../../helpers/client-helpers/sdk-helpers";
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
 import {bluzelle, BluzelleSdk, DbSdk} from "../../../src/bz-sdk/bz-sdk";
 import {expect} from "chai";
@@ -105,21 +112,7 @@ describe('sdk.tx.Upsert()', function () {
     });
 
     it('should only allow the original owner to update a key', async function() {
-        const otherSdk = await bluzelle({
-            mnemonic: bluzelle.newMnemonic(),
-            url: sdk.db.url,
-            gasPrice: 0.002,
-            maxGas: 300000
-        });
-
-        await sdk.bank.tx.Send({
-            fromAddress: sdk.bank.address,
-            toAddress: otherSdk.bank.address,
-            amount: [{
-                amount: '1000',
-                denom: 'ubnt'
-            }]
-        })
+        const otherSdk = await newSdkClient(sdk)
 
         await sdk.db.tx.Upsert({
             creator: sdk.db.address,

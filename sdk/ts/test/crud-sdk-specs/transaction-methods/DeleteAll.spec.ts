@@ -1,7 +1,7 @@
 import {expect} from "chai";
 import {BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
 import {defaultGasParams, newBzClient} from "../../helpers/client-helpers/client-helpers";
-import {defaultLease, encodeData, getSdk, newSdkClient} from "../../helpers/client-helpers/sdk-helpers";
+import {createKeys, defaultLease, encodeData, getSdk, newSdkClient} from "../../helpers/client-helpers/sdk-helpers";
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
 
 describe('deleteAll()', function () {
@@ -52,15 +52,28 @@ describe('deleteAll()', function () {
 
     })
 
-    // it('should delete all keys', async () => {
-    //     await createKeys(sdk, 5);
-    //     expect(await sdk.count()).to.equal(5);
-    //     await sdk.deleteAll(defaultGasParams());
-    //     expect(await sdk.count()).to.equal(0);
-    // });
-    //
-    it.skip('should delete all keys that you own and only keys that you own', async () => {
-        const sdk2 = await newSdkClient(sdk);
+    it('should delete all keys', async () => {
+        await createKeys(sdk.db, 5, uuid);
+        expect(await sdk.db.q.Count({
+            uuid,
+            address: sdk.db.address
+        }).then(resp => resp.count.toInt())).to.equal(5);
+
+        await sdk.db.tx.DeleteAll({
+            creator: sdk.db.address,
+            uuid
+        });
+        expect(await sdk.db.q.Count({
+            uuid,
+            address: sdk.db.address
+        }).then(resp => resp.count.toInt())).to.equal(0);
+
+    });
+
+    it('should delete all keys in specified uuid', async () => {
+
+        const otherUuid = (Date.now() + 1).toString()
+
         await sdk.db.withTransaction(() => {
 
             sdk.db.tx.Create({
@@ -88,16 +101,17 @@ describe('deleteAll()', function () {
                 value: encodeData('myValue'),
                 lease: defaultLease,
                 metadata: new Uint8Array()
-            })
+            });
 
-            sdk2.db.tx.Create({
+            sdk.db.tx.Create({
                 creator: sdk.db.address,
-                uuid,
-                key: 'notMyKey',
+                uuid: otherUuid,
+                key: 'otherKey',
                 value: encodeData('myValue'),
                 lease: defaultLease,
                 metadata: new Uint8Array()
-            });
+            })
+
         }, {memo: ''});
 
         await sdk.db.tx.DeleteAll({
@@ -107,7 +121,11 @@ describe('deleteAll()', function () {
 
         expect(await sdk.db.q.Keys({
             uuid
-        }).then(resp => resp.key)).to.deep.equal(['notMyKey']);
+        }).then(resp => resp.key)).to.deep.equal([]);
+
+        expect(await sdk.db.q.Keys({
+            uuid: otherUuid
+        }).then(resp => resp.key)).to.deep.equal(['otherKey'])
     });
 });
 
