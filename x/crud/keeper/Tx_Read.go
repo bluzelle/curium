@@ -18,7 +18,7 @@ func (k msgServer) Read(goCtx context.Context, msg *types.MsgRead) (*types.MsgRe
 
 	return &types.MsgReadResponse{
 		Value: k.GetCrudValue(&ctx, msg.Uuid, msg.Key).Value,
-		Key: msg.Key,
+		Key:   msg.Key,
 	}, nil
 
 }

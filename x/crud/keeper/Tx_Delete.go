@@ -19,8 +19,6 @@ func (k msgServer) Delete(goCtx context.Context, msg *types.MsgDelete) (*types.M
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
 	}
 
-
-
 	k.RemoveCrudValue(&ctx, msg.Uuid, msg.Key)
 	k.DeleteLease(&ctx, msg.Uuid, msg.Key)
 	k.DeleteOwner(&ctx, msg.Creator, msg.Uuid, msg.Key)

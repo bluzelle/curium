@@ -1,10 +1,11 @@
 import {expect} from "chai";
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
 import {bluzelle, BluzelleSdk, DbSdk, newMnemonic} from "../../../src/bz-sdk/bz-sdk";
-import {createKeys, defaultLease, encodeData, getSdk} from "../../helpers/client-helpers/sdk-helpers";
+import {createKeys, defaultLease, encodeData, getSdk, zeroLease} from "../../helpers/client-helpers/sdk-helpers";
 import Long from 'long'
+import delay from "delay";
 
-describe('keys()', function () {
+describe('q.Keys()', function () {
     this.timeout(DEFAULT_TIMEOUT);
     let sdk: BluzelleSdk ;
     let uuid: string;
@@ -123,5 +124,40 @@ describe('keys()', function () {
                 reverse: false
             }
         }).then(resp => resp.key)).to.have.length(keysValues.keys.length - 2)
-    })
+    });
+
+    it('should not pick up expired keys', async () => {
+        await sdk.db.withTransaction(() => {
+            sdk.db.tx.Create({
+                creator: sdk.db.address,
+                uuid,
+                key: 'key1',
+                value: new TextEncoder().encode('value1'),
+                lease: defaultLease,
+                metadata: new Uint8Array()
+            });
+            sdk.db.tx.Create({
+                creator: sdk.db.address,
+                uuid,
+                key: 'shouldExpire',
+                value: new TextEncoder().encode('value2'),
+                lease: {...zeroLease, seconds: 30},
+                metadata: new Uint8Array()
+            });
+            sdk.db.tx.Create({
+                creator: sdk.db.address,
+                uuid,
+                key: 'key3',
+                value: new TextEncoder().encode('value3'),
+                lease: defaultLease,
+                metadata: new Uint8Array()
+            });
+        }, {memo: ''});
+
+        await delay(40000);
+
+        expect(await sdk.db.q.Keys({
+            uuid
+        }).then(resp => resp.key)).to.deep.equal(['key1', 'key3']);
+    });
 });

@@ -156,15 +156,15 @@ func (k Keeper) UpdateLease(ctx *sdk.Context, crudValue *types.CrudValue) {
 func NewLease(
 	Seconds uint32,
 	Minutes uint32,
-	Hours   uint32,
-	Days    uint32,
-	Years   uint32,
+	Hours uint32,
+	Days uint32,
+	Years uint32,
 ) *types.Lease {
 	return &types.Lease{
 		Seconds: Seconds,
 		Minutes: Minutes,
-		Hours: Hours,
-		Days: Days,
-		Years: Years,
+		Hours:   Hours,
+		Days:    Days,
+		Years:   Years,
 	}
 }

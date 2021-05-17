@@ -1,9 +1,19 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
+import { PageRequest, PageResponse } from "../cosmos/base/query/v1beta1/pagination";
 import { Lease } from "../crud/lease";
 import { KeyValueLease, KeyValue } from "../crud/KeyValue";
 export declare const protobufPackage = "bluzelle.curium.crud";
 /** this line is used by starport scaffolding # proto/tx/message */
+export interface MsgKeys {
+    creator: string;
+    uuid: string;
+    pagination?: PageRequest;
+}
+export interface MsgKeysResponse {
+    keys: string[];
+    pagination?: PageResponse;
+}
 export interface MsgRename {
     creator: string;
     uuid: string;
@@ -96,6 +106,20 @@ export interface MsgDelete {
 }
 export interface MsgDeleteResponse {
 }
+export declare const MsgKeys: {
+    encode(message: MsgKeys, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgKeys;
+    fromJSON(object: any): MsgKeys;
+    toJSON(message: MsgKeys): unknown;
+    fromPartial(object: DeepPartial<MsgKeys>): MsgKeys;
+};
+export declare const MsgKeysResponse: {
+    encode(message: MsgKeysResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgKeysResponse;
+    fromJSON(object: any): MsgKeysResponse;
+    toJSON(message: MsgKeysResponse): unknown;
+    fromPartial(object: DeepPartial<MsgKeysResponse>): MsgKeysResponse;
+};
 export declare const MsgRename: {
     encode(message: MsgRename, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgRename;
@@ -253,6 +277,7 @@ export declare const MsgDeleteResponse: {
 /** Msg defines the Msg service. */
 export interface Msg {
     /** this line is used by starport scaffolding # proto/tx/rpc */
+    Keys(request: MsgKeys): Promise<MsgKeysResponse>;
     Rename(request: MsgRename): Promise<MsgRenameResponse>;
     MultiUpdate(request: MsgMultiUpdate): Promise<MsgMultiUpdateResponse>;
     DeleteAll(request: MsgDeleteAll): Promise<MsgDeleteAllResponse>;
@@ -268,6 +293,7 @@ export interface Msg {
 export declare class MsgClientImpl implements Msg {
     private readonly rpc;
     constructor(rpc: Rpc);
+    Keys(request: MsgKeys): Promise<MsgKeysResponse>;
     Rename(request: MsgRename): Promise<MsgRenameResponse>;
     MultiUpdate(request: MsgMultiUpdate): Promise<MsgMultiUpdateResponse>;
     DeleteAll(request: MsgDeleteAll): Promise<MsgDeleteAllResponse>;

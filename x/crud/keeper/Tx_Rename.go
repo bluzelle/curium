@@ -23,7 +23,7 @@ func (k msgServer) Rename(goCtx context.Context, msg *types.MsgRename) (*types.M
 		msg.NewKey,
 		oldCrudValue.Value,
 		oldCrudValue.Lease,
-		)
+	)
 
 	_, err := k.Create(goCtx, newCreateRequest)
 	if err != nil {

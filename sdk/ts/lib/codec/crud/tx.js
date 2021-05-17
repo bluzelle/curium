@@ -3,13 +3,185 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MsgClientImpl = exports.MsgDeleteResponse = exports.MsgDelete = exports.MsgUpdateResponse = exports.MsgUpdate = exports.MsgCreateResponse = exports.MsgCreate = exports.MsgUpsertResponse = exports.MsgUpsert = exports.MsgReadResponse = exports.MsgRead = exports.MsgGetLeaseResponse = exports.MsgGetLease = exports.MsgHasResponse = exports.MsgHas = exports.MsgKeyValuesResponse = exports.MsgKeyValues = exports.MsgDeleteAllResponse = exports.MsgDeleteAll = exports.MsgMultiUpdateResponse = exports.MsgMultiUpdate = exports.MsgRenameResponse = exports.MsgRename = exports.protobufPackage = void 0;
+exports.MsgClientImpl = exports.MsgDeleteResponse = exports.MsgDelete = exports.MsgUpdateResponse = exports.MsgUpdate = exports.MsgCreateResponse = exports.MsgCreate = exports.MsgUpsertResponse = exports.MsgUpsert = exports.MsgReadResponse = exports.MsgRead = exports.MsgGetLeaseResponse = exports.MsgGetLease = exports.MsgHasResponse = exports.MsgHas = exports.MsgKeyValuesResponse = exports.MsgKeyValues = exports.MsgDeleteAllResponse = exports.MsgDeleteAll = exports.MsgMultiUpdateResponse = exports.MsgMultiUpdate = exports.MsgRenameResponse = exports.MsgRename = exports.MsgKeysResponse = exports.MsgKeys = exports.protobufPackage = void 0;
 /* eslint-disable */
 const long_1 = __importDefault(require("long"));
 const minimal_1 = __importDefault(require("protobufjs/minimal"));
+const pagination_1 = require("../cosmos/base/query/v1beta1/pagination");
 const lease_1 = require("../crud/lease");
 const KeyValue_1 = require("../crud/KeyValue");
 exports.protobufPackage = "bluzelle.curium.crud";
+const baseMsgKeys = { creator: "", uuid: "" };
+exports.MsgKeys = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        if (message.creator !== "") {
+            writer.uint32(10).string(message.creator);
+        }
+        if (message.uuid !== "") {
+            writer.uint32(18).string(message.uuid);
+        }
+        if (message.pagination !== undefined) {
+            pagination_1.PageRequest.encode(message.pagination, writer.uint32(26).fork()).ldelim();
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = { ...baseMsgKeys };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.creator = reader.string();
+                    break;
+                case 2:
+                    message.uuid = reader.string();
+                    break;
+                case 3:
+                    message.pagination = pagination_1.PageRequest.decode(reader, reader.uint32());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = { ...baseMsgKeys };
+        if (object.creator !== undefined && object.creator !== null) {
+            message.creator = String(object.creator);
+        }
+        else {
+            message.creator = "";
+        }
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = String(object.uuid);
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.pagination !== undefined && object.pagination !== null) {
+            message.pagination = pagination_1.PageRequest.fromJSON(object.pagination);
+        }
+        else {
+            message.pagination = undefined;
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.creator !== undefined && (obj.creator = message.creator);
+        message.uuid !== undefined && (obj.uuid = message.uuid);
+        message.pagination !== undefined &&
+            (obj.pagination = message.pagination
+                ? pagination_1.PageRequest.toJSON(message.pagination)
+                : undefined);
+        return obj;
+    },
+    fromPartial(object) {
+        const message = { ...baseMsgKeys };
+        if (object.creator !== undefined && object.creator !== null) {
+            message.creator = object.creator;
+        }
+        else {
+            message.creator = "";
+        }
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = object.uuid;
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.pagination !== undefined && object.pagination !== null) {
+            message.pagination = pagination_1.PageRequest.fromPartial(object.pagination);
+        }
+        else {
+            message.pagination = undefined;
+        }
+        return message;
+    },
+};
+const baseMsgKeysResponse = { keys: "" };
+exports.MsgKeysResponse = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        for (const v of message.keys) {
+            writer.uint32(10).string(v);
+        }
+        if (message.pagination !== undefined) {
+            pagination_1.PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = { ...baseMsgKeysResponse };
+        message.keys = [];
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.keys.push(reader.string());
+                    break;
+                case 2:
+                    message.pagination = pagination_1.PageResponse.decode(reader, reader.uint32());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = { ...baseMsgKeysResponse };
+        message.keys = [];
+        if (object.keys !== undefined && object.keys !== null) {
+            for (const e of object.keys) {
+                message.keys.push(String(e));
+            }
+        }
+        if (object.pagination !== undefined && object.pagination !== null) {
+            message.pagination = pagination_1.PageResponse.fromJSON(object.pagination);
+        }
+        else {
+            message.pagination = undefined;
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        if (message.keys) {
+            obj.keys = message.keys.map((e) => e);
+        }
+        else {
+            obj.keys = [];
+        }
+        message.pagination !== undefined &&
+            (obj.pagination = message.pagination
+                ? pagination_1.PageResponse.toJSON(message.pagination)
+                : undefined);
+        return obj;
+    },
+    fromPartial(object) {
+        const message = { ...baseMsgKeysResponse };
+        message.keys = [];
+        if (object.keys !== undefined && object.keys !== null) {
+            for (const e of object.keys) {
+                message.keys.push(e);
+            }
+        }
+        if (object.pagination !== undefined && object.pagination !== null) {
+            message.pagination = pagination_1.PageResponse.fromPartial(object.pagination);
+        }
+        else {
+            message.pagination = undefined;
+        }
+        return message;
+    },
+};
 const baseMsgRename = { creator: "", uuid: "", key: "", newKey: "" };
 exports.MsgRename = {
     encode(message, writer = minimal_1.default.Writer.create()) {
@@ -1649,6 +1821,11 @@ exports.MsgDeleteResponse = {
 class MsgClientImpl {
     constructor(rpc) {
         this.rpc = rpc;
+    }
+    Keys(request) {
+        const data = exports.MsgKeys.encode(request).finish();
+        const promise = this.rpc.request("bluzelle.curium.crud.Msg", "Keys", data);
+        return promise.then((data) => exports.MsgKeysResponse.decode(new minimal_1.default.Reader(data)));
     }
     Rename(request) {
         const data = exports.MsgRename.encode(request).finish();
