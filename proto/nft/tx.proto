@@ -8,6 +8,7 @@ option go_package = "github.com/bluzelle/curium/x/nft/types";
 // Msg defines the Msg service.
 service Msg {
     // this line is used by starport scaffolding # proto/tx/rpc
+  rpc RegisterPeer(MsgRegisterPeer) returns (MsgRegisterPeerResponse);
   rpc PublishFile(MsgPublishFile) returns (MsgPublishFileResponse);
   rpc FileReceived(MsgFileReceived) returns (MsgFileReceivedResponse);
   rpc CreateNft(MsgCreateNft) returns (MsgCreateNftResponse);
@@ -16,6 +17,16 @@ service Msg {
 }
 
 // this line is used by starport scaffolding # proto/tx/message
+message MsgRegisterPeer {
+  string creator = 1;
+  string id = 2;
+  string address = 3;
+  uint64 port = 4;
+}
+
+message MsgRegisterPeerResponse {
+}
+
 message MsgPublishFile {
   string creator = 1;
   string id = 2;

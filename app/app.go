@@ -236,7 +236,7 @@ type App struct {
 func New(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool, skipUpgradeHeights map[int64]bool,
 	homePath string, invCheckPeriod uint, encodingConfig appparams.EncodingConfig,
-	// this line is used by starport scaffolding # stargate/app/newArgument
+// this line is used by starport scaffolding # stargate/app/newArgument
 	appOpts servertypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),
 ) *App {
 	appCodec := encodingConfig.Marshaler
@@ -353,26 +353,29 @@ func New(
 		appCodec, keys[curiumtypes.StoreKey], keys[curiumtypes.MemStoreKey],
 	)
 
+	msgBroadcaster := curium.NewMsgBroadcaster(&app.AccountKeeper, cast.ToString(appOpts.Get(flags.FlagHome)))
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
+
 
 	app.nftKeeper = *nftkeeper.NewKeeper(
 		appCodec,
-		cast.ToString(appOpts.Get(flags.FlagHome)),
 		keys[nfttypes.StoreKey],
 		keys[nfttypes.MemStoreKey],
-		&app.AccountKeeper,
 		appOpts.Get("nft-file-dir").(string),
 		int(appOpts.Get("nft-p2p-port").(int64)),
+		msgBroadcaster,
+		cast.ToString(appOpts.Get(flags.FlagHome)),
 	)
+
 	nftModule := nft.NewAppModule(appCodec, app.nftKeeper)
 
 	app.votingKeeper = votingkeeper.NewKeeper(
 		appCodec,
 		keys[votingtypes.StoreKey],
 		keys[votingtypes.MemStoreKey],
-		cast.ToString(appOpts.Get(flags.FlagHome)),
 		app.StakingKeeper,
-		app.AccountKeeper,
+		msgBroadcaster,
+		cast.ToString(appOpts.Get(flags.FlagHome)),
 	)
 	votingModule := voting.NewAppModule(appCodec, app.votingKeeper)
 
@@ -458,7 +461,7 @@ func New(
 		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName, crudtypes.ModuleName,
 	)
 
-	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, synchronizertypes.ModuleName, votingtypes.ModuleName, crudtypes.ModuleName)
+	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, synchronizertypes.ModuleName, votingtypes.ModuleName, nfttypes.ModuleName, crudtypes.ModuleName)
 
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.

@@ -16,14 +16,15 @@ func main() {
 	}
 
 	meta, err := seeder.TorrentFromFile("PXL_20210319_171016803.jpg")
-	if err != nil {panic(err)}
+	if err != nil {
+		panic(err)
+	}
 	err = seeder.SeedFile(meta)
 	if err != nil {
 		panic(err)
 	}
 
-
-	leacher, err := torrentClient.NewTorrentClient("/Users/scott/temp/leach", seederPort- 1)
+	leacher, err := torrentClient.NewTorrentClient("/Users/scott/temp/leach", seederPort-1)
 	if err != nil {
 		panic(err)
 	}
@@ -45,6 +46,3 @@ func main() {
 	}
 
 }
-
-
-

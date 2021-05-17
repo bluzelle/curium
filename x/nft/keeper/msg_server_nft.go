@@ -3,7 +3,6 @@ package keeper
 import (
 	"context"
 	"fmt"
-	"github.com/bluzelle/curium/x/curium"
 	"github.com/bluzelle/curium/x/nft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -23,7 +22,7 @@ func (k msgServer) CreateNft(goCtx context.Context, msg *types.MsgCreateNft) (*t
 		msg.Id,
 		msg.Hash,
 	)
-	err := assembleNftFile(k.homeDir + "/nft-upload", k.homeDir + "/nft", msg)
+	err := assembleNftFile(k.homeDir+"/nft-upload", k.homeDir+"/nft", msg)
 	if err != nil {
 		k.Logger(ctx).Error("unable to move nft files", "hash", msg.Hash)
 	}
@@ -53,7 +52,7 @@ func assembleNftFile(uploadDir string, nftDir string, msg *types.MsgCreateNft) e
 				if err != nil {
 					return err
 				}
-				f, err := os.OpenFile(nftDir+"/"+filename, os.O_APPEND | os.O_WRONLY | os.O_CREATE, 0744)
+				f, err := os.OpenFile(nftDir+"/"+filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0744)
 				if err != nil {
 					return err
 				}
@@ -77,14 +76,13 @@ func assembleNftFile(uploadDir string, nftDir string, msg *types.MsgCreateNft) e
 }
 
 func sendFileReceived(ctx sdk.Context, k msgServer, msg *types.MsgFileReceived) {
-	result, err := curium.BroadcastMessages(ctx, []sdk.Msg{msg}, k.accKeeper, "nft", k.homeDir)
+	result, err := k.msgBroadcaster(ctx, []sdk.Msg{msg},"nft")
 	if err != nil {
 		k.Logger(ctx).Error("Error sending msgFileReceived", "err", err)
 	}
 	fmt.Println(result, err)
 
 }
-
 
 func (k msgServer) UpdateNft(goCtx context.Context, msg *types.MsgUpdateNft) (*types.MsgUpdateNftResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)

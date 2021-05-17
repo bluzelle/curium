@@ -35,7 +35,7 @@ func NewTorrentClient(dataDir string, port int) (*TorrentClient, error) {
 	tc := TorrentClient{
 		DataDir: dataDir,
 		Client:  cl,
-		Peers: []torrent.PeerInfo{},
+		Peers:   []torrent.PeerInfo{},
 	}
 	return &tc, nil
 }

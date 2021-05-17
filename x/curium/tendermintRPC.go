@@ -56,6 +56,14 @@ func GetNetInfo() (*NetInfo, error) {
 	return &netInfo, nil
 }
 
+func MyRemoteIp() (string, error) {
+	bz, err := httpGet("https://api.ipify.org?format=json")
+	if err != nil {return "", err}
+	var result map[string]string
+	json.Unmarshal(bz, &result)
+	return result["ip"], nil
+}
+
 func httpGet(url string) ([]byte, error) {
 	resp, err := http.Get(url)
 	if err != nil {

@@ -26,8 +26,9 @@ type (
 		cdc           codec.Marshaler
 		storeKey      sdk.StoreKey
 		memKey        sdk.StoreKey
-		homeDir       string
 		stakingKeeper stakingkeeper.Keeper
+		msgBroadcaster curium.MsgBroadcaster
+		homeDir       string
 		accKeeper     authkeeper.AccountKeeper
 		voteQueue     []*types.MsgVote
 		proofQueue    []*types.MsgVoteProof
@@ -41,9 +42,9 @@ func NewKeeper(
 	cdc codec.Marshaler,
 	storeKey,
 	memKey sdk.StoreKey,
-	homeDir string,
 	stakingKeeper stakingkeeper.Keeper,
-	accKeeper authkeeper.AccountKeeper,
+	msgBroadcaster curium.MsgBroadcaster,
+	homeDir string,
 
 // this line is used by starport scaffolding # ibc/keeper/parameter
 ) *Keeper {
@@ -51,11 +52,10 @@ func NewKeeper(
 		cdc:           cdc,
 		storeKey:      storeKey,
 		memKey:        memKey,
-		homeDir:       homeDir,
 		stakingKeeper: stakingKeeper,
-		accKeeper:     accKeeper,
+		msgBroadcaster: msgBroadcaster,
+		homeDir:        homeDir,
 		voteHandlers:  map[string]types.VoteHandler{},
-
 		// this line is used by starport scaffolding # ibc/keeper/return
 	}
 }
@@ -129,13 +129,13 @@ func (k *Keeper) TransmitProofQueue(ctx sdk.Context) {
 		for i := 0; i < len(k.proofQueue); i++ {
 			msgs = append(msgs, k.proofQueue[i])
 		}
-		result, err := curium.BroadcastMessages(ctx, msgs, &k.accKeeper, k.proofQueue[0].From, k.homeDir)
+		result, err := k.msgBroadcaster(ctx, msgs, k.proofQueue[0].From)
 		k.Logger(ctx).Info("Sending vote proofs", "count", len(msgs))
 		if err != nil {
 			k.Logger(ctx).Error("Error broadcasting proofs", "err", err)
 			return
 		}
-		k.Logger(ctx).Info("Broadcast proofs successful", "txhash", result.TxResponse.TxHash)
+		k.Logger(ctx).Info("Broadcast proofs successful", "txhash", result)
 		k.proofQueue = []*types.MsgVoteProof{}
 	}
 }
@@ -150,12 +150,12 @@ func (k *Keeper) TransmitVoteQueue(ctx sdk.Context) {
 		msgs = append(msgs, voteQueueItem)
 	}
 	k.Logger(ctx).Info("broadcasting votes", "vote count", len(msgs))
-	res, err := curium.BroadcastMessages(ctx, msgs, &k.accKeeper, k.voteQueue[0].From, k.homeDir)
+	res, err := k.msgBroadcaster(ctx, msgs, k.voteQueue[0].From)
 	if err != nil {
 		k.Logger(ctx).Error("Error broadcasting votes", "err", err)
 		return
 	}
-	k.Logger(ctx).Info("Broadcast votes successful", "txhash", res.TxResponse.TxHash)
+	k.Logger(ctx).Info("Broadcast votes successful", "result", res)
 	k.voteQueue = []*types.MsgVote{}
 }
 
