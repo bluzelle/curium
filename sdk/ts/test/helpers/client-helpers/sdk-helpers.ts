@@ -2,9 +2,8 @@ import {localChain} from "../../config"
 import {bluzelle, BluzelleSdk, DbSdk} from "../../../src/bz-sdk/bz-sdk";
 import {range} from "lodash";
 import {Lease} from "../../../src/codec/crud/lease";
-import {API} from "../../../src/legacyAdapter/API";
-import {mnemonicToAddress} from "../../../src/client-lib/rpc";
-import {Some} from "monet";
+
+
 export const DEFAULT_TIMEOUT = 800000;
 export const defaultLease: Lease =  {minutes: 0, seconds: 0, years: 0, hours: 1, days: 0}
 export const zeroLease : Lease = {minutes: 0, seconds: 0, years: 0, hours: 0, days: 0}
@@ -38,6 +37,14 @@ export const createKeys = async (bz: DbSdk, count: number, uuid: string): Promis
     })), {memo: ''});
     return {keys, values};
 };
+
+// export const makeKVPairs = ({keys, values}: {keys: string[], values: string[]}): {key: string, value: string}[] =>  {
+//     let KV: {key: string, value: string};
+//     let list: {key: string, value: string}[]
+//
+//     keys.
+//
+// }
 
 export const newSdkClient = (sdk: BluzelleSdk): Promise<BluzelleSdk> =>
 

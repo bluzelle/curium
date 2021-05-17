@@ -6,7 +6,7 @@ import {
     decodeData,
     defaultLease,
     encodeData,
-    getSdk,
+    getSdk, newSdkClient,
     zeroLease
 } from "../../helpers/client-helpers/sdk-helpers";
 import Long from 'long'
@@ -58,23 +58,10 @@ describe('q.Keys()', function () {
         }).then(resp => resp.key)).to.deep.equal(keys);
     });
 
-    it.skip('should return all keys including ones that are not mine', async () => {    // uuid ownership violation
+    it('should not see keys created by other users since its a query', async () => {
 
-        const otherSdk = await bluzelle({
-            mnemonic: newMnemonic(''),
-            url: sdk.db.url,
-            gasPrice: 0.002,
-            maxGas: 3000000
-        });
-
-        await sdk.bank.tx.Send({
-            toAddress: otherSdk.bank.address,
-            fromAddress: sdk.bank.address,
-            amount: [{
-                amount: '10',
-                denom: 'ubnt'
-            }]
-        })
+        const otherSdk = await newSdkClient(sdk)
+        const otherUuid = (Date.now() + 1).toString()
 
         await sdk.db.withTransaction(() => {
             sdk.db.tx.Create({
@@ -95,7 +82,7 @@ describe('q.Keys()', function () {
             });
             otherSdk.db.tx.Create({
                 creator: sdk.db.address,
-                uuid,
+                uuid: otherUuid,
                 key: 'key3',
                 value: new TextEncoder().encode('other'),
                 lease: defaultLease,
@@ -104,8 +91,8 @@ describe('q.Keys()', function () {
         }, {memo: ''});
 
         expect(await sdk.db.q.Keys({
-            uuid
-        }).then(resp => resp.key)).to.deep.equal(['my1', 'my2', 'other']);
+            uuid: otherUuid
+        }).then(resp => resp.key)).to.be.empty;
     });
 
     it('should pass back correct number of keys below pagination', async () => {

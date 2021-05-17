@@ -1,7 +1,7 @@
 import {expect} from "chai";
 import {BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
 import {defaultGasParams} from "../../helpers/client-helpers/client-helpers";
-import {defaultLease, encodeData, getSdk} from "../../helpers/client-helpers/sdk-helpers";
+import {createKeys, defaultLease, encodeData, getSdk, newSdkClient} from "../../helpers/client-helpers/sdk-helpers";
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
 
 describe('KeyValues()', function () {
@@ -53,12 +53,18 @@ describe('KeyValues()', function () {
         }).then(resp => resp.keyValues)).to.have.length(0);
     })
 
-    // it('should return keys and values', async () => {
-    //     const inPairs = await createKeys(sdk, 5);
-    //     const {keyvalues} = await sdk.txKeyValues(defaultGasParams());
-    //     expect(keyvalues).to.have.length(5);
-    //     inPairs.keys.forEach((key, idx) => {
-    //         expect(keyvalues.find((p: any) => p.key === key)?.value).to.equal(inPairs.values[idx]);
-    //     })
-    // });
+    it('should allow other users to read keyvalues', async () => {
+        const otherSdk = await newSdkClient(sdk);
+
+        const {keys, values} = await createKeys(sdk.db, 3, uuid);
+
+        expect(await otherSdk.db.tx.KeyValues({
+            creator: otherSdk.db.address,
+            uuid
+        }).then(resp => resp.keyValues)).to.deep.equal([
+            {key: keys[0], value: encodeData(values[0])},
+            {key: keys[1], value: encodeData(values[1])},
+            {key: keys[2], value: encodeData(values[2])}
+        ])
+    })
 });

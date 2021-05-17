@@ -4,7 +4,7 @@ import {
     DEFAULT_TIMEOUT,
     defaultLease,
     encodeData,
-    getSdk
+    getSdk, newSdkClient
 } from "../../helpers/client-helpers/sdk-helpers";
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
 import {BluzelleSdk, DbSdk} from "../../../src/bz-sdk/bz-sdk";
@@ -87,6 +87,32 @@ describe('sdk.tx.Read()', function () {
             uuid,
             key: 'key'
         }).then(resp => decodeData(resp.value))).to.equal('myValue');
+    });
+
+    it('should retrieve a value from another uuid', async () => {
+        const otherSdk = await newSdkClient(sdk)
+        const otherUuid = (Date.now() + 1).toString()
+        await sdk.db.tx.Create({
+            creator: sdk.db.address,
+            uuid,
+            key: 'key',
+            value: encodeData('myValue'),
+            lease: defaultLease,
+            metadata: new Uint8Array()
+        });
+        await otherSdk.db.tx.Create({
+            creator: otherSdk.db.address,
+            uuid: otherUuid,
+            key: 'otherKey',
+            value: encodeData('myOtherValue'),
+            lease: defaultLease,
+            metadata: new Uint8Array()
+        });
+        expect(await sdk.db.tx.Read({
+            creator: sdk.db.address,
+            uuid: otherUuid,
+            key: 'otherKey'
+        }).then(resp => decodeData(resp.value))).to.equal('myOtherValue');
     });
 
     it('should throw an error if key does not exist', () => {
