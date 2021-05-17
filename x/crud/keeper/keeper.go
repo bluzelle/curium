@@ -152,3 +152,19 @@ func (k Keeper) UpdateLease(ctx *sdk.Context, crudValue *types.CrudValue) {
 	//keeper.SetValue(ctx, keeper.GetKVStore(ctx), UUID, key, blzValue)
 	k.SetLease(ctx, crudValue.Uuid, crudValue.Key, crudValue.Height, crudValue.Lease)
 }
+
+func NewLease(
+	Seconds uint32,
+	Minutes uint32,
+	Hours   uint32,
+	Days    uint32,
+	Years   uint32,
+) *types.Lease {
+	return &types.Lease{
+		Seconds: Seconds,
+		Minutes: Minutes,
+		Hours: Hours,
+		Days: Days,
+		Years: Years,
+	}
+}

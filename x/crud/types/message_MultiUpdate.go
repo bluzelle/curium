@@ -7,7 +7,7 @@ import (
 
 var _ sdk.Msg = &MsgMultiUpdate{}
 
-func NewMsgMultiUpdate(creator string, uuid string, keyValues []*KeyValue) *MsgMultiUpdate {
+func NewMsgMultiUpdate(creator string, uuid string, keyValues []*KeyValueLease) *MsgMultiUpdate {
 	return &MsgMultiUpdate{
 		Creator:   creator,
 		Uuid:      uuid,
@@ -40,6 +40,9 @@ func (msg *MsgMultiUpdate) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
+	if len(msg.Uuid) == 0 || len(msg.KeyValues) == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
 	}
 	return nil
 }

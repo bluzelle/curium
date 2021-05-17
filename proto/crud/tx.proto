@@ -36,7 +36,7 @@ message MsgRenameResponse {
 message MsgMultiUpdate {
   string creator = 1;
   string uuid = 2;
-  repeated KeyValue keyValues = 3;
+  repeated KeyValueLease keyValues = 3;
 }
 
 message MsgMultiUpdateResponse {

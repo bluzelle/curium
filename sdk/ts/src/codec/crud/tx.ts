@@ -2,7 +2,7 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { Lease } from "../crud/lease";
-import { KeyValue } from "../crud/KeyValue";
+import { KeyValueLease, KeyValue } from "../crud/KeyValue";
 
 export const protobufPackage = "bluzelle.curium.crud";
 
@@ -19,7 +19,7 @@ export interface MsgRenameResponse {}
 export interface MsgMultiUpdate {
   creator: string;
   uuid: string;
-  keyValues: KeyValue[];
+  keyValues: KeyValueLease[];
 }
 
 export interface MsgMultiUpdateResponse {}
@@ -278,7 +278,7 @@ export const MsgMultiUpdate = {
       writer.uint32(18).string(message.uuid);
     }
     for (const v of message.keyValues) {
-      KeyValue.encode(v!, writer.uint32(26).fork()).ldelim();
+      KeyValueLease.encode(v!, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
@@ -298,7 +298,7 @@ export const MsgMultiUpdate = {
           message.uuid = reader.string();
           break;
         case 3:
-          message.keyValues.push(KeyValue.decode(reader, reader.uint32()));
+          message.keyValues.push(KeyValueLease.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -323,7 +323,7 @@ export const MsgMultiUpdate = {
     }
     if (object.keyValues !== undefined && object.keyValues !== null) {
       for (const e of object.keyValues) {
-        message.keyValues.push(KeyValue.fromJSON(e));
+        message.keyValues.push(KeyValueLease.fromJSON(e));
       }
     }
     return message;
@@ -335,7 +335,7 @@ export const MsgMultiUpdate = {
     message.uuid !== undefined && (obj.uuid = message.uuid);
     if (message.keyValues) {
       obj.keyValues = message.keyValues.map((e) =>
-        e ? KeyValue.toJSON(e) : undefined
+        e ? KeyValueLease.toJSON(e) : undefined
       );
     } else {
       obj.keyValues = [];
@@ -358,7 +358,7 @@ export const MsgMultiUpdate = {
     }
     if (object.keyValues !== undefined && object.keyValues !== null) {
       for (const e of object.keyValues) {
-        message.keyValues.push(KeyValue.fromPartial(e));
+        message.keyValues.push(KeyValueLease.fromPartial(e));
       }
     }
     return message;

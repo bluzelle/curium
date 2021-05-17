@@ -160,7 +160,7 @@ exports.MsgMultiUpdate = {
             writer.uint32(18).string(message.uuid);
         }
         for (const v of message.keyValues) {
-            KeyValue_1.KeyValue.encode(v, writer.uint32(26).fork()).ldelim();
+            KeyValue_1.KeyValueLease.encode(v, writer.uint32(26).fork()).ldelim();
         }
         return writer;
     },
@@ -179,7 +179,7 @@ exports.MsgMultiUpdate = {
                     message.uuid = reader.string();
                     break;
                 case 3:
-                    message.keyValues.push(KeyValue_1.KeyValue.decode(reader, reader.uint32()));
+                    message.keyValues.push(KeyValue_1.KeyValueLease.decode(reader, reader.uint32()));
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -205,7 +205,7 @@ exports.MsgMultiUpdate = {
         }
         if (object.keyValues !== undefined && object.keyValues !== null) {
             for (const e of object.keyValues) {
-                message.keyValues.push(KeyValue_1.KeyValue.fromJSON(e));
+                message.keyValues.push(KeyValue_1.KeyValueLease.fromJSON(e));
             }
         }
         return message;
@@ -215,7 +215,7 @@ exports.MsgMultiUpdate = {
         message.creator !== undefined && (obj.creator = message.creator);
         message.uuid !== undefined && (obj.uuid = message.uuid);
         if (message.keyValues) {
-            obj.keyValues = message.keyValues.map((e) => e ? KeyValue_1.KeyValue.toJSON(e) : undefined);
+            obj.keyValues = message.keyValues.map((e) => e ? KeyValue_1.KeyValueLease.toJSON(e) : undefined);
         }
         else {
             obj.keyValues = [];
@@ -239,7 +239,7 @@ exports.MsgMultiUpdate = {
         }
         if (object.keyValues !== undefined && object.keyValues !== null) {
             for (const e of object.keyValues) {
-                message.keyValues.push(KeyValue_1.KeyValue.fromPartial(e));
+                message.keyValues.push(KeyValue_1.KeyValueLease.fromPartial(e));
             }
         }
         return message;

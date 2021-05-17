@@ -1,12 +1,19 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
+import { Lease } from "../crud/lease";
 
 export const protobufPackage = "bluzelle.curium.crud";
 
 export interface KeyValue {
   key: string;
   value: Uint8Array;
+}
+
+export interface KeyValueLease {
+  key: string;
+  value: Uint8Array;
+  lease?: Lease;
 }
 
 const baseKeyValue: object = { key: "" };
@@ -82,6 +89,102 @@ export const KeyValue = {
       message.value = object.value;
     } else {
       message.value = new Uint8Array();
+    }
+    return message;
+  },
+};
+
+const baseKeyValueLease: object = { key: "" };
+
+export const KeyValueLease = {
+  encode(
+    message: KeyValueLease,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key);
+    }
+    if (message.value.length !== 0) {
+      writer.uint32(18).bytes(message.value);
+    }
+    if (message.lease !== undefined) {
+      Lease.encode(message.lease, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): KeyValueLease {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseKeyValueLease } as KeyValueLease;
+    message.value = new Uint8Array();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.key = reader.string();
+          break;
+        case 2:
+          message.value = reader.bytes();
+          break;
+        case 3:
+          message.lease = Lease.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): KeyValueLease {
+    const message = { ...baseKeyValueLease } as KeyValueLease;
+    message.value = new Uint8Array();
+    if (object.key !== undefined && object.key !== null) {
+      message.key = String(object.key);
+    } else {
+      message.key = "";
+    }
+    if (object.value !== undefined && object.value !== null) {
+      message.value = bytesFromBase64(object.value);
+    }
+    if (object.lease !== undefined && object.lease !== null) {
+      message.lease = Lease.fromJSON(object.lease);
+    } else {
+      message.lease = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: KeyValueLease): unknown {
+    const obj: any = {};
+    message.key !== undefined && (obj.key = message.key);
+    message.value !== undefined &&
+      (obj.value = base64FromBytes(
+        message.value !== undefined ? message.value : new Uint8Array()
+      ));
+    message.lease !== undefined &&
+      (obj.lease = message.lease ? Lease.toJSON(message.lease) : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<KeyValueLease>): KeyValueLease {
+    const message = { ...baseKeyValueLease } as KeyValueLease;
+    if (object.key !== undefined && object.key !== null) {
+      message.key = object.key;
+    } else {
+      message.key = "";
+    }
+    if (object.value !== undefined && object.value !== null) {
+      message.value = object.value;
+    } else {
+      message.value = new Uint8Array();
+    }
+    if (object.lease !== undefined && object.lease !== null) {
+      message.lease = Lease.fromPartial(object.lease);
+    } else {
+      message.lease = undefined;
     }
     return message;
   },

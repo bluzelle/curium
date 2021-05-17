@@ -2,9 +2,15 @@ syntax = "proto3";
 package bluzelle.curium.crud;
 
 option go_package = "github.com/bluzelle/curium/x/crud/types";
-
+import "crud/lease.proto";
 
 message KeyValue {
   string key = 1;
   bytes value = 2;
+}
+
+message KeyValueLease {
+  string key = 1;
+  bytes value = 2;
+  Lease lease = 3;
 }

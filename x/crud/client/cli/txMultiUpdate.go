@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"github.com/bluzelle/curium/x/crud/keeper"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/spf13/cobra"
 	"strconv"
@@ -33,7 +34,7 @@ func CmdMultiUpdate() *cobra.Command {
 				msg := types.NewMsgMultiUpdate(string(clientCtx.GetFromAddress()), argsUuid, nil)
 
 				for i := 1; i < argsLen; i += 2 {
-					msg.KeyValues = append(msg.KeyValues, &types.KeyValue{Key: args[i], Value: []byte(args[i+1])})
+					msg.KeyValues = append(msg.KeyValues, &types.KeyValueLease{Key: args[i], Value: []byte(args[i+1]), Lease: keeper.NewLease(0, 0, 1, 0, 0)})
 				}
 
 				err := msg.ValidateBasic()

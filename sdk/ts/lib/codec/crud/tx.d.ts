@@ -1,7 +1,7 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { Lease } from "../crud/lease";
-import { KeyValue } from "../crud/KeyValue";
+import { KeyValueLease, KeyValue } from "../crud/KeyValue";
 export declare const protobufPackage = "bluzelle.curium.crud";
 /** this line is used by starport scaffolding # proto/tx/message */
 export interface MsgRename {
@@ -15,7 +15,7 @@ export interface MsgRenameResponse {
 export interface MsgMultiUpdate {
     creator: string;
     uuid: string;
-    keyValues: KeyValue[];
+    keyValues: KeyValueLease[];
 }
 export interface MsgMultiUpdateResponse {
 }

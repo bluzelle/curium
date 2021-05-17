@@ -58,3 +58,8 @@ export const newSdkClient = (sdk: BluzelleSdk): Promise<BluzelleSdk> =>
                 })
             return newSdk;
         })
+
+export const encodeKeyValues = (keyValues: {key: string, value: string, lease?: Lease}[]): {key: string, value: Uint8Array, lease: Lease}[] =>
+    keyValues
+        .map(({key,value, lease}) => ({key, value: encodeData(value), lease: lease || defaultLease}))
+

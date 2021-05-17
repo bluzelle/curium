@@ -1,7 +1,14 @@
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
 import {expect} from "chai";
 import {BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
-import {decodeData, defaultLease, encodeData, getSdk, createKeys} from "../../helpers/client-helpers/sdk-helpers";
+import {
+    decodeData,
+    defaultLease,
+    encodeData,
+    getSdk,
+    createKeys,
+    newSdkClient, encodeKeyValues
+} from "../../helpers/client-helpers/sdk-helpers";
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
 
 describe('multiUpdate()', function () {
@@ -19,10 +26,9 @@ describe('multiUpdate()', function () {
             sdk.db.tx.MultiUpdate({
                 creator: sdk.db.address,
                 uuid,
-                keyValues: [{key: 'key1', value: 'value1'}, {key: 'key2', value: 'value2'}]
-                    .map(({key,value}) => ({key, value: encodeData(value)}))
+                keyValues: encodeKeyValues([{key: 'key1', value: 'value1'}, {key: 'key2', value: 'value2'}])
             })
-        ).to.be.rejectedWith(/Key does not exist/);
+        ).to.be.rejectedWith(/key not found/);
     })
 
     it('should work with empty values', async () => {
@@ -48,8 +54,8 @@ describe('multiUpdate()', function () {
         await sdk.db.tx.MultiUpdate({
             creator: sdk.db.address,
             uuid,
-            keyValues: [{key: 'key1', value: 'value1'}, {key: 'key2', value: ''}]
-                .map(({key,value}) => ({key: key, value: encodeData(value)}))
+            keyValues: encodeKeyValues([{key: 'key1', value: 'value1'}, {key: 'key2', value: ''}])
+
         });
         expect(await sdk.db.tx.Read({
             creator: sdk.db.address,
@@ -84,8 +90,7 @@ describe('multiUpdate()', function () {
             await sdk.db.tx.MultiUpdate({
                 creator: sdk.db.address,
                 uuid,
-                keyValues: [{key: 'key1', value: 'newVal'}, {key: 'key2', value: 'newVal'}]
-                    .map(({key,value}) => ({key, value: encodeData(value)}))
+                keyValues: encodeKeyValues([{key: 'key1', value: 'newVal'}, {key: 'key2', value: 'newVal'}])
             })
         )
         expect(await sdk.db.tx.Read({
@@ -108,8 +113,7 @@ describe('multiUpdate()', function () {
         await sdk.db.tx.MultiUpdate({
             creator: sdk.db.address,
             uuid,
-            keyValues: [{key: 'key', value: 'newVal'}]
-                .map(({key,value}) => ({key, value: encodeData(value)}))
+            keyValues: encodeKeyValues([{key: 'key', value: 'newVal'}])
         });
 
         expect(await sdk.db.tx.Read({
@@ -124,8 +128,7 @@ describe('multiUpdate()', function () {
         await sdk.db.tx.MultiUpdate({
             creator: sdk.db.address,
             uuid,
-            keyValues: [{key: keys[0], value: 'newValue1'}, {key: keys[2], value: 'newValue2'}]
-                .map(({key,value}) => ({key, value: encodeData(value)}))
+            keyValues: encodeKeyValues([{key: keys[0], value: 'newValue1'}, {key: keys[2], value: 'newValue2'}])
         });
 
         expect(await sdk.db.tx.Read({
@@ -145,5 +148,33 @@ describe('multiUpdate()', function () {
             key: keys[2],
             uuid
         }).then(resp => decodeData(resp.value))).to.equal('newValue2');
-    })
+    });
+
+    it('should only let the owner MultiUpdate()', async () => {
+
+        const otherSdk = await newSdkClient(sdk);
+
+        await sdk.db.tx.Create({
+            creator: sdk.db.address,
+            uuid,
+            key: "key",
+            value: encodeData('value1'),
+            lease: defaultLease,
+            metadata: new Uint8Array()
+        });
+
+        await expect(otherSdk.db.tx.MultiUpdate({
+            creator: otherSdk.db.address,
+            uuid,
+            keyValues: encodeKeyValues([{key: 'key', value: 'newVal'}])
+
+        })).to.be.rejectedWith(/incorrect owner/)
+
+        expect(await otherSdk.db.tx.Read({
+            creator: otherSdk.db.address,
+            key: 'key',
+            uuid
+        }).then(resp => decodeData(resp.value))).to.equal('value1');
+    });
+
 });
