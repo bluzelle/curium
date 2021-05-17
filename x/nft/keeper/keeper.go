@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+	"github.com/bluzelle/curium/x/torrentClient"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 
 	"github.com/tendermint/tendermint/libs/log"
@@ -19,6 +20,7 @@ type (
 		storeKey  sdk.StoreKey
 		memKey    sdk.StoreKey
 		accKeeper *authkeeper.AccountKeeper
+		btClient  *torrentClient.TorrentClient
 		// this line is used by starport scaffolding # ibc/keeper/attribute
 	}
 )
@@ -29,14 +31,21 @@ func NewKeeper(
 	storeKey,
 	memKey sdk.StoreKey,
 	accKeeper *authkeeper.AccountKeeper,
+	btDirectory string,
+	btPort int,
 	// this line is used by starport scaffolding # ibc/keeper/parameter
 ) *Keeper {
+	btClient, err := torrentClient.NewTorrentClient(btDirectory, btPort)
+	if err != nil {
+		panic(err)
+	}
 	return &Keeper{
 		cdc:       cdc,
 		homeDir:   homeDir,
 		storeKey:  storeKey,
 		memKey:    memKey,
 		accKeeper: accKeeper,
+		btClient: btClient,
 		// this line is used by starport scaffolding # ibc/keeper/return
 	}
 }

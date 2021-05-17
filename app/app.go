@@ -239,7 +239,6 @@ func New(
 	// this line is used by starport scaffolding # stargate/app/newArgument
 	appOpts servertypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),
 ) *App {
-
 	appCodec := encodingConfig.Marshaler
 	cdc := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
@@ -362,6 +361,8 @@ func New(
 		keys[nfttypes.StoreKey],
 		keys[nfttypes.MemStoreKey],
 		&app.AccountKeeper,
+		appOpts.Get("nft-file-dir").(string),
+		int(appOpts.Get("nft-p2p-port").(int64)),
 	)
 	nftModule := nft.NewAppModule(appCodec, app.nftKeeper)
 

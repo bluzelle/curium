@@ -17,6 +17,8 @@ init:
     "api.rpc-max-body-bytes": 200000000
     "pruning": "nothing"
     "bluzelle_crud": true
+    "nft-p2p-port": 5500
+    "nft-file-dir": "nft"
   config:
     "consensus.timeout_propose": "3s"
     "consensus.timeout_commit": "5s"
