@@ -2,35 +2,35 @@ package keeper
 
 import (
 	"context"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-
+	"fmt"
 	"github.com/bluzelle/curium/x/crud/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 func (k msgServer) Rename(goCtx context.Context, msg *types.MsgRename) (*types.MsgRenameResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// TODO: Handling the message
-	_ = ctx
-
-	if len(msg.Uuid) == 0 || len(msg.Key) == 0 || len(msg.NewKey) == 0  {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
+	if !k.HasCrudValue(&ctx, msg.Uuid, msg.Key) {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %s doesn't exist", msg.Key))
 	}
 
-	//owner := k.GetOwner(&ctx, msg.Uuid, msg.Key)
-	//if owner.Empty() {
-	//	return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Key does not exist")
-	//}
-	//
-	//if !msg.Owner.Equals(owner) {
-	//	return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "Incorrect Owner")
-	//}
-	//
-	//if !keeper.RenameKey(ctx, keeper.GetKVStore(ctx), keeper.GetOwnerStore(ctx), msg.UUID, msg.Key, msg.NewKey) {
-	//	return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Rename failed")
-	//}
+	oldCrudValue := k.GetCrudValue(&ctx, msg.Uuid, msg.Key)
 
+	newCreateRequest := types.NewMsgCreate(
+		msg.Creator,
+		msg.Uuid,
+		msg.NewKey,
+		oldCrudValue.Value,
+		oldCrudValue.Lease,
+		)
+
+	_, err := k.Create(goCtx, newCreateRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	k.RemoveCrudValue(&ctx, msg.Uuid, msg.Key)
 
 	return &types.MsgRenameResponse{}, nil
 }

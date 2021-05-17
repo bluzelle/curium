@@ -67,6 +67,13 @@ func (k Keeper) GetCrudValue(ctx *sdk.Context, uuid string, key string) types.Cr
 	return CrudValue
 }
 
+func (k Keeper) GetCrudValuePointer (ctx *sdk.Context, uuid string, key string) *types.CrudValue {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CrudValueKey))
+	var CrudValue *types.CrudValue
+	k.cdc.MustUnmarshalBinaryBare(store.Get(MakeCrudValueKey(uuid, key)), CrudValue)
+	return CrudValue
+}
+
 // HasCrudValue checks if the CrudValue exists in the store
 func (k Keeper) HasCrudValue(ctx *sdk.Context, uuid, key string) bool {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CrudValueKey))
