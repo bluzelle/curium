@@ -49,6 +49,15 @@ export interface QueryCountResponse {
   count: Long;
 }
 
+export interface QueryHasRequest {
+  uuid: string;
+  key: string;
+}
+
+export interface QueryHasResponse {
+  has: boolean;
+}
+
 const baseQueryReadRequest: object = { uuid: "", key: "" };
 
 export const QueryReadRequest = {
@@ -685,6 +694,139 @@ export const QueryCountResponse = {
   },
 };
 
+const baseQueryHasRequest: object = { uuid: "", key: "" };
+
+export const QueryHasRequest = {
+  encode(
+    message: QueryHasRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.uuid !== "") {
+      writer.uint32(10).string(message.uuid);
+    }
+    if (message.key !== "") {
+      writer.uint32(18).string(message.key);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryHasRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryHasRequest } as QueryHasRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.uuid = reader.string();
+          break;
+        case 2:
+          message.key = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryHasRequest {
+    const message = { ...baseQueryHasRequest } as QueryHasRequest;
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = String(object.key);
+    } else {
+      message.key = "";
+    }
+    return message;
+  },
+
+  toJSON(message: QueryHasRequest): unknown {
+    const obj: any = {};
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    message.key !== undefined && (obj.key = message.key);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<QueryHasRequest>): QueryHasRequest {
+    const message = { ...baseQueryHasRequest } as QueryHasRequest;
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = object.key;
+    } else {
+      message.key = "";
+    }
+    return message;
+  },
+};
+
+const baseQueryHasResponse: object = { has: false };
+
+export const QueryHasResponse = {
+  encode(
+    message: QueryHasResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.has === true) {
+      writer.uint32(8).bool(message.has);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryHasResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryHasResponse } as QueryHasResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.has = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryHasResponse {
+    const message = { ...baseQueryHasResponse } as QueryHasResponse;
+    if (object.has !== undefined && object.has !== null) {
+      message.has = Boolean(object.has);
+    } else {
+      message.has = false;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryHasResponse): unknown {
+    const obj: any = {};
+    message.has !== undefined && (obj.has = message.has);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<QueryHasResponse>): QueryHasResponse {
+    const message = { ...baseQueryHasResponse } as QueryHasResponse;
+    if (object.has !== undefined && object.has !== null) {
+      message.has = object.has;
+    } else {
+      message.has = false;
+    }
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** this line is used by starport scaffolding # 2 */
@@ -692,6 +834,7 @@ export interface Query {
   Keys(request: QueryKeysRequest): Promise<QueryKeysResponse>;
   MyKeys(request: QueryMyKeysRequest): Promise<QueryMyKeysResponse>;
   Count(request: QueryCountRequest): Promise<QueryCountResponse>;
+  Has(request: QueryHasRequest): Promise<QueryHasResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -744,6 +887,14 @@ export class QueryClientImpl implements Query {
     );
     return promise.then((data) =>
       QueryCountResponse.decode(new _m0.Reader(data))
+    );
+  }
+
+  Has(request: QueryHasRequest): Promise<QueryHasResponse> {
+    const data = QueryHasRequest.encode(request).finish();
+    const promise = this.rpc.request("bluzelle.curium.crud.Query", "Has", data);
+    return promise.then((data) =>
+      QueryHasResponse.decode(new _m0.Reader(data))
     );
   }
 }

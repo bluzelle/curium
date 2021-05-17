@@ -22,6 +22,10 @@ service Query {
 	rpc Count(QueryCountRequest) returns (QueryCountResponse) {
 		option (google.api.http).get = "/bluzelle/curium/crud/CrudValue/{uuid}";
 	}
+	rpc Has(QueryHasRequest) returns (QueryHasResponse) {
+		option (google.api.http).get = "/bluzelle/curium/crud/CrudValue/{uuid}/{key}";
+	}
+
 }
 
 // this line is used by starport scaffolding # 3
@@ -63,6 +67,15 @@ message QueryCountRequest {
 message QueryCountResponse {
 	string uuid = 1;
 	int64 count = 2;
+}
+
+message QueryHasRequest {
+	string uuid = 1;
+	string key = 2;
+}
+
+message QueryHasResponse {
+	bool has = 1;
 }
 
 

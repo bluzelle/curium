@@ -26,7 +26,7 @@ describe('sdk.tx.Create()', function () {
         uuid = Date.now().toString()
     });
 
-    it('should create a key-value', async () => {
+    it.skip('should create a key-value', async () => {
 
         const initialBal: number = await sdk.bank.q.Balance({
                 address: sdk.bank.address,

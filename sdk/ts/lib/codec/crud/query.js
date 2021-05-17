@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.QueryClientImpl = exports.QueryCountResponse = exports.QueryCountRequest = exports.QueryMyKeysResponse = exports.QueryMyKeysRequest = exports.QueryKeysResponse = exports.QueryKeysRequest = exports.QueryReadResponse = exports.QueryReadRequest = exports.protobufPackage = void 0;
+exports.QueryClientImpl = exports.QueryHasResponse = exports.QueryHasRequest = exports.QueryCountResponse = exports.QueryCountRequest = exports.QueryMyKeysResponse = exports.QueryMyKeysRequest = exports.QueryKeysResponse = exports.QueryKeysRequest = exports.QueryReadResponse = exports.QueryReadRequest = exports.protobufPackage = void 0;
 /* eslint-disable */
 const long_1 = __importDefault(require("long"));
 const minimal_1 = __importDefault(require("protobufjs/minimal"));
@@ -594,6 +594,127 @@ exports.QueryCountResponse = {
         return message;
     },
 };
+const baseQueryHasRequest = { uuid: "", key: "" };
+exports.QueryHasRequest = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        if (message.uuid !== "") {
+            writer.uint32(10).string(message.uuid);
+        }
+        if (message.key !== "") {
+            writer.uint32(18).string(message.key);
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = { ...baseQueryHasRequest };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.uuid = reader.string();
+                    break;
+                case 2:
+                    message.key = reader.string();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = { ...baseQueryHasRequest };
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = String(object.uuid);
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.key !== undefined && object.key !== null) {
+            message.key = String(object.key);
+        }
+        else {
+            message.key = "";
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.uuid !== undefined && (obj.uuid = message.uuid);
+        message.key !== undefined && (obj.key = message.key);
+        return obj;
+    },
+    fromPartial(object) {
+        const message = { ...baseQueryHasRequest };
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = object.uuid;
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.key !== undefined && object.key !== null) {
+            message.key = object.key;
+        }
+        else {
+            message.key = "";
+        }
+        return message;
+    },
+};
+const baseQueryHasResponse = { has: false };
+exports.QueryHasResponse = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        if (message.has === true) {
+            writer.uint32(8).bool(message.has);
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = { ...baseQueryHasResponse };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.has = reader.bool();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = { ...baseQueryHasResponse };
+        if (object.has !== undefined && object.has !== null) {
+            message.has = Boolean(object.has);
+        }
+        else {
+            message.has = false;
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.has !== undefined && (obj.has = message.has);
+        return obj;
+    },
+    fromPartial(object) {
+        const message = { ...baseQueryHasResponse };
+        if (object.has !== undefined && object.has !== null) {
+            message.has = object.has;
+        }
+        else {
+            message.has = false;
+        }
+        return message;
+    },
+};
 class QueryClientImpl {
     constructor(rpc) {
         this.rpc = rpc;
@@ -617,6 +738,11 @@ class QueryClientImpl {
         const data = exports.QueryCountRequest.encode(request).finish();
         const promise = this.rpc.request("bluzelle.curium.crud.Query", "Count", data);
         return promise.then((data) => exports.QueryCountResponse.decode(new minimal_1.default.Reader(data)));
+    }
+    Has(request) {
+        const data = exports.QueryHasRequest.encode(request).finish();
+        const promise = this.rpc.request("bluzelle.curium.crud.Query", "Has", data);
+        return promise.then((data) => exports.QueryHasResponse.decode(new minimal_1.default.Reader(data)));
     }
 }
 exports.QueryClientImpl = QueryClientImpl;
