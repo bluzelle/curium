@@ -2,56 +2,43 @@ import {expect} from "chai";
 import {bluzelle, BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
 import {defaultGasParams} from "../../helpers/client-helpers/client-helpers";
-import {defaultLease, encodeData, getSdk, zeroLease} from "../../helpers/client-helpers/sdk-helpers";
+import {defaultLease, encodeData, getSdk, newSdkClient, zeroLease} from "../../helpers/client-helpers/sdk-helpers";
 import delay from "delay";
 
 describe('myKeys()', function () {
     this.timeout(DEFAULT_TIMEOUT);
     let sdk: BluzelleSdk;
-
+    let uuid: string;
     beforeEach(async () => {
         sdk = await getSdk();
+        uuid = Date.now().toString()
     });
 
-    it.skip('should return a list of only keys that I own', async () => {
-        const otherSdk = await bluzelle({
-            mnemonic: bluzelle.newMnemonic(),
-            url: sdk.db.url,
-            gasPrice: 0.002,
-            maxGas: 30000000
-        });
+    it('should return a list of only keys that I own', async () => {
 
-        await sdk.bank.tx.Send({
-            toAddress: otherSdk.bank.address,
-            fromAddress: sdk.bank.address,
-            amount: [{
-                amount: '1000',
-                denom: 'ubnt'
-            }]
-        })
+        const otherUuid = (Date.now() + 1).toString()
 
         await sdk.db.withTransaction(() => {
             sdk.db.tx.Create({
                 creator: sdk.db.address,
-                uuid: 'uuid9',
-                key: 'my14',
+                uuid,
+                key: 'myKey1',
                 value: encodeData('value'),
                 metadata: new Uint8Array(),
                 lease: defaultLease
             });
             sdk.db.tx.Create({
                 creator: sdk.db.address,
-                uuid: 'uuid9',
-                key: 'my24',
+                uuid,
+                key: 'myKey2',
                 value: encodeData('value'),
                 metadata: new Uint8Array(),
                 lease: defaultLease
             });
-
-            otherSdk.db.tx.Create({
+            sdk.db.tx.Create({
                 creator: sdk.db.address,
-                uuid: 'uuid9',
-                key: 'other4',
+                uuid: otherUuid,
+                key: 'myKey3',
                 value: encodeData('value'),
                 metadata: new Uint8Array(),
                 lease: defaultLease
@@ -60,22 +47,21 @@ describe('myKeys()', function () {
 
         expect(await sdk.db.q.MyKeys({
             address: sdk.db.address,
-            uuid: 'uuid9'
-        }).then(resp => resp.key)).to.deep.equal(['my14', 'my24']);
-        expect(await otherSdk.db.q.MyKeys({
-            address: otherSdk.db.address,
-            uuid: 'uuid9'
-        }).then(resp => resp.key)).to.deep.equal(['other4']);
+            uuid
+        }).then(resp => resp.key)).to.deep.equal(['myKey1', 'myKey2']);
+
+        expect(await sdk.db.q.MyKeys({
+            address: sdk.db.address,
+            uuid: otherUuid
+        }).then(resp => resp.key)).to.deep.equal(['myKey3']);
     });
 
     it('should not show keys that have been deleted', async () => {
 
-        const uuidTime = Date.now().toString()
-
         await sdk.db.withTransaction(() => {
             sdk.db.tx.Create({
                 creator: sdk.db.address,
-                uuid: uuidTime,
+                uuid,
                 key: 'my1',
                 value: encodeData('value'),
                 metadata: new Uint8Array(),
@@ -83,7 +69,7 @@ describe('myKeys()', function () {
             });
             sdk.db.tx.Create({
                 creator: sdk.db.address,
-                uuid: uuidTime,
+                uuid,
                 key: 'my2',
                 value: encodeData('value'),
                 metadata: new Uint8Array(),
@@ -93,18 +79,18 @@ describe('myKeys()', function () {
 
         expect(await sdk.db.q.MyKeys({
             address: sdk.db.address,
-            uuid: uuidTime
+            uuid: uuid
         }).then(resp => resp.key)).to.deep.equal(['my1', 'my2']);
 
         await sdk.db.tx.Delete({
             creator: sdk.db.address,
             key: 'my1',
-            uuid: uuidTime
+            uuid: uuid
         })
 
         expect(await sdk.db.q.MyKeys({
             address: sdk.db.address,
-            uuid: uuidTime
+            uuid: uuid
         }).then(resp => resp.key)).to.deep.equal(['my2'])
     });
 
@@ -142,92 +128,35 @@ describe('myKeys()', function () {
         }).then(resp => resp.key)).to.deep.equal(['my2']);
     });
 
-    // it('should not show keys after a deleteAll', async () => {
-    //     const ot = bluzelle({
-    //         mnemonic: bz.generateBIP39Account(),
-    //         endpoint: bz.url,
-    //         uuid: bz.uuid
-    //     });
-    //
-    //     await bz.transferTokensTo(otherBz.address, 1000, defaultGasParams());
-    //
-    //
-    //     await bz.withTransaction(() => {
-    //         bz.create('my1', 'value', defaultGasParams());
-    //         bz.create('my2', 'value', defaultGasParams());
-    //         otherBz.create('other', 'value', defaultGasParams());
-    //     });
-    //
-    //     expect(await bz.myKeys()).to.deep.equal(['my1', 'my2']);
-    //     await bz.deleteAll(defaultGasParams())
-    //     expect(await bz.myKeys()).to.deep.equal([]);
-    //     expect(await otherBz.myKeys()).to.deep.equal(['other']);
-    //     await otherBz.deleteAll(defaultGasParams());
-    //     expect(await otherBz.myKeys()).to.deep.equal([]);
-    //
-    //     const otherSdk = await bluzelle({
-    //         mnemonic: bluzelle.newMnemonic(),
-    //         url: sdk.db.url,
-    //         gasPrice: 0.002,
-    //         maxGas: 30000000
-    //     });
-    //
-    //     await sdk.bank.tx.Send({
-    //         toAddress: otherSdk.bank.address,
-    //         fromAddress: sdk.bank.address,
-    //         amount: [{
-    //             amount: '1000',
-    //             denom: 'ubnt'
-    //         }]
-    //     })
-    //
-    //     await sdk.db.withTransaction(() => {
-    //         sdk.db.tx.Create({
-    //             creator: sdk.db.address,
-    //             uuid: 'uuid9',
-    //             key: 'my14',
-    //             value: encodeData('value'),
-    //             metadata: new Uint8Array(),
-    //             lease: defaultLease
-    //         });
-    //         sdk.db.tx.Create({
-    //             creator: sdk.db.address,
-    //             uuid: 'uuid9',
-    //             key: 'my24',
-    //             value: encodeData('value'),
-    //             metadata: new Uint8Array(),
-    //             lease: defaultLease
-    //         });
-    //
-    //         otherSdk.db.tx.Create({
-    //             creator: sdk.db.address,
-    //             uuid: 'uuid9',
-    //             key: 'other4',
-    //             value: encodeData('value'),
-    //             metadata: new Uint8Array(),
-    //             lease: defaultLease
-    //         });
-    //     }, {memo: ''});
-    //
-    //     expect(await sdk.db.q.MyKeys({
-    //         address: sdk.db.address,
-    //         uuid: 'uuid9'
-    //     }).then(resp => resp.key)).to.deep.equal(['my14', 'my24']);
-    //     expect(await otherSdk.db.q.MyKeys({
-    //         address: otherSdk.db.address,
-    //         uuid: 'uuid9'
-    //     }).then(resp => resp.key)).to.deep.equal(['other4']);
-    // });
-    //
-    // it('should show the right keys if you rename a key', async () => {
-    //     await bz.withTransaction(() => {
-    //         bz.create('my1', 'value', defaultGasParams());
-    //         bz.create('my2', 'value', defaultGasParams());
-    //     });
-    //
-    //     expect(await bz.myKeys()).to.deep.equal(['my1', 'my2']);
-    //
-    //     await bz.rename('my1', 'myOne', defaultGasParams());
-    //     expect(await bz.myKeys()).to.deep.equal(['my2', 'myOne']);
-    // })
+    it('should show the right keys if you rename a key', async () => {
+        await sdk.db.withTransaction(() => {
+            sdk.db.tx.Create({
+                creator: sdk.db.address,
+                uuid,
+                key: 'my1',
+                value: encodeData('value'),
+                lease: defaultLease,
+                metadata: new Uint8Array()
+            }),
+                sdk.db.tx.Create({
+                    creator: sdk.db.address,
+                    uuid,
+                    key: 'my2',
+                    value: encodeData('value'),
+                    lease: defaultLease,
+                    metadata: new Uint8Array()
+                })
+        }, {memo: ''});
+
+        expect(await sdk.db.q.MyKeys({address: sdk.db.address, uuid}).then(resp => resp.key)).to.deep.equal(['my1', 'my2']);
+
+        await sdk.db.tx.Rename({
+            creator: sdk.db.address,
+            key: 'my1',
+            newKey: 'myOne',
+            uuid
+        });
+
+        expect(await sdk.db.q.MyKeys({address: sdk.db.address, uuid}).then(resp => resp.key)).to.deep.equal(['my2', 'myOne']);
+    })
 })

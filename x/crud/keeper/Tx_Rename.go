@@ -31,6 +31,8 @@ func (k msgServer) Rename(goCtx context.Context, msg *types.MsgRename) (*types.M
 	}
 
 	k.RemoveCrudValue(&ctx, msg.Uuid, msg.Key)
+	k.DeleteLease(&ctx, msg.Uuid, msg.Key)
+	k.DeleteOwner(&ctx, msg.Creator, msg.Uuid, msg.Key)
 
 	return &types.MsgRenameResponse{}, nil
 }
