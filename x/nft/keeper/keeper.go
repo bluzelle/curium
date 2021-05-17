@@ -78,12 +78,16 @@ func (k Keeper) CheckIsNftAdmin(address string) error{
 	return nil
 }
 
-func (k Keeper) BroadcastRegisterBtPeer(ctx sdk.Context) {
+func (k Keeper) GetMyNodeId(ctx sdk.Context) string{
 	status, err := curium.GetStatus()
 	if err != nil {
 		k.Logger(ctx).Error("unable to get node id", err)
 	}
-	nodeId := status.NodeInfo.Id
+	return status.NodeInfo.Id
+}
+
+func (k Keeper) BroadcastRegisterBtPeer(ctx sdk.Context) {
+	nodeId := k.GetMyNodeId(ctx)
 
 	myIp, err := curium.MyRemoteIp()
 	if err != nil || myIp == "" {

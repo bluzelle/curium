@@ -21,5 +21,9 @@ func (k msgServer) RegisterPeer(goCtx context.Context, msg *types.MsgRegisterPee
 	peer.Port = msg.Port
 	store.Set([]byte(msg.Id), k.cdc.MustMarshalBinaryBare(&peer))
 
+	if k.GetMyNodeId(ctx) != msg.Id {
+		k.btClient.AddPeer(msg.Id, msg.Address, int(msg.Port))
+	}
+
 	return &types.MsgRegisterPeerResponse{}, nil
 }

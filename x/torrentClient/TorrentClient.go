@@ -84,12 +84,15 @@ func (tc *TorrentClient) SeedFile(meta *metainfo.MetaInfo) error {
 	return nil
 }
 
-func (tc *TorrentClient) AddPeer(ip string, port int) {
+func (tc *TorrentClient) AddPeer(id string, ip string, port int) {
 	b := &strings.Builder{}
 	b.WriteString(fmt.Sprintf("%s:%d", ip, port))
 
+
+	var arr [20]byte
+	copy(arr[:], id)
 	peerInfo := torrent.PeerInfo{
-		Id:                 [20]byte{},
+		Id:                 arr,
 		Addr:               b,
 		Source:             torrent.PeerSourceDirect,
 		SupportsEncryption: true,
