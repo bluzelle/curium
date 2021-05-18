@@ -203,10 +203,10 @@ exports.QueryKeysRequest = {
         return message;
     },
 };
-const baseQueryKeysResponse = { key: "" };
+const baseQueryKeysResponse = { keys: "" };
 exports.QueryKeysResponse = {
     encode(message, writer = minimal_1.default.Writer.create()) {
-        for (const v of message.key) {
+        for (const v of message.keys) {
             writer.uint32(10).string(v);
         }
         if (message.pagination !== undefined) {
@@ -218,12 +218,12 @@ exports.QueryKeysResponse = {
         const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseQueryKeysResponse };
-        message.key = [];
+        message.keys = [];
         while (reader.pos < end) {
             const tag = reader.uint32();
             switch (tag >>> 3) {
                 case 1:
-                    message.key.push(reader.string());
+                    message.keys.push(reader.string());
                     break;
                 case 2:
                     message.pagination = pagination_1.PageResponse.decode(reader, reader.uint32());
@@ -237,10 +237,10 @@ exports.QueryKeysResponse = {
     },
     fromJSON(object) {
         const message = { ...baseQueryKeysResponse };
-        message.key = [];
-        if (object.key !== undefined && object.key !== null) {
-            for (const e of object.key) {
-                message.key.push(String(e));
+        message.keys = [];
+        if (object.keys !== undefined && object.keys !== null) {
+            for (const e of object.keys) {
+                message.keys.push(String(e));
             }
         }
         if (object.pagination !== undefined && object.pagination !== null) {
@@ -253,11 +253,11 @@ exports.QueryKeysResponse = {
     },
     toJSON(message) {
         const obj = {};
-        if (message.key) {
-            obj.key = message.key.map((e) => e);
+        if (message.keys) {
+            obj.keys = message.keys.map((e) => e);
         }
         else {
-            obj.key = [];
+            obj.keys = [];
         }
         message.pagination !== undefined &&
             (obj.pagination = message.pagination
@@ -267,10 +267,10 @@ exports.QueryKeysResponse = {
     },
     fromPartial(object) {
         const message = { ...baseQueryKeysResponse };
-        message.key = [];
-        if (object.key !== undefined && object.key !== null) {
-            for (const e of object.key) {
-                message.key.push(e);
+        message.keys = [];
+        if (object.keys !== undefined && object.keys !== null) {
+            for (const e of object.keys) {
+                message.keys.push(e);
             }
         }
         if (object.pagination !== undefined && object.pagination !== null) {
@@ -374,10 +374,10 @@ exports.QueryMyKeysRequest = {
         return message;
     },
 };
-const baseQueryMyKeysResponse = { key: "" };
+const baseQueryMyKeysResponse = { keys: "" };
 exports.QueryMyKeysResponse = {
     encode(message, writer = minimal_1.default.Writer.create()) {
-        for (const v of message.key) {
+        for (const v of message.keys) {
             writer.uint32(10).string(v);
         }
         if (message.pagination !== undefined) {
@@ -389,12 +389,12 @@ exports.QueryMyKeysResponse = {
         const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseQueryMyKeysResponse };
-        message.key = [];
+        message.keys = [];
         while (reader.pos < end) {
             const tag = reader.uint32();
             switch (tag >>> 3) {
                 case 1:
-                    message.key.push(reader.string());
+                    message.keys.push(reader.string());
                     break;
                 case 2:
                     message.pagination = pagination_1.PageResponse.decode(reader, reader.uint32());
@@ -408,10 +408,10 @@ exports.QueryMyKeysResponse = {
     },
     fromJSON(object) {
         const message = { ...baseQueryMyKeysResponse };
-        message.key = [];
-        if (object.key !== undefined && object.key !== null) {
-            for (const e of object.key) {
-                message.key.push(String(e));
+        message.keys = [];
+        if (object.keys !== undefined && object.keys !== null) {
+            for (const e of object.keys) {
+                message.keys.push(String(e));
             }
         }
         if (object.pagination !== undefined && object.pagination !== null) {
@@ -424,11 +424,11 @@ exports.QueryMyKeysResponse = {
     },
     toJSON(message) {
         const obj = {};
-        if (message.key) {
-            obj.key = message.key.map((e) => e);
+        if (message.keys) {
+            obj.keys = message.keys.map((e) => e);
         }
         else {
-            obj.key = [];
+            obj.keys = [];
         }
         message.pagination !== undefined &&
             (obj.pagination = message.pagination
@@ -438,10 +438,10 @@ exports.QueryMyKeysResponse = {
     },
     fromPartial(object) {
         const message = { ...baseQueryMyKeysResponse };
-        message.key = [];
-        if (object.key !== undefined && object.key !== null) {
-            for (const e of object.key) {
-                message.key.push(e);
+        message.keys = [];
+        if (object.keys !== undefined && object.keys !== null) {
+            for (const e of object.keys) {
+                message.keys.push(e);
             }
         }
         if (object.pagination !== undefined && object.pagination !== null) {

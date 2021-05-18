@@ -15,7 +15,7 @@ export interface QueryKeysRequest {
     pagination?: PageRequest;
 }
 export interface QueryKeysResponse {
-    key: string[];
+    keys: string[];
     pagination?: PageResponse;
 }
 export interface QueryMyKeysRequest {
@@ -24,7 +24,7 @@ export interface QueryMyKeysRequest {
     pagination?: PageRequest;
 }
 export interface QueryMyKeysResponse {
-    key: string[];
+    keys: string[];
     pagination?: PageResponse;
 }
 export interface QueryCountRequest {

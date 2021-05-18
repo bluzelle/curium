@@ -24,7 +24,7 @@ describe('q.Keys()', function () {
     it('should return a empty list if there are no keys', async () => {
         expect(await sdk.db.q.Keys({
             uuid,
-        }).then(resp => resp.key)).to.have.length(0);
+        }).then(resp => resp.keys)).to.have.length(0);
     });
 
     it('should work with an empty value', async () => {
@@ -48,14 +48,14 @@ describe('q.Keys()', function () {
         }, {memo: ''})
         expect(await sdk.db.q.Keys({
             uuid
-        }).then(resp => resp.key)).to.deep.equal(['key3', 'key4']);
+        }).then(resp => resp.keys)).to.deep.equal(['key3', 'key4']);
     })
 
     it('should return a list of keys', async () => {
         const {keys} = await createKeys(sdk.db, 5, uuid);
         expect(await sdk.db.q.Keys({
             uuid
-        }).then(resp => resp.key)).to.deep.equal(keys);
+        }).then(resp => resp.keys)).to.deep.equal(keys);
     });
 
     it('should not see keys created by other users since its a query', async () => {
@@ -92,7 +92,7 @@ describe('q.Keys()', function () {
 
         expect(await sdk.db.q.Keys({
             uuid: otherUuid
-        }).then(resp => resp.key)).to.be.empty;
+        }).then(resp => resp.keys)).to.be.empty;
     });
 
     it('should pass back correct number of keys below pagination', async () => {
@@ -107,7 +107,7 @@ describe('q.Keys()', function () {
                 reverse: false
             }
         }).then(resp => {
-            expect(resp.key).to.have.length(keys.length - 1)
+            expect(resp.keys).to.have.length(keys.length - 1)
             expect(decodeData(resp.pagination?.nextKey || new Uint8Array())).to.equal(keys[99])
         })
 
@@ -121,7 +121,7 @@ describe('q.Keys()', function () {
                 reverse: false
             }
         }).then(resp => {
-            expect(resp.key).to.have.length(5)
+            expect(resp.keys).to.have.length(5)
             expect(decodeData(resp.pagination?.nextKey || new Uint8Array())).to.equal('key-16')
         })
     });
@@ -158,6 +158,6 @@ describe('q.Keys()', function () {
 
         expect(await sdk.db.q.Keys({
             uuid
-        }).then(resp => resp.key)).to.deep.equal(['key1', 'key3']);
+        }).then(resp => resp.keys)).to.deep.equal(['key1', 'key3']);
     });
 });

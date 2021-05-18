@@ -12,5 +12,5 @@ func (k Keeper) MyKeys(goCtx context.Context, req *types.QueryMyKeysRequest) (*t
 
 	keys, err := k.GetAllMyKeys(&ctx, req.Address, req.Uuid)
 
-	return &types.QueryMyKeysResponse{Key: keys}, err
+	return &types.QueryMyKeysResponse{Keys: keys}, err
 }
