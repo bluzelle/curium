@@ -40,12 +40,12 @@ message QueryReadResponse {
 
 message QueryKeysRequest {
 	string uuid = 1;
-	cosmos.base.query.v1beta1.PageRequest pagination = 2;
+	PagingRequest pagination = 2;
 }
 
 message QueryKeysResponse {
 	repeated string keys = 1;
-	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+	PagingResponse pagination = 2;
 }
 
 message QueryMyKeysRequest {
@@ -82,5 +82,16 @@ message QuerySearchResponse {
 	string searchString = 1;
 
 }
+
+message PagingRequest {
+	string startKey = 1;
+	uint64 limit = 2;
+}
+
+message PagingResponse {
+	string nextKey = 1;
+	uint64 total = 2;
+}
+
 
 
