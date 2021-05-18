@@ -18,12 +18,34 @@ import (
 	"time"
 )
 
-//const CONTRACT_ADDRESS = "0x4Fe0D5763cF500454E2b105f6AE8b9b66Ea4dD64"
-//const CONTRACT_ADDRESS = "0x55866CCc07b810d004c67B029BB5bc4b445D0201"
-//const CONTRACT_ADDRESS = "0xe6C18bFB430743C98920244a25cd64EeC584326C"
-//const CONTRACT_ADDRESS = "0x2a811c36C1fA9e071146e2A231c620e30EbF1Fd9"
-//const CONTRACT_ADDRESS = "0x001e89c476c717484dB772C56b9B36E37EF2795c"
-const CONTRACT_ADDRESS = "0xA2102C0a071917E2CaF6588AF95838b0DBb669Cd"
+type Network struct {
+	Contract string
+	Endpoints []string
+}
+
+var networks = map[string]Network{
+	"binance": {
+		Contract: "0xE8eE8e2D82A3966e0353CB11Ab6fcfE6F5b5C9dC",
+		Endpoints: []string{"https://data-seed-prebsc-1-s1.binance.org:8545"},
+	},
+	"ethereum": {
+		Contract: "0xEc2F7de297Fbfc20af848f6961c69028A583379c",
+		Endpoints: []string{"https://ropsten.infura.io/v3/bf3a81b958df4776bb0c7e49a11ecbed"},
+	},
+	"polygon": {
+		Contract: "0xC8Bf0705139bcF5dDf8638323b685Ef588422a66",
+		Endpoints: []string{"https://rpc-mumbai.matic.today"},
+	},
+	"fantom": {
+		Contract: "0x24Bf59C3C690eF9bB95839B5CcBB8b9c07728F35",
+		Endpoints: []string{"https://rpc.testnet.fantom.network"},
+	},
+	"tomochain": {
+		Contract: "0x01B2cFa79ab429554aE547275c70fFebAeEfe467",
+		Endpoints: []string{"https://rpc.testnet.tomochain.com"},
+	},
+
+}
 
 var doOnce sync.Once
 var currCtx sdk.Context
@@ -43,16 +65,14 @@ func StartSynchronizer(ctx sdk.Context, k keeper.Keeper) {
 }
 
 func runSynchronizer(k keeper.Keeper) {
-	sources := k.GetAllSource(currCtx)
-
-	for _, source := range sources {
-		data := fetchDataFromContract(k, source)
+	for  name, network := range networks {
+		data := fetchDataFromContract(k, name, network)
 		creator, err := getSyncUserAddress(k)
 
 		for _, item := range data {
 			value := types.SyncOperation{
 				Op:       item.Opt,
-				Uuid:     "binance-" + item.Uuid,
+				Uuid:     name + "-" + item.Uuid,
 				Key:      item.Key,
 				Value:    []byte(item.Value),
 				Bookmark: item.Bookmark.Uint64(),
@@ -72,14 +92,14 @@ func runSynchronizer(k keeper.Keeper) {
 	}
 }
 
-func fetchDataFromContract(k keeper.Keeper, source types.Source) []binance.BluzelleAdapterTransaction {
+func fetchDataFromContract(k keeper.Keeper, name string, network Network) []binance.BluzelleAdapterTransaction {
 	ethCtx := context.Background()
-	backend, err := eth.Dial(source.Url)
+	backend, err := eth.Dial(network.Endpoints[0])
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	addr := common.HexToAddress(CONTRACT_ADDRESS)
+	addr := common.HexToAddress(network.Contract)
 	ctr, err := binance.NewBluzelleAdapter(addr, backend)
 	if err != nil {
 		fmt.Println(err)
@@ -89,18 +109,18 @@ func fetchDataFromContract(k keeper.Keeper, source types.Source) []binance.Bluze
 	MAX_LOOPS := 1
 	for i := 0; i < MAX_LOOPS; i++ {
 		callOpts := &bind.CallOpts{Context: ethCtx, Pending: false}
-		start, err := readBookmark(k.KeyringDir)
+		start, err := readBookmark(k.KeyringDir, name)
 		if err != nil {
 			start = big.NewInt(0)
 		}
 
 		d, err := ctr.GetSynchronizerData(callOpts, start, big.NewInt(20))
 		data = append(data, d...)
-		fmt.Println("******************* Synchronizer **************************************************")
+		fmt.Println(fmt.Sprintf("******************* Synchronizer (%s) **************************************************\n", name))
 		fmt.Println("***** start=", start)
 
 		end := start.Add(start, big.NewInt(int64(len(d))))
-		saveBookmark(k.KeyringDir, end)
+		saveBookmark(k.KeyringDir, name, end)
 		fmt.Println("**** end=", end)
 		fmt.Println("**** d=", data)
 		fmt.Println("********************************************************************")
@@ -126,13 +146,13 @@ func getSyncUserAddress(k keeper.Keeper) (string, error) {
 // TODO: Lets just dump the bookmark into a file for now, but later we need to
 // incorporate this into the voting.
 
-func saveBookmark(dir string, data *big.Int) error {
-	err := os.WriteFile(dir+"/sync-bookmark", data.Bytes(), 0644)
+func saveBookmark(dir string, name string, data *big.Int) error {
+	err := os.WriteFile(dir+ "/" + name + "-sync-bookmark", data.Bytes(), 0644)
 	return err
 }
 
-func readBookmark(dir string) (*big.Int, error) {
-	data, err := os.ReadFile(dir + "/sync-bookmark")
+func readBookmark(dir string, name string) (*big.Int, error) {
+	data, err := os.ReadFile(dir + "/" + name + "-sync-bookmark")
 	if err != nil {
 		return nil, err
 	}
