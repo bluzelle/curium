@@ -3,9 +3,11 @@ package keeper
 import (
 	"bytes"
 	"fmt"
+
 	"github.com/bluzelle/curium/app/ante"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	"github.com/tendermint/tendermint/libs/log"
+	"sort"
 	"strconv"
 
 	"github.com/bluzelle/curium/x/crud/types"
@@ -43,7 +45,7 @@ func NewKeeper(
 	storeKey sdk.StoreKey,
 	memKey sdk.StoreKey,
 	mks MaxKeeperSizes,
-	// this line is used by starport scaffolding # ibc/keeper/parameter
+// this line is used by starport scaffolding # ibc/keeper/parameter
 ) *Keeper {
 	return &Keeper{
 		cdc:      cdc,
@@ -78,6 +80,32 @@ func (k Keeper) GetRemainingLeaseBlocks(ctx *sdk.Context, uuid string, key strin
 	crudValue := k.GetCrudValue(ctx, uuid, key)
 
 	return k.ConvertLeaseToBlocks(crudValue.Lease) + crudValue.Height - ctx.BlockHeight()
+}
+
+func (k Keeper) GetNShortestLeaseBlocks(ctx *sdk.Context, owner string, uuid string, num uint32) ([]*types.KeyLease, error) {
+
+	keys, _ := k.GetAllMyKeys(ctx, owner, uuid)
+
+	var keyLeases []*types.KeyLease
+
+	for i := range keys {
+
+		remainingBlocks := k.GetRemainingLeaseBlocks(ctx, uuid, keys[i])
+
+		curKeyLease := &types.KeyLease{
+			Key:         keys[i],
+			LeaseBlocks: remainingBlocks,
+		}
+
+		keyLeases = append(keyLeases, curKeyLease)
+	}
+
+	sort.Sort(types.KeyLeasesSortable(keyLeases))
+
+	if len(keyLeases) < int(num) {
+		return keyLeases, nil
+	}
+	return keyLeases[:num], nil
 }
 
 func (k Keeper) DeleteLease(ctx *sdk.Context, uuid string, key string) {

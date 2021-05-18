@@ -2,9 +2,18 @@ import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { PageRequest, PageResponse } from "../cosmos/base/query/v1beta1/pagination";
 import { Lease } from "../crud/lease";
-import { KeyValueLease, KeyValue } from "../crud/KeyValue";
+import { KeyLease, KeyValueLease, KeyValue } from "../crud/KeyValue";
 export declare const protobufPackage = "bluzelle.curium.crud";
 /** this line is used by starport scaffolding # proto/tx/message */
+export interface MsgGetNShortestLeases {
+    creator: string;
+    uuid: string;
+    num: number;
+}
+export interface MsgGetNShortestLeasesResponse {
+    uuid: string;
+    keyLeases: KeyLease[];
+}
 export interface MsgKeys {
     creator: string;
     uuid: string;
@@ -106,6 +115,20 @@ export interface MsgDelete {
 }
 export interface MsgDeleteResponse {
 }
+export declare const MsgGetNShortestLeases: {
+    encode(message: MsgGetNShortestLeases, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgGetNShortestLeases;
+    fromJSON(object: any): MsgGetNShortestLeases;
+    toJSON(message: MsgGetNShortestLeases): unknown;
+    fromPartial(object: DeepPartial<MsgGetNShortestLeases>): MsgGetNShortestLeases;
+};
+export declare const MsgGetNShortestLeasesResponse: {
+    encode(message: MsgGetNShortestLeasesResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgGetNShortestLeasesResponse;
+    fromJSON(object: any): MsgGetNShortestLeasesResponse;
+    toJSON(message: MsgGetNShortestLeasesResponse): unknown;
+    fromPartial(object: DeepPartial<MsgGetNShortestLeasesResponse>): MsgGetNShortestLeasesResponse;
+};
 export declare const MsgKeys: {
     encode(message: MsgKeys, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgKeys;
@@ -277,6 +300,7 @@ export declare const MsgDeleteResponse: {
 /** Msg defines the Msg service. */
 export interface Msg {
     /** this line is used by starport scaffolding # proto/tx/rpc */
+    GetNShortestLeases(request: MsgGetNShortestLeases): Promise<MsgGetNShortestLeasesResponse>;
     Keys(request: MsgKeys): Promise<MsgKeysResponse>;
     Rename(request: MsgRename): Promise<MsgRenameResponse>;
     MultiUpdate(request: MsgMultiUpdate): Promise<MsgMultiUpdateResponse>;
@@ -293,6 +317,7 @@ export interface Msg {
 export declare class MsgClientImpl implements Msg {
     private readonly rpc;
     constructor(rpc: Rpc);
+    GetNShortestLeases(request: MsgGetNShortestLeases): Promise<MsgGetNShortestLeasesResponse>;
     Keys(request: MsgKeys): Promise<MsgKeysResponse>;
     Rename(request: MsgRename): Promise<MsgRenameResponse>;
     MultiUpdate(request: MsgMultiUpdate): Promise<MsgMultiUpdateResponse>;

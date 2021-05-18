@@ -10,6 +10,7 @@ import "cosmos/base/query/v1beta1/pagination.proto";
 // Msg defines the Msg service.
 service Msg {
     // this line is used by starport scaffolding # proto/tx/rpc
+  rpc GetNShortestLeases(MsgGetNShortestLeases) returns (MsgGetNShortestLeasesResponse);
   rpc Keys(MsgKeys) returns (MsgKeysResponse);
   rpc Rename(MsgRename) returns (MsgRenameResponse);
   rpc MultiUpdate(MsgMultiUpdate) returns (MsgMultiUpdateResponse);
@@ -25,6 +26,18 @@ service Msg {
 }
 
 // this line is used by starport scaffolding # proto/tx/message
+message MsgGetNShortestLeases {
+  string creator = 1;
+  string uuid = 2;
+  uint32 num = 3;
+}
+
+message MsgGetNShortestLeasesResponse {
+  string uuid = 1;
+  repeated KeyLease keyLeases = 2;
+
+}
+
 message MsgKeys {
   string creator = 1;
   string uuid = 2;

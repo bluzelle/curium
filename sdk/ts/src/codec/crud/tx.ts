@@ -6,11 +6,22 @@ import {
   PageResponse,
 } from "../cosmos/base/query/v1beta1/pagination";
 import { Lease } from "../crud/lease";
-import { KeyValueLease, KeyValue } from "../crud/KeyValue";
+import { KeyLease, KeyValueLease, KeyValue } from "../crud/KeyValue";
 
 export const protobufPackage = "bluzelle.curium.crud";
 
 /** this line is used by starport scaffolding # proto/tx/message */
+export interface MsgGetNShortestLeases {
+  creator: string;
+  uuid: string;
+  num: number;
+}
+
+export interface MsgGetNShortestLeasesResponse {
+  uuid: string;
+  keyLeases: KeyLease[];
+}
+
 export interface MsgKeys {
   creator: string;
   uuid: string;
@@ -128,6 +139,198 @@ export interface MsgDelete {
 }
 
 export interface MsgDeleteResponse {}
+
+const baseMsgGetNShortestLeases: object = { creator: "", uuid: "", num: 0 };
+
+export const MsgGetNShortestLeases = {
+  encode(
+    message: MsgGetNShortestLeases,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.uuid !== "") {
+      writer.uint32(18).string(message.uuid);
+    }
+    if (message.num !== 0) {
+      writer.uint32(24).uint32(message.num);
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): MsgGetNShortestLeases {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgGetNShortestLeases } as MsgGetNShortestLeases;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.uuid = reader.string();
+          break;
+        case 3:
+          message.num = reader.uint32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgGetNShortestLeases {
+    const message = { ...baseMsgGetNShortestLeases } as MsgGetNShortestLeases;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.num !== undefined && object.num !== null) {
+      message.num = Number(object.num);
+    } else {
+      message.num = 0;
+    }
+    return message;
+  },
+
+  toJSON(message: MsgGetNShortestLeases): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    message.num !== undefined && (obj.num = message.num);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<MsgGetNShortestLeases>
+  ): MsgGetNShortestLeases {
+    const message = { ...baseMsgGetNShortestLeases } as MsgGetNShortestLeases;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.num !== undefined && object.num !== null) {
+      message.num = object.num;
+    } else {
+      message.num = 0;
+    }
+    return message;
+  },
+};
+
+const baseMsgGetNShortestLeasesResponse: object = { uuid: "" };
+
+export const MsgGetNShortestLeasesResponse = {
+  encode(
+    message: MsgGetNShortestLeasesResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.uuid !== "") {
+      writer.uint32(10).string(message.uuid);
+    }
+    for (const v of message.keyLeases) {
+      KeyLease.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): MsgGetNShortestLeasesResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseMsgGetNShortestLeasesResponse,
+    } as MsgGetNShortestLeasesResponse;
+    message.keyLeases = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.uuid = reader.string();
+          break;
+        case 2:
+          message.keyLeases.push(KeyLease.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgGetNShortestLeasesResponse {
+    const message = {
+      ...baseMsgGetNShortestLeasesResponse,
+    } as MsgGetNShortestLeasesResponse;
+    message.keyLeases = [];
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.keyLeases !== undefined && object.keyLeases !== null) {
+      for (const e of object.keyLeases) {
+        message.keyLeases.push(KeyLease.fromJSON(e));
+      }
+    }
+    return message;
+  },
+
+  toJSON(message: MsgGetNShortestLeasesResponse): unknown {
+    const obj: any = {};
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    if (message.keyLeases) {
+      obj.keyLeases = message.keyLeases.map((e) =>
+        e ? KeyLease.toJSON(e) : undefined
+      );
+    } else {
+      obj.keyLeases = [];
+    }
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<MsgGetNShortestLeasesResponse>
+  ): MsgGetNShortestLeasesResponse {
+    const message = {
+      ...baseMsgGetNShortestLeasesResponse,
+    } as MsgGetNShortestLeasesResponse;
+    message.keyLeases = [];
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.keyLeases !== undefined && object.keyLeases !== null) {
+      for (const e of object.keyLeases) {
+        message.keyLeases.push(KeyLease.fromPartial(e));
+      }
+    }
+    return message;
+  },
+};
 
 const baseMsgKeys: object = { creator: "", uuid: "" };
 
@@ -2089,6 +2292,9 @@ export const MsgDeleteResponse = {
 /** Msg defines the Msg service. */
 export interface Msg {
   /** this line is used by starport scaffolding # proto/tx/rpc */
+  GetNShortestLeases(
+    request: MsgGetNShortestLeases
+  ): Promise<MsgGetNShortestLeasesResponse>;
   Keys(request: MsgKeys): Promise<MsgKeysResponse>;
   Rename(request: MsgRename): Promise<MsgRenameResponse>;
   MultiUpdate(request: MsgMultiUpdate): Promise<MsgMultiUpdateResponse>;
@@ -2108,6 +2314,20 @@ export class MsgClientImpl implements Msg {
   constructor(rpc: Rpc) {
     this.rpc = rpc;
   }
+  GetNShortestLeases(
+    request: MsgGetNShortestLeases
+  ): Promise<MsgGetNShortestLeasesResponse> {
+    const data = MsgGetNShortestLeases.encode(request).finish();
+    const promise = this.rpc.request(
+      "bluzelle.curium.crud.Msg",
+      "GetNShortestLeases",
+      data
+    );
+    return promise.then((data) =>
+      MsgGetNShortestLeasesResponse.decode(new _m0.Reader(data))
+    );
+  }
+
   Keys(request: MsgKeys): Promise<MsgKeysResponse> {
     const data = MsgKeys.encode(request).finish();
     const promise = this.rpc.request("bluzelle.curium.crud.Msg", "Keys", data);

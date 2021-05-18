@@ -16,6 +16,11 @@ export interface KeyValueLease {
   lease?: Lease;
 }
 
+export interface KeyLease {
+  key: string;
+  leaseBlocks: Long;
+}
+
 const baseKeyValue: object = { key: "" };
 
 export const KeyValue = {
@@ -185,6 +190,82 @@ export const KeyValueLease = {
       message.lease = Lease.fromPartial(object.lease);
     } else {
       message.lease = undefined;
+    }
+    return message;
+  },
+};
+
+const baseKeyLease: object = { key: "", leaseBlocks: Long.ZERO };
+
+export const KeyLease = {
+  encode(
+    message: KeyLease,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key);
+    }
+    if (!message.leaseBlocks.isZero()) {
+      writer.uint32(16).int64(message.leaseBlocks);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): KeyLease {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseKeyLease } as KeyLease;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.key = reader.string();
+          break;
+        case 2:
+          message.leaseBlocks = reader.int64() as Long;
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): KeyLease {
+    const message = { ...baseKeyLease } as KeyLease;
+    if (object.key !== undefined && object.key !== null) {
+      message.key = String(object.key);
+    } else {
+      message.key = "";
+    }
+    if (object.leaseBlocks !== undefined && object.leaseBlocks !== null) {
+      message.leaseBlocks = Long.fromString(object.leaseBlocks);
+    } else {
+      message.leaseBlocks = Long.ZERO;
+    }
+    return message;
+  },
+
+  toJSON(message: KeyLease): unknown {
+    const obj: any = {};
+    message.key !== undefined && (obj.key = message.key);
+    message.leaseBlocks !== undefined &&
+      (obj.leaseBlocks = (message.leaseBlocks || Long.ZERO).toString());
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<KeyLease>): KeyLease {
+    const message = { ...baseKeyLease } as KeyLease;
+    if (object.key !== undefined && object.key !== null) {
+      message.key = object.key;
+    } else {
+      message.key = "";
+    }
+    if (object.leaseBlocks !== undefined && object.leaseBlocks !== null) {
+      message.leaseBlocks = object.leaseBlocks as Long;
+    } else {
+      message.leaseBlocks = Long.ZERO;
     }
     return message;
   },

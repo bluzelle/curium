@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.KeyValueLease = exports.KeyValue = exports.protobufPackage = void 0;
+exports.KeyLease = exports.KeyValueLease = exports.KeyValue = exports.protobufPackage = void 0;
 /* eslint-disable */
 const long_1 = __importDefault(require("long"));
 const minimal_1 = __importDefault(require("protobufjs/minimal"));
@@ -165,6 +165,77 @@ exports.KeyValueLease = {
         }
         else {
             message.lease = undefined;
+        }
+        return message;
+    },
+};
+const baseKeyLease = { key: "", leaseBlocks: long_1.default.ZERO };
+exports.KeyLease = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        if (message.key !== "") {
+            writer.uint32(10).string(message.key);
+        }
+        if (!message.leaseBlocks.isZero()) {
+            writer.uint32(16).int64(message.leaseBlocks);
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = { ...baseKeyLease };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.key = reader.string();
+                    break;
+                case 2:
+                    message.leaseBlocks = reader.int64();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = { ...baseKeyLease };
+        if (object.key !== undefined && object.key !== null) {
+            message.key = String(object.key);
+        }
+        else {
+            message.key = "";
+        }
+        if (object.leaseBlocks !== undefined && object.leaseBlocks !== null) {
+            message.leaseBlocks = long_1.default.fromString(object.leaseBlocks);
+        }
+        else {
+            message.leaseBlocks = long_1.default.ZERO;
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.key !== undefined && (obj.key = message.key);
+        message.leaseBlocks !== undefined &&
+            (obj.leaseBlocks = (message.leaseBlocks || long_1.default.ZERO).toString());
+        return obj;
+    },
+    fromPartial(object) {
+        const message = { ...baseKeyLease };
+        if (object.key !== undefined && object.key !== null) {
+            message.key = object.key;
+        }
+        else {
+            message.key = "";
+        }
+        if (object.leaseBlocks !== undefined && object.leaseBlocks !== null) {
+            message.leaseBlocks = object.leaseBlocks;
+        }
+        else {
+            message.leaseBlocks = long_1.default.ZERO;
         }
         return message;
     },
