@@ -1,10 +1,18 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { PageRequest, PageResponse } from "../cosmos/base/query/v1beta1/pagination";
 import { Lease } from "../crud/lease";
+import { PageRequest, PageResponse } from "../cosmos/base/query/v1beta1/pagination";
 import { KeyLease, KeyValueLease, KeyValue } from "../crud/KeyValue";
 export declare const protobufPackage = "bluzelle.curium.crud";
 /** this line is used by starport scaffolding # proto/tx/message */
+export interface MsgRenewLease {
+    creator: string;
+    uuid: string;
+    key: string;
+    lease?: Lease;
+}
+export interface MsgRenewLeaseResponse {
+}
 export interface MsgGetNShortestLeases {
     creator: string;
     uuid: string;
@@ -115,6 +123,20 @@ export interface MsgDelete {
 }
 export interface MsgDeleteResponse {
 }
+export declare const MsgRenewLease: {
+    encode(message: MsgRenewLease, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgRenewLease;
+    fromJSON(object: any): MsgRenewLease;
+    toJSON(message: MsgRenewLease): unknown;
+    fromPartial(object: DeepPartial<MsgRenewLease>): MsgRenewLease;
+};
+export declare const MsgRenewLeaseResponse: {
+    encode(_: MsgRenewLeaseResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgRenewLeaseResponse;
+    fromJSON(_: any): MsgRenewLeaseResponse;
+    toJSON(_: MsgRenewLeaseResponse): unknown;
+    fromPartial(_: DeepPartial<MsgRenewLeaseResponse>): MsgRenewLeaseResponse;
+};
 export declare const MsgGetNShortestLeases: {
     encode(message: MsgGetNShortestLeases, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgGetNShortestLeases;
@@ -300,6 +322,7 @@ export declare const MsgDeleteResponse: {
 /** Msg defines the Msg service. */
 export interface Msg {
     /** this line is used by starport scaffolding # proto/tx/rpc */
+    RenewLease(request: MsgRenewLease): Promise<MsgRenewLeaseResponse>;
     GetNShortestLeases(request: MsgGetNShortestLeases): Promise<MsgGetNShortestLeasesResponse>;
     Keys(request: MsgKeys): Promise<MsgKeysResponse>;
     Rename(request: MsgRename): Promise<MsgRenameResponse>;
@@ -317,6 +340,7 @@ export interface Msg {
 export declare class MsgClientImpl implements Msg {
     private readonly rpc;
     constructor(rpc: Rpc);
+    RenewLease(request: MsgRenewLease): Promise<MsgRenewLeaseResponse>;
     GetNShortestLeases(request: MsgGetNShortestLeases): Promise<MsgGetNShortestLeasesResponse>;
     Keys(request: MsgKeys): Promise<MsgKeysResponse>;
     Rename(request: MsgRename): Promise<MsgRenameResponse>;

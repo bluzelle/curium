@@ -45,7 +45,7 @@ func NewKeeper(
 	storeKey sdk.StoreKey,
 	memKey sdk.StoreKey,
 	mks MaxKeeperSizes,
-// this line is used by starport scaffolding # ibc/keeper/parameter
+	// this line is used by starport scaffolding # ibc/keeper/parameter
 ) *Keeper {
 	return &Keeper{
 		cdc:      cdc,

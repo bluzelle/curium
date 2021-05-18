@@ -1,16 +1,25 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
+import { Lease } from "../crud/lease";
 import {
   PageRequest,
   PageResponse,
 } from "../cosmos/base/query/v1beta1/pagination";
-import { Lease } from "../crud/lease";
 import { KeyLease, KeyValueLease, KeyValue } from "../crud/KeyValue";
 
 export const protobufPackage = "bluzelle.curium.crud";
 
 /** this line is used by starport scaffolding # proto/tx/message */
+export interface MsgRenewLease {
+  creator: string;
+  uuid: string;
+  key: string;
+  lease?: Lease;
+}
+
+export interface MsgRenewLeaseResponse {}
+
 export interface MsgGetNShortestLeases {
   creator: string;
   uuid: string;
@@ -139,6 +148,160 @@ export interface MsgDelete {
 }
 
 export interface MsgDeleteResponse {}
+
+const baseMsgRenewLease: object = { creator: "", uuid: "", key: "" };
+
+export const MsgRenewLease = {
+  encode(
+    message: MsgRenewLease,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.uuid !== "") {
+      writer.uint32(18).string(message.uuid);
+    }
+    if (message.key !== "") {
+      writer.uint32(26).string(message.key);
+    }
+    if (message.lease !== undefined) {
+      Lease.encode(message.lease, writer.uint32(34).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgRenewLease {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgRenewLease } as MsgRenewLease;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.uuid = reader.string();
+          break;
+        case 3:
+          message.key = reader.string();
+          break;
+        case 4:
+          message.lease = Lease.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgRenewLease {
+    const message = { ...baseMsgRenewLease } as MsgRenewLease;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = String(object.key);
+    } else {
+      message.key = "";
+    }
+    if (object.lease !== undefined && object.lease !== null) {
+      message.lease = Lease.fromJSON(object.lease);
+    } else {
+      message.lease = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: MsgRenewLease): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    message.key !== undefined && (obj.key = message.key);
+    message.lease !== undefined &&
+      (obj.lease = message.lease ? Lease.toJSON(message.lease) : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgRenewLease>): MsgRenewLease {
+    const message = { ...baseMsgRenewLease } as MsgRenewLease;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = object.key;
+    } else {
+      message.key = "";
+    }
+    if (object.lease !== undefined && object.lease !== null) {
+      message.lease = Lease.fromPartial(object.lease);
+    } else {
+      message.lease = undefined;
+    }
+    return message;
+  },
+};
+
+const baseMsgRenewLeaseResponse: object = {};
+
+export const MsgRenewLeaseResponse = {
+  encode(
+    _: MsgRenewLeaseResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): MsgRenewLeaseResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgRenewLeaseResponse } as MsgRenewLeaseResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgRenewLeaseResponse {
+    const message = { ...baseMsgRenewLeaseResponse } as MsgRenewLeaseResponse;
+    return message;
+  },
+
+  toJSON(_: MsgRenewLeaseResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(_: DeepPartial<MsgRenewLeaseResponse>): MsgRenewLeaseResponse {
+    const message = { ...baseMsgRenewLeaseResponse } as MsgRenewLeaseResponse;
+    return message;
+  },
+};
 
 const baseMsgGetNShortestLeases: object = { creator: "", uuid: "", num: 0 };
 
@@ -2292,6 +2455,7 @@ export const MsgDeleteResponse = {
 /** Msg defines the Msg service. */
 export interface Msg {
   /** this line is used by starport scaffolding # proto/tx/rpc */
+  RenewLease(request: MsgRenewLease): Promise<MsgRenewLeaseResponse>;
   GetNShortestLeases(
     request: MsgGetNShortestLeases
   ): Promise<MsgGetNShortestLeasesResponse>;
@@ -2314,6 +2478,18 @@ export class MsgClientImpl implements Msg {
   constructor(rpc: Rpc) {
     this.rpc = rpc;
   }
+  RenewLease(request: MsgRenewLease): Promise<MsgRenewLeaseResponse> {
+    const data = MsgRenewLease.encode(request).finish();
+    const promise = this.rpc.request(
+      "bluzelle.curium.crud.Msg",
+      "RenewLease",
+      data
+    );
+    return promise.then((data) =>
+      MsgRenewLeaseResponse.decode(new _m0.Reader(data))
+    );
+  }
+
   GetNShortestLeases(
     request: MsgGetNShortestLeases
   ): Promise<MsgGetNShortestLeasesResponse> {
