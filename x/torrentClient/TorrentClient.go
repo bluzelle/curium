@@ -26,7 +26,8 @@ func NewTorrentClient(dataDir string, port int) (*TorrentClient, error) {
 	config.ListenPort = port
 	config.DisableIPv6 = true
 	config.Seed = true
-
+	config.DropDuplicatePeerIds = true
+	config.DropMutuallyCompletePeers = true
 	cl, err := torrent.NewClient(config)
 	if err != nil {
 		return nil, err

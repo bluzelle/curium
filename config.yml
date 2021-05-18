@@ -14,7 +14,6 @@ init:
   app:
     "minimum-gas-prices": "0.002ubnt"
     "api.address": "tcp://0.0.0.0:1317"
-    "api.rpc-max-body-bytes": 200000000
     "pruning": "nothing"
     "bluzelle_crud": true
     "nft-p2p-port": 5500

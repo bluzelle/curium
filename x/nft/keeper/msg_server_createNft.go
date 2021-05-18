@@ -29,13 +29,23 @@ func (k msgServer) CreateNft(goCtx context.Context, msg *types.MsgCreateNft) (*t
 		return nil, sdkerrors.New("nft", 2, fmt.Sprintf("unable to move nft files: %s", msg.Hash))
 	}
 	
-	metainfo, err := k.btClient.TorrentFromFile(msg.Hash)
 
-	k.seedFile(ctx, metainfo)
 
 	if _, err := os.Stat(k.homeDir+"/nft/" + msg.Hash); err == nil {
+		metainfo, err := k.btClient.TorrentFromFile(msg.Hash)
+		if err != nil {
+			return nil, sdkerrors.New("nft", 2, fmt.Sprintf("unable to create torrent for file", msg.Hash))
+		}
+		err = k.seedFile(ctx, metainfo)
+		if err != nil {
+			return nil, sdkerrors.New("nft", 2, fmt.Sprintf("unable to seed file: %s", msg.Hash))
+		}
+
 		go func() {
-			k.broadcastPublishFile(ctx, msg.Id, msg.Hash, metainfo)
+			err = k.broadcastPublishFile(ctx, msg.Id, msg.Hash, metainfo)
+			if err != nil {
+				k.Logger(ctx).Error("error broadcasting publish nft file", "err", err.Error())
+			}
 		}()
 	}
 
