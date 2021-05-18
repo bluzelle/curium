@@ -364,11 +364,11 @@ func New(
 		appCodec,
 		keys[nfttypes.StoreKey],
 		keys[nfttypes.MemStoreKey],
-		DefaultNodeHome + "/" + appOpts.Get("nft-file-dir").(string),
+		appOpts.Get(flags.FlagHome).(string) + "/" + appOpts.Get("nft-file-dir").(string),
 		int(appOpts.Get("nft-p2p-port").(int64)),
 		msgBroadcaster,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
-		curium.NewKeyRingReader(DefaultNodeHome),
+		curium.NewKeyRingReader(appOpts.Get(flags.FlagHome).(string)),
 		&app.curiumKeeper,
 	)
 

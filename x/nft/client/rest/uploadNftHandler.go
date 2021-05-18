@@ -1,8 +1,10 @@
 package rest
 
 import (
+	"fmt"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/types/rest"
+	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/gorilla/mux"
 	"io"
 	"net/http"
@@ -17,7 +19,13 @@ func uploadNftHandler(clientCtx client.Context) http.HandlerFunc {
 		uploadPath := clientCtx.HomeDir + "/nft-upload"
 		os.MkdirAll(uploadPath, os.ModePerm)
 
-		fileWriter, err := os.Create(uploadPath + "/" + hash + "-" + chunkNum)
+		chunkInt, ok := math.ParseUint64(chunkNum)
+		if !ok {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, "unable to read chunk number")
+			return
+		}
+		filename := fmt.Sprintf("%s/%s-%04d", uploadPath, hash, chunkInt)
+		fileWriter, err := os.Create(filename)
 		defer fileWriter.Close()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
