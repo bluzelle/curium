@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.QueryClientImpl = exports.QueryHasResponse = exports.QueryHasRequest = exports.QueryCountResponse = exports.QueryCountRequest = exports.QueryMyKeysResponse = exports.QueryMyKeysRequest = exports.QueryKeysResponse = exports.QueryKeysRequest = exports.QueryReadResponse = exports.QueryReadRequest = exports.protobufPackage = void 0;
+exports.QueryClientImpl = exports.QuerySearchResponse = exports.QueryHasResponse = exports.QueryHasRequest = exports.QueryCountResponse = exports.QueryCountRequest = exports.QueryMyKeysResponse = exports.QueryMyKeysRequest = exports.QueryKeysResponse = exports.QueryKeysRequest = exports.QueryReadResponse = exports.QueryReadRequest = exports.protobufPackage = void 0;
 /* eslint-disable */
 const long_1 = __importDefault(require("long"));
 const minimal_1 = __importDefault(require("protobufjs/minimal"));
@@ -711,6 +711,58 @@ exports.QueryHasResponse = {
         }
         else {
             message.has = false;
+        }
+        return message;
+    },
+};
+const baseQuerySearchResponse = { searchString: "" };
+exports.QuerySearchResponse = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        if (message.searchString !== "") {
+            writer.uint32(10).string(message.searchString);
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = { ...baseQuerySearchResponse };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.searchString = reader.string();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = { ...baseQuerySearchResponse };
+        if (object.searchString !== undefined && object.searchString !== null) {
+            message.searchString = String(object.searchString);
+        }
+        else {
+            message.searchString = "";
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.searchString !== undefined &&
+            (obj.searchString = message.searchString);
+        return obj;
+    },
+    fromPartial(object) {
+        const message = { ...baseQuerySearchResponse };
+        if (object.searchString !== undefined && object.searchString !== null) {
+            message.searchString = object.searchString;
+        }
+        else {
+            message.searchString = "";
         }
         return message;
     },

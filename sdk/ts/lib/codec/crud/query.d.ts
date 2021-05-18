@@ -42,6 +42,9 @@ export interface QueryHasRequest {
 export interface QueryHasResponse {
     has: boolean;
 }
+export interface QuerySearchResponse {
+    searchString: string;
+}
 export declare const QueryReadRequest: {
     encode(message: QueryReadRequest, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryReadRequest;
@@ -111,6 +114,13 @@ export declare const QueryHasResponse: {
     fromJSON(object: any): QueryHasResponse;
     toJSON(message: QueryHasResponse): unknown;
     fromPartial(object: DeepPartial<QueryHasResponse>): QueryHasResponse;
+};
+export declare const QuerySearchResponse: {
+    encode(message: QuerySearchResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QuerySearchResponse;
+    fromJSON(object: any): QuerySearchResponse;
+    toJSON(message: QuerySearchResponse): unknown;
+    fromPartial(object: DeepPartial<QuerySearchResponse>): QuerySearchResponse;
 };
 /** Query defines the gRPC querier service. */
 export interface Query {

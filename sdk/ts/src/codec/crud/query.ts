@@ -58,6 +58,10 @@ export interface QueryHasResponse {
   has: boolean;
 }
 
+export interface QuerySearchResponse {
+  searchString: string;
+}
+
 const baseQueryReadRequest: object = { uuid: "", key: "" };
 
 export const QueryReadRequest = {
@@ -822,6 +826,65 @@ export const QueryHasResponse = {
       message.has = object.has;
     } else {
       message.has = false;
+    }
+    return message;
+  },
+};
+
+const baseQuerySearchResponse: object = { searchString: "" };
+
+export const QuerySearchResponse = {
+  encode(
+    message: QuerySearchResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.searchString !== "") {
+      writer.uint32(10).string(message.searchString);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QuerySearchResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQuerySearchResponse } as QuerySearchResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.searchString = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QuerySearchResponse {
+    const message = { ...baseQuerySearchResponse } as QuerySearchResponse;
+    if (object.searchString !== undefined && object.searchString !== null) {
+      message.searchString = String(object.searchString);
+    } else {
+      message.searchString = "";
+    }
+    return message;
+  },
+
+  toJSON(message: QuerySearchResponse): unknown {
+    const obj: any = {};
+    message.searchString !== undefined &&
+      (obj.searchString = message.searchString);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<QuerySearchResponse>): QuerySearchResponse {
+    const message = { ...baseQuerySearchResponse } as QuerySearchResponse;
+    if (object.searchString !== undefined && object.searchString !== null) {
+      message.searchString = object.searchString;
+    } else {
+      message.searchString = "";
     }
     return message;
   },

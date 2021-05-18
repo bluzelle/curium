@@ -49,8 +49,3 @@ genesis:
         min_deposit:
           - amount: "10000000"
             denom: "ubnt"
-    synchronizer:
-      sourceList:
-        - creator: "config.yml"
-          name: "binance"
-          url: "https://data-seed-prebsc-1-s1.binance.org:8545"

@@ -20,7 +20,6 @@ const uploadNft = (nft) => (params, data) => {
     return node_fetch_1.default(`${nft.url.replace('26657', '1317')}/nft/upload/${hash}`, {
         method: 'POST',
         body: data,
-        mode: 'cors'
     })
         .then(() => nft.tx.CreateNft({
         id: hash,

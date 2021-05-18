@@ -24,7 +24,6 @@ const uploadNft = (nft: NftSdk) => (params: UploadNFTParams, data: Uint8Array): 
     return fetch(`${nft.url.replace('26657', '1317')}/nft/upload/${hash}`, {
         method: 'POST',
         body: data,
-        mode: 'cors'
     })
         .then(() => nft.tx.CreateNft({
             id: hash,

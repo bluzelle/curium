@@ -35,7 +35,7 @@ export interface PageRequest {
      * is set.
      */
     countTotal: boolean;
-    /** reverse is set to true indicates that, results to be returned in the descending order. */
+    /** reverse is set to true if results are to be returned in the descending order. */
     reverse: boolean;
 }
 /**
