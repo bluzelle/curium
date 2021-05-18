@@ -2,6 +2,7 @@ import {DEFAULT_TIMEOUT, defaultGasParams, sentryWithClient} from "../../helpers
 import {expect} from "chai";
 import {BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
 import {encodeData, getSdk, zeroLease} from "../../helpers/client-helpers/sdk-helpers";
+import {useChaiAsPromised} from "testing/lib/globalHelpers";
 
 describe('renewLease', function () {
     this.timeout(DEFAULT_TIMEOUT);
@@ -11,6 +12,7 @@ describe('renewLease', function () {
     let creator: string;
 
     beforeEach(async () => {
+        useChaiAsPromised();
         sdk = await getSdk();
         uuid = Date.now().toString();
         creator = sdk.db.address;
@@ -71,5 +73,14 @@ describe('renewLease', function () {
             key: 'key'
         }).then(resp => resp.leaseBlocks.toInt() * 5.5)).to.be.closeTo(100, 12);
     });
+
+    it('should throw an error when trying to renew a non-existent lease', () => {
+        return expect(sdk.db.tx.RenewLease({
+            creator,
+            uuid,
+            key: 'key',
+            lease: {...zeroLease, seconds: 100}
+        })).to.be.rejectedWith(/key not found/)
+    })
     // ... fee charges, etc.
 });

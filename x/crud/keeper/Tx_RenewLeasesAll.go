@@ -9,6 +9,8 @@ import (
 func (k msgServer) RenewLeasesAll(goCtx context.Context, msg *types.MsgRenewLeasesAll) (*types.MsgRenewLeasesAllResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	k.OwnsUuid(&ctx, msg.Uuid, msg.Creator)
+
 	keys, _ := k.GetAllMyKeys(&ctx, msg.Creator, msg.Uuid)
 
 	for i:= range keys {
@@ -19,7 +21,12 @@ func (k msgServer) RenewLeasesAll(goCtx context.Context, msg *types.MsgRenewLeas
 			msg.Lease,
 			)
 
-		k.RenewLease(goCtx, renewLeaseRequest)
+		_, err := k.RenewLease(goCtx, renewLeaseRequest)
+
+		if err != nil {
+			return nil, err
+		}
+
 
 	}
 

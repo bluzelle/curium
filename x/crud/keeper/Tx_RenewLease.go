@@ -2,14 +2,18 @@ package keeper
 
 import (
 	"context"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-
+	"fmt"
 	"github.com/bluzelle/curium/x/crud/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 func (k msgServer) RenewLease(goCtx context.Context, msg *types.MsgRenewLease) (*types.MsgRenewLeaseResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	if !k.HasCrudValue(&ctx, msg.Uuid, msg.Key) {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %s doesn't exist", msg.Key))
+	}
 
 	if !k.OwnsUuid(&ctx, msg.Uuid, msg.Creator) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner of uuid")
