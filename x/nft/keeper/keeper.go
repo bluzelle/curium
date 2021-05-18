@@ -9,6 +9,7 @@ import (
 
 	"github.com/tendermint/tendermint/libs/log"
 
+	curiumkeeper "github.com/bluzelle/curium/x/curium/keeper"
 	"github.com/bluzelle/curium/x/nft/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -26,6 +27,7 @@ type (
 		msgBroadcaster curium.MsgBroadcaster
 		homeDir string
 		keyringReader *curium.KeyRingReader
+		curiumKeeper *curiumkeeper.Keeper
 		// this line is used by starport scaffolding # ibc/keeper/attribute
 	}
 )
@@ -39,6 +41,7 @@ func NewKeeper(
 	msgBroadcaster curium.MsgBroadcaster,
 	homeDir string,
 	keyringReader *curium.KeyRingReader,
+	curiumKeeper *curiumkeeper.Keeper,
 	// this line is used by starport scaffolding # ibc/keeper/parameter
 ) *Keeper {
 	btClient, err := torrentClient.NewTorrentClient(btDirectory, btPort)
@@ -55,6 +58,7 @@ func NewKeeper(
 		msgBroadcaster: msgBroadcaster,
 		homeDir: homeDir,
 		keyringReader: keyringReader,
+		curiumKeeper: curiumKeeper,
 		// this line is used by starport scaffolding # ibc/keeper/return
 	}
 }
@@ -79,7 +83,7 @@ func (k Keeper) CheckIsNftAdmin(address string) error{
 }
 
 func (k Keeper) GetMyNodeId(ctx sdk.Context) string{
-	status, err := curium.GetStatus()
+	status, err := k.curiumKeeper.GetStatus()
 	if err != nil {
 		k.Logger(ctx).Error("unable to get node id", err)
 	}
@@ -89,7 +93,7 @@ func (k Keeper) GetMyNodeId(ctx sdk.Context) string{
 func (k Keeper) BroadcastRegisterBtPeer(ctx sdk.Context) {
 	nodeId := k.GetMyNodeId(ctx)
 
-	myIp, err := curium.MyRemoteIp()
+	myIp, err := k.curiumKeeper.MyRemoteIp()
 	if err != nil || myIp == "" {
 		k.Logger(ctx).Error("unable to get my ip", err)
 	}
@@ -108,7 +112,9 @@ func (k Keeper) BroadcastRegisterBtPeer(ctx sdk.Context) {
 	if err != nil {
 		k.Logger(ctx).Error("unable to broadcast register peer message")
 	}
-	fmt.Println(result)
+	if result != nil {
+		fmt.Println(result)
+	}
 }
 
 

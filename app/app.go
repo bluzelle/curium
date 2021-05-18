@@ -350,7 +350,10 @@ func New(
 	app.EvidenceKeeper = *evidenceKeeper
 
 	app.curiumKeeper = *curiumkeeper.NewKeeper(
-		appCodec, keys[curiumtypes.StoreKey], keys[curiumtypes.MemStoreKey],
+		appCodec,
+		keys[curiumtypes.StoreKey],
+		keys[curiumtypes.MemStoreKey],
+		appOpts.Get("rpc.laddr").(string),
 	)
 
 	msgBroadcaster := curium.NewMsgBroadcaster(&app.AccountKeeper, cast.ToString(appOpts.Get(flags.FlagHome)))
@@ -361,11 +364,12 @@ func New(
 		appCodec,
 		keys[nfttypes.StoreKey],
 		keys[nfttypes.MemStoreKey],
-		appOpts.Get("nft-file-dir").(string),
+		DefaultNodeHome + "/" + appOpts.Get("nft-file-dir").(string),
 		int(appOpts.Get("nft-p2p-port").(int64)),
 		msgBroadcaster,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		curium.NewKeyRingReader(DefaultNodeHome),
+		&app.curiumKeeper,
 	)
 
 	nftModule := nft.NewAppModule(appCodec, app.nftKeeper)

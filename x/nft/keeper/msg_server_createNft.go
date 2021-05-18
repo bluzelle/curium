@@ -33,8 +33,12 @@ func (k msgServer) CreateNft(goCtx context.Context, msg *types.MsgCreateNft) (*t
 
 	k.seedFile(ctx, metainfo)
 
-	k.broadcastPublishFile(ctx, msg.Id, msg.Hash, metainfo)
-	
+	if _, err := os.Stat(k.homeDir+"/nft/" + msg.Hash); err == nil {
+		go func() {
+			k.broadcastPublishFile(ctx, msg.Id, msg.Hash, metainfo)
+		}()
+	}
+
 	if err != nil {
 		return nil, sdkerrors.New("nft", 2, fmt.Sprintf("unable to create torrent:  %s", msg.Hash))
 	}
