@@ -1,6 +1,6 @@
 {
   "name": "@bluzelle/sdk-js",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "JS sdk for Bluzelle",
   "main": "lib/bz-sdk/bz-sdk.js",
   "license": "MIT",
