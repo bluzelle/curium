@@ -10,7 +10,7 @@ import (
 func (k msgServer) KeyValues(goCtx context.Context, msg *types.MsgKeyValues) (*types.MsgKeyValuesResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	list, pageResp, err := k.GetAllKeyValues(&ctx, msg.Uuid, msg.Pagination)
+	list, pageResp, err := k.GetAllKeyValues(&ctx, msg.Uuid, msg.Pagination, "")
 
 	if err != nil {
 		return nil, err

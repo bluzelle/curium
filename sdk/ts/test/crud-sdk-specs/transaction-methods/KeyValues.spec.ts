@@ -114,6 +114,5 @@ describe('KeyValues()', function () {
         }]);
 
         await expect(response.pagination?.nextKey).to.equal('C')
-        await expect(response.pagination?.total.toInt()).to.equal(3)
     })
 });

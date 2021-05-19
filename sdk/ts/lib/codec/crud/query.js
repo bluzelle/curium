@@ -3,11 +3,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.QueryClientImpl = exports.QuerySearchResponse = exports.QueryHasResponse = exports.QueryHasRequest = exports.QueryCountResponse = exports.QueryCountRequest = exports.QueryMyKeysResponse = exports.QueryMyKeysRequest = exports.QueryKeysResponse = exports.QueryKeysRequest = exports.QueryReadResponse = exports.QueryReadRequest = exports.protobufPackage = void 0;
+exports.QueryClientImpl = exports.QuerySearchResponse = exports.QuerySearchRequest = exports.QueryHasResponse = exports.QueryHasRequest = exports.QueryCountResponse = exports.QueryCountRequest = exports.QueryMyKeysResponse = exports.QueryMyKeysRequest = exports.QueryKeysResponse = exports.QueryKeysRequest = exports.QueryReadResponse = exports.QueryReadRequest = exports.protobufPackage = void 0;
 /* eslint-disable */
 const long_1 = __importDefault(require("long"));
 const minimal_1 = __importDefault(require("protobufjs/minimal"));
 const Paging_1 = require("../crud/Paging");
+const KeyValue_1 = require("../crud/KeyValue");
 exports.protobufPackage = "bluzelle.curium.crud";
 const baseQueryReadRequest = { uuid: "", key: "" };
 exports.QueryReadRequest = {
@@ -715,11 +716,107 @@ exports.QueryHasResponse = {
         return message;
     },
 };
-const baseQuerySearchResponse = { searchString: "" };
+const baseQuerySearchRequest = { uuid: "", searchString: "" };
+exports.QuerySearchRequest = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        if (message.uuid !== "") {
+            writer.uint32(10).string(message.uuid);
+        }
+        if (message.searchString !== "") {
+            writer.uint32(18).string(message.searchString);
+        }
+        if (message.pagination !== undefined) {
+            Paging_1.PagingRequest.encode(message.pagination, writer.uint32(26).fork()).ldelim();
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = { ...baseQuerySearchRequest };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.uuid = reader.string();
+                    break;
+                case 2:
+                    message.searchString = reader.string();
+                    break;
+                case 3:
+                    message.pagination = Paging_1.PagingRequest.decode(reader, reader.uint32());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = { ...baseQuerySearchRequest };
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = String(object.uuid);
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.searchString !== undefined && object.searchString !== null) {
+            message.searchString = String(object.searchString);
+        }
+        else {
+            message.searchString = "";
+        }
+        if (object.pagination !== undefined && object.pagination !== null) {
+            message.pagination = Paging_1.PagingRequest.fromJSON(object.pagination);
+        }
+        else {
+            message.pagination = undefined;
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.uuid !== undefined && (obj.uuid = message.uuid);
+        message.searchString !== undefined &&
+            (obj.searchString = message.searchString);
+        message.pagination !== undefined &&
+            (obj.pagination = message.pagination
+                ? Paging_1.PagingRequest.toJSON(message.pagination)
+                : undefined);
+        return obj;
+    },
+    fromPartial(object) {
+        const message = { ...baseQuerySearchRequest };
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = object.uuid;
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.searchString !== undefined && object.searchString !== null) {
+            message.searchString = object.searchString;
+        }
+        else {
+            message.searchString = "";
+        }
+        if (object.pagination !== undefined && object.pagination !== null) {
+            message.pagination = Paging_1.PagingRequest.fromPartial(object.pagination);
+        }
+        else {
+            message.pagination = undefined;
+        }
+        return message;
+    },
+};
+const baseQuerySearchResponse = {};
 exports.QuerySearchResponse = {
     encode(message, writer = minimal_1.default.Writer.create()) {
-        if (message.searchString !== "") {
-            writer.uint32(10).string(message.searchString);
+        for (const v of message.keyValues) {
+            KeyValue_1.KeyValue.encode(v, writer.uint32(10).fork()).ldelim();
+        }
+        if (message.pagination !== undefined) {
+            Paging_1.PagingResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
         }
         return writer;
     },
@@ -727,11 +824,15 @@ exports.QuerySearchResponse = {
         const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseQuerySearchResponse };
+        message.keyValues = [];
         while (reader.pos < end) {
             const tag = reader.uint32();
             switch (tag >>> 3) {
                 case 1:
-                    message.searchString = reader.string();
+                    message.keyValues.push(KeyValue_1.KeyValue.decode(reader, reader.uint32()));
+                    break;
+                case 2:
+                    message.pagination = Paging_1.PagingResponse.decode(reader, reader.uint32());
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -742,27 +843,47 @@ exports.QuerySearchResponse = {
     },
     fromJSON(object) {
         const message = { ...baseQuerySearchResponse };
-        if (object.searchString !== undefined && object.searchString !== null) {
-            message.searchString = String(object.searchString);
+        message.keyValues = [];
+        if (object.keyValues !== undefined && object.keyValues !== null) {
+            for (const e of object.keyValues) {
+                message.keyValues.push(KeyValue_1.KeyValue.fromJSON(e));
+            }
+        }
+        if (object.pagination !== undefined && object.pagination !== null) {
+            message.pagination = Paging_1.PagingResponse.fromJSON(object.pagination);
         }
         else {
-            message.searchString = "";
+            message.pagination = undefined;
         }
         return message;
     },
     toJSON(message) {
         const obj = {};
-        message.searchString !== undefined &&
-            (obj.searchString = message.searchString);
+        if (message.keyValues) {
+            obj.keyValues = message.keyValues.map((e) => e ? KeyValue_1.KeyValue.toJSON(e) : undefined);
+        }
+        else {
+            obj.keyValues = [];
+        }
+        message.pagination !== undefined &&
+            (obj.pagination = message.pagination
+                ? Paging_1.PagingResponse.toJSON(message.pagination)
+                : undefined);
         return obj;
     },
     fromPartial(object) {
         const message = { ...baseQuerySearchResponse };
-        if (object.searchString !== undefined && object.searchString !== null) {
-            message.searchString = object.searchString;
+        message.keyValues = [];
+        if (object.keyValues !== undefined && object.keyValues !== null) {
+            for (const e of object.keyValues) {
+                message.keyValues.push(KeyValue_1.KeyValue.fromPartial(e));
+            }
+        }
+        if (object.pagination !== undefined && object.pagination !== null) {
+            message.pagination = Paging_1.PagingResponse.fromPartial(object.pagination);
         }
         else {
-            message.searchString = "";
+            message.pagination = undefined;
         }
         return message;
     },
@@ -795,6 +916,11 @@ class QueryClientImpl {
         const data = exports.QueryHasRequest.encode(request).finish();
         const promise = this.rpc.request("bluzelle.curium.crud.Query", "Has", data);
         return promise.then((data) => exports.QueryHasResponse.decode(new minimal_1.default.Reader(data)));
+    }
+    Search(request) {
+        const data = exports.QuerySearchRequest.encode(request).finish();
+        const promise = this.rpc.request("bluzelle.curium.crud.Query", "Search", data);
+        return promise.then((data) => exports.QuerySearchResponse.decode(new minimal_1.default.Reader(data)));
     }
 }
 exports.QueryClientImpl = QueryClientImpl;

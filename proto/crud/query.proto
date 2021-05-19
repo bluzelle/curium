@@ -3,7 +3,7 @@ package bluzelle.curium.crud;
 
 import "google/api/annotations.proto";
 import "crud/Paging.proto";
-import "cosmos/base/query/v1beta1/pagination.proto";
+import "crud/KeyValue.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/bluzelle/curium/x/crud/types";
@@ -25,6 +25,10 @@ service Query {
 	}
 	rpc Has(QueryHasRequest) returns (QueryHasResponse) {
 		option (google.api.http).get = "/bluzelle/curium/crud/CrudValue/{uuid}/{key}";
+	}
+
+	rpc Search(QuerySearchRequest) returns (QuerySearchResponse) {
+		option (google.api.http).get = "/bluzelle/curium/crud/search/{uuid}/{searchString}";
 	}
 
 }
@@ -79,9 +83,15 @@ message QueryHasResponse {
 	bool has = 1;
 }
 
-message QuerySearchResponse {
-	string searchString = 1;
+message QuerySearchRequest {
+	string uuid = 1;
+	string searchString = 2;
+	PagingRequest pagination = 3;
+}
 
+message QuerySearchResponse {
+	repeated KeyValue keyValues = 1;
+	PagingResponse pagination = 2;
 }
 
 

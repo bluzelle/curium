@@ -2,6 +2,7 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { PagingRequest, PagingResponse } from "../crud/Paging";
+import { KeyValue } from "../crud/KeyValue";
 
 export const protobufPackage = "bluzelle.curium.crud";
 
@@ -55,8 +56,15 @@ export interface QueryHasResponse {
   has: boolean;
 }
 
-export interface QuerySearchResponse {
+export interface QuerySearchRequest {
+  uuid: string;
   searchString: string;
+  pagination?: PagingRequest;
+}
+
+export interface QuerySearchResponse {
+  keyValues: KeyValue[];
+  pagination?: PagingResponse;
 }
 
 const baseQueryReadRequest: object = { uuid: "", key: "" };
@@ -834,15 +842,120 @@ export const QueryHasResponse = {
   },
 };
 
-const baseQuerySearchResponse: object = { searchString: "" };
+const baseQuerySearchRequest: object = { uuid: "", searchString: "" };
+
+export const QuerySearchRequest = {
+  encode(
+    message: QuerySearchRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.uuid !== "") {
+      writer.uint32(10).string(message.uuid);
+    }
+    if (message.searchString !== "") {
+      writer.uint32(18).string(message.searchString);
+    }
+    if (message.pagination !== undefined) {
+      PagingRequest.encode(
+        message.pagination,
+        writer.uint32(26).fork()
+      ).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QuerySearchRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQuerySearchRequest } as QuerySearchRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.uuid = reader.string();
+          break;
+        case 2:
+          message.searchString = reader.string();
+          break;
+        case 3:
+          message.pagination = PagingRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QuerySearchRequest {
+    const message = { ...baseQuerySearchRequest } as QuerySearchRequest;
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.searchString !== undefined && object.searchString !== null) {
+      message.searchString = String(object.searchString);
+    } else {
+      message.searchString = "";
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PagingRequest.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QuerySearchRequest): unknown {
+    const obj: any = {};
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    message.searchString !== undefined &&
+      (obj.searchString = message.searchString);
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PagingRequest.toJSON(message.pagination)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<QuerySearchRequest>): QuerySearchRequest {
+    const message = { ...baseQuerySearchRequest } as QuerySearchRequest;
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.searchString !== undefined && object.searchString !== null) {
+      message.searchString = object.searchString;
+    } else {
+      message.searchString = "";
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PagingRequest.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+};
+
+const baseQuerySearchResponse: object = {};
 
 export const QuerySearchResponse = {
   encode(
     message: QuerySearchResponse,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.searchString !== "") {
-      writer.uint32(10).string(message.searchString);
+    for (const v of message.keyValues) {
+      KeyValue.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PagingResponse.encode(
+        message.pagination,
+        writer.uint32(18).fork()
+      ).ldelim();
     }
     return writer;
   },
@@ -851,11 +964,15 @@ export const QuerySearchResponse = {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseQuerySearchResponse } as QuerySearchResponse;
+    message.keyValues = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.searchString = reader.string();
+          message.keyValues.push(KeyValue.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PagingResponse.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -867,27 +984,48 @@ export const QuerySearchResponse = {
 
   fromJSON(object: any): QuerySearchResponse {
     const message = { ...baseQuerySearchResponse } as QuerySearchResponse;
-    if (object.searchString !== undefined && object.searchString !== null) {
-      message.searchString = String(object.searchString);
+    message.keyValues = [];
+    if (object.keyValues !== undefined && object.keyValues !== null) {
+      for (const e of object.keyValues) {
+        message.keyValues.push(KeyValue.fromJSON(e));
+      }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PagingResponse.fromJSON(object.pagination);
     } else {
-      message.searchString = "";
+      message.pagination = undefined;
     }
     return message;
   },
 
   toJSON(message: QuerySearchResponse): unknown {
     const obj: any = {};
-    message.searchString !== undefined &&
-      (obj.searchString = message.searchString);
+    if (message.keyValues) {
+      obj.keyValues = message.keyValues.map((e) =>
+        e ? KeyValue.toJSON(e) : undefined
+      );
+    } else {
+      obj.keyValues = [];
+    }
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PagingResponse.toJSON(message.pagination)
+        : undefined);
     return obj;
   },
 
   fromPartial(object: DeepPartial<QuerySearchResponse>): QuerySearchResponse {
     const message = { ...baseQuerySearchResponse } as QuerySearchResponse;
-    if (object.searchString !== undefined && object.searchString !== null) {
-      message.searchString = object.searchString;
+    message.keyValues = [];
+    if (object.keyValues !== undefined && object.keyValues !== null) {
+      for (const e of object.keyValues) {
+        message.keyValues.push(KeyValue.fromPartial(e));
+      }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PagingResponse.fromPartial(object.pagination);
     } else {
-      message.searchString = "";
+      message.pagination = undefined;
     }
     return message;
   },
@@ -901,6 +1039,7 @@ export interface Query {
   MyKeys(request: QueryMyKeysRequest): Promise<QueryMyKeysResponse>;
   Count(request: QueryCountRequest): Promise<QueryCountResponse>;
   Has(request: QueryHasRequest): Promise<QueryHasResponse>;
+  Search(request: QuerySearchRequest): Promise<QuerySearchResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -961,6 +1100,18 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("bluzelle.curium.crud.Query", "Has", data);
     return promise.then((data) =>
       QueryHasResponse.decode(new _m0.Reader(data))
+    );
+  }
+
+  Search(request: QuerySearchRequest): Promise<QuerySearchResponse> {
+    const data = QuerySearchRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "bluzelle.curium.crud.Query",
+      "Search",
+      data
+    );
+    return promise.then((data) =>
+      QuerySearchResponse.decode(new _m0.Reader(data))
     );
   }
 }

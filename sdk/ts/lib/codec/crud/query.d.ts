@@ -1,6 +1,7 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { PagingRequest, PagingResponse } from "../crud/Paging";
+import { KeyValue } from "../crud/KeyValue";
 export declare const protobufPackage = "bluzelle.curium.crud";
 /** this line is used by starport scaffolding # 3 */
 export interface QueryReadRequest {
@@ -42,8 +43,14 @@ export interface QueryHasRequest {
 export interface QueryHasResponse {
     has: boolean;
 }
-export interface QuerySearchResponse {
+export interface QuerySearchRequest {
+    uuid: string;
     searchString: string;
+    pagination?: PagingRequest;
+}
+export interface QuerySearchResponse {
+    keyValues: KeyValue[];
+    pagination?: PagingResponse;
 }
 export declare const QueryReadRequest: {
     encode(message: QueryReadRequest, writer?: _m0.Writer): _m0.Writer;
@@ -115,6 +122,13 @@ export declare const QueryHasResponse: {
     toJSON(message: QueryHasResponse): unknown;
     fromPartial(object: DeepPartial<QueryHasResponse>): QueryHasResponse;
 };
+export declare const QuerySearchRequest: {
+    encode(message: QuerySearchRequest, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QuerySearchRequest;
+    fromJSON(object: any): QuerySearchRequest;
+    toJSON(message: QuerySearchRequest): unknown;
+    fromPartial(object: DeepPartial<QuerySearchRequest>): QuerySearchRequest;
+};
 export declare const QuerySearchResponse: {
     encode(message: QuerySearchResponse, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QuerySearchResponse;
@@ -130,6 +144,7 @@ export interface Query {
     MyKeys(request: QueryMyKeysRequest): Promise<QueryMyKeysResponse>;
     Count(request: QueryCountRequest): Promise<QueryCountResponse>;
     Has(request: QueryHasRequest): Promise<QueryHasResponse>;
+    Search(request: QuerySearchRequest): Promise<QuerySearchResponse>;
 }
 export declare class QueryClientImpl implements Query {
     private readonly rpc;
@@ -139,6 +154,7 @@ export declare class QueryClientImpl implements Query {
     MyKeys(request: QueryMyKeysRequest): Promise<QueryMyKeysResponse>;
     Count(request: QueryCountRequest): Promise<QueryCountResponse>;
     Has(request: QueryHasRequest): Promise<QueryHasResponse>;
+    Search(request: QuerySearchRequest): Promise<QuerySearchResponse>;
 }
 interface Rpc {
     request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;
