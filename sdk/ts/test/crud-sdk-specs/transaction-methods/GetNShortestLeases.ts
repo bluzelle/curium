@@ -4,7 +4,7 @@ import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
 import {encodeData, getSdk, zeroLease} from "../../helpers/client-helpers/sdk-helpers";
 import Long from 'long'
 
-describe('getNShortestLeases', function () {
+describe('tx.GetNShortestLeases', function () {
     this.timeout(DEFAULT_TIMEOUT);
 
     let sdk: BluzelleSdk;

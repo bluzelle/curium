@@ -5,7 +5,7 @@ import {createKeys, defaultLease, encodeData, getSdk, newSdkClient} from "../../
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
 import Long from 'long'
 
-describe('KeyValues()', function () {
+describe('tx.KeyValues()', function () {
     this.timeout(DEFAULT_TIMEOUT);
     let sdk: BluzelleSdk;
     let uuid: string

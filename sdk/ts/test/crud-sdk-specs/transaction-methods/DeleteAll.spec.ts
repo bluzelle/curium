@@ -12,7 +12,7 @@ import {
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
 
-describe('deleteAll()', function () {
+describe('tx.DeleteAll()', function () {
     this.timeout(DEFAULT_TIMEOUT);
     let sdk: BluzelleSdk;
     let uuid: string
@@ -27,6 +27,13 @@ describe('deleteAll()', function () {
             creator: sdk.db.address,
             uuid
         });
+    });
+
+    it('should throw an error for an empty uuid', () => {
+        return expect(sdk.db.tx.DeleteAll({
+            creator: sdk.db.address,
+            uuid: ''
+        })).to.be.rejectedWith(/Uuid cannot be empty/)
     });
 
     it('should delete 2 of 2 keys', async () => {
@@ -188,7 +195,7 @@ describe('deleteAll()', function () {
             address: sdk.db.address
         }).then(resp => resp.count.toInt())).to.equal(keys.length)
 
-    })
+    });
 });
 
 

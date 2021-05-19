@@ -13,7 +13,7 @@ import {Lease} from "../../../src/codec/crud/lease";
 import {createKeys} from "../../helpers/client-helpers/sdk-helpers";
 import {defaultRegistryTypes} from "@cosmjs/stargate";
 
-describe('sdk.tx.Delete()', function () {
+describe('tx.Delete()', function () {
     this.timeout(DEFAULT_TIMEOUT);
 
     let sdk: BluzelleSdk;

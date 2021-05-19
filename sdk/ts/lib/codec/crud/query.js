@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.QueryClientImpl = exports.QuerySearchResponse = exports.QuerySearchRequest = exports.QueryHasResponse = exports.QueryHasRequest = exports.QueryCountResponse = exports.QueryCountRequest = exports.QueryMyKeysResponse = exports.QueryMyKeysRequest = exports.QueryKeysResponse = exports.QueryKeysRequest = exports.QueryReadResponse = exports.QueryReadRequest = exports.protobufPackage = void 0;
+exports.QueryClientImpl = exports.QueryGetNShortestLeasesResponse = exports.QueryGetNShortestLeasesRequest = exports.QueryGetLeaseResponse = exports.QueryGetLeaseRequest = exports.QuerySearchResponse = exports.QuerySearchRequest = exports.QueryHasResponse = exports.QueryHasRequest = exports.QueryCountResponse = exports.QueryCountRequest = exports.QueryMyKeysResponse = exports.QueryMyKeysRequest = exports.QueryKeysResponse = exports.QueryKeysRequest = exports.QueryReadResponse = exports.QueryReadRequest = exports.protobufPackage = void 0;
 /* eslint-disable */
 const long_1 = __importDefault(require("long"));
 const minimal_1 = __importDefault(require("protobufjs/minimal"));
@@ -888,6 +888,328 @@ exports.QuerySearchResponse = {
         return message;
     },
 };
+const baseQueryGetLeaseRequest = { uuid: "", key: "" };
+exports.QueryGetLeaseRequest = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        if (message.uuid !== "") {
+            writer.uint32(10).string(message.uuid);
+        }
+        if (message.key !== "") {
+            writer.uint32(18).string(message.key);
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = { ...baseQueryGetLeaseRequest };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.uuid = reader.string();
+                    break;
+                case 2:
+                    message.key = reader.string();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = { ...baseQueryGetLeaseRequest };
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = String(object.uuid);
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.key !== undefined && object.key !== null) {
+            message.key = String(object.key);
+        }
+        else {
+            message.key = "";
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.uuid !== undefined && (obj.uuid = message.uuid);
+        message.key !== undefined && (obj.key = message.key);
+        return obj;
+    },
+    fromPartial(object) {
+        const message = { ...baseQueryGetLeaseRequest };
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = object.uuid;
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.key !== undefined && object.key !== null) {
+            message.key = object.key;
+        }
+        else {
+            message.key = "";
+        }
+        return message;
+    },
+};
+const baseQueryGetLeaseResponse = {
+    uuid: "",
+    key: "",
+    leaseBlocks: long_1.default.ZERO,
+};
+exports.QueryGetLeaseResponse = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        if (message.uuid !== "") {
+            writer.uint32(10).string(message.uuid);
+        }
+        if (message.key !== "") {
+            writer.uint32(18).string(message.key);
+        }
+        if (!message.leaseBlocks.isZero()) {
+            writer.uint32(24).int64(message.leaseBlocks);
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = { ...baseQueryGetLeaseResponse };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.uuid = reader.string();
+                    break;
+                case 2:
+                    message.key = reader.string();
+                    break;
+                case 3:
+                    message.leaseBlocks = reader.int64();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = { ...baseQueryGetLeaseResponse };
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = String(object.uuid);
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.key !== undefined && object.key !== null) {
+            message.key = String(object.key);
+        }
+        else {
+            message.key = "";
+        }
+        if (object.leaseBlocks !== undefined && object.leaseBlocks !== null) {
+            message.leaseBlocks = long_1.default.fromString(object.leaseBlocks);
+        }
+        else {
+            message.leaseBlocks = long_1.default.ZERO;
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.uuid !== undefined && (obj.uuid = message.uuid);
+        message.key !== undefined && (obj.key = message.key);
+        message.leaseBlocks !== undefined &&
+            (obj.leaseBlocks = (message.leaseBlocks || long_1.default.ZERO).toString());
+        return obj;
+    },
+    fromPartial(object) {
+        const message = { ...baseQueryGetLeaseResponse };
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = object.uuid;
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.key !== undefined && object.key !== null) {
+            message.key = object.key;
+        }
+        else {
+            message.key = "";
+        }
+        if (object.leaseBlocks !== undefined && object.leaseBlocks !== null) {
+            message.leaseBlocks = object.leaseBlocks;
+        }
+        else {
+            message.leaseBlocks = long_1.default.ZERO;
+        }
+        return message;
+    },
+};
+const baseQueryGetNShortestLeasesRequest = { uuid: "", num: 0 };
+exports.QueryGetNShortestLeasesRequest = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        if (message.uuid !== "") {
+            writer.uint32(10).string(message.uuid);
+        }
+        if (message.num !== 0) {
+            writer.uint32(16).uint32(message.num);
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = {
+            ...baseQueryGetNShortestLeasesRequest,
+        };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.uuid = reader.string();
+                    break;
+                case 2:
+                    message.num = reader.uint32();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = {
+            ...baseQueryGetNShortestLeasesRequest,
+        };
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = String(object.uuid);
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.num !== undefined && object.num !== null) {
+            message.num = Number(object.num);
+        }
+        else {
+            message.num = 0;
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.uuid !== undefined && (obj.uuid = message.uuid);
+        message.num !== undefined && (obj.num = message.num);
+        return obj;
+    },
+    fromPartial(object) {
+        const message = {
+            ...baseQueryGetNShortestLeasesRequest,
+        };
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = object.uuid;
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.num !== undefined && object.num !== null) {
+            message.num = object.num;
+        }
+        else {
+            message.num = 0;
+        }
+        return message;
+    },
+};
+const baseQueryGetNShortestLeasesResponse = { uuid: "" };
+exports.QueryGetNShortestLeasesResponse = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        if (message.uuid !== "") {
+            writer.uint32(10).string(message.uuid);
+        }
+        for (const v of message.keyLeases) {
+            KeyValue_1.KeyLease.encode(v, writer.uint32(18).fork()).ldelim();
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = {
+            ...baseQueryGetNShortestLeasesResponse,
+        };
+        message.keyLeases = [];
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.uuid = reader.string();
+                    break;
+                case 2:
+                    message.keyLeases.push(KeyValue_1.KeyLease.decode(reader, reader.uint32()));
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = {
+            ...baseQueryGetNShortestLeasesResponse,
+        };
+        message.keyLeases = [];
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = String(object.uuid);
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.keyLeases !== undefined && object.keyLeases !== null) {
+            for (const e of object.keyLeases) {
+                message.keyLeases.push(KeyValue_1.KeyLease.fromJSON(e));
+            }
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.uuid !== undefined && (obj.uuid = message.uuid);
+        if (message.keyLeases) {
+            obj.keyLeases = message.keyLeases.map((e) => e ? KeyValue_1.KeyLease.toJSON(e) : undefined);
+        }
+        else {
+            obj.keyLeases = [];
+        }
+        return obj;
+    },
+    fromPartial(object) {
+        const message = {
+            ...baseQueryGetNShortestLeasesResponse,
+        };
+        message.keyLeases = [];
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = object.uuid;
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.keyLeases !== undefined && object.keyLeases !== null) {
+            for (const e of object.keyLeases) {
+                message.keyLeases.push(KeyValue_1.KeyLease.fromPartial(e));
+            }
+        }
+        return message;
+    },
+};
 class QueryClientImpl {
     constructor(rpc) {
         this.rpc = rpc;
@@ -921,6 +1243,11 @@ class QueryClientImpl {
         const data = exports.QuerySearchRequest.encode(request).finish();
         const promise = this.rpc.request("bluzelle.curium.crud.Query", "Search", data);
         return promise.then((data) => exports.QuerySearchResponse.decode(new minimal_1.default.Reader(data)));
+    }
+    GetNShortestLeases(request) {
+        const data = exports.QueryGetNShortestLeasesRequest.encode(request).finish();
+        const promise = this.rpc.request("bluzelle.curium.crud.Query", "GetNShortestLeases", data);
+        return promise.then((data) => exports.QueryGetNShortestLeasesResponse.decode(new minimal_1.default.Reader(data)));
     }
 }
 exports.QueryClientImpl = QueryClientImpl;

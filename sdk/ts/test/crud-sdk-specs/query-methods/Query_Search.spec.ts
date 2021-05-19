@@ -6,7 +6,7 @@ import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
 import Long from 'long'
 
 
-describe('keyValues()', function () {
+describe('q.Search()', function () {
     this.timeout(DEFAULT_TIMEOUT);
     let sdk: BluzelleSdk;
     let uuid: string;

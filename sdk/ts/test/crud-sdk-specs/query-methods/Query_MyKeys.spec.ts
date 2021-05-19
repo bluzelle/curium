@@ -5,7 +5,7 @@ import {defaultGasParams} from "../../helpers/client-helpers/client-helpers";
 import {defaultLease, encodeData, getSdk, newSdkClient, zeroLease} from "../../helpers/client-helpers/sdk-helpers";
 import delay from "delay";
 
-describe('myKeys()', function () {
+describe('q.MyKeys()', function () {
     this.timeout(DEFAULT_TIMEOUT);
     let sdk: BluzelleSdk;
     let uuid: string;

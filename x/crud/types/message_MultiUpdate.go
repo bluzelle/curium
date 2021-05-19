@@ -41,8 +41,16 @@ func (msg *MsgMultiUpdate) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
-	if len(msg.Uuid) == 0 || len(msg.KeyValues) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Invalid message")
+	err = CheckEmptyUuid(msg.Uuid)
+
+	if err != nil {
+		return err
+	}
+
+	err = CheckEmptyKeyValueLeases(msg.KeyValues)
+
+	if err != nil {
+		return err
 	}
 	return nil
 }

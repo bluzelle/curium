@@ -3,15 +3,13 @@ import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
 import {bluzelle, BluzelleSdk, DbSdk, newMnemonic} from "../../../src/bz-sdk/bz-sdk";
 import {
     createKeys,
-    decodeData,
     defaultLease,
-    encodeData,
     getSdk, newSdkClient,
     zeroLease
 } from "../../helpers/client-helpers/sdk-helpers";
 import Long from 'long'
 import delay from "delay";
-import {PageRequest} from "@cosmjs/stargate/build/codec/cosmos/base/query/v1beta1/pagination";
+
 
 describe('q.Keys()', function () {
     this.timeout(DEFAULT_TIMEOUT);

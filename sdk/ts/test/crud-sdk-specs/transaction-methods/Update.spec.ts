@@ -12,7 +12,7 @@ import {expect} from "chai";
 import delay from "delay";
 
 
-describe('sdk.tx.Update()', function () {
+describe('tx.Update()', function () {
     this.timeout(DEFAULT_TIMEOUT);
 
     let sdk: BluzelleSdk;

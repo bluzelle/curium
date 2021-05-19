@@ -11,7 +11,7 @@ import {BluzelleSdk, DbSdk} from "../../../src/bz-sdk/bz-sdk";
 import {expect} from "chai";
 
 
-describe('sdk.tx.Read()', function () {
+describe('tx.Read()', function () {
     this.timeout(DEFAULT_TIMEOUT);
 
     let sdk: BluzelleSdk;

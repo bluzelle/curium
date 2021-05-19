@@ -6,7 +6,7 @@ import {encodeData, getSdk, defaultLease, newSdkClient} from "../../helpers/clie
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
 
 
-describe('Rename()', function () {
+describe('tx.Rename()', function () {
     this.timeout(DEFAULT_TIMEOUT);
     let sdk: BluzelleSdk;
     let uuid: string;
@@ -33,7 +33,7 @@ describe('Rename()', function () {
             uuid,
             key: 'keyBefore',
             newKey: '',
-        })).to.be.rejectedWith(/invalid request/)
+        })).to.be.rejectedWith(/Key cannot be empty/)
     })
 
     it('should rename a key', async () => {

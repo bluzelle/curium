@@ -2,7 +2,7 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { PagingRequest, PagingResponse } from "../crud/Paging";
-import { KeyValue } from "../crud/KeyValue";
+import { KeyValue, KeyLease } from "../crud/KeyValue";
 
 export const protobufPackage = "bluzelle.curium.crud";
 
@@ -65,6 +65,27 @@ export interface QuerySearchRequest {
 export interface QuerySearchResponse {
   keyValues: KeyValue[];
   pagination?: PagingResponse;
+}
+
+export interface QueryGetLeaseRequest {
+  uuid: string;
+  key: string;
+}
+
+export interface QueryGetLeaseResponse {
+  uuid: string;
+  key: string;
+  leaseBlocks: Long;
+}
+
+export interface QueryGetNShortestLeasesRequest {
+  uuid: string;
+  num: number;
+}
+
+export interface QueryGetNShortestLeasesResponse {
+  uuid: string;
+  keyLeases: KeyLease[];
 }
 
 const baseQueryReadRequest: object = { uuid: "", key: "" };
@@ -1031,6 +1052,367 @@ export const QuerySearchResponse = {
   },
 };
 
+const baseQueryGetLeaseRequest: object = { uuid: "", key: "" };
+
+export const QueryGetLeaseRequest = {
+  encode(
+    message: QueryGetLeaseRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.uuid !== "") {
+      writer.uint32(10).string(message.uuid);
+    }
+    if (message.key !== "") {
+      writer.uint32(18).string(message.key);
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): QueryGetLeaseRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryGetLeaseRequest } as QueryGetLeaseRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.uuid = reader.string();
+          break;
+        case 2:
+          message.key = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetLeaseRequest {
+    const message = { ...baseQueryGetLeaseRequest } as QueryGetLeaseRequest;
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = String(object.key);
+    } else {
+      message.key = "";
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGetLeaseRequest): unknown {
+    const obj: any = {};
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    message.key !== undefined && (obj.key = message.key);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<QueryGetLeaseRequest>): QueryGetLeaseRequest {
+    const message = { ...baseQueryGetLeaseRequest } as QueryGetLeaseRequest;
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = object.key;
+    } else {
+      message.key = "";
+    }
+    return message;
+  },
+};
+
+const baseQueryGetLeaseResponse: object = {
+  uuid: "",
+  key: "",
+  leaseBlocks: Long.ZERO,
+};
+
+export const QueryGetLeaseResponse = {
+  encode(
+    message: QueryGetLeaseResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.uuid !== "") {
+      writer.uint32(10).string(message.uuid);
+    }
+    if (message.key !== "") {
+      writer.uint32(18).string(message.key);
+    }
+    if (!message.leaseBlocks.isZero()) {
+      writer.uint32(24).int64(message.leaseBlocks);
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): QueryGetLeaseResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryGetLeaseResponse } as QueryGetLeaseResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.uuid = reader.string();
+          break;
+        case 2:
+          message.key = reader.string();
+          break;
+        case 3:
+          message.leaseBlocks = reader.int64() as Long;
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetLeaseResponse {
+    const message = { ...baseQueryGetLeaseResponse } as QueryGetLeaseResponse;
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = String(object.key);
+    } else {
+      message.key = "";
+    }
+    if (object.leaseBlocks !== undefined && object.leaseBlocks !== null) {
+      message.leaseBlocks = Long.fromString(object.leaseBlocks);
+    } else {
+      message.leaseBlocks = Long.ZERO;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGetLeaseResponse): unknown {
+    const obj: any = {};
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    message.key !== undefined && (obj.key = message.key);
+    message.leaseBlocks !== undefined &&
+      (obj.leaseBlocks = (message.leaseBlocks || Long.ZERO).toString());
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryGetLeaseResponse>
+  ): QueryGetLeaseResponse {
+    const message = { ...baseQueryGetLeaseResponse } as QueryGetLeaseResponse;
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = object.key;
+    } else {
+      message.key = "";
+    }
+    if (object.leaseBlocks !== undefined && object.leaseBlocks !== null) {
+      message.leaseBlocks = object.leaseBlocks as Long;
+    } else {
+      message.leaseBlocks = Long.ZERO;
+    }
+    return message;
+  },
+};
+
+const baseQueryGetNShortestLeasesRequest: object = { uuid: "", num: 0 };
+
+export const QueryGetNShortestLeasesRequest = {
+  encode(
+    message: QueryGetNShortestLeasesRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.uuid !== "") {
+      writer.uint32(10).string(message.uuid);
+    }
+    if (message.num !== 0) {
+      writer.uint32(16).uint32(message.num);
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): QueryGetNShortestLeasesRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryGetNShortestLeasesRequest,
+    } as QueryGetNShortestLeasesRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.uuid = reader.string();
+          break;
+        case 2:
+          message.num = reader.uint32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetNShortestLeasesRequest {
+    const message = {
+      ...baseQueryGetNShortestLeasesRequest,
+    } as QueryGetNShortestLeasesRequest;
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.num !== undefined && object.num !== null) {
+      message.num = Number(object.num);
+    } else {
+      message.num = 0;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGetNShortestLeasesRequest): unknown {
+    const obj: any = {};
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    message.num !== undefined && (obj.num = message.num);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryGetNShortestLeasesRequest>
+  ): QueryGetNShortestLeasesRequest {
+    const message = {
+      ...baseQueryGetNShortestLeasesRequest,
+    } as QueryGetNShortestLeasesRequest;
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.num !== undefined && object.num !== null) {
+      message.num = object.num;
+    } else {
+      message.num = 0;
+    }
+    return message;
+  },
+};
+
+const baseQueryGetNShortestLeasesResponse: object = { uuid: "" };
+
+export const QueryGetNShortestLeasesResponse = {
+  encode(
+    message: QueryGetNShortestLeasesResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.uuid !== "") {
+      writer.uint32(10).string(message.uuid);
+    }
+    for (const v of message.keyLeases) {
+      KeyLease.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): QueryGetNShortestLeasesResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryGetNShortestLeasesResponse,
+    } as QueryGetNShortestLeasesResponse;
+    message.keyLeases = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.uuid = reader.string();
+          break;
+        case 2:
+          message.keyLeases.push(KeyLease.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetNShortestLeasesResponse {
+    const message = {
+      ...baseQueryGetNShortestLeasesResponse,
+    } as QueryGetNShortestLeasesResponse;
+    message.keyLeases = [];
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.keyLeases !== undefined && object.keyLeases !== null) {
+      for (const e of object.keyLeases) {
+        message.keyLeases.push(KeyLease.fromJSON(e));
+      }
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGetNShortestLeasesResponse): unknown {
+    const obj: any = {};
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    if (message.keyLeases) {
+      obj.keyLeases = message.keyLeases.map((e) =>
+        e ? KeyLease.toJSON(e) : undefined
+      );
+    } else {
+      obj.keyLeases = [];
+    }
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryGetNShortestLeasesResponse>
+  ): QueryGetNShortestLeasesResponse {
+    const message = {
+      ...baseQueryGetNShortestLeasesResponse,
+    } as QueryGetNShortestLeasesResponse;
+    message.keyLeases = [];
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.keyLeases !== undefined && object.keyLeases !== null) {
+      for (const e of object.keyLeases) {
+        message.keyLeases.push(KeyLease.fromPartial(e));
+      }
+    }
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** this line is used by starport scaffolding # 2 */
@@ -1040,6 +1422,9 @@ export interface Query {
   Count(request: QueryCountRequest): Promise<QueryCountResponse>;
   Has(request: QueryHasRequest): Promise<QueryHasResponse>;
   Search(request: QuerySearchRequest): Promise<QuerySearchResponse>;
+  GetNShortestLeases(
+    request: QueryGetNShortestLeasesRequest
+  ): Promise<QueryGetNShortestLeasesResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -1112,6 +1497,20 @@ export class QueryClientImpl implements Query {
     );
     return promise.then((data) =>
       QuerySearchResponse.decode(new _m0.Reader(data))
+    );
+  }
+
+  GetNShortestLeases(
+    request: QueryGetNShortestLeasesRequest
+  ): Promise<QueryGetNShortestLeasesResponse> {
+    const data = QueryGetNShortestLeasesRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "bluzelle.curium.crud.Query",
+      "GetNShortestLeases",
+      data
+    );
+    return promise.then((data) =>
+      QueryGetNShortestLeasesResponse.decode(new _m0.Reader(data))
     );
   }
 }

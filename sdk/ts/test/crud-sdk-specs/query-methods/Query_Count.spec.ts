@@ -3,7 +3,7 @@ import {BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
 import {getSdk, createKeys} from "../../helpers/client-helpers/sdk-helpers";
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
 
-describe('count()', function () {
+describe('q.Count()', function () {
     this.timeout(DEFAULT_TIMEOUT);
     let sdk: BluzelleSdk;
     let uuid: string

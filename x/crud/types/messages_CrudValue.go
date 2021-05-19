@@ -49,8 +49,16 @@ func (msg *MsgCreate) ValidateBasic() error {
 		return sdkerrors.New("crud", 2, "Invalid lease time")
 	}
 
-	if len(msg.Key) == 0 {
-		return sdkerrors.New("crud", 2, "Key cannot be empty")
+	err = CheckEmptyUuid(msg.Uuid)
+
+	if err != nil {
+		return err
+	}
+
+	err = CheckEmptyKey(msg.Key)
+
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -95,8 +103,16 @@ func (msg *MsgUpdate) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if len(msg.Key) == 0 {
-		return sdkerrors.New("crud", 2, "Key cannot be empty")
+	err = CheckEmptyUuid(msg.Uuid)
+
+	if err != nil {
+		return err
+	}
+
+	err = CheckEmptyKey(msg.Key)
+
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -137,5 +153,18 @@ func (msg *MsgDelete) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
+
+	err = CheckEmptyUuid(msg.Uuid)
+
+	if err != nil {
+		return err
+	}
+
+	err = CheckEmptyKey(msg.Key)
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

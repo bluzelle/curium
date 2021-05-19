@@ -41,5 +41,18 @@ func (msg *MsgRead) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
+
+	err = CheckEmptyUuid(msg.Uuid)
+
+	if err != nil {
+		return err
+	}
+
+	err = CheckEmptyKey(msg.Key)
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

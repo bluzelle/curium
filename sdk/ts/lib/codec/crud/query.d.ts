@@ -1,7 +1,7 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { PagingRequest, PagingResponse } from "../crud/Paging";
-import { KeyValue } from "../crud/KeyValue";
+import { KeyValue, KeyLease } from "../crud/KeyValue";
 export declare const protobufPackage = "bluzelle.curium.crud";
 /** this line is used by starport scaffolding # 3 */
 export interface QueryReadRequest {
@@ -51,6 +51,23 @@ export interface QuerySearchRequest {
 export interface QuerySearchResponse {
     keyValues: KeyValue[];
     pagination?: PagingResponse;
+}
+export interface QueryGetLeaseRequest {
+    uuid: string;
+    key: string;
+}
+export interface QueryGetLeaseResponse {
+    uuid: string;
+    key: string;
+    leaseBlocks: Long;
+}
+export interface QueryGetNShortestLeasesRequest {
+    uuid: string;
+    num: number;
+}
+export interface QueryGetNShortestLeasesResponse {
+    uuid: string;
+    keyLeases: KeyLease[];
 }
 export declare const QueryReadRequest: {
     encode(message: QueryReadRequest, writer?: _m0.Writer): _m0.Writer;
@@ -136,6 +153,34 @@ export declare const QuerySearchResponse: {
     toJSON(message: QuerySearchResponse): unknown;
     fromPartial(object: DeepPartial<QuerySearchResponse>): QuerySearchResponse;
 };
+export declare const QueryGetLeaseRequest: {
+    encode(message: QueryGetLeaseRequest, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryGetLeaseRequest;
+    fromJSON(object: any): QueryGetLeaseRequest;
+    toJSON(message: QueryGetLeaseRequest): unknown;
+    fromPartial(object: DeepPartial<QueryGetLeaseRequest>): QueryGetLeaseRequest;
+};
+export declare const QueryGetLeaseResponse: {
+    encode(message: QueryGetLeaseResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryGetLeaseResponse;
+    fromJSON(object: any): QueryGetLeaseResponse;
+    toJSON(message: QueryGetLeaseResponse): unknown;
+    fromPartial(object: DeepPartial<QueryGetLeaseResponse>): QueryGetLeaseResponse;
+};
+export declare const QueryGetNShortestLeasesRequest: {
+    encode(message: QueryGetNShortestLeasesRequest, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryGetNShortestLeasesRequest;
+    fromJSON(object: any): QueryGetNShortestLeasesRequest;
+    toJSON(message: QueryGetNShortestLeasesRequest): unknown;
+    fromPartial(object: DeepPartial<QueryGetNShortestLeasesRequest>): QueryGetNShortestLeasesRequest;
+};
+export declare const QueryGetNShortestLeasesResponse: {
+    encode(message: QueryGetNShortestLeasesResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryGetNShortestLeasesResponse;
+    fromJSON(object: any): QueryGetNShortestLeasesResponse;
+    toJSON(message: QueryGetNShortestLeasesResponse): unknown;
+    fromPartial(object: DeepPartial<QueryGetNShortestLeasesResponse>): QueryGetNShortestLeasesResponse;
+};
 /** Query defines the gRPC querier service. */
 export interface Query {
     /** this line is used by starport scaffolding # 2 */
@@ -145,6 +190,7 @@ export interface Query {
     Count(request: QueryCountRequest): Promise<QueryCountResponse>;
     Has(request: QueryHasRequest): Promise<QueryHasResponse>;
     Search(request: QuerySearchRequest): Promise<QuerySearchResponse>;
+    GetNShortestLeases(request: QueryGetNShortestLeasesRequest): Promise<QueryGetNShortestLeasesResponse>;
 }
 export declare class QueryClientImpl implements Query {
     private readonly rpc;
@@ -155,6 +201,7 @@ export declare class QueryClientImpl implements Query {
     Count(request: QueryCountRequest): Promise<QueryCountResponse>;
     Has(request: QueryHasRequest): Promise<QueryHasResponse>;
     Search(request: QuerySearchRequest): Promise<QuerySearchResponse>;
+    GetNShortestLeases(request: QueryGetNShortestLeasesRequest): Promise<QueryGetNShortestLeasesResponse>;
 }
 interface Rpc {
     request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;

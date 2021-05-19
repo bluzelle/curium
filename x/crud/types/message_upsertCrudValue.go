@@ -44,8 +44,16 @@ func (msg *MsgUpsert) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if len(msg.Key) == 0 {
-		return sdkerrors.New("crud", 2, "Key cannot be empty")
+	err = CheckEmptyUuid(msg.Uuid)
+
+	if err != nil {
+		return err
+	}
+
+	err = CheckEmptyKey(msg.Key)
+
+	if err != nil {
+		return err
 	}
 
 	return nil

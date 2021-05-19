@@ -42,12 +42,17 @@ func (msg *MsgGetLease) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if len(msg.Uuid) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "UUID empty")
+	err = CheckEmptyUuid(msg.Uuid)
+
+	if err != nil {
+		return err
 	}
 
-	if len(msg.Key) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Key empty")
+	err = CheckEmptyKey(msg.Key)
+
+	if err != nil {
+		return err
 	}
+
 	return nil
 }

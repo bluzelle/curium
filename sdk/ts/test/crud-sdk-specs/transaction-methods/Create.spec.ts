@@ -12,10 +12,10 @@ import {Lease} from "../../../src/codec/crud/lease";
 import {getPrintableChars} from "testing/lib/helpers/testHelpers";
 import {localChain} from "../../config";
 import {CalculateGasForLease} from "../../helpers/client-helpers/client-helpers";
-import {isAminoMsgVote} from "@cosmjs/stargate";
 
 
-describe('sdk.tx.Create()', function () {
+
+describe('tx.Create()', function () {
     this.timeout(DEFAULT_TIMEOUT);
 
     let sdk: BluzelleSdk;

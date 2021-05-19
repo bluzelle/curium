@@ -3,7 +3,7 @@ import {BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
 import {defaultLease, getSdk, newSdkClient} from "../../helpers/client-helpers/sdk-helpers";
 
-describe('txHas()', function () {
+describe('tx.Has()', function () {
     this.timeout(DEFAULT_TIMEOUT);
     let sdk: BluzelleSdk;
     let uuid: string;

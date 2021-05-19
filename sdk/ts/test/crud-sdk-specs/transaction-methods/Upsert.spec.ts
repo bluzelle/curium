@@ -9,10 +9,9 @@ import {
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
 import {bluzelle, BluzelleSdk, DbSdk} from "../../../src/bz-sdk/bz-sdk";
 import {expect} from "chai";
-import fs from "fs";
-import {defaultGasParams} from "../../helpers/client-helpers/client-helpers";
 
-describe('sdk.tx.Upsert()', function () {
+
+describe('tx.Upsert()', function () {
     this.timeout(DEFAULT_TIMEOUT);
 
     let sdk: BluzelleSdk;

@@ -4,7 +4,7 @@ import {BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
 import {encodeData, getSdk, zeroLease} from "../../helpers/client-helpers/sdk-helpers";
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
 
-describe('renewLease', function () {
+describe('tx.RenewLease()', function () {
     this.timeout(DEFAULT_TIMEOUT);
 
     let sdk: BluzelleSdk;
