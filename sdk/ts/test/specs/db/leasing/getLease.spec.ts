@@ -25,4 +25,4 @@ describe('getLease', function () {
         expect(await bz.getLease('myKey11')).to.be.lessThan(20);
     })
 
-});
+})

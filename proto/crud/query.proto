@@ -94,6 +94,18 @@ message QuerySearchResponse {
 	PagingResponse pagination = 2;
 }
 
+message QueryGetLeaseRequest {
+	string creator = 1;
+	string uuid = 2;
+	string key = 3;
+}
+
+message QueryGetLeaseResponse {
+	string uuid = 1;
+	string key = 2;
+	int64 leaseBlocks = 3;
+}
+
 
 
 
