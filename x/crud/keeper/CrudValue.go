@@ -146,23 +146,29 @@ func (k Keeper) GetNumKeysOwned(ctx *sdk.Context, uuid string, owner string) (in
 	return numKeys, nil
 }
 
-func (k Keeper) GetAllKeyValues(ctx *sdk.Context, uuid string) []*types.KeyValue {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.UuidPrefix(types.CrudValueKey, uuid))
-	iterator := store.Iterator(nil, nil)
-	var list []*types.KeyValue
-	defer iterator.Close()
+func (k Keeper) GetAllKeyValues(ctx *sdk.Context, uuid string, pagination *types.PagingRequest) ([]*types.KeyValue, *types.PagingResponse, error) {
 
-	for ; iterator.Valid(); iterator.Next() {
+	var list []*types.KeyValue
+
+	store := ctx.KVStore(k.storeKey)
+	CrudValueStore := prefix.NewStore(store, types.UuidPrefix(types.CrudValueKey, uuid + "\x00"))
+
+	pageRes, err := k.Paginate(CrudValueStore, pagination, func(key []byte, value []byte) error {
 		var val types.CrudValue
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &val)
+		k.cdc.MustUnmarshalBinaryBare(value, &val)
 		kv := &types.KeyValue{
 			Key:   val.Key,
 			Value: val.Value,
 		}
 		list = append(list, kv)
+		return nil
+	})
+
+	if err != nil {
+		return nil, nil, err
 	}
 
-	return list
+	return list, pageRes, nil
 }
 
 // GetCrudValueIDBytes returns the byte representation of the ID

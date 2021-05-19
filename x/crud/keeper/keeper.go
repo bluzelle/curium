@@ -3,16 +3,16 @@ package keeper
 import (
 	"bytes"
 	"fmt"
+	"github.com/cosmos/cosmos-sdk/types/query"
 
 	"github.com/bluzelle/curium/app/ante"
+	"github.com/bluzelle/curium/x/crud/types"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/tendermint/tendermint/libs/log"
 	"sort"
 	"strconv"
-
-	"github.com/bluzelle/curium/x/crud/types"
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	// this line is used by starport scaffolding # ibc/keeper/import
 )
 
@@ -195,4 +195,34 @@ func NewLease(
 		Days:    Days,
 		Years:   Years,
 	}
+}
+
+func (k Keeper) Paginate(
+	prefixStore sdk.KVStore,
+	pageRequest *types.PagingRequest,
+	onResult func(key []byte, value []byte) error,
+) (*types.PagingResponse, error) {
+	if pageRequest == nil {
+		pageRequest = &types.PagingRequest{
+			StartKey: "",
+			Limit:    0,
+		}
+	}
+	wrappedPageRequest := query.PageRequest{
+		Key:        []byte(pageRequest.StartKey),
+		Offset:     0,
+		Limit:      pageRequest.Limit,
+		CountTotal: false,
+	}
+	response, err := query.Paginate(prefixStore, &wrappedPageRequest, onResult)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.PagingResponse{
+		NextKey: string(response.NextKey),
+		Total:   response.Total,
+	}, nil
+
 }

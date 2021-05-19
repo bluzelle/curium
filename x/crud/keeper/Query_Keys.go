@@ -2,8 +2,6 @@ package keeper
 
 import (
 	"context"
-	"github.com/bluzelle/curium/x/crud"
-
 	"github.com/bluzelle/curium/x/crud/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -22,7 +20,7 @@ func (k Keeper) Keys(goCtx context.Context, req *types.QueryKeysRequest) (*types
 	store := ctx.KVStore(k.storeKey)
 	CrudValueStore := prefix.NewStore(store, types.UuidPrefix(types.CrudValueKey, req.Uuid + "\x00"))
 
-	pageRes, err := crud.Paginate(CrudValueStore, req.Pagination, func(key []byte, value []byte) error {
+	pageRes, err := k.Paginate(CrudValueStore, req.Pagination, func(key []byte, value []byte) error {
 		var CrudValue types.CrudValue
 		if err := k.cdc.UnmarshalBinaryBare(value, &CrudValue); err != nil {
 			return err

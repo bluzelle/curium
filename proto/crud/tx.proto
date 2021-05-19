@@ -6,7 +6,7 @@ package bluzelle.curium.crud;
 option go_package = "github.com/bluzelle/curium/x/crud/types";
 import "crud/lease.proto";
 import "crud/KeyValue.proto";
-import "cosmos/base/query/v1beta1/pagination.proto";
+import "crud/Paging.proto";
 // Msg defines the Msg service.
 service Msg {
     // this line is used by starport scaffolding # proto/tx/rpc
@@ -62,12 +62,12 @@ message MsgGetNShortestLeasesResponse {
 message MsgKeys {
   string creator = 1;
   string uuid = 2;
-  cosmos.base.query.v1beta1.PageRequest pagination = 3;
+  PagingRequest pagination = 3;
 }
 
 message MsgKeysResponse {
   repeated string keys = 1;
-  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+  PagingResponse pagination = 2;
 }
 
 message MsgRename {
@@ -100,10 +100,12 @@ message MsgDeleteAllResponse {
 message MsgKeyValues {
   string creator = 1;
   string uuid = 2;
+  PagingRequest pagination = 3;
 }
 
 message MsgKeyValuesResponse {
   repeated KeyValue keyValues = 1;
+  PagingResponse pagination = 2;
 }
 
 message MsgHas {

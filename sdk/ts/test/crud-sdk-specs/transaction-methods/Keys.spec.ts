@@ -106,32 +106,28 @@ describe('tx.Keys()', function () {
 
     it('should pass back correct number of keys below pagination', async () => {
         const {keys, values} = await createKeys(sdk.db, 101, uuid);
-        await sdk.db.q.Keys({
+        await sdk.db.tx.Keys({
+            creator,
             uuid,
             pagination: {
-                key: encodeData(keys[101]),
-                offset: Long.fromInt(0),
+                startKey: keys[0],
                 limit: Long.fromInt(100),
-                countTotal: true,
-                reverse: false
             }
         }).then(resp => {
-            expect(resp.key).to.have.length(keys.length - 1)
-            expect(decodeData(resp.pagination?.nextKey || new Uint8Array())).to.equal(keys[99])
+            expect(resp.keys).to.have.length(keys.length - 1)
+            expect(resp.pagination?.nextKey).to.equal(keys[99])
         })
 
-        await sdk.db.q.Keys({
+        await sdk.db.tx.Keys({
+            creator,
             uuid,
             pagination: {
-                key: encodeData(keys[11]),
-                offset: Long.fromInt(0),
+                startKey: keys[11],
                 limit: Long.fromInt(5),
-                countTotal: true,
-                reverse: false
             }
         }).then(resp => {
-            expect(resp.key).to.have.length(5)
-            expect(decodeData(resp.pagination?.nextKey || new Uint8Array())).to.equal('key-16')
+            expect(resp.keys).to.have.length(5)
+            expect(resp.pagination?.nextKey).to.equal('key-16')
         })
     });
 

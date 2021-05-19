@@ -57,7 +57,7 @@ describe('Rename()', function () {
         await sdk.db.q.Keys({
             uuid
         })
-            .then((results) => expect(results.key).to.contain('keyAfter'));
+            .then((results) => expect(results.keys).to.contain('keyAfter'));
     });
 
     it('should only rename if it is the owner', async () => {

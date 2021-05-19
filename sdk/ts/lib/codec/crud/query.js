@@ -7,7 +7,7 @@ exports.QueryClientImpl = exports.QuerySearchResponse = exports.QueryHasResponse
 /* eslint-disable */
 const long_1 = __importDefault(require("long"));
 const minimal_1 = __importDefault(require("protobufjs/minimal"));
-const pagination_1 = require("../cosmos/base/query/v1beta1/pagination");
+const Paging_1 = require("../crud/Paging");
 exports.protobufPackage = "bluzelle.curium.crud";
 const baseQueryReadRequest = { uuid: "", key: "" };
 exports.QueryReadRequest = {
@@ -137,7 +137,7 @@ exports.QueryKeysRequest = {
             writer.uint32(10).string(message.uuid);
         }
         if (message.pagination !== undefined) {
-            pagination_1.PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+            Paging_1.PagingRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
         }
         return writer;
     },
@@ -152,7 +152,7 @@ exports.QueryKeysRequest = {
                     message.uuid = reader.string();
                     break;
                 case 2:
-                    message.pagination = pagination_1.PageRequest.decode(reader, reader.uint32());
+                    message.pagination = Paging_1.PagingRequest.decode(reader, reader.uint32());
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -170,7 +170,7 @@ exports.QueryKeysRequest = {
             message.uuid = "";
         }
         if (object.pagination !== undefined && object.pagination !== null) {
-            message.pagination = pagination_1.PageRequest.fromJSON(object.pagination);
+            message.pagination = Paging_1.PagingRequest.fromJSON(object.pagination);
         }
         else {
             message.pagination = undefined;
@@ -182,7 +182,7 @@ exports.QueryKeysRequest = {
         message.uuid !== undefined && (obj.uuid = message.uuid);
         message.pagination !== undefined &&
             (obj.pagination = message.pagination
-                ? pagination_1.PageRequest.toJSON(message.pagination)
+                ? Paging_1.PagingRequest.toJSON(message.pagination)
                 : undefined);
         return obj;
     },
@@ -195,7 +195,7 @@ exports.QueryKeysRequest = {
             message.uuid = "";
         }
         if (object.pagination !== undefined && object.pagination !== null) {
-            message.pagination = pagination_1.PageRequest.fromPartial(object.pagination);
+            message.pagination = Paging_1.PagingRequest.fromPartial(object.pagination);
         }
         else {
             message.pagination = undefined;
@@ -210,7 +210,7 @@ exports.QueryKeysResponse = {
             writer.uint32(10).string(v);
         }
         if (message.pagination !== undefined) {
-            pagination_1.PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+            Paging_1.PagingResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
         }
         return writer;
     },
@@ -226,7 +226,7 @@ exports.QueryKeysResponse = {
                     message.keys.push(reader.string());
                     break;
                 case 2:
-                    message.pagination = pagination_1.PageResponse.decode(reader, reader.uint32());
+                    message.pagination = Paging_1.PagingResponse.decode(reader, reader.uint32());
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -244,7 +244,7 @@ exports.QueryKeysResponse = {
             }
         }
         if (object.pagination !== undefined && object.pagination !== null) {
-            message.pagination = pagination_1.PageResponse.fromJSON(object.pagination);
+            message.pagination = Paging_1.PagingResponse.fromJSON(object.pagination);
         }
         else {
             message.pagination = undefined;
@@ -261,7 +261,7 @@ exports.QueryKeysResponse = {
         }
         message.pagination !== undefined &&
             (obj.pagination = message.pagination
-                ? pagination_1.PageResponse.toJSON(message.pagination)
+                ? Paging_1.PagingResponse.toJSON(message.pagination)
                 : undefined);
         return obj;
     },
@@ -274,7 +274,7 @@ exports.QueryKeysResponse = {
             }
         }
         if (object.pagination !== undefined && object.pagination !== null) {
-            message.pagination = pagination_1.PageResponse.fromPartial(object.pagination);
+            message.pagination = Paging_1.PagingResponse.fromPartial(object.pagination);
         }
         else {
             message.pagination = undefined;
@@ -292,7 +292,7 @@ exports.QueryMyKeysRequest = {
             writer.uint32(18).string(message.uuid);
         }
         if (message.pagination !== undefined) {
-            pagination_1.PageRequest.encode(message.pagination, writer.uint32(26).fork()).ldelim();
+            Paging_1.PagingRequest.encode(message.pagination, writer.uint32(26).fork()).ldelim();
         }
         return writer;
     },
@@ -310,7 +310,7 @@ exports.QueryMyKeysRequest = {
                     message.uuid = reader.string();
                     break;
                 case 3:
-                    message.pagination = pagination_1.PageRequest.decode(reader, reader.uint32());
+                    message.pagination = Paging_1.PagingRequest.decode(reader, reader.uint32());
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -334,7 +334,7 @@ exports.QueryMyKeysRequest = {
             message.uuid = "";
         }
         if (object.pagination !== undefined && object.pagination !== null) {
-            message.pagination = pagination_1.PageRequest.fromJSON(object.pagination);
+            message.pagination = Paging_1.PagingRequest.fromJSON(object.pagination);
         }
         else {
             message.pagination = undefined;
@@ -347,7 +347,7 @@ exports.QueryMyKeysRequest = {
         message.uuid !== undefined && (obj.uuid = message.uuid);
         message.pagination !== undefined &&
             (obj.pagination = message.pagination
-                ? pagination_1.PageRequest.toJSON(message.pagination)
+                ? Paging_1.PagingRequest.toJSON(message.pagination)
                 : undefined);
         return obj;
     },
@@ -366,7 +366,7 @@ exports.QueryMyKeysRequest = {
             message.uuid = "";
         }
         if (object.pagination !== undefined && object.pagination !== null) {
-            message.pagination = pagination_1.PageRequest.fromPartial(object.pagination);
+            message.pagination = Paging_1.PagingRequest.fromPartial(object.pagination);
         }
         else {
             message.pagination = undefined;
@@ -381,7 +381,7 @@ exports.QueryMyKeysResponse = {
             writer.uint32(10).string(v);
         }
         if (message.pagination !== undefined) {
-            pagination_1.PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+            Paging_1.PagingResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
         }
         return writer;
     },
@@ -397,7 +397,7 @@ exports.QueryMyKeysResponse = {
                     message.keys.push(reader.string());
                     break;
                 case 2:
-                    message.pagination = pagination_1.PageResponse.decode(reader, reader.uint32());
+                    message.pagination = Paging_1.PagingResponse.decode(reader, reader.uint32());
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -415,7 +415,7 @@ exports.QueryMyKeysResponse = {
             }
         }
         if (object.pagination !== undefined && object.pagination !== null) {
-            message.pagination = pagination_1.PageResponse.fromJSON(object.pagination);
+            message.pagination = Paging_1.PagingResponse.fromJSON(object.pagination);
         }
         else {
             message.pagination = undefined;
@@ -432,7 +432,7 @@ exports.QueryMyKeysResponse = {
         }
         message.pagination !== undefined &&
             (obj.pagination = message.pagination
-                ? pagination_1.PageResponse.toJSON(message.pagination)
+                ? Paging_1.PagingResponse.toJSON(message.pagination)
                 : undefined);
         return obj;
     },
@@ -445,7 +445,7 @@ exports.QueryMyKeysResponse = {
             }
         }
         if (object.pagination !== undefined && object.pagination !== null) {
-            message.pagination = pagination_1.PageResponse.fromPartial(object.pagination);
+            message.pagination = Paging_1.PagingResponse.fromPartial(object.pagination);
         }
         else {
             message.pagination = undefined;

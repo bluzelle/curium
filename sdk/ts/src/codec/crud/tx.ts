@@ -2,10 +2,7 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { Lease } from "../crud/lease";
-import {
-  PageRequest,
-  PageResponse,
-} from "../cosmos/base/query/v1beta1/pagination";
+import { PagingRequest, PagingResponse } from "../crud/Paging";
 import { KeyLease, KeyValueLease, KeyValue } from "../crud/KeyValue";
 
 export const protobufPackage = "bluzelle.curium.crud";
@@ -42,12 +39,12 @@ export interface MsgGetNShortestLeasesResponse {
 export interface MsgKeys {
   creator: string;
   uuid: string;
-  pagination?: PageRequest;
+  pagination?: PagingRequest;
 }
 
 export interface MsgKeysResponse {
   keys: string[];
-  pagination?: PageResponse;
+  pagination?: PagingResponse;
 }
 
 export interface MsgRename {
@@ -77,10 +74,12 @@ export interface MsgDeleteAllResponse {}
 export interface MsgKeyValues {
   creator: string;
   uuid: string;
+  pagination?: PagingRequest;
 }
 
 export interface MsgKeyValuesResponse {
   keyValues: KeyValue[];
+  pagination?: PagingResponse;
 }
 
 export interface MsgHas {
@@ -662,7 +661,10 @@ export const MsgKeys = {
       writer.uint32(18).string(message.uuid);
     }
     if (message.pagination !== undefined) {
-      PageRequest.encode(message.pagination, writer.uint32(26).fork()).ldelim();
+      PagingRequest.encode(
+        message.pagination,
+        writer.uint32(26).fork()
+      ).ldelim();
     }
     return writer;
   },
@@ -681,7 +683,7 @@ export const MsgKeys = {
           message.uuid = reader.string();
           break;
         case 3:
-          message.pagination = PageRequest.decode(reader, reader.uint32());
+          message.pagination = PagingRequest.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -704,7 +706,7 @@ export const MsgKeys = {
       message.uuid = "";
     }
     if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageRequest.fromJSON(object.pagination);
+      message.pagination = PagingRequest.fromJSON(object.pagination);
     } else {
       message.pagination = undefined;
     }
@@ -717,7 +719,7 @@ export const MsgKeys = {
     message.uuid !== undefined && (obj.uuid = message.uuid);
     message.pagination !== undefined &&
       (obj.pagination = message.pagination
-        ? PageRequest.toJSON(message.pagination)
+        ? PagingRequest.toJSON(message.pagination)
         : undefined);
     return obj;
   },
@@ -735,7 +737,7 @@ export const MsgKeys = {
       message.uuid = "";
     }
     if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageRequest.fromPartial(object.pagination);
+      message.pagination = PagingRequest.fromPartial(object.pagination);
     } else {
       message.pagination = undefined;
     }
@@ -754,7 +756,7 @@ export const MsgKeysResponse = {
       writer.uint32(10).string(v!);
     }
     if (message.pagination !== undefined) {
-      PageResponse.encode(
+      PagingResponse.encode(
         message.pagination,
         writer.uint32(18).fork()
       ).ldelim();
@@ -774,7 +776,7 @@ export const MsgKeysResponse = {
           message.keys.push(reader.string());
           break;
         case 2:
-          message.pagination = PageResponse.decode(reader, reader.uint32());
+          message.pagination = PagingResponse.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -793,7 +795,7 @@ export const MsgKeysResponse = {
       }
     }
     if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageResponse.fromJSON(object.pagination);
+      message.pagination = PagingResponse.fromJSON(object.pagination);
     } else {
       message.pagination = undefined;
     }
@@ -809,7 +811,7 @@ export const MsgKeysResponse = {
     }
     message.pagination !== undefined &&
       (obj.pagination = message.pagination
-        ? PageResponse.toJSON(message.pagination)
+        ? PagingResponse.toJSON(message.pagination)
         : undefined);
     return obj;
   },
@@ -823,7 +825,7 @@ export const MsgKeysResponse = {
       }
     }
     if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageResponse.fromPartial(object.pagination);
+      message.pagination = PagingResponse.fromPartial(object.pagination);
     } else {
       message.pagination = undefined;
     }
@@ -1258,6 +1260,12 @@ export const MsgKeyValues = {
     if (message.uuid !== "") {
       writer.uint32(18).string(message.uuid);
     }
+    if (message.pagination !== undefined) {
+      PagingRequest.encode(
+        message.pagination,
+        writer.uint32(26).fork()
+      ).ldelim();
+    }
     return writer;
   },
 
@@ -1273,6 +1281,9 @@ export const MsgKeyValues = {
           break;
         case 2:
           message.uuid = reader.string();
+          break;
+        case 3:
+          message.pagination = PagingRequest.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -1294,6 +1305,11 @@ export const MsgKeyValues = {
     } else {
       message.uuid = "";
     }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PagingRequest.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
     return message;
   },
 
@@ -1301,6 +1317,10 @@ export const MsgKeyValues = {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
     message.uuid !== undefined && (obj.uuid = message.uuid);
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PagingRequest.toJSON(message.pagination)
+        : undefined);
     return obj;
   },
 
@@ -1316,6 +1336,11 @@ export const MsgKeyValues = {
     } else {
       message.uuid = "";
     }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PagingRequest.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
     return message;
   },
 };
@@ -1329,6 +1354,12 @@ export const MsgKeyValuesResponse = {
   ): _m0.Writer {
     for (const v of message.keyValues) {
       KeyValue.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PagingResponse.encode(
+        message.pagination,
+        writer.uint32(18).fork()
+      ).ldelim();
     }
     return writer;
   },
@@ -1347,6 +1378,9 @@ export const MsgKeyValuesResponse = {
         case 1:
           message.keyValues.push(KeyValue.decode(reader, reader.uint32()));
           break;
+        case 2:
+          message.pagination = PagingResponse.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1363,6 +1397,11 @@ export const MsgKeyValuesResponse = {
         message.keyValues.push(KeyValue.fromJSON(e));
       }
     }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PagingResponse.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
     return message;
   },
 
@@ -1375,6 +1414,10 @@ export const MsgKeyValuesResponse = {
     } else {
       obj.keyValues = [];
     }
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PagingResponse.toJSON(message.pagination)
+        : undefined);
     return obj;
   },
 
@@ -1385,6 +1428,11 @@ export const MsgKeyValuesResponse = {
       for (const e of object.keyValues) {
         message.keyValues.push(KeyValue.fromPartial(e));
       }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PagingResponse.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
     }
     return message;
   },

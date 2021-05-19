@@ -3,6 +3,7 @@ import {BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
 import {defaultGasParams} from "../../helpers/client-helpers/client-helpers";
 import {createKeys, defaultLease, encodeData, getSdk, newSdkClient} from "../../helpers/client-helpers/sdk-helpers";
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
+import Long from 'long'
 
 describe('KeyValues()', function () {
     this.timeout(DEFAULT_TIMEOUT);
@@ -66,5 +67,53 @@ describe('KeyValues()', function () {
             {key: keys[1], value: encodeData(values[1])},
             {key: keys[2], value: encodeData(values[2])}
         ])
+    });
+
+    it('should paginate keyValues correctly', async () => {
+
+        await sdk.db.tx.Create({
+            creator: sdk.db.address,
+            uuid,
+            key: 'A',
+            value: encodeData('valueA'),
+            lease: defaultLease,
+            metadata: new Uint8Array()
+        });
+        await sdk.db.tx.Create({
+            creator: sdk.db.address,
+            uuid,
+            key: 'B',
+            value: new TextEncoder().encode('valueB'),
+            lease: defaultLease,
+            metadata: new Uint8Array()
+        });
+        await sdk.db.tx.Create({
+            creator: sdk.db.address,
+            uuid,
+            key: 'C',
+            value: new TextEncoder().encode('valueC'),
+            lease: defaultLease,
+            metadata: new Uint8Array()
+        });
+
+        const response = await sdk.db.tx.KeyValues({
+            creator: sdk.db.address,
+            uuid,
+            pagination: {
+                startKey: 'A',
+                limit: Long.fromInt(2)
+            }
+        });
+
+        await expect(response.keyValues).to.deep.equal([{
+            key: 'A',
+            value: encodeData('valueA')
+        }, {
+            key: 'B',
+            value: encodeData('valueB')
+        }]);
+
+        await expect(response.pagination?.nextKey).to.equal('C')
+        await expect(response.pagination?.total.toInt()).to.equal(3)
     })
 });

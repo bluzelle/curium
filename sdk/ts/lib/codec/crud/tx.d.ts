@@ -1,7 +1,7 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { Lease } from "../crud/lease";
-import { PageRequest, PageResponse } from "../cosmos/base/query/v1beta1/pagination";
+import { PagingRequest, PagingResponse } from "../crud/Paging";
 import { KeyLease, KeyValueLease, KeyValue } from "../crud/KeyValue";
 export declare const protobufPackage = "bluzelle.curium.crud";
 /** this line is used by starport scaffolding # proto/tx/message */
@@ -32,11 +32,11 @@ export interface MsgGetNShortestLeasesResponse {
 export interface MsgKeys {
     creator: string;
     uuid: string;
-    pagination?: PageRequest;
+    pagination?: PagingRequest;
 }
 export interface MsgKeysResponse {
     keys: string[];
-    pagination?: PageResponse;
+    pagination?: PagingResponse;
 }
 export interface MsgRename {
     creator: string;
@@ -62,9 +62,11 @@ export interface MsgDeleteAllResponse {
 export interface MsgKeyValues {
     creator: string;
     uuid: string;
+    pagination?: PagingRequest;
 }
 export interface MsgKeyValuesResponse {
     keyValues: KeyValue[];
+    pagination?: PagingResponse;
 }
 export interface MsgHas {
     creator: string;

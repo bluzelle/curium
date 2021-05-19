@@ -2,6 +2,7 @@ syntax = "proto3";
 package bluzelle.curium.crud;
 
 import "google/api/annotations.proto";
+import "crud/Paging.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 // this line is used by starport scaffolding # 1
 
@@ -51,12 +52,12 @@ message QueryKeysResponse {
 message QueryMyKeysRequest {
 	string address = 1;
 	string uuid = 2;
-	cosmos.base.query.v1beta1.PageRequest pagination = 3;
+	PagingRequest pagination = 3;
 }
 
 message QueryMyKeysResponse {
 	repeated string keys = 1;
-	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+	PagingResponse pagination = 2;
 }
 
 message QueryCountRequest {
@@ -83,15 +84,7 @@ message QuerySearchResponse {
 
 }
 
-message PagingRequest {
-	string startKey = 1;
-	uint64 limit = 2;
-}
 
-message PagingResponse {
-	string nextKey = 1;
-	uint64 total = 2;
-}
 
 
 

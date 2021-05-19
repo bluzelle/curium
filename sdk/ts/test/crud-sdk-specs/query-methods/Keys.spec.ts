@@ -11,6 +11,7 @@ import {
 } from "../../helpers/client-helpers/sdk-helpers";
 import Long from 'long'
 import delay from "delay";
+import {PageRequest} from "@cosmjs/stargate/build/codec/cosmos/base/query/v1beta1/pagination";
 
 describe('q.Keys()', function () {
     this.timeout(DEFAULT_TIMEOUT);
@@ -100,29 +101,23 @@ describe('q.Keys()', function () {
         await sdk.db.q.Keys({
             uuid,
             pagination: {
-                key: encodeData(keys[101]),
-                offset: Long.fromInt(0),
-                limit: Long.fromInt(100),
-                countTotal: true,
-                reverse: false
+                startKey: keys[0],
+                limit: Long.fromInt(89),
             }
         }).then(resp => {
-            expect(resp.keys).to.have.length(keys.length - 1)
-            expect(decodeData(resp.pagination?.nextKey || new Uint8Array())).to.equal(keys[99])
+            expect(resp.keys).to.have.length(89)
+            expect(resp.pagination?.nextKey).to.equal(keys[89])
         })
 
         await sdk.db.q.Keys({
             uuid,
             pagination: {
-                key: encodeData(keys[11]),
-                offset: Long.fromInt(0),
+                startKey: keys[11],
                 limit: Long.fromInt(5),
-                countTotal: true,
-                reverse: false
             }
         }).then(resp => {
             expect(resp.keys).to.have.length(5)
-            expect(decodeData(resp.pagination?.nextKey || new Uint8Array())).to.equal('key-16')
+            expect(resp.pagination?.nextKey).to.equal('key-16')
         })
     });
 

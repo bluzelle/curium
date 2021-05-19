@@ -130,11 +130,11 @@ describe('deleteAll()', function () {
 
         expect(await sdk.db.q.Keys({
             uuid
-        }).then(resp => resp.key)).to.deep.equal([]);
+        }).then(resp => resp.keys)).to.deep.equal([]);
 
         expect(await sdk.db.q.Keys({
             uuid: otherUuid
-        }).then(resp => resp.key)).to.deep.equal(['otherKey'])
+        }).then(resp => resp.keys)).to.deep.equal(['otherKey'])
     });
 
     it("should free up uuid space after uuid is emptied, claim ownership", async () => {

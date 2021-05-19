@@ -1,6 +1,6 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { PageRequest, PageResponse } from "../cosmos/base/query/v1beta1/pagination";
+import { PagingRequest, PagingResponse } from "../crud/Paging";
 export declare const protobufPackage = "bluzelle.curium.crud";
 /** this line is used by starport scaffolding # 3 */
 export interface QueryReadRequest {
@@ -12,20 +12,20 @@ export interface QueryReadResponse {
 }
 export interface QueryKeysRequest {
     uuid: string;
-    pagination?: PageRequest;
+    pagination?: PagingRequest;
 }
 export interface QueryKeysResponse {
     keys: string[];
-    pagination?: PageResponse;
+    pagination?: PagingResponse;
 }
 export interface QueryMyKeysRequest {
     address: string;
     uuid: string;
-    pagination?: PageRequest;
+    pagination?: PagingRequest;
 }
 export interface QueryMyKeysResponse {
     keys: string[];
-    pagination?: PageResponse;
+    pagination?: PagingResponse;
 }
 export interface QueryCountRequest {
     address: string;

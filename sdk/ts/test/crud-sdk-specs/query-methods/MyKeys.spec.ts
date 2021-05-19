@@ -48,12 +48,12 @@ describe('myKeys()', function () {
         expect(await sdk.db.q.MyKeys({
             address: sdk.db.address,
             uuid
-        }).then(resp => resp.key)).to.deep.equal(['myKey1', 'myKey2']);
+        }).then(resp => resp.keys)).to.deep.equal(['myKey1', 'myKey2']);
 
         expect(await sdk.db.q.MyKeys({
             address: sdk.db.address,
             uuid: otherUuid
-        }).then(resp => resp.key)).to.deep.equal(['myKey3']);
+        }).then(resp => resp.keys)).to.deep.equal(['myKey3']);
     });
 
     it('should not show keys that have been deleted', async () => {
@@ -80,7 +80,7 @@ describe('myKeys()', function () {
         expect(await sdk.db.q.MyKeys({
             address: sdk.db.address,
             uuid: uuid
-        }).then(resp => resp.key)).to.deep.equal(['my1', 'my2']);
+        }).then(resp => resp.keys)).to.deep.equal(['my1', 'my2']);
 
         await sdk.db.tx.Delete({
             creator: sdk.db.address,
@@ -91,7 +91,7 @@ describe('myKeys()', function () {
         expect(await sdk.db.q.MyKeys({
             address: sdk.db.address,
             uuid: uuid
-        }).then(resp => resp.key)).to.deep.equal(['my2'])
+        }).then(resp => resp.keys)).to.deep.equal(['my2'])
     });
 
     it('should not show a key after it expires', async () => {
@@ -118,14 +118,14 @@ describe('myKeys()', function () {
         expect(await sdk.db.q.MyKeys({
             uuid: uuidTime,
             address: sdk.db.address
-        }).then(resp => resp.key)).to.deep.equal(['my1', 'my2']);
+        }).then(resp => resp.keys)).to.deep.equal(['my1', 'my2']);
 
         await delay(12000);
 
         expect(await sdk.db.q.MyKeys({
             uuid: uuidTime,
             address: sdk.db.address
-        }).then(resp => resp.key)).to.deep.equal(['my2']);
+        }).then(resp => resp.keys)).to.deep.equal(['my2']);
     });
 
     it('should show the right keys if you rename a key', async () => {
@@ -148,7 +148,7 @@ describe('myKeys()', function () {
                 })
         }, {memo: ''});
 
-        expect(await sdk.db.q.MyKeys({address: sdk.db.address, uuid}).then(resp => resp.key)).to.deep.equal(['my1', 'my2']);
+        expect(await sdk.db.q.MyKeys({address: sdk.db.address, uuid}).then(resp => resp.keys)).to.deep.equal(['my1', 'my2']);
 
         await sdk.db.tx.Rename({
             creator: sdk.db.address,
@@ -157,6 +157,6 @@ describe('myKeys()', function () {
             uuid
         });
 
-        expect(await sdk.db.q.MyKeys({address: sdk.db.address, uuid}).then(resp => resp.key)).to.deep.equal(['my2', 'myOne']);
+        expect(await sdk.db.q.MyKeys({address: sdk.db.address, uuid}).then(resp => resp.keys)).to.deep.equal(['my2', 'myOne']);
     })
 })

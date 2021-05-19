@@ -1,10 +1,7 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import {
-  PageRequest,
-  PageResponse,
-} from "../cosmos/base/query/v1beta1/pagination";
+import { PagingRequest, PagingResponse } from "../crud/Paging";
 
 export const protobufPackage = "bluzelle.curium.crud";
 
@@ -20,23 +17,23 @@ export interface QueryReadResponse {
 
 export interface QueryKeysRequest {
   uuid: string;
-  pagination?: PageRequest;
+  pagination?: PagingRequest;
 }
 
 export interface QueryKeysResponse {
   keys: string[];
-  pagination?: PageResponse;
+  pagination?: PagingResponse;
 }
 
 export interface QueryMyKeysRequest {
   address: string;
   uuid: string;
-  pagination?: PageRequest;
+  pagination?: PagingRequest;
 }
 
 export interface QueryMyKeysResponse {
   keys: string[];
-  pagination?: PageResponse;
+  pagination?: PagingResponse;
 }
 
 export interface QueryCountRequest {
@@ -209,7 +206,10 @@ export const QueryKeysRequest = {
       writer.uint32(10).string(message.uuid);
     }
     if (message.pagination !== undefined) {
-      PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+      PagingRequest.encode(
+        message.pagination,
+        writer.uint32(18).fork()
+      ).ldelim();
     }
     return writer;
   },
@@ -225,7 +225,7 @@ export const QueryKeysRequest = {
           message.uuid = reader.string();
           break;
         case 2:
-          message.pagination = PageRequest.decode(reader, reader.uint32());
+          message.pagination = PagingRequest.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -243,7 +243,7 @@ export const QueryKeysRequest = {
       message.uuid = "";
     }
     if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageRequest.fromJSON(object.pagination);
+      message.pagination = PagingRequest.fromJSON(object.pagination);
     } else {
       message.pagination = undefined;
     }
@@ -255,7 +255,7 @@ export const QueryKeysRequest = {
     message.uuid !== undefined && (obj.uuid = message.uuid);
     message.pagination !== undefined &&
       (obj.pagination = message.pagination
-        ? PageRequest.toJSON(message.pagination)
+        ? PagingRequest.toJSON(message.pagination)
         : undefined);
     return obj;
   },
@@ -268,7 +268,7 @@ export const QueryKeysRequest = {
       message.uuid = "";
     }
     if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageRequest.fromPartial(object.pagination);
+      message.pagination = PagingRequest.fromPartial(object.pagination);
     } else {
       message.pagination = undefined;
     }
@@ -287,7 +287,7 @@ export const QueryKeysResponse = {
       writer.uint32(10).string(v!);
     }
     if (message.pagination !== undefined) {
-      PageResponse.encode(
+      PagingResponse.encode(
         message.pagination,
         writer.uint32(18).fork()
       ).ldelim();
@@ -307,7 +307,7 @@ export const QueryKeysResponse = {
           message.keys.push(reader.string());
           break;
         case 2:
-          message.pagination = PageResponse.decode(reader, reader.uint32());
+          message.pagination = PagingResponse.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -326,7 +326,7 @@ export const QueryKeysResponse = {
       }
     }
     if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageResponse.fromJSON(object.pagination);
+      message.pagination = PagingResponse.fromJSON(object.pagination);
     } else {
       message.pagination = undefined;
     }
@@ -342,7 +342,7 @@ export const QueryKeysResponse = {
     }
     message.pagination !== undefined &&
       (obj.pagination = message.pagination
-        ? PageResponse.toJSON(message.pagination)
+        ? PagingResponse.toJSON(message.pagination)
         : undefined);
     return obj;
   },
@@ -356,7 +356,7 @@ export const QueryKeysResponse = {
       }
     }
     if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageResponse.fromPartial(object.pagination);
+      message.pagination = PagingResponse.fromPartial(object.pagination);
     } else {
       message.pagination = undefined;
     }
@@ -378,7 +378,10 @@ export const QueryMyKeysRequest = {
       writer.uint32(18).string(message.uuid);
     }
     if (message.pagination !== undefined) {
-      PageRequest.encode(message.pagination, writer.uint32(26).fork()).ldelim();
+      PagingRequest.encode(
+        message.pagination,
+        writer.uint32(26).fork()
+      ).ldelim();
     }
     return writer;
   },
@@ -397,7 +400,7 @@ export const QueryMyKeysRequest = {
           message.uuid = reader.string();
           break;
         case 3:
-          message.pagination = PageRequest.decode(reader, reader.uint32());
+          message.pagination = PagingRequest.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -420,7 +423,7 @@ export const QueryMyKeysRequest = {
       message.uuid = "";
     }
     if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageRequest.fromJSON(object.pagination);
+      message.pagination = PagingRequest.fromJSON(object.pagination);
     } else {
       message.pagination = undefined;
     }
@@ -433,7 +436,7 @@ export const QueryMyKeysRequest = {
     message.uuid !== undefined && (obj.uuid = message.uuid);
     message.pagination !== undefined &&
       (obj.pagination = message.pagination
-        ? PageRequest.toJSON(message.pagination)
+        ? PagingRequest.toJSON(message.pagination)
         : undefined);
     return obj;
   },
@@ -451,7 +454,7 @@ export const QueryMyKeysRequest = {
       message.uuid = "";
     }
     if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageRequest.fromPartial(object.pagination);
+      message.pagination = PagingRequest.fromPartial(object.pagination);
     } else {
       message.pagination = undefined;
     }
@@ -470,7 +473,7 @@ export const QueryMyKeysResponse = {
       writer.uint32(10).string(v!);
     }
     if (message.pagination !== undefined) {
-      PageResponse.encode(
+      PagingResponse.encode(
         message.pagination,
         writer.uint32(18).fork()
       ).ldelim();
@@ -490,7 +493,7 @@ export const QueryMyKeysResponse = {
           message.keys.push(reader.string());
           break;
         case 2:
-          message.pagination = PageResponse.decode(reader, reader.uint32());
+          message.pagination = PagingResponse.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -509,7 +512,7 @@ export const QueryMyKeysResponse = {
       }
     }
     if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageResponse.fromJSON(object.pagination);
+      message.pagination = PagingResponse.fromJSON(object.pagination);
     } else {
       message.pagination = undefined;
     }
@@ -525,7 +528,7 @@ export const QueryMyKeysResponse = {
     }
     message.pagination !== undefined &&
       (obj.pagination = message.pagination
-        ? PageResponse.toJSON(message.pagination)
+        ? PagingResponse.toJSON(message.pagination)
         : undefined);
     return obj;
   },
@@ -539,7 +542,7 @@ export const QueryMyKeysResponse = {
       }
     }
     if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageResponse.fromPartial(object.pagination);
+      message.pagination = PagingResponse.fromPartial(object.pagination);
     } else {
       message.pagination = undefined;
     }

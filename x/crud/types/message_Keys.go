@@ -3,12 +3,11 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/cosmos/cosmos-sdk/types/query"
 )
 
 var _ sdk.Msg = &MsgKeys{}
 
-func NewMsgKeys(creator string, uuid string, pagination *query.PageRequest) *MsgKeys {
+func NewMsgKeys(creator string, uuid string, pagination *PagingRequest) *MsgKeys {
 	return &MsgKeys{
 		Creator:    creator,
 		Uuid:       uuid,
