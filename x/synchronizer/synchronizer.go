@@ -147,12 +147,16 @@ func getSyncUserAddress(k keeper.Keeper) (string, error) {
 // incorporate this into the voting.
 
 func saveBookmark(dir string, name string, data *big.Int) error {
-	err := os.WriteFile(dir+ "/" + name + "-sync-bookmark", data.Bytes(), 0644)
+	err := os.MkdirAll(dir + "/synchronizer", 0755)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(dir+ "/synchronizer/" + name + "-sync-bookmark", data.Bytes(), 0644)
 	return err
 }
 
 func readBookmark(dir string, name string) (*big.Int, error) {
-	data, err := os.ReadFile(dir + "/" + name + "-sync-bookmark")
+	data, err := os.ReadFile(dir + "/synchronizer/" + name + "-sync-bookmark")
 	if err != nil {
 		return nil, err
 	}
