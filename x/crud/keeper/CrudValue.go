@@ -130,6 +130,30 @@ func (k Keeper) GetAllMyKeys(ctx *sdk.Context, owner string, uuid string) ([]str
 	return keys, nil
 }
 
+func (k Keeper) GetKeysUnderUuid(ctx *sdk.Context, uuid string) ([]string, error) {
+
+	store := ctx.KVStore(k.storeKey)
+	crudValueStore := prefix.NewStore(store, types.UuidPrefix(types.OwnerValueKey, uuid + "\x00"))
+
+	iterator := crudValueStore.Iterator(nil, nil)
+	defer iterator.Close()
+	keys := make([]string, 0)
+
+	keysSize := uint64(0)
+	for ; iterator.Valid(); iterator.Next() {
+		key := string(iterator.Key())
+		keysSize = uint64(len(key)) + keysSize
+
+		if keysSize < k.mks.MaxKeysSize {
+			keys = append(keys, key)
+		} else {
+			return keys, nil
+		}
+	}
+	return keys, nil
+}
+
+
 func (k Keeper) GetNumKeysOwned(ctx *sdk.Context, uuid string, owner string) (int, error) {
 	uuidPrefix := "\x00" + uuid + "\x00"
 	store := ctx.KVStore(k.storeKey)

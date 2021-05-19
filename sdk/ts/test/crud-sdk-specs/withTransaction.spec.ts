@@ -6,18 +6,21 @@ import {expect} from 'chai'
 describe('sdk.xx.withTransaction()', function () {
     this.timeout(DEFAULT_TIMEOUT);
 
-    let sdk: BluzelleSdk
-    ;
+    let sdk: BluzelleSdk;
+    let uuid: string;
+    let creator: string;
     beforeEach(async () => {
         useChaiAsPromised();
-        sdk = await getSdk()
+        sdk = await getSdk();
+        uuid = Date.now().toString();
+        creator = sdk.db.address;
     });
 
     it('should create multiple key-values', async () => {
         await sdk.db.withTransaction(() => {
             sdk.db.tx.Create({
-                creator: sdk.db.address,
-                uuid: 'uuid',
+                creator,
+                uuid,
                 key: 'firstkey',
                 value: encodeData('firstvalue'),
                 metadata: new Uint8Array(),
@@ -25,8 +28,8 @@ describe('sdk.xx.withTransaction()', function () {
             })
 
             sdk.db.tx.Create({
-                creator: sdk.db.address,
-                uuid: 'uuid',
+                creator,
+                uuid,
                 key: 'secondkey',
                 value: encodeData('secondvalue'),
                 metadata: new Uint8Array(),
@@ -34,8 +37,8 @@ describe('sdk.xx.withTransaction()', function () {
             })
 
             sdk.db.tx.Create({
-                creator: sdk.db.address,
-                uuid: 'uuid',
+                creator,
+                uuid,
                 key: 'thirdkey',
                 value: encodeData('thirdvalue'),
                 metadata: new Uint8Array(),
@@ -43,18 +46,18 @@ describe('sdk.xx.withTransaction()', function () {
             })
         }, {memo: ''})
 
-        expect(await sdk.db.q.CrudValue({
-            uuid: 'uuid',
+        expect(await sdk.db.q.Read({
+            uuid,
             key: 'firstkey'
-        }).then(resp => resp.CrudValue?.value as Uint8Array).then(decodeData)).to.equal('firstvalue')
-        expect(await sdk.db.q.CrudValue({
-            uuid: 'uuid',
+        }).then(resp => resp.value as Uint8Array).then(decodeData)).to.equal('firstvalue')
+        expect(await sdk.db.q.Read({
+            uuid,
             key: 'secondkey'
-        }).then(resp => resp.CrudValue?.value as Uint8Array).then(decodeData)).to.equal('secondvalue')
-        expect(await sdk.db.q.CrudValue({
-            uuid: 'uuid',
+        }).then(resp => resp.value as Uint8Array).then(decodeData)).to.equal('secondvalue')
+        expect(await sdk.db.q.Read({
+            uuid,
             key: 'thirdkey'
-        }).then(resp => resp.CrudValue?.value as Uint8Array).then(decodeData)).to.equal('thirdvalue')
+        }).then(resp => resp.value as Uint8Array).then(decodeData)).to.equal('thirdvalue')
 
     })
 

@@ -108,6 +108,32 @@ func (k Keeper) GetNShortestLeaseBlocks(ctx *sdk.Context, owner string, uuid str
 	return keyLeases[:num], nil
 }
 
+func (k Keeper) QueryNShortestLeaseBlocks (ctx *sdk.Context, owner string, uuid string, num uint32) ([]*types.KeyLease, error) {
+
+	keys, _ := k.GetKeysUnderUuid(ctx, uuid)
+
+	var keyLeases []*types.KeyLease
+
+	for i := range keys {
+
+		remainingBlocks := k.GetRemainingLeaseBlocks(ctx, uuid, keys[i])
+
+		curKeyLease := &types.KeyLease{
+			Key:         keys[i],
+			LeaseBlocks: remainingBlocks,
+		}
+
+		keyLeases = append(keyLeases, curKeyLease)
+	}
+
+	sort.Sort(types.KeyLeasesSortable(keyLeases))
+
+	if len(keyLeases) < int(num) {
+		return keyLeases, nil
+	}
+	return keyLeases[:num], nil
+}
+
 func (k Keeper) DeleteLease(ctx *sdk.Context, uuid string, key string) {
 	leaseStore := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.LeaseValueKey))
 
