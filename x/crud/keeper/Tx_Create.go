@@ -15,9 +15,9 @@ func (k msgServer) Create(goCtx context.Context, msg *types.MsgCreate) (*types.M
 		return nil, sdkerrors.New("crud", 0, "key already exists")
 	}
 
-	ownsUuid, _ := k.OwnsUuid(&ctx, msg.Uuid, msg.Creator)
+	ownsUuid, err := k.OwnsUuid(&ctx, msg.Uuid, msg.Creator)
 
-	if !ownsUuid {
+	if !ownsUuid && err == nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
 	}
 

@@ -175,7 +175,7 @@ describe('tx.DeleteAll()', function () {
             value: encodeData('firstValue'),
             lease: defaultLease,
             metadata: new Uint8Array()
-        })).to.be.rejectedWith(/incorrect owner of uuid/);
+        })).to.be.rejectedWith(/incorrect owner/);
 
     });
 
@@ -188,7 +188,7 @@ describe('tx.DeleteAll()', function () {
         await expect(otherSdk.db.tx.DeleteAll({
             creator: otherSdk.db.address,
             uuid
-        })).to.be.rejectedWith(/incorrect owner of uuid/);
+        })).to.be.rejectedWith(/incorrect owner/);
 
         expect(await sdk.db.q.Count({
             uuid,

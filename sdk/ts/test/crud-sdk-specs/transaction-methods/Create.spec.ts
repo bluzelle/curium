@@ -204,7 +204,7 @@ describe('tx.Create()', function () {
             value: encodeData('imposterValue'),
             lease: defaultLease,
             metadata: new Uint8Array()
-        })).to.be.rejectedWith(/incorrect owner of uuid/)
+        })).to.be.rejectedWith(/incorrect owner/)
 
         await expect(sdk.db.tx.Read({
             creator: sdk.db.address,
@@ -277,7 +277,7 @@ describe('tx.Create()', function () {
             value: encodeData('firstValue'),
             lease: defaultLease,
             metadata: new Uint8Array()
-        })).to.be.rejectedWith(/incorrect owner of uuid/);
+        })).to.be.rejectedWith(/incorrect owner/);
 
     });
 })

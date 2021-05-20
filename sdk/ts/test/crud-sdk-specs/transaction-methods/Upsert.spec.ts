@@ -165,4 +165,28 @@ describe('tx.Upsert()', function () {
             }).then(resp => decodeData(resp.value))).to.equal('slashKey'))
     });
 
+    it ('should only allow original owner of uuid to upsert (create)', async () => {
+        const otherSdk = await newSdkClient(sdk)
+
+        await sdk.db.tx.Upsert({
+            creator: sdk.db.address,
+            uuid,
+            key: 'myKey',
+            value: encodeData('firstValue'),
+            metadata: new Uint8Array(),
+            lease: defaultLease
+        });
+
+        await expect(otherSdk.db.tx.Upsert({
+            creator: otherSdk.db.address,
+            uuid,
+            key: 'newKey',
+            value: encodeData('imposterValue'),
+            metadata: new Uint8Array(),
+            lease: defaultLease
+        })).to.be.rejectedWith(/incorrect owner/)
+
+
+    })
+
 });

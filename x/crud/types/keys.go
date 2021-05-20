@@ -33,6 +33,10 @@ func OwnerPrefix(p string, owner string) []byte {
 	return append(KeyPrefix(p), []byte(owner)...)
 }
 
+func SearchCrudValuePrefix(p string, uuidKeySearch []byte) []byte {
+	return append(KeyPrefix(p), uuidKeySearch...)
+}
+
 const (
 	CrudValueKey  = "CrudValue-value-"
 	LeaseValueKey = "LeaseValue-value-"

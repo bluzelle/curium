@@ -221,7 +221,7 @@ func (k Keeper) GetAllKeyValues(ctx *sdk.Context, uuid string, pagination *types
 	var list []*types.KeyValue
 
 	store := ctx.KVStore(k.storeKey)
-	CrudValueStore := prefix.NewStore(store, types.UuidPrefix(types.CrudValueKey, uuid + "\x00" + searchKey))
+	CrudValueStore := prefix.NewStore(store, types.SearchCrudValuePrefix(types.CrudValueKey, MakeCrudValueKey(uuid, searchKey)))
 
 	pageRes, err := k.Paginate(CrudValueStore, pagination, func(key []byte, value []byte) error {
 		var val types.CrudValue
@@ -231,37 +231,6 @@ func (k Keeper) GetAllKeyValues(ctx *sdk.Context, uuid string, pagination *types
 			Value: val.Value,
 		}
 		list = append(list, kv)
-		return nil
-	})
-
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return list, pageRes, nil
-}
-
-func (k Keeper) GetAllSearchedKeyValues (ctx *sdk.Context, uuid string, searchKey string, pagination *types.PagingRequest) ([]*types.KeyValue, *types.PagingResponse, error) {
-	var list []*types.KeyValue
-
-	store := ctx.KVStore(k.storeKey)
-	CrudValueStore := prefix.NewStore(store, types.UuidPrefix(types.CrudValueKey, uuid + "\x00"))
-
-	keyValuesSize := uint64(0)
-
-	pageRes, err := k.Paginate(CrudValueStore, pagination, func(key []byte, value []byte) error {
-		var val types.CrudValue
-		k.cdc.MustUnmarshalBinaryBare(value, &val)
-		keyValuesSize = keyValuesSize + uint64(len(key)) + uint64(len(val.Value))
-
-		kv := &types.KeyValue{
-			Key:   val.Key,
-			Value: val.Value,
-		}
-		if keyValuesSize < k.mks.MaxKeyValuesSize {
-			list = append(list, kv)
-		}
-
 		return nil
 	})
 
