@@ -29,7 +29,7 @@ describe('q.MyKeys()', function () {
         });
     })
 
-    it('should return a list of only keys that I own', async () => {
+    it('should return a list of only keys in all my uuids', async () => {
 
 
         await sdk.db.withTransaction(() => {

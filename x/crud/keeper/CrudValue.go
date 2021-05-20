@@ -108,29 +108,6 @@ func (k Keeper) GetAllCrudValue(ctx *sdk.Context) (list []types.CrudValue) {
 	return
 }
 
-func (k Keeper) GetAllMyKeysUnderUuid(ctx *sdk.Context, owner string, uuid string) ([]string, error) {
-	ownerUuidPrefix := owner + "\x00" + uuid + "\x00"
-	store := ctx.KVStore(k.storeKey)
-	ownerStore := prefix.NewStore(store, types.OwnerPrefix(types.OwnerValueKey, ownerUuidPrefix))
-
-	iterator := ownerStore.Iterator(nil, nil)
-	defer iterator.Close()
-	keys := make([]string, 0)
-
-	keysSize := uint64(0)
-	for ; iterator.Valid(); iterator.Next() {
-		key := string(iterator.Key())
-		keysSize = uint64(len(key)) + keysSize
-
-		if keysSize < k.mks.MaxKeysSize {
-			keys = append(keys, key)
-		} else {
-			return keys, nil
-		}
-	}
-	return keys, nil
-}
-
 func (k Keeper) GetAllMyKeys(ctx *sdk.Context, owner string, pagination *types.PagingRequest) ([]*types.KeysUnderUuid, *types.PagingResponse, error) {
 
 	store := ctx.KVStore(k.storeKey)
@@ -162,7 +139,7 @@ func (k Keeper) GetAllMyKeys(ctx *sdk.Context, owner string, pagination *types.P
 
 	for i:= range uniqueUuids {
 
-		keys, _ := k.GetAllMyKeysUnderUuid(ctx, owner, uniqueUuids[i])
+		keys, _ := k.GetKeysUnderUuid(ctx, uniqueUuids[i])
 
 		uuidAndKeys := &types.KeysUnderUuid{
 			Uuid: uniqueUuids[i],
