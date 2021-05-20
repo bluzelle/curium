@@ -9,18 +9,32 @@ describe('q.MyKeys()', function () {
     this.timeout(DEFAULT_TIMEOUT);
     let sdk: BluzelleSdk;
     let uuid: string;
+    let otherUuid: string;
+    let creator: string;
     beforeEach(async () => {
         sdk = await getSdk();
         uuid = Date.now().toString()
+        otherUuid = 'other' + uuid;
+        creator = sdk.db.address;
     });
+
+    afterEach(async () => {
+        await sdk.db.tx.DeleteAll({
+            creator,
+            uuid
+        });
+        await sdk.db.tx.DeleteAll({
+            creator,
+            uuid: otherUuid
+        });
+    })
 
     it('should return a list of only keys that I own', async () => {
 
-        const otherUuid = (Date.now() + 10).toString()
 
         await sdk.db.withTransaction(() => {
             sdk.db.tx.Create({
-                creator: sdk.db.address,
+                creator,
                 uuid,
                 key: 'myKey1',
                 value: encodeData('value'),
@@ -28,7 +42,7 @@ describe('q.MyKeys()', function () {
                 lease: defaultLease
             });
             sdk.db.tx.Create({
-                creator: sdk.db.address,
+                creator,
                 uuid,
                 key: 'myKey2',
                 value: encodeData('value'),
@@ -36,7 +50,7 @@ describe('q.MyKeys()', function () {
                 lease: defaultLease
             });
             sdk.db.tx.Create({
-                creator: sdk.db.address,
+                creator,
                 uuid: otherUuid,
                 key: 'myKey3',
                 value: encodeData('value'),
@@ -46,7 +60,7 @@ describe('q.MyKeys()', function () {
         }, {memo: ''});
 
         expect(await sdk.db.q.MyKeys({
-            address: sdk.db.address,
+            address: creator
         }).then(resp => resp.keysUnderUuid)).to.deep.equal([{
             uuid,
             keys: ['myKey1', 'myKey2']

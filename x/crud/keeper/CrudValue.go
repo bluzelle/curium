@@ -179,11 +179,11 @@ func (k Keeper) GetAllMyKeys(ctx *sdk.Context, owner string, pagination *types.P
 func (k Keeper) GetKeysUnderUuid(ctx *sdk.Context, uuid string) ([]string, error) {
 
 	store := ctx.KVStore(k.storeKey)
-	crudValueStore := prefix.NewStore(store, types.UuidPrefix(types.OwnerValueKey, uuid + "\x00"))
+	crudValueStore := prefix.NewStore(store, types.UuidPrefix(types.CrudValueKey, uuid + "\x00"))
 
 	iterator := crudValueStore.Iterator(nil, nil)
 	defer iterator.Close()
-	keys := make([]string, 0)
+	var keys []string
 
 	keysSize := uint64(0)
 	for ; iterator.Valid(); iterator.Next() {
