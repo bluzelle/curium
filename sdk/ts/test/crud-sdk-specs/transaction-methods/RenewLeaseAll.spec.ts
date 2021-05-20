@@ -114,12 +114,12 @@ describe('tx.RenewLeaseAll()', function () {
 
     });
 
-    it('should throw an error when trying to renew a non-existent lease', () => {
-        return expect(sdk.db.tx.RenewLeasesAll({
+    it('should throw an error when trying to renew a non-existent lease', async () => {
+        await expect(sdk.db.tx.RenewLeasesAll({
             creator,
             uuid,
             lease: {...zeroLease, seconds: 100}
-        })).to.be.rejectedWith(/key not found/)
+        })).to.be.rejectedWith(/Uuid is empty/)
     })
 
 

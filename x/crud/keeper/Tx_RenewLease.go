@@ -15,8 +15,14 @@ func (k msgServer) RenewLease(goCtx context.Context, msg *types.MsgRenewLease) (
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %s doesn't exist", msg.Key))
 	}
 
-	if !k.OwnsUuid(&ctx, msg.Uuid, msg.Creator) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner of uuid")
+	ownsUuid, err := k.OwnsUuid(&ctx, msg.Uuid, msg.Creator)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if !ownsUuid {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
 	}
 
 	curCrudValue := k.GetCrudValue(&ctx, msg.Uuid, msg.Key)

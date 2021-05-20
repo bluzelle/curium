@@ -22,11 +22,11 @@ describe('tx.DeleteAll()', function () {
         uuid = Date.now().toString()
     });
 
-    it('should do nothing if there are no keys', async () => {
-        await sdk.db.tx.DeleteAll({
+    it('should throw an error if there are no keys', async () => {
+        await expect(sdk.db.tx.DeleteAll({
             creator: sdk.db.address,
             uuid
-        });
+        })).to.be.rejectedWith(/Uuid is empty/)
     });
 
     it('should throw an error for an empty uuid', () => {

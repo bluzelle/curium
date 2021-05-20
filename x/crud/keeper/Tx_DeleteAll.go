@@ -11,8 +11,14 @@ import (
 func (k msgServer) DeleteAll(goCtx context.Context, msg *types.MsgDeleteAll) (*types.MsgDeleteAllResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	if !k.OwnsUuid(&ctx, msg.Uuid, msg.Creator) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner of uuid")
+	ownsUuid, err := k.OwnsUuid(&ctx, msg.Uuid, msg.Creator)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if !ownsUuid {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
 	}
 
 	keys, _ := k.GetKeysUnderUuid(&ctx, msg.Uuid)

@@ -4,6 +4,7 @@ import (
 	"github.com/bluzelle/curium/x/crud/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 func MakeOwnerKey(owner string, uuid string, key string) []byte {
@@ -17,19 +18,19 @@ func (k Keeper) SetOwner(ctx *sdk.Context, uuid string, key string, owner string
 	ownerStore.Set(MakeOwnerKey(owner, uuid, key), make([]byte, 0))
 }
 
-func (k Keeper) OwnsUuid(ctx *sdk.Context, uuid string, owner string) bool {
+func (k Keeper) OwnsUuid(ctx *sdk.Context, uuid string, owner string) (bool, error) {
 
 	crudStore := prefix.NewStore(ctx.KVStore(k.storeKey), types.UuidPrefix(types.CrudValueKey, uuid))
 	var val types.CrudValue
 	iterator := crudStore.Iterator(nil, nil)
 
 	if !iterator.Valid() {
-		return true
+		return false, sdkerrors.New("crud", 2, "Uuid is empty")
 	}
 
 	k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &val)
 
-	return val.Creator == owner
+	return val.Creator == owner, nil
 
 }
 

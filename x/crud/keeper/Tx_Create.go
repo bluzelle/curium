@@ -15,8 +15,10 @@ func (k msgServer) Create(goCtx context.Context, msg *types.MsgCreate) (*types.M
 		return nil, sdkerrors.New("crud", 0, "key already exists")
 	}
 
-	if !k.OwnsUuid(&ctx, msg.Uuid, msg.Creator) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner of uuid")
+	ownsUuid, _ := k.OwnsUuid(&ctx, msg.Uuid, msg.Creator)
+
+	if !ownsUuid {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
 	}
 
 	k.AppendCrudValue(

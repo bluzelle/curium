@@ -88,14 +88,14 @@ describe('tx.Update()', function () {
         }).then(resp => decodeData(resp.value))).to.equal('secondValue');
     });
 
-    it('should throw error if key does not exist', function () {
-        expect(sdk.db.tx.Update({
+    it('should throw error if key does not exist', async () => {
+        await expect(sdk.db.tx.Update({
             creator: sdk.db.address,
             uuid,
             key: 'nonExistingKey',
             value: encodeData('nonExistingValue'),
             metadata: new Uint8Array()
-        })).to.be.rejectedWith(/key does not exist/)
+        })).to.be.rejectedWith(/key not found/)
 
     });
 
