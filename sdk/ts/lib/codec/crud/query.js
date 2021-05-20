@@ -1230,6 +1230,11 @@ class QueryClientImpl {
         const promise = this.rpc.request("bluzelle.curium.crud.Query", "GetNShortestLeases", data);
         return promise.then((data) => exports.QueryGetNShortestLeasesResponse.decode(new minimal_1.default.Reader(data)));
     }
+    GetLease(request) {
+        const data = exports.QueryGetLeaseRequest.encode(request).finish();
+        const promise = this.rpc.request("bluzelle.curium.crud.Query", "GetLease", data);
+        return promise.then((data) => exports.QueryGetLeaseResponse.decode(new minimal_1.default.Reader(data)));
+    }
 }
 exports.QueryClientImpl = QueryClientImpl;
 var globalThis = (() => {

@@ -19,8 +19,7 @@ describe('q.GetLease()', function () {
     });
 
     it('should throw exception if key does not exist', async () => {
-        await expect(sdk.db.tx.GetLease({
-            creator,
+        await expect(sdk.db.q.GetLease({
             uuid,
             key: 'nonExistentKey'
         })).to.be.rejectedWith(/key nonExistentKey doesn't exist/);
@@ -36,8 +35,7 @@ describe('q.GetLease()', function () {
             metadata: new Uint8Array()
         });
         await delay(10000);
-        expect(await sdk.db.tx.GetLease({
-            creator,
+        expect(await sdk.db.q.GetLease({
             uuid,
             key: 'myKey'
         }).then(resp => resp.leaseBlocks.toInt() * 5.5)).to.be.lessThan(28);
@@ -55,8 +53,7 @@ describe('q.GetLease()', function () {
 
         await delay(13000);
 
-        await expect(sdk.db.tx.GetLease({
-            creator,
+        await expect(sdk.db.q.GetLease({
             uuid,
             key: 'expiredKey'
         })).to.be.rejectedWith(/key expiredKey doesn't exist/);

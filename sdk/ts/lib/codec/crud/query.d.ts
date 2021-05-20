@@ -190,6 +190,7 @@ export interface Query {
     Has(request: QueryHasRequest): Promise<QueryHasResponse>;
     Search(request: QuerySearchRequest): Promise<QuerySearchResponse>;
     GetNShortestLeases(request: QueryGetNShortestLeasesRequest): Promise<QueryGetNShortestLeasesResponse>;
+    GetLease(request: QueryGetLeaseRequest): Promise<QueryGetLeaseResponse>;
 }
 export declare class QueryClientImpl implements Query {
     private readonly rpc;
@@ -201,6 +202,7 @@ export declare class QueryClientImpl implements Query {
     Has(request: QueryHasRequest): Promise<QueryHasResponse>;
     Search(request: QuerySearchRequest): Promise<QuerySearchResponse>;
     GetNShortestLeases(request: QueryGetNShortestLeasesRequest): Promise<QueryGetNShortestLeasesResponse>;
+    GetLease(request: QueryGetLeaseRequest): Promise<QueryGetLeaseResponse>;
 }
 interface Rpc {
     request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;

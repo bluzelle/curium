@@ -35,6 +35,10 @@ service Query {
 		option (google.api.http).get = "/bluzelle/curium/crud/GetNShortestLeases/{uuid}/{num}";
 	}
 
+	rpc GetLease(QueryGetLeaseRequest) returns (QueryGetLeaseResponse) {
+		option (google.api.http).get = "/bluzelle/curium/crud/GetLease/{uuid}/{key}";
+	}
+
 }
 
 // this line is used by starport scaffolding # 3

@@ -1411,6 +1411,7 @@ export interface Query {
   GetNShortestLeases(
     request: QueryGetNShortestLeasesRequest
   ): Promise<QueryGetNShortestLeasesResponse>;
+  GetLease(request: QueryGetLeaseRequest): Promise<QueryGetLeaseResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -1497,6 +1498,18 @@ export class QueryClientImpl implements Query {
     );
     return promise.then((data) =>
       QueryGetNShortestLeasesResponse.decode(new _m0.Reader(data))
+    );
+  }
+
+  GetLease(request: QueryGetLeaseRequest): Promise<QueryGetLeaseResponse> {
+    const data = QueryGetLeaseRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "bluzelle.curium.crud.Query",
+      "GetLease",
+      data
+    );
+    return promise.then((data) =>
+      QueryGetLeaseResponse.decode(new _m0.Reader(data))
     );
   }
 }
