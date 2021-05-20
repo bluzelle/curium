@@ -18,7 +18,7 @@ service Query {
 		option (google.api.http).get = "/bluzelle/curium/crud/CrudValue";
 	}
 	rpc MyKeys(QueryMyKeysRequest) returns (QueryMyKeysResponse) {
-		option (google.api.http).get = "/bluzelle/curium/crud/CrudValue/{address}/{uuid}";
+		option (google.api.http).get = "/bluzelle/curium/crud/MyKeys/{address}";
 	}
 	rpc Count(QueryCountRequest) returns (QueryCountResponse) {
 		option (google.api.http).get = "/bluzelle/curium/crud/CrudValue/{uuid}";
@@ -59,12 +59,11 @@ message QueryKeysResponse {
 
 message QueryMyKeysRequest {
 	string address = 1;
-	string uuid = 2;
-	PagingRequest pagination = 3;
+	PagingRequest pagination = 2;
 }
 
 message QueryMyKeysResponse {
-	repeated string keys = 1;
+	repeated KeysUnderUuid keysUnderUuid = 1;
 	PagingResponse pagination = 2;
 }
 

@@ -15,7 +15,7 @@ func (k msgServer) DeleteAll(goCtx context.Context, msg *types.MsgDeleteAll) (*t
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner of uuid")
 	}
 
-	keys, _ := k.GetAllMyKeys(&ctx, msg.Creator, msg.Uuid)
+	keys, _ := k.GetKeysUnderUuid(&ctx, msg.Uuid)
 
 	for _, key := range keys {
 		k.RemoveCrudValue(&ctx, msg.Uuid, key)

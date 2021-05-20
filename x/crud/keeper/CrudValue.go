@@ -5,6 +5,7 @@ import (
 	"github.com/bluzelle/curium/x/crud/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"strings"
 )
 
 func (k Keeper) NewCrudValue(
@@ -107,7 +108,7 @@ func (k Keeper) GetAllCrudValue(ctx *sdk.Context) (list []types.CrudValue) {
 	return
 }
 
-func (k Keeper) GetAllMyKeys(ctx *sdk.Context, owner string, uuid string) ([]string, error) {
+func (k Keeper) GetAllMyKeysUnderUuid(ctx *sdk.Context, owner string, uuid string) ([]string, error) {
 	ownerUuidPrefix := owner + "\x00" + uuid + "\x00"
 	store := ctx.KVStore(k.storeKey)
 	ownerStore := prefix.NewStore(store, types.OwnerPrefix(types.OwnerValueKey, ownerUuidPrefix))
@@ -129,6 +130,51 @@ func (k Keeper) GetAllMyKeys(ctx *sdk.Context, owner string, uuid string) ([]str
 	}
 	return keys, nil
 }
+
+func (k Keeper) GetAllMyKeys(ctx *sdk.Context, owner string, pagination *types.PagingRequest) ([]*types.KeysUnderUuid, *types.PagingResponse, error) {
+
+	store := ctx.KVStore(k.storeKey)
+	ownerStore := prefix.NewStore(store, types.OwnerPrefix(types.OwnerValueKey, owner))
+
+	uniqueUuids := make([]string, 0)
+
+	m := map[string]bool{}
+
+	pageRes, err := k.Paginate(ownerStore, pagination, func(key []byte, value []byte) error {
+
+		decodedPrefix := string(key)
+
+		uuid := strings.Split(decodedPrefix, "\x00")[1]
+
+		if !m[uuid] {
+			m[uuid] = true
+			uniqueUuids = append(uniqueUuids, uuid)
+		}
+		return nil
+	})
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+
+	var keysUnderUuid []*types.KeysUnderUuid
+
+	for i:= range uniqueUuids {
+
+		keys, _ := k.GetAllMyKeysUnderUuid(ctx, owner, uniqueUuids[i])
+
+		uuidAndKeys := &types.KeysUnderUuid{
+			Uuid: uniqueUuids[i],
+			Keys: keys,
+		}
+		keysUnderUuid = append(keysUnderUuid, uuidAndKeys)
+
+	}
+
+	return keysUnderUuid, pageRes, nil
+}
+
 
 func (k Keeper) GetKeysUnderUuid(ctx *sdk.Context, uuid string) ([]string, error) {
 

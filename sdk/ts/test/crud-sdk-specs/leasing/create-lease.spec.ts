@@ -41,11 +41,11 @@ describe('leasing', function () {
 
         await delay(60000);
 
-        expect(sdk.tx.Read({
+        await expect(sdk.tx.Read({
             creator,
             key: 'leaseKey',
             uuid
-        })).to.be.rejectedWith(/key does not exist/)
+        })).to.be.rejectedWith(/key not found/)
 
     });
 
@@ -69,7 +69,7 @@ describe('leasing', function () {
         expect(await sdk.tx.Read({
             creator: sdk.address,
             key: 'leaseKey2',
-            uuid: 'uuid'
+            uuid,
         }).then(resp => decodeData(resp.value))).to.equal('myValue')
 
     });

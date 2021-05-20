@@ -15,6 +15,10 @@ export interface KeyLease {
     key: string;
     leaseBlocks: Long;
 }
+export interface KeysUnderUuid {
+    uuid: string;
+    keys: string[];
+}
 export declare const KeyValue: {
     encode(message: KeyValue, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number | undefined): KeyValue;
@@ -35,6 +39,13 @@ export declare const KeyLease: {
     fromJSON(object: any): KeyLease;
     toJSON(message: KeyLease): unknown;
     fromPartial(object: DeepPartial<KeyLease>): KeyLease;
+};
+export declare const KeysUnderUuid: {
+    encode(message: KeysUnderUuid, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): KeysUnderUuid;
+    fromJSON(object: any): KeysUnderUuid;
+    toJSON(message: KeysUnderUuid): unknown;
+    fromPartial(object: DeepPartial<KeysUnderUuid>): KeysUnderUuid;
 };
 declare type Builtin = Date | Function | Uint8Array | string | number | undefined | Long;
 export declare type DeepPartial<T> = T extends Builtin ? T : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>> : T extends {} ? {

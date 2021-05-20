@@ -21,6 +21,11 @@ export interface KeyLease {
   leaseBlocks: Long;
 }
 
+export interface KeysUnderUuid {
+  uuid: string;
+  keys: string[];
+}
+
 const baseKeyValue: object = { key: "" };
 
 export const KeyValue = {
@@ -266,6 +271,88 @@ export const KeyLease = {
       message.leaseBlocks = object.leaseBlocks as Long;
     } else {
       message.leaseBlocks = Long.ZERO;
+    }
+    return message;
+  },
+};
+
+const baseKeysUnderUuid: object = { uuid: "", keys: "" };
+
+export const KeysUnderUuid = {
+  encode(
+    message: KeysUnderUuid,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.uuid !== "") {
+      writer.uint32(10).string(message.uuid);
+    }
+    for (const v of message.keys) {
+      writer.uint32(18).string(v!);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): KeysUnderUuid {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseKeysUnderUuid } as KeysUnderUuid;
+    message.keys = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.uuid = reader.string();
+          break;
+        case 2:
+          message.keys.push(reader.string());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): KeysUnderUuid {
+    const message = { ...baseKeysUnderUuid } as KeysUnderUuid;
+    message.keys = [];
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.keys !== undefined && object.keys !== null) {
+      for (const e of object.keys) {
+        message.keys.push(String(e));
+      }
+    }
+    return message;
+  },
+
+  toJSON(message: KeysUnderUuid): unknown {
+    const obj: any = {};
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    if (message.keys) {
+      obj.keys = message.keys.map((e) => e);
+    } else {
+      obj.keys = [];
+    }
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<KeysUnderUuid>): KeysUnderUuid {
+    const message = { ...baseKeysUnderUuid } as KeysUnderUuid;
+    message.keys = [];
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.keys !== undefined && object.keys !== null) {
+      for (const e of object.keys) {
+        message.keys.push(e);
+      }
     }
     return message;
   },

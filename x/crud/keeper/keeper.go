@@ -84,7 +84,7 @@ func (k Keeper) GetRemainingLeaseBlocks(ctx *sdk.Context, uuid string, key strin
 
 func (k Keeper) GetNShortestLeaseBlocks(ctx *sdk.Context, owner string, uuid string, num uint32) ([]*types.KeyLease, error) {
 
-	keys, _ := k.GetAllMyKeys(ctx, owner, uuid)
+	keys, _ := k.GetAllMyKeysUnderUuid(ctx, owner, uuid)
 
 	var keyLeases []*types.KeyLease
 

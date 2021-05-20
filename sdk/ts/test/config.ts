@@ -4,7 +4,7 @@ interface Config {
 }
 
 export const localChain: Config = {
-    mnemonic: "silly caught member betray merry half echo winner obscure pigeon bring fog verify host hip winner oyster can message gentle goat fortune sadness link",
+    mnemonic: "lazy meadow speed degree abandon narrow manage apology narrow slice orange only any crash start reward away cheap young uniform swing elbow stomach grit",
     endpoint: "http://localhost:26657"
 }
 

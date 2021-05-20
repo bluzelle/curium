@@ -81,14 +81,14 @@ describe('tx.Delete()', function () {
 
     })
 
-    it('should throw an error if a key does not exist', async () => {
-        expect(
+    it('should throw an error if a key does not exist',  () => {
+        return expect(
             sdk.db.tx.Delete({
                 creator: sdk.db.address,
                 uuid,
                 key: 'voided'
             })
-        ).to.be.rejectedWith(/Key does not exist/);
+        ).to.be.rejectedWith(/key not found/);
     });
 
 

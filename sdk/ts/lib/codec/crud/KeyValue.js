@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.KeyLease = exports.KeyValueLease = exports.KeyValue = exports.protobufPackage = void 0;
+exports.KeysUnderUuid = exports.KeyLease = exports.KeyValueLease = exports.KeyValue = exports.protobufPackage = void 0;
 /* eslint-disable */
 const long_1 = __importDefault(require("long"));
 const minimal_1 = __importDefault(require("protobufjs/minimal"));
@@ -236,6 +236,82 @@ exports.KeyLease = {
         }
         else {
             message.leaseBlocks = long_1.default.ZERO;
+        }
+        return message;
+    },
+};
+const baseKeysUnderUuid = { uuid: "", keys: "" };
+exports.KeysUnderUuid = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        if (message.uuid !== "") {
+            writer.uint32(10).string(message.uuid);
+        }
+        for (const v of message.keys) {
+            writer.uint32(18).string(v);
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = { ...baseKeysUnderUuid };
+        message.keys = [];
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.uuid = reader.string();
+                    break;
+                case 2:
+                    message.keys.push(reader.string());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = { ...baseKeysUnderUuid };
+        message.keys = [];
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = String(object.uuid);
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.keys !== undefined && object.keys !== null) {
+            for (const e of object.keys) {
+                message.keys.push(String(e));
+            }
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.uuid !== undefined && (obj.uuid = message.uuid);
+        if (message.keys) {
+            obj.keys = message.keys.map((e) => e);
+        }
+        else {
+            obj.keys = [];
+        }
+        return obj;
+    },
+    fromPartial(object) {
+        const message = { ...baseKeysUnderUuid };
+        message.keys = [];
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = object.uuid;
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.keys !== undefined && object.keys !== null) {
+            for (const e of object.keys) {
+                message.keys.push(e);
+            }
         }
         return message;
     },
