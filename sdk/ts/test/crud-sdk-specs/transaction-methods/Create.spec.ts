@@ -26,7 +26,7 @@ describe('tx.Create()', function () {
         uuid = Date.now().toString()
     });
 
-    it.skip('should create a key-value', async () => {
+    it.skip('should create a key-value and charge accordingly', async () => {
 
         const initialBal: number = await sdk.bank.q.Balance({
                 address: sdk.bank.address,
@@ -60,6 +60,7 @@ describe('tx.Create()', function () {
 
         await expect(finalBal).to.equal(initialBal - 0.002 * CalculateGasForLease(defaultLease, 'uuid'.length + 'key'.length + 'value'.length))
     });
+
     it('should throw an error if key already exists', () => {
         return sdk.db.tx.Create({
             creator: sdk.db.address,
