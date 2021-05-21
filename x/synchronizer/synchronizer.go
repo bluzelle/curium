@@ -29,19 +29,19 @@ var networks = map[string]Network{
 		Endpoints: []string{"https://data-seed-prebsc-1-s1.binance.org:8545"},
 	},
 	"ethereum": {
-		Contract: "0xEc2F7de297Fbfc20af848f6961c69028A583379c",
+		Contract: "0xBf9d90fE45e0B3069ee4546e878eCcb2b37AF659",
 		Endpoints: []string{"https://ropsten.infura.io/v3/bf3a81b958df4776bb0c7e49a11ecbed"},
 	},
 	"polygon": {
-		Contract: "0xC8Bf0705139bcF5dDf8638323b685Ef588422a66",
+		Contract: "0x266699A193F68CFD213B995604418740d6278dC4",
 		Endpoints: []string{"https://rpc-mumbai.matic.today"},
 	},
 	"fantom": {
-		Contract: "0x24Bf59C3C690eF9bB95839B5CcBB8b9c07728F35",
+		Contract: "0xb6fd9f0F6760c4d4ACE488d094E27F5DeDaa6eCC",
 		Endpoints: []string{"https://rpc.testnet.fantom.network"},
 	},
 	"tomochain": {
-		Contract: "0x01B2cFa79ab429554aE547275c70fFebAeEfe467",
+		Contract: "0xE2603e3a2C8dF20324e7277c1320Ab7EBb8ee7c2",
 		Endpoints: []string{"https://rpc.testnet.tomochain.com"},
 	},
 
