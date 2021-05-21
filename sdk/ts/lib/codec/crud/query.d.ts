@@ -1,7 +1,7 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { PagingRequest, PagingResponse } from "../crud/Paging";
-import { KeysUnderUuid, KeyValue, KeyLease } from "../crud/KeyValue";
+import { KeyValue, KeyLease } from "../crud/KeyValue";
 export declare const protobufPackage = "bluzelle.curium.crud";
 /** this line is used by starport scaffolding # 3 */
 export interface QueryReadRequest {
@@ -21,10 +21,11 @@ export interface QueryKeysResponse {
 }
 export interface QueryMyKeysRequest {
     address: string;
+    uuid: string;
     pagination?: PagingRequest;
 }
 export interface QueryMyKeysResponse {
-    keysUnderUuid: KeysUnderUuid[];
+    keys: string[];
     pagination?: PagingResponse;
 }
 export interface QueryCountRequest {

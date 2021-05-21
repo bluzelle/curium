@@ -19,8 +19,3 @@ message KeyLease {
   string key = 1;
   int64 leaseBlocks = 2;
 }
-
-message KeysUnderUuid {
-  string uuid = 1;
-  repeated string keys = 2;
-}

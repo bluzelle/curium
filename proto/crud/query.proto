@@ -63,11 +63,12 @@ message QueryKeysResponse {
 
 message QueryMyKeysRequest {
 	string address = 1;
-	PagingRequest pagination = 2;
+	string uuid = 2;
+	PagingRequest pagination = 3;
 }
 
 message QueryMyKeysResponse {
-	repeated KeysUnderUuid keysUnderUuid = 1;
+	repeated string keys = 1;
 	PagingResponse pagination = 2;
 }
 

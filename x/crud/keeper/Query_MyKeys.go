@@ -10,7 +10,7 @@ import (
 func (k Keeper) MyKeys(goCtx context.Context, req *types.QueryMyKeysRequest) (*types.QueryMyKeysResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	keysUnderUuid, pagination, err := k.GetAllMyKeys(&ctx, req.Address, req.Pagination)
+	keysUnderUuid, pagination, err := k.GetOwnedKeys(&ctx, req.Address, req.Uuid, req.Pagination)
 
-	return &types.QueryMyKeysResponse{KeysUnderUuid: keysUnderUuid, Pagination: pagination}, err
+	return &types.QueryMyKeysResponse{Keys: keysUnderUuid, Pagination: pagination}, err
 }

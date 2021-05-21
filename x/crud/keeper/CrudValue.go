@@ -5,7 +5,7 @@ import (
 	"github.com/bluzelle/curium/x/crud/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"strings"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 func (k Keeper) NewCrudValue(
@@ -108,48 +108,25 @@ func (k Keeper) GetAllCrudValue(ctx *sdk.Context) (list []types.CrudValue) {
 	return
 }
 
-func (k Keeper) GetAllMyKeys(ctx *sdk.Context, owner string, pagination *types.PagingRequest) ([]*types.KeysUnderUuid, *types.PagingResponse, error) {
-
+func (k Keeper) GetOwnedKeys(ctx *sdk.Context, owner string, uuid string, pagination *types.PagingRequest) ([]string, *types.PagingResponse, error) {
+	ownerUuidPrefix := owner + "\x00" + uuid + "\x00"
 	store := ctx.KVStore(k.storeKey)
-	ownerStore := prefix.NewStore(store, types.OwnerPrefix(types.OwnerValueKey, owner))
+	ownerStore := prefix.NewStore(store, types.OwnerPrefix(types.OwnerValueKey, ownerUuidPrefix))
 
-	uniqueUuids := make([]string, 0)
+	keys := make([]string, 0)
+	keysSize := uint64(0)
+	pageRes, _ := k.Paginate(ownerStore, pagination, func(key []byte, value []byte) error {
 
-	m := map[string]bool{}
+		keysSize = uint64(len(key)) + keysSize
 
-	pageRes, err := k.Paginate(ownerStore, pagination, func(key []byte, value []byte) error {
-
-		decodedPrefix := string(key)
-
-		uuid := strings.Split(decodedPrefix, "\x00")[1]
-
-		if !m[uuid] {
-			m[uuid] = true
-			uniqueUuids = append(uniqueUuids, uuid)
+		if keysSize > k.mks.MaxKeysSize {
+			return sdkerrors.New("crud", 2, "exceeded max key size")
 		}
+		keys = append(keys, string(key))
 		return nil
 	})
 
-	if err != nil {
-		return nil, nil, err
-	}
-
-
-	var keysUnderUuid []*types.KeysUnderUuid
-
-	for i:= range uniqueUuids {
-
-		keys, _ := k.GetKeysUnderUuid(ctx, uniqueUuids[i])
-
-		uuidAndKeys := &types.KeysUnderUuid{
-			Uuid: uniqueUuids[i],
-			Keys: keys,
-		}
-		keysUnderUuid = append(keysUnderUuid, uuidAndKeys)
-
-	}
-
-	return keysUnderUuid, pageRes, nil
+	return keys, pageRes, nil
 }
 
 
