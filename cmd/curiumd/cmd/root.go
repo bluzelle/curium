@@ -68,6 +68,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		},
 	}
 
+	rootCmd.PersistentFlags().String("log_module", "", "Filter logs for a specific module")
 	initRootCmd(rootCmd, encodingConfig)
 	overwriteFlagDefaults(rootCmd, map[string]string{
 		flags.FlagChainID:        ChainID,
@@ -194,7 +195,7 @@ func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, a
 	}
 
 	return app.New(
-		logger, db, traceStore, true, skipUpgradeHeights,
+		app.NewLoggerWrapper(logger, appOpts.Get("log_module").(string)), db, traceStore, true, skipUpgradeHeights,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
 		a.encCfg,

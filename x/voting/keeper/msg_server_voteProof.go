@@ -8,6 +8,7 @@ import (
 
 func (k msgServer) VoteProof(goCtx context.Context, msg *types.MsgVoteProof) (*types.MsgVoteProofResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+	k.Logger(ctx).Info("Vote proof received", "msg", msg)
 	proofStore := k.GetProofStore(ctx)
 	proof := k.cdc.MustMarshalBinaryBare(msg)
 	key := MakeProofStoreKey(msg.Valcons, msg.VoteType, msg.Id)

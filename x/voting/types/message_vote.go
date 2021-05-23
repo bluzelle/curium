@@ -7,7 +7,7 @@ import (
 
 var _ sdk.Msg = &MsgVote{}
 
-func NewMsgVote(creator string, valcons string, voteType string, from string, id uint64, batch string) *MsgVote {
+func NewMsgVote(creator string, valcons string, voteType string, from string, id string, batch string) *MsgVote {
 	return &MsgVote{
 		Creator:  creator,
 		Valcons:  valcons,

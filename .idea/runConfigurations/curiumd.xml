@@ -2,7 +2,7 @@
   <configuration default="false" name="curiumd" type="GoApplicationRunConfiguration" factoryName="Go Application">
     <module name="curium" />
     <working_directory value="$PROJECT_DIR$" />
-    <parameters value="start --log_level warn" />
+    <parameters value="start --log_level error --log_module x/voting" />
     <kind value="PACKAGE" />
     <package value="github.com/bluzelle/curium/cmd/curiumd" />
     <directory value="$PROJECT_DIR$" />

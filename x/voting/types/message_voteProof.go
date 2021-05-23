@@ -7,7 +7,7 @@ import (
 
 var _ sdk.Msg = &MsgVoteProof{}
 
-func NewMsgVoteProof(creator string, valcons string, signature string) *MsgVoteProof {
+func NewMsgVoteProof(creator string, valcons string, signature []byte) *MsgVoteProof {
 	return &MsgVoteProof{
 		Creator:   creator,
 		Valcons:   valcons,

@@ -67,6 +67,7 @@ func (k Keeper) GetCdc() codec.Marshaler {
 }
 
 func (k Keeper) ExecuteOperation(ctx *sdk.Context, syncOp *types.SyncOperation) {
+	k.Logger(*ctx).Info("Sync operation", "syncOp", syncOp)
 	switch syncOp.Op {
 	case "create":
 		metaBytes := k.cdc.MustMarshalBinaryBare(&types.SynchronizerValueMeta{

@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"encoding/binary"
-	"encoding/hex"
 	"fmt"
 	"github.com/bluzelle/curium/x/curium"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
@@ -68,6 +67,7 @@ func (k Keeper) RegisterVoteHandler(handler types.VoteHandler) {
 
 // Vote this is the function that other modules will call to send a vote
 func (k Keeper) Vote(ctx sdk.Context, votingReq types.VotingRequest) {
+	k.Logger(ctx).Info("Voting request received", "request", votingReq)
 	valcons := k.GetValconsAddress()
 	proof := types.MsgVoteProof{
 		Creator:   votingReq.Creator,
@@ -95,8 +95,8 @@ func (k Keeper) Vote(ctx sdk.Context, votingReq types.VotingRequest) {
 	voteQueue[ctx.BlockHeight()+3] = append(voteQueue[ctx.BlockHeight()+3], vote)
 }
 
-func MakeProofStoreKey(valcons string, voteType string, voteId uint64) []byte {
-	return append([]byte(valcons+voteType), uint64ToByteArray(voteId)...)
+func MakeProofStoreKey(valcons string, voteType string, voteId string) []byte {
+	return append([]byte(valcons+voteType), []byte(voteId)...)
 }
 
 func uint64ToByteArray(n uint64) []byte {
@@ -105,10 +105,10 @@ func uint64ToByteArray(n uint64) []byte {
 	return b
 }
 
-func MakeVoteStoreKey(block int64, voteType string, voteId uint64, valcons string) []byte {
+func MakeVoteStoreKey(block int64, voteType string, voteId string, valcons string) []byte {
 	bytes := uint64ToByteArray(uint64(block))
 	bytes = append(bytes, []byte(voteType)...)
-	bytes = append(bytes, uint64ToByteArray(voteId)...)
+	bytes = append(bytes, []byte(voteId)...)
 	bytes = append(bytes, []byte(valcons)...)
 	return bytes
 }
@@ -128,6 +128,7 @@ func (k Keeper) TransmitProofQueue(ctx sdk.Context) {
 			msgs = append(msgs, &proofQueue[i])
 		}
 		result, err := curium.BroadcastMessages(ctx, msgs, &k.accKeeper, proofQueue[0].From, k.homeDir)
+		k.Logger(ctx).Info("Sending vote proofs", "proofs", msgs)
 		if err != nil {
 			k.Logger(ctx).Error("Error broadcasting proofs", "err", err)
 			return
@@ -143,7 +144,14 @@ func (k Keeper) TransmitVoteQueue(ctx sdk.Context) {
 		for i := 0; i < len(voteQueue[ctx.BlockHeight()]); i++ {
 			msgs = append(msgs, &voteQueue[ctx.BlockHeight()][i])
 		}
-		curium.BroadcastMessages(ctx, msgs, &k.accKeeper, voteQueue[ctx.BlockHeight()][0].From, k.homeDir)
+		result, err := curium.BroadcastMessages(ctx, msgs, &k.accKeeper, voteQueue[ctx.BlockHeight()][0].From, k.homeDir)
+		k.Logger(ctx).Info("Broadcasting votes", "votes", msgs)
+		if err != nil {
+			k.Logger(ctx).Error("Error broadcasting votes", "err", err)
+			return
+		}
+		k.Logger(ctx).Info("Broadcast votes successful", "result", result)
+
 		delete(voteQueue, ctx.BlockHeight())
 	}
 }
@@ -176,16 +184,17 @@ func (k Keeper) StoreVote(ctx sdk.Context, vote *types.Vote) {
 }
 
 func (k Keeper) CheckDeliverVotes(ctx sdk.Context) {
+	k.Logger(ctx).Info("Check deliver votes", "block", ctx.BlockHeight() - 2)
 	start := make([]byte, 8)
 	binary.LittleEndian.PutUint64(start, uint64(ctx.BlockHeight()-2))
 	store := k.GetVoteStore(ctx)
 	iterator := sdk.KVStorePrefixIterator(store, start)
-	var votes = map[string]map[uint64][]*types.Vote{}
+	var votes = map[string]map[string][]*types.Vote{}
 	for ; iterator.Valid(); iterator.Next() {
 		var vote types.Vote
 		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &vote)
 		if votes[vote.VoteType] == nil {
-			votes[vote.VoteType] = map[uint64][]*types.Vote{}
+			votes[vote.VoteType] = map[string][]*types.Vote{}
 		}
 		votes[vote.VoteType][vote.Id] = append(votes[vote.VoteType][vote.Id], &vote)
 		store.Delete(iterator.Key())
@@ -197,12 +206,13 @@ func (k Keeper) CheckDeliverVotes(ctx sdk.Context) {
 			continue
 		}
 
-		var ids []uint64
+		var ids []string
 		for id := range votes[voteType] {
 			ids = append(ids, id)
 		}
-		sortkeys.Uint64s(ids)
+		sortkeys.Strings(ids)
 		for _, id := range ids {
+			k.Logger(ctx).Info("Sending vote to vote handler", "vote", votes[voteType][id])
 			voteHandlers[voteType].VotesReceived(&ctx, id, votes[voteType][id])
 		}
 	}
@@ -220,10 +230,10 @@ func (k Keeper) GetValconsAddress() string {
 	return addressString
 }
 
-func (k Keeper) SignProofSig(value []byte) string {
+func (k Keeper) SignProofSig(value []byte) []byte {
 	v := k.GetPrivateValidator()
 	s, _ := v.Key.PrivKey.Sign([]byte(value))
-	return hex.EncodeToString(s)
+	return s
 }
 
 func (k Keeper) GetValidator(ctx sdk.Context, valcons string) (validator stakingtypes.Validator, found bool) {
@@ -252,8 +262,7 @@ func (k Keeper) IsVoteValid(ctx sdk.Context, msg *types.MsgVote) bool {
 		return false
 	}
 
-	proofSignatureString := k.GetVoteProof(ctx, msg).Signature
-	proofSignature, _ := hex.DecodeString(proofSignatureString)
+	proofSignature := k.GetVoteProof(ctx, msg).Signature
 
 	pubKey, _ := validator.ConsPubKey()
 

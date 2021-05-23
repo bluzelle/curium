@@ -4,7 +4,7 @@ package bluzelle.curium.voting;
 option go_package = "github.com/bluzelle/curium/x/voting/types";
 
 message VotingRequest {
-  uint64 id = 1;
+  string id = 1;
   string voteType = 2;
   string creator = 3;
   bytes value = 4;

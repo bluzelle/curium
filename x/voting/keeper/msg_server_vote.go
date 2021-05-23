@@ -10,11 +10,11 @@ import (
 
 func (k msgServer) Vote(goCtx context.Context, msg *types.MsgVote) (*types.MsgVoteResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+	k.Logger(ctx).Info("Vote received", "msg", msg)
 	valid := k.IsVoteValid(ctx, msg)
 	if !valid {
 		return nil, sdkerrors.New("voting", 2, "Vote not valid")
 	}
-
 	k.StoreVote(ctx, &types.Vote{
 		Id:       msg.Id,
 		VoteType: msg.VoteType,

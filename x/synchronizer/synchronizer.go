@@ -81,7 +81,7 @@ func runSynchronizer(k keeper.Keeper) {
 				k.Logger(currCtx).Error("Unable to retrieve user from keyring", "name", "sync", "error", err)
 			}
 			k.VotingKeeper.Vote(currCtx, votingtypes.VotingRequest{
-				Id:       item.Bookmark.Uint64(),
+				Id:       fmt.Sprintf("%s-%d", name, item.Bookmark.Uint64()),
 				VoteType: types.ModuleName,
 				Creator:  creator,
 				Value:    k.GetCdc().MustMarshalBinaryBare(&value),
@@ -115,14 +115,11 @@ func fetchDataFromContract(k keeper.Keeper, name string, network Network) []bina
 
 		d, err := ctr.GetSynchronizerData(callOpts, start, big.NewInt(20))
 		data = append(data, d...)
-		fmt.Println(fmt.Sprintf("******************* Synchronizer (%s) **************************************************\n", name))
-		fmt.Println("***** start=", start)
-
+		k.Logger(currCtx).Info("sync start", "network", name, "start", start)
 		end := start.Add(start, big.NewInt(int64(len(d))))
 		saveBookmark(k.KeyringDir, name, end)
-		fmt.Println("**** end=", end)
-		fmt.Println("**** d=", data)
-		fmt.Println("********************************************************************")
+		k.Logger(currCtx).Info("sync end", "network", name, "end", end)
+		k.Logger(currCtx).Info("sync data", "network", name, "data", data)
 	}
 
 	return data
