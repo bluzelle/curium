@@ -5,7 +5,6 @@ import (
 	"github.com/bluzelle/curium/x/crud/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 func (k Keeper) NewCrudValue(
@@ -114,14 +113,8 @@ func (k Keeper) GetOwnedKeys(ctx *sdk.Context, owner string, uuid string, pagina
 	ownerStore := prefix.NewStore(store, types.OwnerPrefix(types.OwnerValueKey, ownerUuidPrefix))
 
 	keys := make([]string, 0)
-	keysSize := uint64(0)
+
 	pageRes, _ := k.Paginate(ownerStore, pagination, func(key []byte, value []byte) error {
-
-		keysSize = uint64(len(key)) + keysSize
-
-		if keysSize > k.mks.MaxKeysSize {
-			return sdkerrors.New("crud", 2, "exceeded max key size")
-		}
 		keys = append(keys, string(key))
 		return nil
 	})
@@ -139,16 +132,9 @@ func (k Keeper) GetKeysUnderUuid(ctx *sdk.Context, uuid string) ([]string, error
 	defer iterator.Close()
 	var keys []string
 
-	keysSize := uint64(0)
 	for ; iterator.Valid(); iterator.Next() {
 		key := string(iterator.Key())
-		keysSize = uint64(len(key)) + keysSize
-
-		if keysSize < k.mks.MaxKeysSize {
-			keys = append(keys, key)
-		} else {
-			return keys, nil
-		}
+		keys = append(keys, key)
 	}
 	return keys, nil
 }

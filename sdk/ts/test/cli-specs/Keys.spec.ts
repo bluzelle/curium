@@ -9,7 +9,8 @@ import {
 } from "../helpers/client-helpers/sdk-helpers";
 import Long from 'long'
 import delay from "delay";
-import {curiumd} from "../helpers/cli-helpers/curiumd-helpers";
+import {curiumd, execute} from "../helpers/cli-helpers/curiumd-helpers";
+
 
 
 describe('q.Keys()', function () {
@@ -22,14 +23,6 @@ describe('q.Keys()', function () {
     });
 
     it('should return a empty list if there are no keys', async () => {
-        await sdk.db.tx.Create({
-            creator: sdk.db.address,
-            uuid,
-            key: 'aven',
-            value: new TextEncoder().encode('dauz'),
-            lease: defaultLease,
-            metadata: new Uint8Array()
-        })
-        expect(await curiumd(`q crud ${uuid}`)).to.equal('[aven]')
+        expect(await curiumd(`q crud keys ${uuid}`).then(resp => resp)).to.equal('[aven]')
     });
 });

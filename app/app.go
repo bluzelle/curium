@@ -376,6 +376,7 @@ func New(
 
 	app.crudKeeper = *crudkeeper.NewKeeper(
 		appCodec,
+		app.curiumKeeper,
 		keys[crudtypes.StoreKey],
 		keys[crudtypes.MemStoreKey],
 		crudkeeper.MaxKeeperSizes{
@@ -383,6 +384,7 @@ func New(
 			MaxKeyValuesSize:      0,
 			MaxDefaultLeaseBlocks: 0,
 		},
+
 	)
 	crudModule := crud.NewAppModule(appCodec, app.crudKeeper)
 

@@ -151,6 +151,20 @@ describe('tx.Create()', function () {
 
     });
 
+    it('should not allow another user to input another address as creator', async () => {
+        const otherSdk = await newSdkClient(sdk);
+
+        await expect(sdk.db.tx.Create({
+            creator: otherSdk.db.address,
+            uuid,
+            key: 'key',
+            value: encodeData('value'),
+            lease: defaultLease,
+            metadata: new Uint8Array()
+        })).to.be.rejectedWith(/pubKey does not match signer address/)
+
+    })
+
     it('should throw an error if incorrect owner tries to create in uuid', async () => {
         const sdk2 = await bluzelle({
             mnemonic: bluzelle.newMnemonic(),

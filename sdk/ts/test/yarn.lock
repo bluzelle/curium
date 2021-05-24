@@ -791,6 +791,14 @@ chalk@^4.0.0:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
 
+chalk@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/chalk/-/chalk-4.1.1.tgz#c80b3fab28bf6371e6863325eee67e618b77e6ad"
+  integrity sha512-diHzdDKxcU+bAsUboHLPEDQiw0qEe0qd7SYUn3HgcFlWgbDcfLGswOHYeGrHKzG9z6UYf01d9VFMfZxPM1xZSg==
+  dependencies:
+    ansi-styles "^4.1.0"
+    supports-color "^7.1.0"
+
 check-error@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/check-error/-/check-error-1.0.2.tgz#574d312edd88bb5dd8912e9286dd6c0aed4aac82"
@@ -2547,6 +2555,11 @@ shell-escape@^0.2.0:
   resolved "https://registry.yarnpkg.com/shell-escape/-/shell-escape-0.2.0.tgz#68fd025eb0490b4f567a027f0bf22480b5f84133"
   integrity sha1-aP0CXrBJC09WegJ/C/IkgLX4QTM=
 
+shq@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/shq/-/shq-1.0.2.tgz#bc3f9ac369100cdd754d45032d987b3b62d32fd0"
+  integrity sha512-8AvNyHL75DHlkbLmzF7nzTzT2F0qEfSewwxHjH79Ww8S+hGpIZVlf8b0TcdOwv4HqIkOVBInu9n+wqhUSl9Wag==
+
 signal-exit@^3.0.2:
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.3.tgz#a1410c2edd8f077b08b4e253c8eacfcaf057461c"
@@ -2973,7 +2986,7 @@ which-module@^2.0.0:
   resolved "https://registry.yarnpkg.com/which-module/-/which-module-2.0.0.tgz#d9ef07dce77b9902b8a3a8fa4b31c3e3f7e6e87a"
   integrity sha1-2e8H3Od7mQK4o6j6SzHD4/fm6Ho=
 
-which@2.0.2, which@^2.0.1:
+which@2.0.2, which@^2.0.1, which@^2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/which/-/which-2.0.2.tgz#7c6a8dd0a636a0327e10b59c9286eee93f3f51b1"
   integrity sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==
@@ -3141,3 +3154,13 @@ yocto-queue@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-0.1.0.tgz#0294eb3dee05028d31ee1a5fa2c556a6aaf10a1b"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
+
+zx@^1.8.0:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/zx/-/zx-1.8.0.tgz#dc5893cc5e433afe708292bf44da29ba55215bd7"
+  integrity sha512-NcNA+c+xOoKzNjkcotI5DTmtT/tdzaxP8EAY9JXpCW28lcFPtdEFDbCzqWb23T0X7G3SiR0pONVqYXCn6eA2qA==
+  dependencies:
+    chalk "^4.1.1"
+    node-fetch "^2.6.1"
+    shq "^1.0.2"
+    which "^2.0.2"

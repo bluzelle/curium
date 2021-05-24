@@ -3,6 +3,7 @@ package keeper
 import (
 	"bytes"
 	"fmt"
+	curiumkeeper "github.com/bluzelle/curium/x/curium/keeper"
 	"github.com/cosmos/cosmos-sdk/types/query"
 
 	"github.com/bluzelle/curium/app/ante"
@@ -19,6 +20,7 @@ import (
 type (
 	Keeper struct {
 		cdc      codec.Marshaler
+		curiumKeeper curiumkeeper.Keeper
 		storeKey sdk.StoreKey
 		memKey   sdk.StoreKey
 		mks      MaxKeeperSizes
@@ -42,6 +44,7 @@ func MakeLeaseKey(blockHeight int64, UUID string, key string) []byte {
 
 func NewKeeper(
 	cdc codec.Marshaler,
+	curiumKeeper curiumkeeper.Keeper,
 	storeKey sdk.StoreKey,
 	memKey sdk.StoreKey,
 	mks MaxKeeperSizes,
@@ -49,6 +52,7 @@ func NewKeeper(
 ) *Keeper {
 	return &Keeper{
 		cdc:      cdc,
+		curiumKeeper: curiumKeeper,
 		storeKey: storeKey,
 		memKey:   memKey,
 		mks:      mks,
