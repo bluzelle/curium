@@ -23,6 +23,14 @@ describe('q.Keys()', function () {
     });
 
     it('should return a empty list if there are no keys', async () => {
-        expect(await curiumd(`q crud keys ${uuid}`).then(resp => resp)).to.equal('[aven]')
+        expect(await curiumd(`q crud keys ${uuid}`)
+            .then(({stderr, stdout}) => ({stdout: stdout.split('\n'), stderr}))
+            .then(resp => resp.stdout[0])).to.equal('keys: []')
+    });
+    it('should return a list of keys in the uuid', async () => {
+        const {keys} = await createKeys(sdk.db, 10, uuid)
+        expect(await curiumd(`q crud keys ${uuid}`)
+            .then(({stderr, stdout}) => ({stdout: stdout.split('\n'), stderr}))
+            .then(resp => resp.stdout[0])).to.equal(`keys: [${keys}]`)
     });
 });

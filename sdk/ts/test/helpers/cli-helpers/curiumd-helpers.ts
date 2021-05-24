@@ -5,7 +5,7 @@ process.env.PATH = process.env.PATH + ':/Users/avendauz/go/bin:'
 
 const exec = util.promisify(require('child_process').exec);
 
-export const curiumd = (...args: any[]):Promise<string> =>
+export const curiumd = (...args: any[]): Promise<{stderr: string, stdout: string}> =>
     exec(`curiumd ${args.join(' ')}`);
 
 export const execute = (...args: any[]):Promise<string> =>
