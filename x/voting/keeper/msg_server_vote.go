@@ -10,18 +10,19 @@ import (
 
 func (k msgServer) Vote(goCtx context.Context, msg *types.MsgVote) (*types.MsgVoteResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	k.Logger(ctx).Info("Vote received", "msg", msg)
 	valid := k.IsVoteValid(ctx, msg)
 	if !valid {
 		return nil, sdkerrors.New("voting", 2, "Vote not valid")
 	}
-	k.StoreVote(ctx, &types.Vote{
+	vote :=  &types.Vote{
 		Id:       msg.Id,
 		VoteType: msg.VoteType,
 		Creator:  msg.Creator,
 		Value:    msg.Value,
 		Valcons:  msg.Valcons,
 		Weight:   k.GetValidatorWeight(ctx, msg.Valcons),
-	})
+	}
+	k.Logger(ctx).Info("Storing received vote", "vote", vote, "msg block", msg.Block, "block", ctx.BlockHeight())
+	k.StoreVote(&ctx, vote)
 	return &types.MsgVoteResponse{}, nil
 }

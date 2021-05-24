@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"encoding/binary"
 	"fmt"
 	"github.com/bluzelle/curium/x/curium"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
@@ -99,25 +98,24 @@ func MakeProofStoreKey(valcons string, voteType string, voteId string) []byte {
 	return append([]byte(valcons+voteType), []byte(voteId)...)
 }
 
-func uint64ToByteArray(n uint64) []byte {
-	b := make([]byte, 8)
-	binary.LittleEndian.PutUint64(b, uint64(n))
-	return b
+func padBlockNumber(n uint64) string {
+	return fmt.Sprintf("%020d", n)
 }
 
 func MakeVoteStoreKey(block int64, voteType string, voteId string, valcons string) []byte {
-	bytes := uint64ToByteArray(uint64(block))
-	bytes = append(bytes, []byte(voteType)...)
-	bytes = append(bytes, []byte(voteId)...)
-	bytes = append(bytes, []byte(valcons)...)
-	return bytes
+	s := fmt.Sprintf("%s\x00%s\x00%s\x00%s", Pad20Int64(block), voteType, voteId, valcons)
+	return []byte(s)
+}
+
+func Pad20Int64(n int64) string {
+	return fmt.Sprintf("%020d", n)
 }
 
 func (k Keeper) GetProofStore(ctx sdk.Context) prefix.Store {
 	return prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.ProofPrefix))
 }
 
-func (k Keeper) GetVoteStore(ctx sdk.Context) prefix.Store {
+func (k Keeper) GetVoteStore(ctx *sdk.Context) prefix.Store {
 	return prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.VotePrefix))
 }
 
@@ -177,18 +175,18 @@ func GenerateBatch(t time.Time) string {
 
 }
 
-func (k Keeper) StoreVote(ctx sdk.Context, vote *types.Vote) {
+func (k Keeper) StoreVote(ctx *sdk.Context, vote *types.Vote) {
 	store := k.GetVoteStore(ctx)
 	key := MakeVoteStoreKey(ctx.BlockHeight(), vote.VoteType, vote.Id, vote.Valcons)
+	k.Logger(*ctx).Info("Storing vote", "key", key)
 	store.Set(key, k.cdc.MustMarshalBinaryBare(vote))
 }
 
-func (k Keeper) CheckDeliverVotes(ctx sdk.Context) {
-	k.Logger(ctx).Info("Check deliver votes", "block", ctx.BlockHeight() - 2)
-	start := make([]byte, 8)
-	binary.LittleEndian.PutUint64(start, uint64(ctx.BlockHeight()-2))
+func (k Keeper) CheckDeliverVotes(ctx *sdk.Context) {
+	start := Pad20Int64(ctx.BlockHeight() - 3)
+	k.Logger(*ctx).Info("Check deliver votes", "start", start, "height", ctx.BlockHeight())
 	store := k.GetVoteStore(ctx)
-	iterator := sdk.KVStorePrefixIterator(store, start)
+	iterator := sdk.KVStoreReversePrefixIterator(store, []byte(start))
 	var votes = map[string]map[string][]*types.Vote{}
 	for ; iterator.Valid(); iterator.Next() {
 		var vote types.Vote
@@ -202,7 +200,7 @@ func (k Keeper) CheckDeliverVotes(ctx sdk.Context) {
 
 	for voteType := range votes {
 		if voteHandlers[voteType] == nil {
-			k.Logger(ctx).Error("No vote handler registered", "type", voteType)
+			k.Logger(*ctx).Error("No vote handler registered", "type", voteType)
 			continue
 		}
 
@@ -212,8 +210,8 @@ func (k Keeper) CheckDeliverVotes(ctx sdk.Context) {
 		}
 		sortkeys.Strings(ids)
 		for _, id := range ids {
-			k.Logger(ctx).Info("Sending vote to vote handler", "vote", votes[voteType][id])
-			voteHandlers[voteType].VotesReceived(&ctx, id, votes[voteType][id])
+			k.Logger(*ctx).Info("Sending vote to vote handler", "vote", votes[voteType][id])
+			voteHandlers[voteType].VotesReceived(ctx, id, votes[voteType][id])
 		}
 	}
 }
