@@ -44,9 +44,9 @@ func CmdCreate() *cobra.Command {
 	return cmd
 }
 
-func CmdUpdateCrudValue() *cobra.Command {
+func CmdUpdate() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-CrudValue [uuid] [key] [value] [lease]",
+		Use:   "update [uuid] [key] [value] [lease]",
 		Short: "Update a CrudValue",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -79,9 +79,9 @@ func CmdUpdateCrudValue() *cobra.Command {
 	return cmd
 }
 
-func CmdDeleteCrudValue() *cobra.Command {
+func CmdDelete() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "delete-CrudValue [uuid] [key]",
+		Use:   "delete [uuid] [key]",
 		Short: "Delete a Key",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {

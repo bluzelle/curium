@@ -6,7 +6,6 @@ import (
 	curiumkeeper "github.com/bluzelle/curium/x/curium/keeper"
 	"github.com/cosmos/cosmos-sdk/types/query"
 
-	"github.com/bluzelle/curium/app/ante"
 	"github.com/bluzelle/curium/x/crud/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
@@ -175,36 +174,36 @@ func (k Keeper) ProcessLeasesAtBlockHeight(ctx *sdk.Context, lease int64) {
 
 func (k Keeper) UpdateLease(ctx *sdk.Context, crudValue *types.CrudValue) {
 
-	curLeaseBlocks := k.ConvertLeaseToBlocks(crudValue.Lease)
+	//curLeaseBlocks := k.ConvertLeaseToBlocks(crudValue.Lease)
 
 	k.DeleteLease(ctx, crudValue.Uuid, crudValue.Key)
 
-	calculateLeaseRefund := func() uint64 {
-		bytes := len(crudValue.Uuid) + len(crudValue.Key) + len(crudValue.Value)
-		unusedOriginalLease := crudValue.Height + curLeaseBlocks - ctx.BlockHeight()
-
-		if unusedOriginalLease <= 0 {
-			return 0
-		}
-
-		percentUnused := float64(unusedOriginalLease) / float64(curLeaseBlocks)
-		originalLeaseCost := CalculateGasForLease(crudValue.Lease, bytes)
-		return uint64(float64(originalLeaseCost) * percentUnused)
-	}
-
-	// Charge for lease gas
-	func() {
-		gasForNewLease := CalculateGasForLease(crudValue.Lease, len(crudValue.Uuid)+len(crudValue.Key)+len(crudValue.Value))
-
-		blzGasMeter := ctx.GasMeter().(ante.BluzelleGasMeterInterface)
-
-		gasRefund := calculateLeaseRefund()
-		if gasForNewLease > gasRefund {
-			gasForLease := gasForNewLease - gasRefund
-			//ctx.GasMeter().ConsumeGas(gasForLease, "lease")
-			blzGasMeter.ConsumeBillableGas(gasForLease, "lease")
-		}
-	}()
+	//calculateLeaseRefund := func() uint64 {
+	//	bytes := len(crudValue.Uuid) + len(crudValue.Key) + len(crudValue.Value)
+	//	unusedOriginalLease := crudValue.Height + curLeaseBlocks - ctx.BlockHeight()
+	//
+	//	if unusedOriginalLease <= 0 {
+	//		return 0
+	//	}
+	//
+	//	percentUnused := float64(unusedOriginalLease) / float64(curLeaseBlocks)
+	//	originalLeaseCost := CalculateGasForLease(crudValue.Lease, bytes)
+	//	return uint64(float64(originalLeaseCost) * percentUnused)
+	//}
+	//
+	//// Charge for lease gas
+	//func() {
+	//	gasForNewLease := CalculateGasForLease(crudValue.Lease, len(crudValue.Uuid)+len(crudValue.Key)+len(crudValue.Value))
+	//
+	//	blzGasMeter := ctx.GasMeter().(ante.BluzelleGasMeterInterface)
+	//
+	//	gasRefund := calculateLeaseRefund()
+	//	if gasForNewLease > gasRefund {
+	//		gasForLease := gasForNewLease - gasRefund
+	//		//ctx.GasMeter().ConsumeGas(gasForLease, "lease")
+	//		blzGasMeter.ConsumeBillableGas(gasForLease, "lease")
+	//	}
+	//}()
 
 	crudValue.Height = ctx.BlockHeight()
 	//keeper.SetValue(ctx, keeper.GetKVStore(ctx), UUID, key, blzValue)
