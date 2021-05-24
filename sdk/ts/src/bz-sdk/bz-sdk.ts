@@ -16,11 +16,16 @@ import {QueryClientImpl as StakingQueryClientImpl} from '../codec/cosmos/staking
 import {MsgClientImpl as StakingMsgClientImpl} from '../codec/cosmos/staking/v1beta1/tx'
 import * as StakingMsgTypes from '../codec/cosmos/staking/v1beta1/tx'
 
+import {QueryClientImpl as DistributionQueryClientImpl} from '../codec/cosmos/distribution/v1beta1/query'
+import {MsgClientImpl as DistributionMsgClientImpl} from '../codec/cosmos/distribution/v1beta1/tx'
+import * as DistributionMsgTypes from '../codec/cosmos/distribution/v1beta1/tx'
+
+
 import {newCommunicationService} from "../client-lib/CommunicationService";
 import {Left, Right} from "monet";
 import {entropyToMnemonic, generateMnemonic} from "bip39";
 import {nftHelpers, NftHelpers} from "../helpers/nft-helpers";
-import {account, CosmosAccount} from "../client-lib/cosmos";
+
 
 
 
@@ -28,7 +33,8 @@ export type DbSdk = SDK<CrudQueryClientImpl, CrudMsgClientImpl>
 export type NftSdk = SDK<NftQueryClientImpl, NftMsgClientImpl>
 export type BankSdk = SDK<BankQueryClientImpl, BankMsgClientImpl>
 export type StakingSdk = SDK<StakingQueryClientImpl, StakingMsgClientImpl>
-export type BluzelleSdk = { db: DbSdk, nft: NftSdk, bank: BankSdk, staking: StakingSdk, helpers: {nft: NftHelpers} }
+export type DistributionSdk = SDK<DistributionQueryClientImpl, DistributionMsgClientImpl>
+export type BluzelleSdk = { db: DbSdk, nft: NftSdk, bank: BankSdk, staking: StakingSdk, helpers: {nft: NftHelpers}, distribution: DistributionSdk }
 export interface Bluzelle {
     (options: SDKOptions): Promise<BluzelleSdk>,
     newMnemonic: (entropy?: string) => string
@@ -41,13 +47,15 @@ export const bluzelle: Bluzelle = (options: SDKOptions): Promise<BluzelleSdk> =>
                 sdk<NftQueryClientImpl, NftMsgClientImpl>(options, NftQueryClientImpl, NftMsgClientImpl, NftMsgTypes, cs),
                 sdk<BankQueryClientImpl, BankMsgClientImpl>(options, BankQueryClientImpl, BankMsgClientImpl, BankMsgTypes, cs),
                 sdk<StakingQueryClientImpl, StakingMsgClientImpl>(options, StakingQueryClientImpl, StakingMsgClientImpl, StakingMsgTypes, cs),
+                sdk<DistributionQueryClientImpl, DistributionMsgClientImpl>(options, DistributionQueryClientImpl, DistributionMsgClientImpl, DistributionMsgTypes, cs)
             ])
         )
         .then(([
                    db,
                    nft,
                    bank,
-                   staking
+                   staking,
+                    distribution
                ]) => ({
             db,
             nft,
@@ -55,7 +63,8 @@ export const bluzelle: Bluzelle = (options: SDKOptions): Promise<BluzelleSdk> =>
             staking,
             helpers: {
                 nft: nftHelpers(nft)
-            }
+            },
+            distribution
                }))
 
 bluzelle.newMnemonic = newMnemonic;

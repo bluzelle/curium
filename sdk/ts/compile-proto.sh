@@ -19,6 +19,11 @@ curl https://raw.githubusercontent.com/cosmos/cosmos-sdk/master/proto/cosmos/sta
 curl https://raw.githubusercontent.com/cosmos/cosmos-sdk/master/proto/cosmos/staking/v1beta1/query.proto > proto/cosmos/staking/v1beta1/query.proto
 curl https://raw.githubusercontent.com/cosmos/cosmos-sdk/master/proto/cosmos/staking/v1beta1/tx.proto > proto/cosmos/staking/v1beta1/tx.proto
 
+mkdir -p proto/cosmos/distribution/v1beta1
+curl https://raw.githubusercontent.com/cosmos/cosmos-sdk/master/proto/cosmos/distribution/v1beta1/distribution.proto > proto/cosmos/distribution/v1beta1/distribution.proto
+curl https://raw.githubusercontent.com/cosmos/cosmos-sdk/master/proto/cosmos/distribution/v1beta1/query.proto > proto/cosmos/distribution/v1beta1/query.proto
+curl https://raw.githubusercontent.com/cosmos/cosmos-sdk/master/proto/cosmos/distribution/v1beta1/tx.proto > proto/cosmos/distribution/v1beta1/tx.proto
+
 mkdir -p proto/tendermint/types
 curl https://raw.githubusercontent.com/tendermint/tendermint/master/proto/tendermint/types/types.proto > proto/tendermint/types/types.proto
 curl https://raw.githubusercontent.com/tendermint/tendermint/master/proto/tendermint/types/validator.proto > proto/tendermint/types/validator.proto
@@ -68,5 +73,8 @@ protoc \
   "./proto/cosmos/bank/v1beta1/tx.proto" \
   "./proto/cosmos/staking/v1beta1/staking.proto" \
   "./proto/cosmos/staking/v1beta1/query.proto" \
-  "./proto/cosmos/staking/v1beta1/tx.proto"
+  "./proto/cosmos/staking/v1beta1/tx.proto" \
+  "./proto/cosmos/distribution/v1beta1/distribution.proto" \
+  "./proto/cosmos/distribution/v1beta1/query.proto" \
+  "./proto/cosmos/distribution/v1beta1/tx.proto"
 
