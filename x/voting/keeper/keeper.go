@@ -98,10 +98,6 @@ func MakeProofStoreKey(valcons string, voteType string, voteId string) []byte {
 	return append([]byte(valcons+voteType), []byte(voteId)...)
 }
 
-func padBlockNumber(n uint64) string {
-	return fmt.Sprintf("%020d", n)
-}
-
 func MakeVoteStoreKey(block int64, voteType string, voteId string, valcons string) []byte {
 	s := fmt.Sprintf("%s\x00%s\x00%s\x00%s", Pad20Int64(block), voteType, voteId, valcons)
 	return []byte(s)
@@ -186,7 +182,7 @@ func (k Keeper) CheckDeliverVotes(ctx *sdk.Context) {
 	start := Pad20Int64(ctx.BlockHeight() - 3)
 	k.Logger(*ctx).Info("Check deliver votes", "start", start, "height", ctx.BlockHeight())
 	store := k.GetVoteStore(ctx)
-	iterator := sdk.KVStoreReversePrefixIterator(store, []byte(start))
+	iterator := sdk.KVStorePrefixIterator(store, []byte(start))
 	var votes = map[string]map[string][]*types.Vote{}
 	for ; iterator.Valid(); iterator.Next() {
 		var vote types.Vote
