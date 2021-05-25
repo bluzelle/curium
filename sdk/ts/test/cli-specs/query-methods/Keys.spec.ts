@@ -1,15 +1,15 @@
 import {expect} from "chai";
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
-import {bluzelle, BluzelleSdk, DbSdk, newMnemonic} from "../../src/bz-sdk/bz-sdk";
+import {bluzelle, BluzelleSdk, DbSdk, newMnemonic} from "../../../src/bz-sdk/bz-sdk";
 import {
     createKeys,
     defaultLease,
     getSdk, newSdkClient,
     zeroLease
-} from "../helpers/client-helpers/sdk-helpers";
+} from "../../helpers/client-helpers/sdk-helpers";
 import Long from 'long'
 import delay from "delay";
-import {curiumd, execute} from "../helpers/cli-helpers/curiumd-helpers";
+import {curiumd, execute} from "../../helpers/cli-helpers/curiumd-helpers";
 
 
 
@@ -28,9 +28,9 @@ describe('q.Keys()', function () {
             .then(resp => resp.stdout[0])).to.equal('keys: []')
     });
     it('should return a list of keys in the uuid', async () => {
-        const {keys} = await createKeys(sdk.db, 10, uuid)
+        const {keys} = await createKeys(sdk.db, 5, uuid)
+
         expect(await curiumd(`q crud keys ${uuid}`)
-            .then(({stderr, stdout}) => ({stdout: stdout.split('\n'), stderr}))
-            .then(resp => resp.stdout[0])).to.equal(`keys: [${keys}]`)
+            .then(({stdout}) => expect(stdout).to.match(/key-0.*key-1/)))
     });
 });

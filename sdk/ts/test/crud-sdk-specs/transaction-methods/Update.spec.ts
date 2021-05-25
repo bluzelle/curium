@@ -67,11 +67,6 @@ describe('tx.Update()', function () {
             metadata: new Uint8Array(),
             lease: defaultLease
         });
-        expect(await sdk.db.tx.Read({
-            creator: sdk.db.address,
-            uuid,
-            key: 'myKey'
-        }).then(resp => decodeData(resp.value))).to.equal('firstValue');
 
         await sdk.db.tx.Update({
             creator: sdk.db.address,

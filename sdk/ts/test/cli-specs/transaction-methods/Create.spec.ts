@@ -1,21 +1,21 @@
 import {expect} from "chai";
 import {DEFAULT_TIMEOUT, getPrintableChars} from "testing/lib/helpers/testHelpers";
-import {bluzelle, BluzelleSdk, DbSdk, newMnemonic} from "../../src/bz-sdk/bz-sdk";
+import {bluzelle, BluzelleSdk, DbSdk, newMnemonic} from "../../../src/bz-sdk/bz-sdk";
 import {
     createKeys, decodeData,
     defaultLease, encodeData,
     getSdk, newSdkClient,
     zeroLease
-} from "../helpers/client-helpers/sdk-helpers";
+} from "../../helpers/client-helpers/sdk-helpers";
 import Long from 'long'
 import delay from "delay";
-import {curiumd, execute} from "../helpers/cli-helpers/curiumd-helpers";
+import {curiumd, execute} from "../../helpers/cli-helpers/curiumd-helpers";
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
-import {Lease} from "../../src/codec/crud/lease";
+import {Lease} from "../../../src/codec/crud/lease";
 
 
 
-describe('tx.Update()', function () {
+describe('tx.Create()', function () {
     this.timeout(DEFAULT_TIMEOUT);
     let sdk: BluzelleSdk;
     let uuid: string;
@@ -25,25 +25,13 @@ describe('tx.Update()', function () {
         uuid = Date.now().toString()
     });
 
-    it('should update a key-value', async () => {
+    it('should create a key value', async () => {
 
-        //await curiumd(`tx crud create ${uuid} someKey someValue 600 --from ${sdk.db.address} --fees 500ubnt -y`)
-        await sdk.db.tx.Create({
-            creator: sdk.db.address,
-            uuid,
-            key: 'someKey',
-            value: encodeData('someValue'),
-            lease: defaultLease,
-            metadata: new Uint8Array()
-        })
-
-        await curiumd(`tx crud update ${uuid} someKey updatedValue 600 --from ${sdk.db.address} --fees 1000ubnt -y`)
-            .then(x => x)
-
+        await curiumd(`tx crud create ${uuid} someKey someValue 600 --from ${sdk.db.address} --fees 500ubnt -y`)
         expect(await sdk.db.q.Read({
             uuid,
             key: 'someKey'
-        }).then(resp => decodeData(resp.value))).to.equal('updatedValue')
+        }).then(resp => decodeData(resp.value))).to.equal('someValue')
     });
 
     it('should expire a key value beyond the specified lease in secods', async () => {
@@ -67,5 +55,18 @@ describe('tx.Update()', function () {
             .then(decodeData)
             .then(readResponse => expect(readResponse).to.equal(symbols));
     });
+
+    it('should throw an error if key already exists', () => {
+
+       return curiumd(`tx crud create ${uuid} firstKey firstValue 600 --from ${sdk.db.address} --fees 500ubnt -y`)
+            .then(() => curiumd(`tx crud create ${uuid} firstKey secondValue 600 --from ${sdk.db.address} --fees 500ubnt -y`))
+           .then(({stdout}) => expect(stdout).to.match(/key already exists/))
+    });
+
+    it.skip('should throw an error if key is empty', () => {
+        return expect(curiumd(`tx crud create ${uuid}  firstValue 600 --from ${sdk.db.address} --fees 500ubnt -y`)).to.be.rejectedWith('Key cannot be empty')
+
+    });
+
 
 });

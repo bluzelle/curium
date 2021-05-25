@@ -166,21 +166,7 @@ describe('tx.Create()', function () {
     })
 
     it('should throw an error if incorrect owner tries to create in uuid', async () => {
-        const sdk2 = await bluzelle({
-            mnemonic: bluzelle.newMnemonic(),
-            url: localChain.endpoint,
-            gasPrice: 0.002,
-            maxGas: 100000000
-        })
-
-        await sdk.bank.tx.Send({
-            toAddress: sdk2.bank.address,
-            fromAddress: sdk.bank.address,
-            amount: [{
-                amount: '100',
-                denom: 'ubnt'
-            }]
-        })
+        const sdk2 = await newSdkClient(sdk)
         await sdk.db.tx.Create({
             creator: sdk.db.address,
             uuid,
