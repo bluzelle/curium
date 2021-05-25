@@ -39,9 +39,24 @@ service Query {
 		option (google.api.http).get = "/bluzelle/curium/crud/GetLease/{uuid}/{key}";
 	}
 
+	rpc KeyValues(QueryKeyValuesRequest) returns (QueryKeyValuesResponse) {
+		option (google.api.http).get = "/bluzelle/curium/crud/KeyValues/{uuid}";
+	}
+
 }
 
 // this line is used by starport scaffolding # 3
+
+message QueryKeyValuesRequest {
+	string uuid = 1;
+	PagingRequest pagination = 2;
+}
+
+message QueryKeyValuesResponse {
+	repeated KeyValue keyValues = 1;
+	PagingResponse pagination = 2;
+}
+
 message QueryReadRequest {
 	string uuid = 1;
 	string key = 2;

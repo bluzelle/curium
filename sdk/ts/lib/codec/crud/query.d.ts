@@ -3,7 +3,14 @@ import _m0 from "protobufjs/minimal";
 import { PagingRequest, PagingResponse } from "../crud/Paging";
 import { KeyValue, KeyLease } from "../crud/KeyValue";
 export declare const protobufPackage = "bluzelle.curium.crud";
-/** this line is used by starport scaffolding # 3 */
+export interface QueryKeyValuesRequest {
+    uuid: string;
+    pagination?: PagingRequest;
+}
+export interface QueryKeyValuesResponse {
+    keyValues: KeyValue[];
+    pagination?: PagingResponse;
+}
 export interface QueryReadRequest {
     uuid: string;
     key: string;
@@ -69,6 +76,20 @@ export interface QueryGetNShortestLeasesResponse {
     uuid: string;
     keyLeases: KeyLease[];
 }
+export declare const QueryKeyValuesRequest: {
+    encode(message: QueryKeyValuesRequest, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryKeyValuesRequest;
+    fromJSON(object: any): QueryKeyValuesRequest;
+    toJSON(message: QueryKeyValuesRequest): unknown;
+    fromPartial(object: DeepPartial<QueryKeyValuesRequest>): QueryKeyValuesRequest;
+};
+export declare const QueryKeyValuesResponse: {
+    encode(message: QueryKeyValuesResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryKeyValuesResponse;
+    fromJSON(object: any): QueryKeyValuesResponse;
+    toJSON(message: QueryKeyValuesResponse): unknown;
+    fromPartial(object: DeepPartial<QueryKeyValuesResponse>): QueryKeyValuesResponse;
+};
 export declare const QueryReadRequest: {
     encode(message: QueryReadRequest, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryReadRequest;
@@ -192,6 +213,7 @@ export interface Query {
     Search(request: QuerySearchRequest): Promise<QuerySearchResponse>;
     GetNShortestLeases(request: QueryGetNShortestLeasesRequest): Promise<QueryGetNShortestLeasesResponse>;
     GetLease(request: QueryGetLeaseRequest): Promise<QueryGetLeaseResponse>;
+    KeyValues(request: QueryKeyValuesRequest): Promise<QueryKeyValuesResponse>;
 }
 export declare class QueryClientImpl implements Query {
     private readonly rpc;
@@ -204,6 +226,7 @@ export declare class QueryClientImpl implements Query {
     Search(request: QuerySearchRequest): Promise<QuerySearchResponse>;
     GetNShortestLeases(request: QueryGetNShortestLeasesRequest): Promise<QueryGetNShortestLeasesResponse>;
     GetLease(request: QueryGetLeaseRequest): Promise<QueryGetLeaseResponse>;
+    KeyValues(request: QueryKeyValuesRequest): Promise<QueryKeyValuesResponse>;
 }
 interface Rpc {
     request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;

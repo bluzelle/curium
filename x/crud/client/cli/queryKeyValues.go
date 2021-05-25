@@ -8,31 +8,40 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdReadQuery() *cobra.Command {
+func CmdKeyValuesQuery() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "read",
-		Short: "uuid key",
+		Use:   "keyValues [uuid]",
+		Short: "uuid",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
-			queryClient := types.NewQueryClient(clientCtx)
-
-			params := &types.QueryReadRequest{
-				Uuid: args[0],
-				Key: args[1],
-			}
-
-			res, err := queryClient.Read(context.Background(), params)
+			pageReq, err := client.ReadPageRequest(cmd.Flags())
 			if err != nil {
 				return err
 			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			params := &types.QueryKeyValuesRequest{
+				Uuid: args[0],
+				Pagination: &types.PagingRequest{
+					StartKey: string(pageReq.Key),
+					Limit:    pageReq.Limit,
+				},
+			}
+
+			res, err := queryClient.KeyValues(context.Background(), params)
+			if err != nil {
+				return err
+			}
+
 			return clientCtx.PrintProto(res)
 		},
 	}
-
-	cmd.Flags().Bool("base64", false, "return values in base64 encoding")
 
 	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
 }
+
+

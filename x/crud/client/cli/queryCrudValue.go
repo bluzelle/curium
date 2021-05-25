@@ -10,7 +10,7 @@ import (
 
 func CmdKeysQuery() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "keys",
+		Use:   "keys [uuid]",
 		Short: "uuid",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -38,6 +38,8 @@ func CmdKeysQuery() *cobra.Command {
 			return clientCtx.PrintProto(res)
 		},
 	}
+
+	cmd.Flags().String("base64", "", "return values in base64 encoding")
 
 	flags.AddQueryFlagsToCmd(cmd)
 

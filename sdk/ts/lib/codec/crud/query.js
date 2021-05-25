@@ -3,13 +3,165 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.QueryClientImpl = exports.QueryGetNShortestLeasesResponse = exports.QueryGetNShortestLeasesRequest = exports.QueryGetLeaseResponse = exports.QueryGetLeaseRequest = exports.QuerySearchResponse = exports.QuerySearchRequest = exports.QueryHasResponse = exports.QueryHasRequest = exports.QueryCountResponse = exports.QueryCountRequest = exports.QueryMyKeysResponse = exports.QueryMyKeysRequest = exports.QueryKeysResponse = exports.QueryKeysRequest = exports.QueryReadResponse = exports.QueryReadRequest = exports.protobufPackage = void 0;
+exports.QueryClientImpl = exports.QueryGetNShortestLeasesResponse = exports.QueryGetNShortestLeasesRequest = exports.QueryGetLeaseResponse = exports.QueryGetLeaseRequest = exports.QuerySearchResponse = exports.QuerySearchRequest = exports.QueryHasResponse = exports.QueryHasRequest = exports.QueryCountResponse = exports.QueryCountRequest = exports.QueryMyKeysResponse = exports.QueryMyKeysRequest = exports.QueryKeysResponse = exports.QueryKeysRequest = exports.QueryReadResponse = exports.QueryReadRequest = exports.QueryKeyValuesResponse = exports.QueryKeyValuesRequest = exports.protobufPackage = void 0;
 /* eslint-disable */
 const long_1 = __importDefault(require("long"));
 const minimal_1 = __importDefault(require("protobufjs/minimal"));
 const Paging_1 = require("../crud/Paging");
 const KeyValue_1 = require("../crud/KeyValue");
 exports.protobufPackage = "bluzelle.curium.crud";
+const baseQueryKeyValuesRequest = { uuid: "" };
+exports.QueryKeyValuesRequest = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        if (message.uuid !== "") {
+            writer.uint32(10).string(message.uuid);
+        }
+        if (message.pagination !== undefined) {
+            Paging_1.PagingRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = { ...baseQueryKeyValuesRequest };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.uuid = reader.string();
+                    break;
+                case 2:
+                    message.pagination = Paging_1.PagingRequest.decode(reader, reader.uint32());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = { ...baseQueryKeyValuesRequest };
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = String(object.uuid);
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.pagination !== undefined && object.pagination !== null) {
+            message.pagination = Paging_1.PagingRequest.fromJSON(object.pagination);
+        }
+        else {
+            message.pagination = undefined;
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.uuid !== undefined && (obj.uuid = message.uuid);
+        message.pagination !== undefined &&
+            (obj.pagination = message.pagination
+                ? Paging_1.PagingRequest.toJSON(message.pagination)
+                : undefined);
+        return obj;
+    },
+    fromPartial(object) {
+        const message = { ...baseQueryKeyValuesRequest };
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = object.uuid;
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.pagination !== undefined && object.pagination !== null) {
+            message.pagination = Paging_1.PagingRequest.fromPartial(object.pagination);
+        }
+        else {
+            message.pagination = undefined;
+        }
+        return message;
+    },
+};
+const baseQueryKeyValuesResponse = {};
+exports.QueryKeyValuesResponse = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        for (const v of message.keyValues) {
+            KeyValue_1.KeyValue.encode(v, writer.uint32(10).fork()).ldelim();
+        }
+        if (message.pagination !== undefined) {
+            Paging_1.PagingResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = { ...baseQueryKeyValuesResponse };
+        message.keyValues = [];
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.keyValues.push(KeyValue_1.KeyValue.decode(reader, reader.uint32()));
+                    break;
+                case 2:
+                    message.pagination = Paging_1.PagingResponse.decode(reader, reader.uint32());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = { ...baseQueryKeyValuesResponse };
+        message.keyValues = [];
+        if (object.keyValues !== undefined && object.keyValues !== null) {
+            for (const e of object.keyValues) {
+                message.keyValues.push(KeyValue_1.KeyValue.fromJSON(e));
+            }
+        }
+        if (object.pagination !== undefined && object.pagination !== null) {
+            message.pagination = Paging_1.PagingResponse.fromJSON(object.pagination);
+        }
+        else {
+            message.pagination = undefined;
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        if (message.keyValues) {
+            obj.keyValues = message.keyValues.map((e) => e ? KeyValue_1.KeyValue.toJSON(e) : undefined);
+        }
+        else {
+            obj.keyValues = [];
+        }
+        message.pagination !== undefined &&
+            (obj.pagination = message.pagination
+                ? Paging_1.PagingResponse.toJSON(message.pagination)
+                : undefined);
+        return obj;
+    },
+    fromPartial(object) {
+        const message = { ...baseQueryKeyValuesResponse };
+        message.keyValues = [];
+        if (object.keyValues !== undefined && object.keyValues !== null) {
+            for (const e of object.keyValues) {
+                message.keyValues.push(KeyValue_1.KeyValue.fromPartial(e));
+            }
+        }
+        if (object.pagination !== undefined && object.pagination !== null) {
+            message.pagination = Paging_1.PagingResponse.fromPartial(object.pagination);
+        }
+        else {
+            message.pagination = undefined;
+        }
+        return message;
+    },
+};
 const baseQueryReadRequest = { uuid: "", key: "" };
 exports.QueryReadRequest = {
     encode(message, writer = minimal_1.default.Writer.create()) {
@@ -1253,6 +1405,11 @@ class QueryClientImpl {
         const data = exports.QueryGetLeaseRequest.encode(request).finish();
         const promise = this.rpc.request("bluzelle.curium.crud.Query", "GetLease", data);
         return promise.then((data) => exports.QueryGetLeaseResponse.decode(new minimal_1.default.Reader(data)));
+    }
+    KeyValues(request) {
+        const data = exports.QueryKeyValuesRequest.encode(request).finish();
+        const promise = this.rpc.request("bluzelle.curium.crud.Query", "KeyValues", data);
+        return promise.then((data) => exports.QueryKeyValuesResponse.decode(new minimal_1.default.Reader(data)));
     }
 }
 exports.QueryClientImpl = QueryClientImpl;
