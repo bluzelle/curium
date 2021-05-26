@@ -171,11 +171,10 @@ func GenerateBatch(t time.Time) string {
 
 }
 
-func (k Keeper) StoreVote(ctx sdk.Context, vote *types.Vote) {
+func (k Keeper) StoreVote(ctx sdk.Context, vote types.Vote) {
 	store := k.GetVoteStore(ctx)
 	key := MakeVoteStoreKey(ctx.BlockHeight(), vote.VoteType, vote.Id, vote.Valcons)
-	k.Logger(ctx).Info("Storing vote", "key", string(key))
-	store.Set(key, k.cdc.MustMarshalBinaryBare(vote))
+	store.Set(key, k.cdc.MustMarshalBinaryBare(&vote))
 }
 
 
@@ -195,9 +194,15 @@ func (k Keeper) CheckDeliverVotes(ctx sdk.Context) {
 	if filteredLogger.IsDebug("x/voting") {
 		k.Logger(ctx).Debug("vote store keys", "keys", k.getVoteStoreKeys(ctx))
 	}
+
 	store := k.GetVoteStore(ctx)
-	iterator := sdk.KVStorePrefixIterator(store, []byte(start))
+	iterator := store.ReverseIterator([]byte(start), nil)
+	if iterator.Valid() {
+		return
+	}
+
 	var votes = map[string]map[string][]*types.Vote{}
+	iterator = store.Iterator(nil, nil)
 	for ; iterator.Valid(); iterator.Next() {
 		var vote types.Vote
 		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &vote)
@@ -206,7 +211,7 @@ func (k Keeper) CheckDeliverVotes(ctx sdk.Context) {
 			votes[vote.VoteType] = map[string][]*types.Vote{}
 		}
 		votes[vote.VoteType][vote.Id] = append(votes[vote.VoteType][vote.Id], &vote)
-		store.Delete(iterator.Key())
+		defer store.Delete(iterator.Key())
 	}
 
 	for voteType := range votes {
@@ -221,7 +226,7 @@ func (k Keeper) CheckDeliverVotes(ctx sdk.Context) {
 		}
 		sortkeys.Strings(ids)
 		for _, id := range ids {
-			k.Logger(ctx).Info("Sending votes to vote handler", "count", len(votes[voteType][id]))
+			k.Logger(ctx).Info("Sending vote to vote handler", "id", id, "count", len(votes[voteType][id]))
 			voteHandlers[voteType].VotesReceived(ctx, id, votes[voteType][id])
 		}
 	}

@@ -14,7 +14,7 @@ func (k msgServer) Vote(goCtx context.Context, msg *types.MsgVote) (*types.MsgVo
 	if !valid {
 		return nil, sdkerrors.New("voting", 2, "Vote not valid")
 	}
-	vote :=  &types.Vote{
+	vote :=  types.Vote{
 		Id:       msg.Id,
 		VoteType: msg.VoteType,
 		Creator:  msg.Creator,
