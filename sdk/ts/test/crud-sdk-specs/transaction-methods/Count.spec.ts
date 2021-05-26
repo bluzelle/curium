@@ -3,7 +3,7 @@ import {BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
 import {getSdk, createKeys} from "../../helpers/client-helpers/sdk-helpers";
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
 
-describe('q.Count()', function () {
+describe('tx.Count()', function () {
     this.timeout(DEFAULT_TIMEOUT);
     let sdk: BluzelleSdk;
     let uuid: string
@@ -14,7 +14,8 @@ describe('q.Count()', function () {
     });
 
     it('should return 0 if no keys', async () => {
-        expect(await sdk.db.q.Count({
+        expect(await sdk.db.tx.Count({
+            creator: sdk.db.address,
             uuid
         }).then(resp => resp.count)).to.equal(0);
     });
@@ -22,7 +23,8 @@ describe('q.Count()', function () {
     it('should return the number of keys', async () => {
         const {keys} = await createKeys(sdk.db, 5, uuid);
 
-        expect(await sdk.db.q.Count({
+        expect(await sdk.db.tx.Count({
+            creator: sdk.db.address,
             uuid
         }).then(resp => resp.count)).to.equal(5);
 
@@ -32,7 +34,8 @@ describe('q.Count()', function () {
             key: keys[0]
         });
 
-        expect(await sdk.db.q.Count({
+        expect(await sdk.db.tx.Count({
+            creator: sdk.db.address,
             uuid
         }).then(resp => resp.count)).to.equal(4);
     });

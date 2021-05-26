@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) Search (goCtx context.Context, req *types.QuerySearchRequest) (*types.QuerySearchResponse, error) {
+func (k Keeper) Search(goCtx context.Context, req *types.QuerySearchRequest) (*types.QuerySearchResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	keyValues, pageResponse, err := k.GetAllKeyValues(&ctx, req.Uuid, req.Pagination, req.SearchString)

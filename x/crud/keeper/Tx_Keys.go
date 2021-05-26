@@ -16,7 +16,7 @@ func (k msgServer) Keys(goCtx context.Context, msg *types.MsgKeys) (*types.MsgKe
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	store := ctx.KVStore(k.storeKey)
-	CrudValueStore := prefix.NewStore(store, types.UuidPrefix(types.CrudValueKey, msg.Uuid + "\x00"))
+	CrudValueStore := prefix.NewStore(store, types.UuidPrefix(types.CrudValueKey, msg.Uuid+"\x00"))
 
 	pageRes, err := k.Paginate(CrudValueStore, msg.Pagination, func(key []byte, value []byte) error {
 		var CrudValue types.CrudValue

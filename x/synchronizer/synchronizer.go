@@ -19,32 +19,31 @@ import (
 )
 
 type Network struct {
-	Contract string
+	Contract  string
 	Endpoints []string
 }
 
 var networks = map[string]Network{
 	"binance": {
-		Contract: "0xE8eE8e2D82A3966e0353CB11Ab6fcfE6F5b5C9dC",
+		Contract:  "0xE8eE8e2D82A3966e0353CB11Ab6fcfE6F5b5C9dC",
 		Endpoints: []string{"https://data-seed-prebsc-1-s1.binance.org:8545"},
 	},
 	"ethereum": {
-		Contract: "0xBf9d90fE45e0B3069ee4546e878eCcb2b37AF659",
+		Contract:  "0xBf9d90fE45e0B3069ee4546e878eCcb2b37AF659",
 		Endpoints: []string{"https://ropsten.infura.io/v3/bf3a81b958df4776bb0c7e49a11ecbed"},
 	},
 	"polygon": {
-		Contract: "0x266699A193F68CFD213B995604418740d6278dC4",
+		Contract:  "0x266699A193F68CFD213B995604418740d6278dC4",
 		Endpoints: []string{"https://rpc-mumbai.matic.today"},
 	},
 	"fantom": {
-		Contract: "0xb6fd9f0F6760c4d4ACE488d094E27F5DeDaa6eCC",
+		Contract:  "0xb6fd9f0F6760c4d4ACE488d094E27F5DeDaa6eCC",
 		Endpoints: []string{"https://rpc.testnet.fantom.network"},
 	},
 	"tomochain": {
-		Contract: "0xE2603e3a2C8dF20324e7277c1320Ab7EBb8ee7c2",
+		Contract:  "0xE2603e3a2C8dF20324e7277c1320Ab7EBb8ee7c2",
 		Endpoints: []string{"https://rpc.testnet.tomochain.com"},
 	},
-
 }
 
 var doOnce sync.Once
@@ -65,7 +64,7 @@ func StartSynchronizer(ctx sdk.Context, k keeper.Keeper) {
 }
 
 func runSynchronizer(k keeper.Keeper) {
-	for  name, network := range networks {
+	for name, network := range networks {
 		data := fetchDataFromContract(k, name, network)
 		creator, err := getSyncUserAddress(k)
 
@@ -147,11 +146,11 @@ func getSyncUserAddress(k keeper.Keeper) (string, error) {
 // incorporate this into the voting.
 
 func saveBookmark(dir string, name string, data *big.Int) error {
-	err := os.MkdirAll(dir + "/synchronizer", 0755)
+	err := os.MkdirAll(dir+"/synchronizer", 0755)
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(dir+ "/synchronizer/" + name + "-sync-bookmark", data.Bytes(), 0644)
+	err = os.WriteFile(dir+"/synchronizer/"+name+"-sync-bookmark", data.Bytes(), 0644)
 	return err
 }
 

@@ -384,7 +384,6 @@ func New(
 			MaxKeyValuesSize:      0,
 			MaxDefaultLeaseBlocks: 0,
 		},
-
 	)
 	crudModule := crud.NewAppModule(appCodec, app.crudKeeper)
 

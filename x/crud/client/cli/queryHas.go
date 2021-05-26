@@ -20,7 +20,7 @@ func CmdHasQuery() *cobra.Command {
 
 			params := &types.QueryHasRequest{
 				Uuid: args[0],
-				Key: args[1],
+				Key:  args[1],
 			}
 
 			res, err := queryClient.Has(context.Background(), params)

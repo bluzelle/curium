@@ -10,6 +10,7 @@ import "crud/Paging.proto";
 // Msg defines the Msg service.
 service Msg {
     // this line is used by starport scaffolding # proto/tx/rpc
+  rpc Count(MsgCount) returns (MsgCountResponse);
   rpc RenewLeasesAll(MsgRenewLeasesAll) returns (MsgRenewLeasesAllResponse);
   rpc RenewLease(MsgRenewLease) returns (MsgRenewLeaseResponse);
   rpc GetNShortestLeases(MsgGetNShortestLeases) returns (MsgGetNShortestLeasesResponse);
@@ -28,6 +29,15 @@ service Msg {
 }
 
 // this line is used by starport scaffolding # proto/tx/message
+message MsgCount {
+  string creator = 1;
+  string uuid = 2;
+}
+
+message MsgCountResponse {
+  uint32 count = 1;
+}
+
 message MsgRenewLeasesAll {
   string creator = 1;
   string uuid = 2;

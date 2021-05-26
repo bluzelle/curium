@@ -36,12 +36,11 @@ export interface QueryMyKeysResponse {
     pagination?: PagingResponse;
 }
 export interface QueryCountRequest {
-    address: string;
     uuid: string;
 }
 export interface QueryCountResponse {
     uuid: string;
-    count: Long;
+    count: number;
 }
 export interface QueryHasRequest {
     uuid: string;

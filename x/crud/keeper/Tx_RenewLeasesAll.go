@@ -22,20 +22,19 @@ func (k msgServer) RenewLeasesAll(goCtx context.Context, msg *types.MsgRenewLeas
 
 	keys, _ := k.GetKeysUnderUuid(&ctx, msg.Uuid)
 
-	for i:= range keys {
+	for i := range keys {
 		renewLeaseRequest := types.NewMsgRenewLease(
 			msg.Creator,
 			msg.Uuid,
 			keys[i],
 			msg.Lease,
-			)
+		)
 
 		_, err := k.RenewLease(goCtx, renewLeaseRequest)
 
 		if err != nil {
 			return nil, err
 		}
-
 
 	}
 

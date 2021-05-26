@@ -20,7 +20,7 @@ func CmdReadQuery() *cobra.Command {
 
 			params := &types.QueryReadRequest{
 				Uuid: args[0],
-				Key: args[1],
+				Key:  args[1],
 			}
 
 			res, err := queryClient.Read(context.Background(), params)

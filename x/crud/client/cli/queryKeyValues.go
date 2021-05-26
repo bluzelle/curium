@@ -44,5 +44,3 @@ func CmdKeyValuesQuery() *cobra.Command {
 
 	return cmd
 }
-
-

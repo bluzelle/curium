@@ -606,14 +606,11 @@ exports.QueryMyKeysResponse = {
         return message;
     },
 };
-const baseQueryCountRequest = { address: "", uuid: "" };
+const baseQueryCountRequest = { uuid: "" };
 exports.QueryCountRequest = {
     encode(message, writer = minimal_1.default.Writer.create()) {
-        if (message.address !== "") {
-            writer.uint32(10).string(message.address);
-        }
         if (message.uuid !== "") {
-            writer.uint32(18).string(message.uuid);
+            writer.uint32(10).string(message.uuid);
         }
         return writer;
     },
@@ -625,9 +622,6 @@ exports.QueryCountRequest = {
             const tag = reader.uint32();
             switch (tag >>> 3) {
                 case 1:
-                    message.address = reader.string();
-                    break;
-                case 2:
                     message.uuid = reader.string();
                     break;
                 default:
@@ -639,12 +633,6 @@ exports.QueryCountRequest = {
     },
     fromJSON(object) {
         const message = { ...baseQueryCountRequest };
-        if (object.address !== undefined && object.address !== null) {
-            message.address = String(object.address);
-        }
-        else {
-            message.address = "";
-        }
         if (object.uuid !== undefined && object.uuid !== null) {
             message.uuid = String(object.uuid);
         }
@@ -655,18 +643,11 @@ exports.QueryCountRequest = {
     },
     toJSON(message) {
         const obj = {};
-        message.address !== undefined && (obj.address = message.address);
         message.uuid !== undefined && (obj.uuid = message.uuid);
         return obj;
     },
     fromPartial(object) {
         const message = { ...baseQueryCountRequest };
-        if (object.address !== undefined && object.address !== null) {
-            message.address = object.address;
-        }
-        else {
-            message.address = "";
-        }
         if (object.uuid !== undefined && object.uuid !== null) {
             message.uuid = object.uuid;
         }
@@ -676,14 +657,14 @@ exports.QueryCountRequest = {
         return message;
     },
 };
-const baseQueryCountResponse = { uuid: "", count: long_1.default.ZERO };
+const baseQueryCountResponse = { uuid: "", count: 0 };
 exports.QueryCountResponse = {
     encode(message, writer = minimal_1.default.Writer.create()) {
         if (message.uuid !== "") {
             writer.uint32(10).string(message.uuid);
         }
-        if (!message.count.isZero()) {
-            writer.uint32(16).int64(message.count);
+        if (message.count !== 0) {
+            writer.uint32(16).uint32(message.count);
         }
         return writer;
     },
@@ -698,7 +679,7 @@ exports.QueryCountResponse = {
                     message.uuid = reader.string();
                     break;
                 case 2:
-                    message.count = reader.int64();
+                    message.count = reader.uint32();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -716,18 +697,17 @@ exports.QueryCountResponse = {
             message.uuid = "";
         }
         if (object.count !== undefined && object.count !== null) {
-            message.count = long_1.default.fromString(object.count);
+            message.count = Number(object.count);
         }
         else {
-            message.count = long_1.default.ZERO;
+            message.count = 0;
         }
         return message;
     },
     toJSON(message) {
         const obj = {};
         message.uuid !== undefined && (obj.uuid = message.uuid);
-        message.count !== undefined &&
-            (obj.count = (message.count || long_1.default.ZERO).toString());
+        message.count !== undefined && (obj.count = message.count);
         return obj;
     },
     fromPartial(object) {
@@ -742,7 +722,7 @@ exports.QueryCountResponse = {
             message.count = object.count;
         }
         else {
-            message.count = long_1.default.ZERO;
+            message.count = 0;
         }
         return message;
     },

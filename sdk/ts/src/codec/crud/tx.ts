@@ -8,6 +8,15 @@ import { KeyLease, KeyValueLease, KeyValue } from "../crud/KeyValue";
 export const protobufPackage = "bluzelle.curium.crud";
 
 /** this line is used by starport scaffolding # proto/tx/message */
+export interface MsgCount {
+  creator: string;
+  uuid: string;
+}
+
+export interface MsgCountResponse {
+  count: number;
+}
+
 export interface MsgRenewLeasesAll {
   creator: string;
   uuid: string;
@@ -155,6 +164,139 @@ export interface MsgDelete {
 }
 
 export interface MsgDeleteResponse {}
+
+const baseMsgCount: object = { creator: "", uuid: "" };
+
+export const MsgCount = {
+  encode(
+    message: MsgCount,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.uuid !== "") {
+      writer.uint32(18).string(message.uuid);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgCount {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgCount } as MsgCount;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.uuid = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgCount {
+    const message = { ...baseMsgCount } as MsgCount;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgCount): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgCount>): MsgCount {
+    const message = { ...baseMsgCount } as MsgCount;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    return message;
+  },
+};
+
+const baseMsgCountResponse: object = { count: 0 };
+
+export const MsgCountResponse = {
+  encode(
+    message: MsgCountResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.count !== 0) {
+      writer.uint32(8).uint32(message.count);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgCountResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgCountResponse } as MsgCountResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.count = reader.uint32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgCountResponse {
+    const message = { ...baseMsgCountResponse } as MsgCountResponse;
+    if (object.count !== undefined && object.count !== null) {
+      message.count = Number(object.count);
+    } else {
+      message.count = 0;
+    }
+    return message;
+  },
+
+  toJSON(message: MsgCountResponse): unknown {
+    const obj: any = {};
+    message.count !== undefined && (obj.count = message.count);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgCountResponse>): MsgCountResponse {
+    const message = { ...baseMsgCountResponse } as MsgCountResponse;
+    if (object.count !== undefined && object.count !== null) {
+      message.count = object.count;
+    } else {
+      message.count = 0;
+    }
+    return message;
+  },
+};
 
 const baseMsgRenewLeasesAll: object = { creator: "", uuid: "" };
 
@@ -2656,6 +2798,7 @@ export const MsgDeleteResponse = {
 /** Msg defines the Msg service. */
 export interface Msg {
   /** this line is used by starport scaffolding # proto/tx/rpc */
+  Count(request: MsgCount): Promise<MsgCountResponse>;
   RenewLeasesAll(
     request: MsgRenewLeasesAll
   ): Promise<MsgRenewLeasesAllResponse>;
@@ -2682,6 +2825,14 @@ export class MsgClientImpl implements Msg {
   constructor(rpc: Rpc) {
     this.rpc = rpc;
   }
+  Count(request: MsgCount): Promise<MsgCountResponse> {
+    const data = MsgCount.encode(request).finish();
+    const promise = this.rpc.request("bluzelle.curium.crud.Msg", "Count", data);
+    return promise.then((data) =>
+      MsgCountResponse.decode(new _m0.Reader(data))
+    );
+  }
+
   RenewLeasesAll(
     request: MsgRenewLeasesAll
   ): Promise<MsgRenewLeasesAllResponse> {

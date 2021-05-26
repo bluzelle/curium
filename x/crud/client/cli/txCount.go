@@ -12,24 +12,20 @@ import (
 
 var _ = strconv.Itoa(0)
 
-func CmdRenewLeasesAll() *cobra.Command {
+func CmdCount() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "RenewLeasesAll [uuid] [lease]",
-		Short: "Broadcast message RenewLeasesAll",
-		Args:  cobra.ExactArgs(2),
+		Use:   "Count [uuid]",
+		Short: "Broadcast message Count",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			argsUuid := string(args[0])
-			argsLease, err := strconv.ParseUint(args[3], 10, 32)
-			if err != nil {
-				return err
-			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgRenewLeasesAll(clientCtx.GetFromAddress().String(), string(argsUuid), &types.Lease{Seconds: uint32(argsLease)})
+			msg := types.NewMsgCount(clientCtx.GetFromAddress().String(), string(argsUuid))
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

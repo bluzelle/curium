@@ -18,11 +18,11 @@ import (
 
 type (
 	Keeper struct {
-		cdc      codec.Marshaler
+		cdc          codec.Marshaler
 		curiumKeeper curiumkeeper.Keeper
-		storeKey sdk.StoreKey
-		memKey   sdk.StoreKey
-		mks      MaxKeeperSizes
+		storeKey     sdk.StoreKey
+		memKey       sdk.StoreKey
+		mks          MaxKeeperSizes
 		// this line is used by starport scaffolding # ibc/keeper/attribute
 	}
 )
@@ -50,11 +50,11 @@ func NewKeeper(
 	// this line is used by starport scaffolding # ibc/keeper/parameter
 ) *Keeper {
 	return &Keeper{
-		cdc:      cdc,
+		cdc:          cdc,
 		curiumKeeper: curiumKeeper,
-		storeKey: storeKey,
-		memKey:   memKey,
-		mks:      mks,
+		storeKey:     storeKey,
+		memKey:       memKey,
+		mks:          mks,
 		// this line is used by starport scaffolding # ibc/keeper/return
 	}
 }
@@ -111,7 +111,7 @@ func (k Keeper) GetNShortestLeaseBlocks(ctx *sdk.Context, owner string, uuid str
 	return keyLeases[:num], nil
 }
 
-func (k Keeper) QueryNShortestLeaseBlocks (ctx *sdk.Context, owner string, uuid string, num uint32) ([]*types.KeyLease, error) {
+func (k Keeper) QueryNShortestLeaseBlocks(ctx *sdk.Context, owner string, uuid string, num uint32) ([]*types.KeyLease, error) {
 
 	keys, _ := k.GetKeysUnderUuid(ctx, uuid)
 

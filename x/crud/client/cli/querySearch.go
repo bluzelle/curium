@@ -19,7 +19,7 @@ func CmdSearchQuery() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			params := &types.QuerySearchRequest{
-				Uuid: args[0],
+				Uuid:         args[0],
 				SearchString: args[1],
 			}
 

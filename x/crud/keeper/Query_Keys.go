@@ -18,7 +18,7 @@ func (k Keeper) Keys(goCtx context.Context, req *types.QueryKeysRequest) (*types
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	store := ctx.KVStore(k.storeKey)
-	CrudValueStore := prefix.NewStore(store, types.UuidPrefix(types.CrudValueKey, req.Uuid + "\x00"))
+	CrudValueStore := prefix.NewStore(store, types.UuidPrefix(types.CrudValueKey, req.Uuid+"\x00"))
 
 	pageRes, err := k.Paginate(CrudValueStore, req.Pagination, func(key []byte, value []byte) error {
 		var CrudValue types.CrudValue
@@ -36,5 +36,3 @@ func (k Keeper) Keys(goCtx context.Context, req *types.QueryKeysRequest) (*types
 
 	return &types.QueryKeysResponse{Keys: keys, Pagination: pageRes}, nil
 }
-
-

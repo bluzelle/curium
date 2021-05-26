@@ -122,11 +122,10 @@ func (k Keeper) GetOwnedKeys(ctx *sdk.Context, owner string, uuid string, pagina
 	return keys, pageRes, nil
 }
 
-
 func (k Keeper) GetKeysUnderUuid(ctx *sdk.Context, uuid string) ([]string, error) {
 
 	store := ctx.KVStore(k.storeKey)
-	crudValueStore := prefix.NewStore(store, types.UuidPrefix(types.CrudValueKey, uuid + "\x00"))
+	crudValueStore := prefix.NewStore(store, types.UuidPrefix(types.CrudValueKey, uuid+"\x00"))
 
 	iterator := crudValueStore.Iterator(nil, nil)
 	defer iterator.Close()
@@ -139,20 +138,18 @@ func (k Keeper) GetKeysUnderUuid(ctx *sdk.Context, uuid string) ([]string, error
 	return keys, nil
 }
 
+func (k Keeper) GetNumKeysOwned(ctx *sdk.Context, uuid string) (int, error) {
 
-func (k Keeper) GetNumKeysOwned(ctx *sdk.Context, uuid string, owner string) (int, error) {
-	uuidPrefix := "\x00" + uuid + "\x00"
 	store := ctx.KVStore(k.storeKey)
-	OwnerStore := prefix.NewStore(store, types.OwnerPrefix(types.OwnerValueKey, owner+uuidPrefix))
+	crudValueStore := prefix.NewStore(store, types.UuidPrefix(types.CrudValueKey, uuid+"\x00"))
 
-	iterator := OwnerStore.Iterator(nil, nil)
+	iterator := crudValueStore.Iterator(nil, nil)
 	defer iterator.Close()
-	numKeys := 0
+	var numKeys = 0
 
 	for ; iterator.Valid(); iterator.Next() {
-		numKeys += 1
+		numKeys+=1
 	}
-
 	return numKeys, nil
 }
 

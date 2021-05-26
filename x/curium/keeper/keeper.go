@@ -40,4 +40,3 @@ func (k Keeper) IsCaughtUp() bool {
 	lastBlockTime = time.Now()
 	return result
 }
-

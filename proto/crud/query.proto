@@ -12,19 +12,19 @@ option go_package = "github.com/bluzelle/curium/x/crud/types";
 service Query {
     // this line is used by starport scaffolding # 2
 	rpc Read(QueryReadRequest) returns (QueryReadResponse) {
-		option (google.api.http).get = "/bluzelle/curium/crud/CrudValue/{uuid}/{key}";
+		option (google.api.http).get = "/bluzelle/curium/crud/Read/{uuid}/{key}";
 	}
 	rpc Keys(QueryKeysRequest) returns (QueryKeysResponse) {
-		option (google.api.http).get = "/bluzelle/curium/crud/CrudValue";
+		option (google.api.http).get = "/bluzelle/curium/crud/Keys/{uuid}";
 	}
 	rpc MyKeys(QueryMyKeysRequest) returns (QueryMyKeysResponse) {
 		option (google.api.http).get = "/bluzelle/curium/crud/MyKeys/{address}";
 	}
 	rpc Count(QueryCountRequest) returns (QueryCountResponse) {
-		option (google.api.http).get = "/bluzelle/curium/crud/CrudValue/{uuid}";
+		option (google.api.http).get = "/bluzelle/curium/crud/Count/{uuid}";
 	}
 	rpc Has(QueryHasRequest) returns (QueryHasResponse) {
-		option (google.api.http).get = "/bluzelle/curium/crud/CrudValue/{uuid}/{key}";
+		option (google.api.http).get = "/bluzelle/curium/crud/Has/{uuid}/{key}";
 	}
 
 	rpc Search(QuerySearchRequest) returns (QuerySearchResponse) {
@@ -88,13 +88,12 @@ message QueryMyKeysResponse {
 }
 
 message QueryCountRequest {
-	string address = 1;
-	string uuid = 2;
+	string uuid = 1;
 }
 
 message QueryCountResponse {
 	string uuid = 1;
-	int64 count = 2;
+	uint32 count = 2;
 }
 
 message QueryHasRequest {

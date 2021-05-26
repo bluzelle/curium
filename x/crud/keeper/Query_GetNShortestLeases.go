@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) GetNShortestLeases (goCtx context.Context, req *types.QueryGetNShortestLeasesRequest) (*types.QueryGetNShortestLeasesResponse, error) {
+func (k Keeper) GetNShortestLeases(goCtx context.Context, req *types.QueryGetNShortestLeasesRequest) (*types.QueryGetNShortestLeasesResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	KeyLeases, err := k.QueryNShortestLeaseBlocks(&ctx, "", req.Uuid, req.Num)

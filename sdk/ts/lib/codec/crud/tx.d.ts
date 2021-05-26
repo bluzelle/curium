@@ -5,6 +5,13 @@ import { PagingRequest, PagingResponse } from "../crud/Paging";
 import { KeyLease, KeyValueLease, KeyValue } from "../crud/KeyValue";
 export declare const protobufPackage = "bluzelle.curium.crud";
 /** this line is used by starport scaffolding # proto/tx/message */
+export interface MsgCount {
+    creator: string;
+    uuid: string;
+}
+export interface MsgCountResponse {
+    count: number;
+}
 export interface MsgRenewLeasesAll {
     creator: string;
     uuid: string;
@@ -132,6 +139,20 @@ export interface MsgDelete {
 }
 export interface MsgDeleteResponse {
 }
+export declare const MsgCount: {
+    encode(message: MsgCount, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgCount;
+    fromJSON(object: any): MsgCount;
+    toJSON(message: MsgCount): unknown;
+    fromPartial(object: DeepPartial<MsgCount>): MsgCount;
+};
+export declare const MsgCountResponse: {
+    encode(message: MsgCountResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgCountResponse;
+    fromJSON(object: any): MsgCountResponse;
+    toJSON(message: MsgCountResponse): unknown;
+    fromPartial(object: DeepPartial<MsgCountResponse>): MsgCountResponse;
+};
 export declare const MsgRenewLeasesAll: {
     encode(message: MsgRenewLeasesAll, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgRenewLeasesAll;
@@ -345,6 +366,7 @@ export declare const MsgDeleteResponse: {
 /** Msg defines the Msg service. */
 export interface Msg {
     /** this line is used by starport scaffolding # proto/tx/rpc */
+    Count(request: MsgCount): Promise<MsgCountResponse>;
     RenewLeasesAll(request: MsgRenewLeasesAll): Promise<MsgRenewLeasesAllResponse>;
     RenewLease(request: MsgRenewLease): Promise<MsgRenewLeaseResponse>;
     GetNShortestLeases(request: MsgGetNShortestLeases): Promise<MsgGetNShortestLeasesResponse>;
@@ -364,6 +386,7 @@ export interface Msg {
 export declare class MsgClientImpl implements Msg {
     private readonly rpc;
     constructor(rpc: Rpc);
+    Count(request: MsgCount): Promise<MsgCountResponse>;
     RenewLeasesAll(request: MsgRenewLeasesAll): Promise<MsgRenewLeasesAllResponse>;
     RenewLease(request: MsgRenewLease): Promise<MsgRenewLeaseResponse>;
     GetNShortestLeases(request: MsgGetNShortestLeases): Promise<MsgGetNShortestLeasesResponse>;
