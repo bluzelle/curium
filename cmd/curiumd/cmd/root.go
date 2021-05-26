@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"github.com/bluzelle/curium/app/filteredLogger"
 	"io"
 	"os"
 	"path/filepath"
@@ -194,7 +195,7 @@ func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, a
 		panic(err)
 	}
 
-	logger, err = app.NewFilteredLogger(appOpts.Get("log_filter").(string))
+	logger, err = filteredLogger.NewFilteredLogger(appOpts.Get("log_filter").(string))
 	if err != nil {
 		panic(err)
 	}

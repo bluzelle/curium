@@ -116,7 +116,7 @@ func BroadcastMessages(ctx sdk.Context, msgs []types.Msg, accKeeper *keeper.Acco
 	_, err = txClient.BroadcastTx(
 		txCtx,
 		&tx2.BroadcastTxRequest{
-			Mode:    tx2.BroadcastMode_BROADCAST_MODE_SYNC,
+			Mode:    tx2.BroadcastMode_BROADCAST_MODE_BLOCK,
 			TxBytes: txBytes, // Proto-binary of the signed transaction, see previous step.
 		},
 	)

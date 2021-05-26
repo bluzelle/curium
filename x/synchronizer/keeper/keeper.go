@@ -66,14 +66,14 @@ func (k Keeper) GetCdc() codec.Marshaler {
 	return k.cdc
 }
 
-func (k Keeper) ExecuteOperation(ctx *sdk.Context, syncOp *types.SyncOperation) {
-	k.Logger(*ctx).Info("Sync operation", "syncOp", syncOp)
+func (k Keeper) ExecuteOperation(ctx sdk.Context, syncOp *types.SyncOperation) {
+	k.Logger(ctx).Info("Sync operation", "syncOp", syncOp)
 	switch syncOp.Op {
 	case "create":
 		metaBytes := k.cdc.MustMarshalBinaryBare(&types.SynchronizerValueMeta{
 			Bookmark: syncOp.Bookmark,
 		})
-		k.CrudKeeper.SetCrudValue(ctx, crudtypes.CrudValue{
+		k.CrudKeeper.SetCrudValue(&ctx, crudtypes.CrudValue{
 			Creator:  syncOp.Creator,
 			Uuid:     syncOp.Uuid,
 			Key:      syncOp.Key,
@@ -88,7 +88,7 @@ func (k Keeper) ExecuteOperation(ctx *sdk.Context, syncOp *types.SyncOperation) 
 		metaBytes := k.cdc.MustMarshalBinaryBare(&types.SynchronizerValueMeta{
 			Bookmark: syncOp.Bookmark,
 		})
-		k.CrudKeeper.SetCrudValue(ctx, crudtypes.CrudValue{
+		k.CrudKeeper.SetCrudValue(&ctx, crudtypes.CrudValue{
 			Creator:  syncOp.Creator,
 			Uuid:     syncOp.Uuid,
 			Key:      syncOp.Key,
@@ -99,6 +99,6 @@ func (k Keeper) ExecuteOperation(ctx *sdk.Context, syncOp *types.SyncOperation) 
 		})
 		break
 	case "delete":
-		k.CrudKeeper.RemoveCrudValue(ctx, syncOp.Uuid, syncOp.Key)
+		k.CrudKeeper.RemoveCrudValue(&ctx, syncOp.Uuid, syncOp.Key)
 	}
 }

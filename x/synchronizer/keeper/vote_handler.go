@@ -17,7 +17,7 @@ func NewVoteHandler(k Keeper) *VoteHandler {
 	}
 }
 
-func (h *VoteHandler) VotesReceived(ctx *sdk.Context, voteId string, votes []*votingtypes.Vote) {
+func (h *VoteHandler) VotesReceived(ctx sdk.Context, voteId string, votes []*votingtypes.Vote) {
 	winner := TallyVotes(votes)
 	var op types.SyncOperation
 	op.Unmarshal(*winner)

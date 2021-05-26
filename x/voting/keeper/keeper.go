@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+	"github.com/bluzelle/curium/app/filteredLogger"
 	"github.com/bluzelle/curium/x/curium"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
@@ -66,7 +67,7 @@ func (k Keeper) RegisterVoteHandler(handler types.VoteHandler) {
 
 // Vote this is the function that other modules will call to send a vote
 func (k Keeper) Vote(ctx sdk.Context, votingReq types.VotingRequest) {
-	k.Logger(ctx).Info("Voting request received", "request", votingReq)
+	k.Logger(ctx).Info("Voting request received", "id", votingReq.Id, "value", string(votingReq.Value))
 	valcons := k.GetValconsAddress()
 	proof := types.MsgVoteProof{
 		Creator:   votingReq.Creator,
@@ -111,7 +112,7 @@ func (k Keeper) GetProofStore(ctx sdk.Context) prefix.Store {
 	return prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.ProofPrefix))
 }
 
-func (k Keeper) GetVoteStore(ctx *sdk.Context) prefix.Store {
+func (k Keeper) GetVoteStore(ctx sdk.Context) prefix.Store {
 	return prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.VotePrefix))
 }
 
@@ -122,7 +123,7 @@ func (k Keeper) TransmitProofQueue(ctx sdk.Context) {
 			msgs = append(msgs, &proofQueue[i])
 		}
 		result, err := curium.BroadcastMessages(ctx, msgs, &k.accKeeper, proofQueue[0].From, k.homeDir)
-		k.Logger(ctx).Info("Sending vote proofs", "proofs", msgs)
+		k.Logger(ctx).Info("Sending vote proofs", "count", len(msgs))
 		if err != nil {
 			k.Logger(ctx).Error("Error broadcasting proofs", "err", err)
 			return
@@ -138,13 +139,12 @@ func (k Keeper) TransmitVoteQueue(ctx sdk.Context) {
 		for i := 0; i < len(voteQueue[ctx.BlockHeight()]); i++ {
 			msgs = append(msgs, &voteQueue[ctx.BlockHeight()][i])
 		}
-		result, err := curium.BroadcastMessages(ctx, msgs, &k.accKeeper, voteQueue[ctx.BlockHeight()][0].From, k.homeDir)
-		k.Logger(ctx).Info("Broadcasting votes", "votes", msgs)
+		k.Logger(ctx).Info("Broadcasting votes", "vote count", len(msgs))
+		_, err := curium.BroadcastMessages(ctx, msgs, &k.accKeeper, voteQueue[ctx.BlockHeight()][0].From, k.homeDir)
 		if err != nil {
 			k.Logger(ctx).Error("Error broadcasting votes", "err", err)
 			return
 		}
-		k.Logger(ctx).Info("Broadcast votes successful", "result", result)
 
 		delete(voteQueue, ctx.BlockHeight())
 	}
@@ -171,22 +171,37 @@ func GenerateBatch(t time.Time) string {
 
 }
 
-func (k Keeper) StoreVote(ctx *sdk.Context, vote *types.Vote) {
+func (k Keeper) StoreVote(ctx sdk.Context, vote *types.Vote) {
 	store := k.GetVoteStore(ctx)
 	key := MakeVoteStoreKey(ctx.BlockHeight(), vote.VoteType, vote.Id, vote.Valcons)
-	k.Logger(*ctx).Info("Storing vote", "key", key)
+	k.Logger(ctx).Info("Storing vote", "key", string(key))
 	store.Set(key, k.cdc.MustMarshalBinaryBare(vote))
 }
 
-func (k Keeper) CheckDeliverVotes(ctx *sdk.Context) {
-	start := Pad20Int64(ctx.BlockHeight() - 3)
-	k.Logger(*ctx).Info("Check deliver votes", "start", start, "height", ctx.BlockHeight())
+
+func (k Keeper) getVoteStoreKeys(ctx sdk.Context) []string {
+	store := k.GetVoteStore(ctx)
+	var keys []string
+	iterator := store.Iterator(nil, nil)
+	for ; iterator.Valid(); iterator.Next() {
+		keys = append(keys, string(iterator.Key()))
+	}
+	return keys
+}
+
+func (k Keeper) CheckDeliverVotes(ctx sdk.Context) {
+	start := Pad20Int64(ctx.BlockHeight() - 2)
+	k.Logger(ctx).Info("Check deliver votes", "start", start, "height", ctx.BlockHeight())
+	if filteredLogger.IsDebug("x/voting") {
+		k.Logger(ctx).Debug("vote store keys", "keys", k.getVoteStoreKeys(ctx))
+	}
 	store := k.GetVoteStore(ctx)
 	iterator := sdk.KVStorePrefixIterator(store, []byte(start))
 	var votes = map[string]map[string][]*types.Vote{}
 	for ; iterator.Valid(); iterator.Next() {
 		var vote types.Vote
 		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &vote)
+		k.Logger(ctx).Debug("prepare vote for delivery", "id", vote.Id)
 		if votes[vote.VoteType] == nil {
 			votes[vote.VoteType] = map[string][]*types.Vote{}
 		}
@@ -196,7 +211,7 @@ func (k Keeper) CheckDeliverVotes(ctx *sdk.Context) {
 
 	for voteType := range votes {
 		if voteHandlers[voteType] == nil {
-			k.Logger(*ctx).Error("No vote handler registered", "type", voteType)
+			k.Logger(ctx).Error("No vote handler registered", "type", voteType)
 			continue
 		}
 
@@ -206,7 +221,7 @@ func (k Keeper) CheckDeliverVotes(ctx *sdk.Context) {
 		}
 		sortkeys.Strings(ids)
 		for _, id := range ids {
-			k.Logger(*ctx).Info("Sending vote to vote handler", "vote", votes[voteType][id])
+			k.Logger(ctx).Info("Sending votes to vote handler", "count", len(votes[voteType][id]))
 			voteHandlers[voteType].VotesReceived(ctx, id, votes[voteType][id])
 		}
 	}

@@ -48,7 +48,7 @@ var networks = map[string]Network{
 
 var doOnce sync.Once
 var currCtx sdk.Context
-var ticker = time.NewTicker(time.Second * 15)
+var ticker = time.NewTicker(time.Second * 60)
 
 func StartSynchronizer(ctx sdk.Context, k keeper.Keeper) {
 	k.VotingKeeper.RegisterVoteHandler(keeper.NewVoteHandler(k))
