@@ -14,7 +14,7 @@ var _ = strconv.Itoa(0)
 
 func CmdHas() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "Has [uuid] [key]",
+		Use:   "has [uuid] [key]",
 		Short: "Broadcast message Has",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {

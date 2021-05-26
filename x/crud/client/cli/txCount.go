@@ -14,7 +14,7 @@ var _ = strconv.Itoa(0)
 
 func CmdCount() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "Count [uuid]",
+		Use:   "count [uuid]",
 		Short: "Broadcast message Count",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {

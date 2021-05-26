@@ -14,7 +14,7 @@ var _ = strconv.Itoa(0)
 
 func CmdDeleteAll() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "DeleteAll [uuid]",
+		Use:   "deleteAll [uuid]",
 		Short: "Broadcast message DeleteAll",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {

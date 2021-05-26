@@ -54,7 +54,7 @@ func GetTxCmd() *cobra.Command {
 
 	cmd.AddCommand(CmdRead())
 
-	cmd.AddCommand(CmdUpsertCrudValue())
+	cmd.AddCommand(CmdUpsert())
 
 	cmd.AddCommand(CmdCreate())
 	cmd.AddCommand(CmdUpdate())

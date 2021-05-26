@@ -14,9 +14,9 @@ var _ = strconv.Itoa(0)
 
 func CmdKeys() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "Keys [uuid] [pagination]",
+		Use:   "keys [uuid]",
 		Short: "Broadcast message Keys",
-		Args:  cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			argsUuid := string(args[0])
 
@@ -26,7 +26,16 @@ func CmdKeys() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgKeys(clientCtx.GetFromAddress().String(), string(argsUuid), nil)
+			pageReq, err := client.ReadPageRequest(cmd.Flags())
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgKeys(clientCtx.GetFromAddress().String(), string(argsUuid), &types.PagingRequest{
+				StartKey: string(pageReq.Key),
+				Limit:    pageReq.Limit,
+			})
+
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

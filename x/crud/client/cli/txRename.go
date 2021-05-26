@@ -14,7 +14,7 @@ var _ = strconv.Itoa(0)
 
 func CmdRename() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "Rename [uuid] [key] [newKey]",
+		Use:   "rename [uuid] [key] [newKey]",
 		Short: "Broadcast message Rename",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {

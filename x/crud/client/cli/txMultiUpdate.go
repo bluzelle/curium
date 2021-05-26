@@ -16,7 +16,7 @@ var _ = strconv.Itoa(0)
 
 func CmdMultiUpdate() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "MultiUpdate [uuid] [keyValues]",
+		Use:   "multiUpdate [uuid] [keyValues]",
 		Short: "Broadcast message MultiUpdate",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {

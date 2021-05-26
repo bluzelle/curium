@@ -14,7 +14,7 @@ var _ = strconv.Itoa(0)
 
 func CmdKeyValues() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "KeyValues [uuid]",
+		Use:   "keyValues [uuid]",
 		Short: "Broadcast message KeyValues",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {

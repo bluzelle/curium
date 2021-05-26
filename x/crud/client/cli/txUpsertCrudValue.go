@@ -12,10 +12,10 @@ import (
 
 var _ = strconv.Itoa(0)
 
-func CmdUpsertCrudValue() *cobra.Command {
+func CmdUpsert() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "upsertCrudValue [uuid] [key] [value] [lease]",
-		Short: "Broadcast message upsertCrudValue",
+		Use:   "upsert [uuid] [key] [value] [lease]",
+		Short: "Broadcast message upsert",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			argsUuid := string(args[0])

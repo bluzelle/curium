@@ -14,7 +14,7 @@ var _ = strconv.Itoa(0)
 
 func CmdGetLease() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "GetLease [uuid] [key]",
+		Use:   "getLease [uuid] [key]",
 		Short: "Broadcast message GetLease",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {

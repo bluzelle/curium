@@ -14,7 +14,7 @@ var _ = strconv.Itoa(0)
 
 func CmdRenewLease() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "RenewLease [uuid] [key] [lease]",
+		Use:   "renewLease [uuid] [key] [lease]",
 		Short: "Broadcast message RenewLease",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
