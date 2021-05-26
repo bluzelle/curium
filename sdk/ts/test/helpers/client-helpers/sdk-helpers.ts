@@ -27,6 +27,9 @@ export const convertStringtoBase64 = (ascii: string): string =>
 export const parseJSONCliStdout = ({stdout}: {stdout: string}): any =>
     JSON.parse(stdout)
 
+export const parseJSONCliStderr = ({stderr}: {stderr: string}): any =>
+    JSON.parse(stderr)
+
 export const encodeData = (data: string): Uint8Array =>
     new TextEncoder().encode(data)
 

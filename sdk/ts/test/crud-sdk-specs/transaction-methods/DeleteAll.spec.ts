@@ -72,8 +72,7 @@ describe('tx.DeleteAll()', function () {
         await createKeys(sdk.db, 5, uuid);
         expect(await sdk.db.q.Count({
             uuid,
-            address: sdk.db.address
-        }).then(resp => resp.count.toInt())).to.equal(5);
+        }).then(resp => resp.count)).to.equal(5);
 
         await sdk.db.tx.DeleteAll({
             creator: sdk.db.address,
@@ -81,8 +80,7 @@ describe('tx.DeleteAll()', function () {
         });
         expect(await sdk.db.q.Count({
             uuid,
-            address: sdk.db.address
-        }).then(resp => resp.count.toInt())).to.equal(0);
+        }).then(resp => resp.count)).to.equal(0);
 
     });
 
@@ -192,8 +190,7 @@ describe('tx.DeleteAll()', function () {
 
         expect(await sdk.db.q.Count({
             uuid,
-            address: sdk.db.address
-        }).then(resp => resp.count.toInt())).to.equal(keys.length)
+        }).then(resp => resp.count)).to.equal(keys.length)
 
     });
 });
