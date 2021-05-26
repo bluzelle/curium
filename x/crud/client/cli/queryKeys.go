@@ -8,10 +8,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdKeyValuesQuery() *cobra.Command {
+func CmdKeysQuery() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "keyValues [uuid]",
-		Short: "read all key-values under specified uuid",
+		Use:   "keys [uuid]",
+		Short: "query all keys existing under specified uuid",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -23,7 +23,7 @@ func CmdKeyValuesQuery() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryKeyValuesRequest{
+			params := &types.QueryKeysRequest{
 				Uuid: args[0],
 				Pagination: &types.PagingRequest{
 					StartKey: string(pageReq.Key),
@@ -31,7 +31,7 @@ func CmdKeyValuesQuery() *cobra.Command {
 				},
 			}
 
-			res, err := queryClient.KeyValues(context.Background(), params)
+			res, err := queryClient.Keys(context.Background(), params)
 			if err != nil {
 				return err
 			}

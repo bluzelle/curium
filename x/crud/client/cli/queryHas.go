@@ -11,7 +11,8 @@ import (
 func CmdHasQuery() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "has [uuid] [key]",
-		Short: "uuid key",
+		Short: "query whether or not key exists under uuid",
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 

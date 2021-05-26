@@ -18,6 +18,15 @@ export const getSdk = (): Promise<BluzelleSdk> => {
     })
 }
 
+export const convertBase64ToString = (base64Encoded: string): string =>
+    Buffer.from(base64Encoded, 'base64').toString()
+
+export const convertStringtoBase64 = (ascii: string): string =>
+    Buffer.from(ascii).toString('base64')
+
+export const parseJSONCliStdout = ({stdout}: {stdout: string}): any =>
+    JSON.parse(stdout)
+
 export const encodeData = (data: string): Uint8Array =>
     new TextEncoder().encode(data)
 
@@ -37,14 +46,6 @@ export const createKeys = async (bz: DbSdk, count: number, uuid: string): Promis
     })), {memo: ''});
     return {keys, values};
 };
-
-// export const makeKVPairs = ({keys, values}: {keys: string[], values: string[]}): {key: string, value: string}[] =>  {
-//     let KV: {key: string, value: string};
-//     let list: {key: string, value: string}[]
-//
-//     keys.
-//
-// }
 
 export const newSdkClient = (sdk: BluzelleSdk): Promise<BluzelleSdk> =>
 

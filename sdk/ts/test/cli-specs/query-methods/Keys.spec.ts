@@ -4,7 +4,7 @@ import {bluzelle, BluzelleSdk, DbSdk, newMnemonic} from "../../../src/bz-sdk/bz-
 import {
     createKeys,
     defaultLease,
-    getSdk, newSdkClient,
+    getSdk, newSdkClient, parseJSONCliStdout,
     zeroLease
 } from "../../helpers/client-helpers/sdk-helpers";
 import Long from 'long'
@@ -22,15 +22,18 @@ describe('q.Keys()', function () {
         uuid = Date.now().toString()
     });
 
-    it('should return a empty list if there are no keys', async () => {
-        expect(await curiumd(`q crud keys ${uuid}`)
-            .then(({stderr, stdout}) => ({stdout: stdout.split('\n'), stderr}))
-            .then(resp => resp.stdout[0])).to.equal('keys: []')
-    });
-    it('should return a list of keys in the uuid', async () => {
-        const {keys} = await createKeys(sdk.db, 5, uuid)
+    it('should return a empty list if there are no keys', () => {
+        return curiumd(`q crud keys ${uuid} -o json`)
+            .then(parseJSONCliStdout)
+            .then(({keys}) => expect(keys).to.have.length(0))
 
-        expect(await curiumd(`q crud keys ${uuid}`)
-            .then(({stdout}) => expect(stdout).to.match(/key-0.*key-1/)))
+    });
+    it('should return a list of keys in the uuid',  async () => {
+        const {keys} = await createKeys(sdk.db, 5, uuid)
+        const Keys = keys
+
+        await curiumd(`q crud keys ${uuid} -o json`)
+            .then(parseJSONCliStdout)
+            .then(({keys}) => expect(keys).to.deep.equal(Keys))
     });
 });

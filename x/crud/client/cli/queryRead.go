@@ -10,8 +10,9 @@ import (
 
 func CmdReadQuery() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "read",
-		Short: "uuid key",
+		Use:   "read [uuid] [key]",
+		Short: "read a key-value under specified uuid",
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -29,8 +30,6 @@ func CmdReadQuery() *cobra.Command {
 			return clientCtx.PrintProto(res)
 		},
 	}
-
-	cmd.Flags().Bool("base64", false, "return values in base64 encoding")
 
 	flags.AddQueryFlagsToCmd(cmd)
 

@@ -2,6 +2,7 @@ import {expect} from "chai";
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
 import {bluzelle, BluzelleSdk, DbSdk, newMnemonic} from "../../../src/bz-sdk/bz-sdk";
 import {
+    convertBase64ToString,
     createKeys, decodeData,
     defaultLease, encodeData,
     getSdk, newSdkClient,
@@ -11,6 +12,7 @@ import Long from 'long'
 import delay from "delay";
 import {curiumd, execute} from "../../helpers/cli-helpers/curiumd-helpers";
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
+import {Some} from "monet";
 
 
 
@@ -38,19 +40,10 @@ describe('q.Read()', function () {
             metadata: new Uint8Array(),
             lease: defaultLease
         })
-            .then(() => curiumd(`q crud read ${uuid} firstKey`))
-            .then(({stdout}) => expect(stdout).to.match(/firstValue/))
+            .then(() => curiumd(`q crud read ${uuid} firstKey -o json`))
+            .then(({stdout}) => JSON.parse(stdout))
+            .then((obj: any) => expect(Some(obj.value).map(convertBase64ToString).join()).to.equal('firstValue'))
 
-    });
-
-    it.skip('should immediately retrieve values from the store', () => {
-
-        return createKeys(sdk.db, 3, uuid)
-            .then(({keys}) => Promise.all(keys
-                .map(async (key) => await curiumd(`q crud read ${uuid} ${key}`)))
-            )
-            .then(readResponses => readResponses
-                .forEach(({stdout}, index) => expect(stdout).to.match(new RegExp(encodeData("value-"+index).toString()))))
     });
 
 });
