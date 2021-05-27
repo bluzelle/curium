@@ -23,7 +23,7 @@ type (
 		memKey       sdk.StoreKey
 		AccKeeper    authkeeper.AccountKeeper
 		CrudKeeper   crudkeeper.Keeper
-		VotingKeeper votingkeeper.Keeper
+		VotingKeeper *votingkeeper.Keeper
 		CuriumKeeper curiumkeeper.Keeper
 		KeyringDir   string
 		// this line is used by starport scaffolding # ibc/Keeper/attribute
@@ -36,7 +36,7 @@ func NewKeeper(
 	memKey sdk.StoreKey,
 	AccKeeper authkeeper.AccountKeeper,
 	CrudKeeper crudkeeper.Keeper,
-	VotingKeeper votingkeeper.Keeper,
+	VotingKeeper *votingkeeper.Keeper,
 	CuriumKeeper curiumkeeper.Keeper,
 	KeyringDir string,
 	// this line is used by starport scaffolding # ibc/Keeper/parameter
@@ -67,7 +67,7 @@ func (k Keeper) GetCdc() codec.Marshaler {
 }
 
 func (k Keeper) ExecuteOperation(ctx sdk.Context, syncOp *types.SyncOperation) {
-	k.Logger(ctx).Info("Sync operation", "syncOp", syncOp)
+	k.Logger(ctx).Info("Sync operation", "op", syncOp.Op, "uuid", syncOp.Uuid, "key", syncOp.Key, "value", syncOp.Value)
 	switch syncOp.Op {
 	case "create":
 		metaBytes := k.cdc.MustMarshalBinaryBare(&types.SynchronizerValueMeta{

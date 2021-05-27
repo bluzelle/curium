@@ -18,9 +18,14 @@ func NewVoteHandler(k Keeper) *VoteHandler {
 }
 
 func (h *VoteHandler) VotesReceived(ctx sdk.Context, voteId string, votes []*votingtypes.Vote) {
+	h.Keeper.Logger(ctx).Info("Votes received", "len", len(votes))
 	winner := TallyVotes(votes)
 	var op types.SyncOperation
-	op.Unmarshal(*winner)
+	err := op.Unmarshal(*winner)
+	if err != nil {
+		h.Keeper.Logger(ctx).Error("Error unmarshaling winning vote", err)
+	}
+	h.Keeper.Logger(ctx).Info("Executing operation", "op", op.Op, "uuid", op.Uuid, "key", op.Key)
 	h.Keeper.ExecuteOperation(ctx, &op)
 }
 

@@ -12,13 +12,12 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	signing2 "github.com/cosmos/cosmos-sdk/x/auth/signing"
-	"github.com/tendermint/tendermint/rpc/core/types"
 
 	"google.golang.org/grpc"
 	"time"
 )
 
-func BroadcastMessages(ctx sdk.Context, msgs []types.Msg, accKeeper *keeper.AccountKeeper, from string, keyringDir string) (*coretypes.ResultBroadcastTxCommit, error) {
+func BroadcastMessages(ctx sdk.Context, msgs []types.Msg, accKeeper *keeper.AccountKeeper, from string, keyringDir string) (*tx2.BroadcastTxResponse, error) {
 	// Choose your codec: Amino or Protobuf. Here, we use Protobuf, given by the
 	// following function.
 	encCfg := simapp.MakeTestEncodingConfig()
@@ -34,7 +33,7 @@ func BroadcastMessages(ctx sdk.Context, msgs []types.Msg, accKeeper *keeper.Acco
 	gas := uint64(400000)
 	txBuilder.SetGasLimit(gas)
 
-	txBuilder.SetFeeAmount(types.NewCoins(types.NewCoin("ubnt", types.NewInt(1000))))
+	txBuilder.SetFeeAmount(types.NewCoins(types.NewCoin("ubnt", types.NewInt(10000000))))
 	txBuilder.SetMemo("memo")
 	txBuilder.SetTimeoutHeight(uint64(ctx.BlockHeight() + 2))
 
@@ -113,7 +112,7 @@ func BroadcastMessages(ctx sdk.Context, msgs []types.Msg, accKeeper *keeper.Acco
 	//	var ctx context.Context
 	txClient := tx2.NewServiceClient(grpcConn)
 	// We then call the BroadcastTx method on this client.
-	_, err = txClient.BroadcastTx(
+	res, err := txClient.BroadcastTx(
 		txCtx,
 		&tx2.BroadcastTxRequest{
 			Mode:    tx2.BroadcastMode_BROADCAST_MODE_BLOCK,
@@ -124,5 +123,5 @@ func BroadcastMessages(ctx sdk.Context, msgs []types.Msg, accKeeper *keeper.Acco
 		return nil, err
 	}
 
-	return nil, nil
+	return res, nil
 }

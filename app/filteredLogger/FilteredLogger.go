@@ -1,6 +1,7 @@
 package filteredLogger
 
 import (
+	"fmt"
 	"github.com/tendermint/tendermint/libs/log"
 	"os"
 	"strings"
@@ -37,6 +38,7 @@ func NewFilteredLogger(filterString string) (log.Logger, error) {
 			parts := strings.Split(option, ":")
 			module := parts[0]
 			level := parts[1]
+			fmt.Printf("Setting log level %s for module %s\n", level, module)
 			moduleLogLevels[module] = logLevels[level]
 			if module == "*" {
 				if f, err := log.AllowLevel(level); err != nil {

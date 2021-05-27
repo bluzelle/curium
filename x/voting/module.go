@@ -3,6 +3,9 @@ package voting
 import (
 	"encoding/json"
 	"fmt"
+	"sync"
+	"time"
+
 	// this line is used by starport scaffolding # 1
 
 	"github.com/gorilla/mux"
@@ -102,10 +105,10 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 type AppModule struct {
 	AppModuleBasic
 
-	keeper keeper.Keeper
+	keeper *keeper.Keeper
 }
 
-func NewAppModule(cdc codec.Marshaler, keeper keeper.Keeper) AppModule {
+func NewAppModule(cdc codec.Marshaler, keeper *keeper.Keeper) AppModule {
 	return AppModule{
 		AppModuleBasic: NewAppModuleBasic(cdc),
 		keeper:         keeper,
@@ -119,7 +122,7 @@ func (am AppModule) Name() string {
 
 // Route returns the capability module's message routing key.
 func (am AppModule) Route() sdk.Route {
-	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper))
+	return sdk.NewRoute(types.RouterKey, NewHandler(*am.keeper))
 }
 
 // QuerierRoute returns the capability module's query routing key.
@@ -127,7 +130,7 @@ func (AppModule) QuerierRoute() string { return types.QuerierRoute }
 
 // LegacyQuerierHandler returns the capability module's Querier.
 func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
-	return keeper.NewQuerier(am.keeper, legacyQuerierCdc)
+	return keeper.NewQuerier(*am.keeper, legacyQuerierCdc)
 }
 
 // RegisterServices registers a GRPC query service to respond to the
@@ -146,14 +149,14 @@ func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONMarshaler, gs jso
 	// Initialize global index to index in genesis state
 	cdc.MustUnmarshalJSON(gs, &genState)
 
-	InitGenesis(ctx, am.keeper, genState)
+	InitGenesis(ctx, *am.keeper, genState)
 
 	return []abci.ValidatorUpdate{}
 }
 
 // ExportGenesis returns the capability module's exported genesis state as raw JSON bytes.
 func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONMarshaler) json.RawMessage {
-	genState := ExportGenesis(ctx, am.keeper)
+	genState := ExportGenesis(ctx, *am.keeper)
 	return cdc.MustMarshalJSON(genState)
 }
 
@@ -162,11 +165,28 @@ func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
 
 // EndBlock executes all ABCI EndBlock logic respective to the capability module. It
 // returns no validator updates.
+var doOnce sync.Once
+
+var currCtx sdk.Context
+var checkDeliverVotes = false
 func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-	am.keeper.CheckDeliverVotes(ctx)
-	go func() {
-		am.keeper.TransmitProofQueue(ctx)
-		am.keeper.TransmitVoteQueue(ctx)
-	}()
+	currCtx = ctx
+	if checkDeliverVotes {
+		checkDeliverVotes = false
+		am.keeper.CheckDeliverVotes(currCtx)
+	}
+	doOnce.Do(func() {
+		go func() {
+			for {
+				now := time.Now()
+				waitTime := now.Truncate(time.Minute).Add(time.Minute).Sub(now)
+				c := time.After(waitTime)
+				<- c
+				time.AfterFunc(time.Second * 10, func() {am.keeper.TransmitProofQueue(currCtx)})
+				time.AfterFunc(time.Second * 30, func() {am.keeper.TransmitVoteQueue(currCtx)})
+				time.AfterFunc(time.Second * 45, func() {checkDeliverVotes = true})
+			}
+		}()
+	})
 	return []abci.ValidatorUpdate{}
 }

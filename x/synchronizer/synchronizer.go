@@ -56,14 +56,17 @@ func StartSynchronizer(ctx sdk.Context, k keeper.Keeper) {
 	doOnce.Do(func() {
 		go func() {
 			for {
-				_ = <-ticker.C
-				runSynchronizer(k)
+				now := time.Now()
+				waitTime := now.Truncate(time.Minute).Add(time.Minute).Sub(now)
+				c := time.After(waitTime)
+				<- c
+				runSynchronizer(&k)
 			}
 		}()
 	})
 }
 
-func runSynchronizer(k keeper.Keeper) {
+func runSynchronizer(k *keeper.Keeper) {
 	for name, network := range networks {
 		data := fetchDataFromContract(k, name, network)
 		creator, err := getSyncUserAddress(k)
@@ -91,7 +94,7 @@ func runSynchronizer(k keeper.Keeper) {
 	}
 }
 
-func fetchDataFromContract(k keeper.Keeper, name string, network Network) []binance.BluzelleAdapterTransaction {
+func fetchDataFromContract(k *keeper.Keeper, name string, network Network) []binance.BluzelleAdapterTransaction {
 	ethCtx := context.Background()
 	backend, err := eth.Dial(network.Endpoints[0])
 	if err != nil {
@@ -125,7 +128,7 @@ func fetchDataFromContract(k keeper.Keeper, name string, network Network) []bina
 	return data
 }
 
-func getSyncUserAddress(k keeper.Keeper) (string, error) {
+func getSyncUserAddress(k *keeper.Keeper) (string, error) {
 	kr, err := keyring.New("curium", keyring.BackendTest, k.GetKeyringDir(), nil)
 
 	if err != nil {

@@ -221,7 +221,7 @@ type App struct {
 
 	nftKeeper nftkeeper.Keeper
 
-	votingKeeper votingkeeper.Keeper
+	votingKeeper *votingkeeper.Keeper
 
 	synchronizerKeeper synchronizerkeeper.Keeper
 
@@ -365,7 +365,7 @@ func New(
 	)
 	nftModule := nft.NewAppModule(appCodec, app.nftKeeper)
 
-	app.votingKeeper = *votingkeeper.NewKeeper(
+	app.votingKeeper = votingkeeper.NewKeeper(
 		appCodec,
 		keys[votingtypes.StoreKey],
 		keys[votingtypes.MemStoreKey],

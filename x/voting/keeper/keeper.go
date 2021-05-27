@@ -21,10 +21,6 @@ import (
 	// this line is used by starport scaffolding # ibc/keeper/import
 )
 
-var voteQueue = map[int64][]types.MsgVote{}
-var proofQueue = make([]types.MsgVoteProof, 0)
-var voteHandlers = map[string]types.VoteHandler{}
-
 type (
 	Keeper struct {
 		cdc           codec.Marshaler
@@ -33,6 +29,10 @@ type (
 		homeDir       string
 		stakingKeeper stakingkeeper.Keeper
 		accKeeper     authkeeper.AccountKeeper
+		voteQueue     []types.MsgVote
+		proofQueue    []types.MsgVoteProof
+		voteHandlers  map[string]types.VoteHandler
+
 		// this line is used by starport scaffolding # ibc/keeper/attribute
 	}
 )
@@ -44,7 +44,8 @@ func NewKeeper(
 	homeDir string,
 	stakingKeeper stakingkeeper.Keeper,
 	accKeeper authkeeper.AccountKeeper,
-	// this line is used by starport scaffolding # ibc/keeper/parameter
+
+// this line is used by starport scaffolding # ibc/keeper/parameter
 ) *Keeper {
 	return &Keeper{
 		cdc:           cdc,
@@ -53,20 +54,24 @@ func NewKeeper(
 		homeDir:       homeDir,
 		stakingKeeper: stakingKeeper,
 		accKeeper:     accKeeper,
+		voteQueue:     []types.MsgVote{},
+		proofQueue:    []types.MsgVoteProof{},
+		voteHandlers:  map[string]types.VoteHandler{},
+
 		// this line is used by starport scaffolding # ibc/keeper/return
 	}
 }
 
-func (k Keeper) Logger(ctx sdk.Context) log.Logger {
+func (k *Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
-func (k Keeper) RegisterVoteHandler(handler types.VoteHandler) {
-	voteHandlers[handler.VoteType()] = handler
+func (k *Keeper) RegisterVoteHandler(handler types.VoteHandler) {
+	k.voteHandlers[handler.VoteType()] = handler
 }
 
 // Vote this is the function that other modules will call to send a vote
-func (k Keeper) Vote(ctx sdk.Context, votingReq types.VotingRequest) {
+func (k *Keeper) Vote(ctx sdk.Context, votingReq types.VotingRequest) {
 	k.Logger(ctx).Info("Voting request received", "id", votingReq.Id, "value", string(votingReq.Value))
 	valcons := k.GetValconsAddress()
 	proof := types.MsgVoteProof{
@@ -79,7 +84,7 @@ func (k Keeper) Vote(ctx sdk.Context, votingReq types.VotingRequest) {
 		Batch:     GenerateBatchNow(),
 	}
 
-	proofQueue = append(proofQueue, proof)
+	k.proofQueue = append(k.proofQueue, proof)
 
 	vote := types.MsgVote{
 		Creator:  proof.Creator,
@@ -92,7 +97,7 @@ func (k Keeper) Vote(ctx sdk.Context, votingReq types.VotingRequest) {
 		Block:    ctx.BlockHeight() + 3,
 	}
 
-	voteQueue[ctx.BlockHeight()+3] = append(voteQueue[ctx.BlockHeight()+3], vote)
+	k.voteQueue = append(k.voteQueue, vote)
 }
 
 func MakeProofStoreKey(valcons string, voteType string, voteId string) []byte {
@@ -108,46 +113,52 @@ func Pad20Int64(n int64) string {
 	return fmt.Sprintf("%020d", n)
 }
 
-func (k Keeper) GetProofStore(ctx sdk.Context) prefix.Store {
+func (k *Keeper) GetProofStore(ctx sdk.Context) prefix.Store {
 	return prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.ProofPrefix))
 }
 
-func (k Keeper) GetVoteStore(ctx sdk.Context) prefix.Store {
+func (k *Keeper) GetVoteStore(ctx sdk.Context) prefix.Store {
 	return prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.VotePrefix))
 }
 
-func (k Keeper) TransmitProofQueue(ctx sdk.Context) {
-	if len(proofQueue) > 0 {
+func (k *Keeper) TransmitProofQueue(ctx sdk.Context) {
+	if len(k.proofQueue) == 0 {
+		k.Logger(ctx).Info("Skipping empty proof queue")
+		return
+	}
+	if len(k.proofQueue) > 0 {
 		var msgs []sdk.Msg
-		for i := 0; i < len(proofQueue); i++ {
-			msgs = append(msgs, &proofQueue[i])
+		for i := 0; i < len(k.proofQueue); i++ {
+			msgs = append(msgs, &k.proofQueue[i])
 		}
-		result, err := curium.BroadcastMessages(ctx, msgs, &k.accKeeper, proofQueue[0].From, k.homeDir)
+		result, err := curium.BroadcastMessages(ctx, msgs, &k.accKeeper, k.proofQueue[0].From, k.homeDir)
 		k.Logger(ctx).Info("Sending vote proofs", "count", len(msgs))
 		if err != nil {
 			k.Logger(ctx).Error("Error broadcasting proofs", "err", err)
 			return
 		}
-		k.Logger(ctx).Info("Broadcast proofs successful", "result", result)
-		proofQueue = make([]types.MsgVoteProof, 0)
+		k.Logger(ctx).Info("Broadcast proofs successful", "txhash", result.TxResponse.TxHash)
+		k.proofQueue = []types.MsgVoteProof{}
 	}
 }
 
-func (k Keeper) TransmitVoteQueue(ctx sdk.Context) {
-	if voteQueue[ctx.BlockHeight()] != nil {
-		var msgs []sdk.Msg
-		for i := 0; i < len(voteQueue[ctx.BlockHeight()]); i++ {
-			msgs = append(msgs, &voteQueue[ctx.BlockHeight()][i])
-		}
-		k.Logger(ctx).Info("Broadcasting votes", "vote count", len(msgs))
-		_, err := curium.BroadcastMessages(ctx, msgs, &k.accKeeper, voteQueue[ctx.BlockHeight()][0].From, k.homeDir)
-		if err != nil {
-			k.Logger(ctx).Error("Error broadcasting votes", "err", err)
-			return
-		}
-
-		delete(voteQueue, ctx.BlockHeight())
+func (k *Keeper) TransmitVoteQueue(ctx sdk.Context) {
+	if len(k.voteQueue) == 0 {
+		k.Logger(ctx).Info("skipping empty vote queue")
+		return
 	}
+	var msgs []sdk.Msg
+	for _, voteQueueItem := range k.voteQueue {
+		msgs = append(msgs, &voteQueueItem)
+	}
+	k.Logger(ctx).Info("broadcasting votes", "vote count", len(msgs))
+	res, err := curium.BroadcastMessages(ctx, msgs, &k.accKeeper, k.voteQueue[0].From, k.homeDir)
+	if err != nil {
+		k.Logger(ctx).Error("Error broadcasting votes", "err", err)
+		return
+	}
+	k.Logger(ctx).Info("Broadcast votes successful", "txhash", res.TxResponse.TxHash)
+	k.voteQueue = []types.MsgVote{}
 }
 
 func GenerateBatchNow() string {
@@ -171,14 +182,13 @@ func GenerateBatch(t time.Time) string {
 
 }
 
-func (k Keeper) StoreVote(ctx sdk.Context, vote types.Vote) {
+func (k *Keeper) StoreVote(ctx sdk.Context, vote types.Vote) {
 	store := k.GetVoteStore(ctx)
 	key := MakeVoteStoreKey(ctx.BlockHeight(), vote.VoteType, vote.Id, vote.Valcons)
 	store.Set(key, k.cdc.MustMarshalBinaryBare(&vote))
 }
 
-
-func (k Keeper) getVoteStoreKeys(ctx sdk.Context) []string {
+func (k *Keeper) getVoteStoreKeys(ctx sdk.Context) []string {
 	store := k.GetVoteStore(ctx)
 	var keys []string
 	iterator := store.Iterator(nil, nil)
@@ -188,21 +198,16 @@ func (k Keeper) getVoteStoreKeys(ctx sdk.Context) []string {
 	return keys
 }
 
-func (k Keeper) CheckDeliverVotes(ctx sdk.Context) {
-	start := Pad20Int64(ctx.BlockHeight() - 2)
-	k.Logger(ctx).Info("Check deliver votes", "start", start, "height", ctx.BlockHeight())
+func (k *Keeper) CheckDeliverVotes(ctx sdk.Context) {
+	k.Logger(ctx).Info("Check deliver votes")
 	if filteredLogger.IsDebug("x/voting") {
 		k.Logger(ctx).Debug("vote store keys", "keys", k.getVoteStoreKeys(ctx))
 	}
 
 	store := k.GetVoteStore(ctx)
-	iterator := store.ReverseIterator([]byte(start), nil)
-	if iterator.Valid() {
-		return
-	}
 
 	var votes = map[string]map[string][]*types.Vote{}
-	iterator = store.Iterator(nil, nil)
+	iterator := store.Iterator(nil, nil)
 	for ; iterator.Valid(); iterator.Next() {
 		var vote types.Vote
 		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &vote)
@@ -215,7 +220,7 @@ func (k Keeper) CheckDeliverVotes(ctx sdk.Context) {
 	}
 
 	for voteType := range votes {
-		if voteHandlers[voteType] == nil {
+		if k.voteHandlers[voteType] == nil {
 			k.Logger(ctx).Error("No vote handler registered", "type", voteType)
 			continue
 		}
@@ -227,16 +232,16 @@ func (k Keeper) CheckDeliverVotes(ctx sdk.Context) {
 		sortkeys.Strings(ids)
 		for _, id := range ids {
 			k.Logger(ctx).Info("Sending vote to vote handler", "id", id, "count", len(votes[voteType][id]))
-			voteHandlers[voteType].VotesReceived(ctx, id, votes[voteType][id])
+			k.voteHandlers[voteType].VotesReceived(ctx, id, votes[voteType][id])
 		}
 	}
 }
 
-func (k Keeper) GetPrivateValidator() *privval.FilePV {
+func (k *Keeper) GetPrivateValidator() *privval.FilePV {
 	return privval.LoadFilePV(k.homeDir+"/config/priv_validator_key.json", k.homeDir+"/data/priv_validator_state.json")
 }
 
-func (k Keeper) GetValconsAddress() string {
+func (k *Keeper) GetValconsAddress() string {
 	validator := k.GetPrivateValidator()
 	address := validator.GetAddress()
 	consAddress := (sdk.ConsAddress)(address)
@@ -244,18 +249,18 @@ func (k Keeper) GetValconsAddress() string {
 	return addressString
 }
 
-func (k Keeper) SignProofSig(value []byte) []byte {
+func (k *Keeper) SignProofSig(value []byte) []byte {
 	v := k.GetPrivateValidator()
 	s, _ := v.Key.PrivKey.Sign([]byte(value))
 	return s
 }
 
-func (k Keeper) GetValidator(ctx sdk.Context, valcons string) (validator stakingtypes.Validator, found bool) {
+func (k *Keeper) GetValidator(ctx sdk.Context, valcons string) (validator stakingtypes.Validator, found bool) {
 	consAddr, _ := sdk.ConsAddressFromBech32(valcons)
 	return k.stakingKeeper.GetValidatorByConsAddr(ctx, consAddr)
 }
 
-func (k Keeper) GetValidatorWeight(ctx sdk.Context, valcons string) int64 {
+func (k *Keeper) GetValidatorWeight(ctx sdk.Context, valcons string) int64 {
 	validator, validatorFound := k.GetValidator(ctx, valcons)
 	if !validatorFound {
 		return 0
@@ -263,7 +268,7 @@ func (k Keeper) GetValidatorWeight(ctx sdk.Context, valcons string) int64 {
 	return validator.ConsensusPower()
 }
 
-func (k Keeper) IsVoteValid(ctx sdk.Context, msg *types.MsgVote) bool {
+func (k *Keeper) IsVoteValid(ctx sdk.Context, msg *types.MsgVote) bool {
 	validator, validatorFound := k.GetValidator(ctx, msg.Valcons)
 
 	if validator.Jailed {
@@ -289,7 +294,7 @@ func (k Keeper) IsVoteValid(ctx sdk.Context, msg *types.MsgVote) bool {
 	return isGood
 }
 
-func (k Keeper) GetVoteProof(ctx sdk.Context, vote *types.MsgVote) types.MsgVoteProof {
+func (k *Keeper) GetVoteProof(ctx sdk.Context, vote *types.MsgVote) types.MsgVoteProof {
 	var msg types.MsgVoteProof
 	proofStore := k.GetProofStore(ctx)
 
