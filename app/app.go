@@ -227,6 +227,8 @@ type App struct {
 
 	crudKeeper crudkeeper.Keeper
 
+	gasMeterKeeper *ante.GasMeterKeeper
+
 	// the module manager
 	mm *module.Manager
 }
@@ -384,9 +386,12 @@ func New(
 	)
 	votingModule := voting.NewAppModule(appCodec, app.votingKeeper)
 
+	app.gasMeterKeeper = ante.NewGasMeterKeeper()
+
 	app.crudKeeper = *crudkeeper.NewKeeper(
 		appCodec,
 		app.curiumKeeper,
+		app.gasMeterKeeper,
 		keys[crudtypes.StoreKey],
 		keys[crudtypes.MemStoreKey],
 		crudkeeper.MaxKeeperSizes{
@@ -413,6 +418,8 @@ func New(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
 		&stakingKeeper, govRouter,
 	)
+
+
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
@@ -511,6 +518,7 @@ func New(
 		ante.NewAnteHandler(
 			app.AccountKeeper, app.BankKeeper, authante.DefaultSigVerificationGasConsumer,
 			encodingConfig.TxConfig.SignModeHandler(),
+			app.gasMeterKeeper,
 		),
 	)
 	app.SetEndBlocker(app.EndBlocker)

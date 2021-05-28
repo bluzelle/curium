@@ -5,6 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
+	"strings"
 )
 
 var (
@@ -22,10 +23,14 @@ type GasTx interface {
 // on gas provided and gas used.
 // CONTRACT: Must be first decorator in the chain
 // CONTRACT: Tx must implement GasTx interface
-type SetUpContextDecorator struct{}
+type SetUpContextDecorator struct{
+	gasMeterKeeper *GasMeterKeeper
+}
 
-func NewSetUpContextDecorator() SetUpContextDecorator {
-	return SetUpContextDecorator{}
+func NewSetUpContextDecorator(gasMeterKeeper *GasMeterKeeper) SetUpContextDecorator {
+	return SetUpContextDecorator{
+		gasMeterKeeper: gasMeterKeeper,
+	}
 }
 
 func (sud SetUpContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
@@ -35,11 +40,11 @@ func (sud SetUpContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate
 	if !ok {
 		// Set a gas meter with limit 0 as to prevent an infinite gas meter attack
 		// during runTx.
-		newCtx = SetGasMeter(simulate, ctx, 0)
+		newCtx = SetGasMeter(simulate, ctx, 0, sud.gasMeterKeeper, tx)
 		return newCtx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be GasTx")
 	}
 
-	newCtx = SetGasMeter(simulate, ctx, gasTx.GetGas())
+	newCtx = SetGasMeter(simulate, ctx, gasTx.GetGas(), sud.gasMeterKeeper, tx)
 
 	// Decorator will catch an OutOfGasPanic caused in the next antehandler
 	// AnteHandlers must have their own defer/recover in order for the BaseApp
@@ -65,12 +70,25 @@ func (sud SetUpContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate
 }
 
 // SetGasMeter returns a new context with a gas meter set from a given context.
-func SetGasMeter(simulate bool, ctx sdk.Context, gasLimit uint64) sdk.Context {
+func SetGasMeter(simulate bool, ctx sdk.Context, gasLimit uint64, gk *GasMeterKeeper, tx sdk.Tx) sdk.Context {
 	// In various cases such as simulation and during the genesis block, we do not
 	// meter any gas utilization.
 	if simulate || ctx.BlockHeight() == 0 {
 		return ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 	}
 
-	return ctx.WithGasMeter(NewBluzelleGasMeter(gasLimit))
+	msgModule := tx.GetMsgs()[0].Route()
+	isCrud := strings.Contains(msgModule, "crud")
+
+	if isCrud {
+		gm := NewCrudGasMeter(gasLimit).(ChargingGasMeterInterface)
+
+		gk.AddGasMeter(&gm)
+		return ctx.WithGasMeter(gm)
+	}
+
+	gm := NewFreeGasMeter(gasLimit).(ChargingGasMeterInterface)
+	gk.AddGasMeter(&gm)
+
+	return ctx.WithGasMeter(gm)
 }

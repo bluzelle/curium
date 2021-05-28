@@ -13,8 +13,8 @@ type FreeGasMeterTestSuite struct {
 }
 
 func (suite *FreeGasMeterTestSuite) SetupTest() {
-	suite.GasMeter = NewBluzelleGasMeter(1000)
-	suite.ZeroLimitGasMeter = NewBluzelleGasMeter(0)
+	suite.GasMeter = NewCrudGasMeter(1000)
+	suite.ZeroLimitGasMeter = NewCrudGasMeter(0)
 }
 
 func (suite *FreeGasMeterTestSuite) TestFreeGasMeter_GasConsumed() {
@@ -59,7 +59,7 @@ func (suite *FreeGasMeterTestSuite) TestFreeGasMeter_ConsumeGas() {
 
 func (suite *FreeGasMeterTestSuite) TestFreeGasMeter_ConsumeBillableGas() {
 	suite.Run("should consume gas and update billableGas", func() {
-		gasMeter := suite.GasMeter.(BluzelleGasMeterInterface)
+		gasMeter := suite.GasMeter.(CrudGasMeterInterface)
 		gasMeter.ConsumeBillableGas(1000, "just right")
 		suite.Equal(uint64(1000), gasMeter.BillableGasConsumed())
 	})
