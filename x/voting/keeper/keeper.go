@@ -54,8 +54,6 @@ func NewKeeper(
 		homeDir:       homeDir,
 		stakingKeeper: stakingKeeper,
 		accKeeper:     accKeeper,
-		voteQueue:     []types.MsgVote{},
-		proofQueue:    []types.MsgVoteProof{},
 		voteHandlers:  map[string]types.VoteHandler{},
 
 		// this line is used by starport scaffolding # ibc/keeper/return

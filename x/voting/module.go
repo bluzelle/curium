@@ -122,7 +122,7 @@ func (am AppModule) Name() string {
 
 // Route returns the capability module's message routing key.
 func (am AppModule) Route() sdk.Route {
-	return sdk.NewRoute(types.RouterKey, NewHandler(*am.keeper))
+	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper))
 }
 
 // QuerierRoute returns the capability module's query routing key.
@@ -173,7 +173,7 @@ func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.Val
 	currCtx = ctx
 	if checkDeliverVotes {
 		checkDeliverVotes = false
-		am.keeper.CheckDeliverVotes(currCtx)
+		am.keeper.CheckDeliverVotes(ctx)
 	}
 	doOnce.Do(func() {
 		go func() {
