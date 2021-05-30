@@ -3,6 +3,9 @@ package ante
 import (
 	"fmt"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"math"
 )
 
@@ -11,7 +14,7 @@ type freeGasMeter struct {
 	consumed storetypes.Gas
 }
 
-func NewFreeGasMeter(limit storetypes.Gas) ChargingGasMeterInterface {
+func NewFreeGasMeter(limit storetypes.Gas) storetypes.GasMeter {
 	return &freeGasMeter{
 		limit:    limit,
 		consumed: 0,
@@ -30,13 +33,6 @@ func (g *freeGasMeter) GasConsumedToLimit() storetypes.Gas {
 	if g.IsPastLimit() {
 		return 0
 	}
-	return 0
-}
-
-func (g *freeGasMeter) ConsumeBillableGas(amount storetypes.Gas, descriptor string)  {
-}
-
-func (g *freeGasMeter) BillableGasConsumed() storetypes.Gas {
 	return 0
 }
 
@@ -76,4 +72,4 @@ func (g *freeGasMeter) String() string {
 	return fmt.Sprintf("FreeGasMeter:\n  limit: %d\n  consumed: %d", g.limit, g.consumed)
 }
 
-func (g *freeGasMeter) Charge () {}
+func (g *freeGasMeter) Charge (ctx *sdk.Context, bankKeeper authtypes.BankKeeper, accountKeeper authante.AccountKeeper) error {return nil}

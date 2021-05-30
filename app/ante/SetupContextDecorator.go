@@ -5,6 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"strings"
 )
 
@@ -25,11 +26,13 @@ type GasTx interface {
 // CONTRACT: Tx must implement GasTx interface
 type SetUpContextDecorator struct{
 	gasMeterKeeper *GasMeterKeeper
+	bankKeeper authtypes.BankKeeper
 }
 
-func NewSetUpContextDecorator(gasMeterKeeper *GasMeterKeeper) SetUpContextDecorator {
+func NewSetUpContextDecorator(gasMeterKeeper *GasMeterKeeper, bankKeeper authtypes.BankKeeper) SetUpContextDecorator {
 	return SetUpContextDecorator{
 		gasMeterKeeper: gasMeterKeeper,
+		bankKeeper: bankKeeper,
 	}
 }
 
@@ -76,18 +79,20 @@ func SetGasMeter(simulate bool, ctx sdk.Context, gasLimit uint64, gk *GasMeterKe
 	if simulate || ctx.BlockHeight() == 0 {
 		return ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 	}
+	feeTx := tx.(sdk.FeeTx)
+	feePayer := feeTx.FeePayer()
 
 	msgModule := tx.GetMsgs()[0].Route()
 	isCrud := strings.Contains(msgModule, "crud")
 
 	if isCrud {
-		gm := NewCrudGasMeter(gasLimit).(ChargingGasMeterInterface)
+		gm := NewChargingGasMeter(gasLimit, feePayer)
 
 		gk.AddGasMeter(&gm)
 		return ctx.WithGasMeter(gm)
 	}
 
-	gm := NewFreeGasMeter(gasLimit).(ChargingGasMeterInterface)
+	gm := NewFreeGasMeter(gasLimit)
 	gk.AddGasMeter(&gm)
 
 	return ctx.WithGasMeter(gm)

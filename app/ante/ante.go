@@ -18,7 +18,7 @@ func NewAnteHandler(
 ) sdk.AnteHandler {
 	return sdk.ChainAnteDecorators(
 		//auth.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
-		NewSetUpContextDecorator(gasMeterKeeper),
+		NewSetUpContextDecorator(gasMeterKeeper, bankKeeper),
 		auth.NewRejectExtensionOptionsDecorator(),
 		auth.NewMempoolFeeDecorator(),
 		auth.NewValidateBasicDecorator(),

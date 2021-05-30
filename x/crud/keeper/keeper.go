@@ -6,6 +6,8 @@ import (
 	"github.com/bluzelle/curium/app/ante"
 	curiumkeeper "github.com/bluzelle/curium/x/curium/keeper"
 	"github.com/cosmos/cosmos-sdk/types/query"
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 
 	"github.com/bluzelle/curium/x/crud/types"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -22,6 +24,8 @@ type (
 		cdc          codec.Marshaler
 		curiumKeeper curiumkeeper.Keeper
 		GasMeterKeeper *ante.GasMeterKeeper
+		BankKeeper bankkeeper.Keeper
+		AccountKeeper authkeeper.AccountKeeper
 		storeKey     sdk.StoreKey
 		memKey       sdk.StoreKey
 		mks          MaxKeeperSizes
@@ -47,6 +51,8 @@ func NewKeeper(
 	cdc codec.Marshaler,
 	curiumKeeper curiumkeeper.Keeper,
 	GasMeterKeeper *ante.GasMeterKeeper,
+	BankKeeper bankkeeper.Keeper,
+	AccountKeeper authkeeper.AccountKeeper,
 	storeKey sdk.StoreKey,
 	memKey sdk.StoreKey,
 	mks MaxKeeperSizes,
@@ -56,6 +62,8 @@ func NewKeeper(
 		cdc:          cdc,
 		curiumKeeper: curiumKeeper,
 		GasMeterKeeper: GasMeterKeeper,
+		BankKeeper: BankKeeper,
+		AccountKeeper: AccountKeeper,
 		storeKey:     storeKey,
 		memKey:       memKey,
 		mks:          mks,
@@ -77,6 +85,13 @@ func (k Keeper) SetLease(ctx *sdk.Context, UUID string, key string, blockHeight 
 	}
 
 	leaseStore.Set(MakeLeaseKey(blockHeight+leaseBlocks, UUID, key), make([]byte, 0))
+}
+
+func (k Keeper) ConsumeGasForMsg(ctx *sdk.Context, lease *types.Lease, uuid string, key string, value []byte) {
+	gasMeter := ctx.GasMeter()
+	gas := CalculateGasForLease(lease, len(uuid) + len(key) + len(value))
+
+	gasMeter.ConsumeGas(gas, "consume gas for message")
 }
 
 func (k Keeper) ConvertLeaseToBlocks(lease *types.Lease) int64 {

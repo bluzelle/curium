@@ -1,46 +1,38 @@
 package ante
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/store/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 )
 
-type ChargingGasMeterInterface interface {
-	GasConsumed() sdk.Gas
-	GasConsumedToLimit() sdk.Gas
-	ConsumeBillableGas(amount sdk.Gas, descriptor string)
-	BillableGasConsumed() sdk.Gas
-	Limit() sdk.Gas
-	ConsumeGas(amount sdk.Gas, descriptor string)
-	IsPastLimit() bool
-	IsOutOfGas() bool
-	String() string
-	Charge()
-}
-
 type GasMeterKeeper struct {
-	gasMeters []*ChargingGasMeterInterface
+	gasMeters []*sdk.GasMeter
 }
 
 func NewGasMeterKeeper () *GasMeterKeeper {
 	return &GasMeterKeeper{
-		gasMeters: make([]*ChargingGasMeterInterface, 0),
+		gasMeters: make([]*sdk.GasMeter, 0),
 	}
 }
 
-func (gk *GasMeterKeeper) ChargeAll () {
+func (gk *GasMeterKeeper) ChargeAll (ctx *sdk.Context, bankKeeper bankkeeper.Keeper, accountKeeper authkeeper.AccountKeeper) {
 	if len(gk.gasMeters) == 0 {
 		return
 	}
 	for _,gasMeter := range gk.gasMeters {
 		gm := *gasMeter
-		gm.Charge()
+		chargingGm := gm.(ChargingGasMeterInterface)
+		err := chargingGm.Charge(ctx, bankKeeper, accountKeeper)
+		_ = err
+
 	}
 }
 
-func (gk *GasMeterKeeper) AddGasMeter (gasMeter *ChargingGasMeterInterface) {
+func (gk *GasMeterKeeper) AddGasMeter (gasMeter *sdk.GasMeter) {
 	gk.gasMeters = append(gk.gasMeters, gasMeter)
 }
 
 func (gk *GasMeterKeeper) ClearAll () {
-	gk.gasMeters = make([]*ChargingGasMeterInterface, 0)
+	gk.gasMeters = make([]*sdk.GasMeter, 0)
 }

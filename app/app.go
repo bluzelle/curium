@@ -392,6 +392,8 @@ func New(
 		appCodec,
 		app.curiumKeeper,
 		app.gasMeterKeeper,
+		app.BankKeeper,
+		app.AccountKeeper,
 		keys[crudtypes.StoreKey],
 		keys[crudtypes.MemStoreKey],
 		crudkeeper.MaxKeeperSizes{
