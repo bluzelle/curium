@@ -23,6 +23,6 @@ func (k *msgServer) Vote(goCtx context.Context, msg *types.MsgVote) (*types.MsgV
 		Weight:   k.GetValidatorWeight(ctx, msg.Valcons),
 	}
 	k.Logger(ctx).Info("Storing received vote", "id", vote.Id, "type", vote.VoteType, "msg block", msg.Block, "height", ctx.BlockHeight())
-	k.StoreVote(ctx, vote)
+	k.StoreVote(ctx, &vote)
 	return &types.MsgVoteResponse{}, nil
 }

@@ -29,8 +29,8 @@ type (
 		homeDir       string
 		stakingKeeper stakingkeeper.Keeper
 		accKeeper     authkeeper.AccountKeeper
-		voteQueue     []types.MsgVote
-		proofQueue    []types.MsgVoteProof
+		voteQueue     []*types.MsgVote
+		proofQueue    []*types.MsgVoteProof
 		voteHandlers  map[string]types.VoteHandler
 
 		// this line is used by starport scaffolding # ibc/keeper/attribute
@@ -82,7 +82,7 @@ func (k *Keeper) Vote(ctx sdk.Context, votingReq types.VotingRequest) {
 		Batch:     GenerateBatchNow(),
 	}
 
-	k.proofQueue = append(k.proofQueue, proof)
+	k.proofQueue = append(k.proofQueue, &proof)
 
 	vote := types.MsgVote{
 		Creator:  proof.Creator,
@@ -95,7 +95,7 @@ func (k *Keeper) Vote(ctx sdk.Context, votingReq types.VotingRequest) {
 		Block:    ctx.BlockHeight() + 3,
 	}
 
-	k.voteQueue = append(k.voteQueue, vote)
+	k.voteQueue = append(k.voteQueue, &vote)
 }
 
 func MakeProofStoreKey(valcons string, voteType string, voteId string) []byte {
@@ -127,7 +127,7 @@ func (k *Keeper) TransmitProofQueue(ctx sdk.Context) {
 	if len(k.proofQueue) > 0 {
 		var msgs []sdk.Msg
 		for i := 0; i < len(k.proofQueue); i++ {
-			msgs = append(msgs, &k.proofQueue[i])
+			msgs = append(msgs, k.proofQueue[i])
 		}
 		result, err := curium.BroadcastMessages(ctx, msgs, &k.accKeeper, k.proofQueue[0].From, k.homeDir)
 		k.Logger(ctx).Info("Sending vote proofs", "count", len(msgs))
@@ -136,7 +136,7 @@ func (k *Keeper) TransmitProofQueue(ctx sdk.Context) {
 			return
 		}
 		k.Logger(ctx).Info("Broadcast proofs successful", "txhash", result.TxResponse.TxHash)
-		k.proofQueue = []types.MsgVoteProof{}
+		k.proofQueue = []*types.MsgVoteProof{}
 	}
 }
 
@@ -147,7 +147,7 @@ func (k *Keeper) TransmitVoteQueue(ctx sdk.Context) {
 	}
 	var msgs []sdk.Msg
 	for _, voteQueueItem := range k.voteQueue {
-		msgs = append(msgs, &voteQueueItem)
+		msgs = append(msgs, voteQueueItem)
 	}
 	k.Logger(ctx).Info("broadcasting votes", "vote count", len(msgs))
 	res, err := curium.BroadcastMessages(ctx, msgs, &k.accKeeper, k.voteQueue[0].From, k.homeDir)
@@ -156,7 +156,7 @@ func (k *Keeper) TransmitVoteQueue(ctx sdk.Context) {
 		return
 	}
 	k.Logger(ctx).Info("Broadcast votes successful", "txhash", res.TxResponse.TxHash)
-	k.voteQueue = []types.MsgVote{}
+	k.voteQueue = []*types.MsgVote{}
 }
 
 func GenerateBatchNow() string {
@@ -180,10 +180,11 @@ func GenerateBatch(t time.Time) string {
 
 }
 
-func (k *Keeper) StoreVote(ctx sdk.Context, vote types.Vote) {
+func (k *Keeper) StoreVote(ctx sdk.Context, vote *types.Vote) {
 	store := k.GetVoteStore(ctx)
 	key := MakeVoteStoreKey(ctx.BlockHeight(), vote.VoteType, vote.Id, vote.Valcons)
-	store.Set(key, k.cdc.MustMarshalBinaryBare(&vote))
+	val := k.cdc.MustMarshalBinaryBare(vote)
+	store.Set(key, val)
 }
 
 func (k *Keeper) getVoteStoreKeys(ctx sdk.Context) []string {
