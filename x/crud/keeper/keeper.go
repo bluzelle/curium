@@ -193,40 +193,41 @@ func (k Keeper) ProcessLeasesAtBlockHeight(ctx *sdk.Context, lease int64) {
 
 func (k Keeper) UpdateLease(ctx *sdk.Context, crudValue *types.CrudValue) {
 
-	//curLeaseBlocks := k.ConvertLeaseToBlocks(crudValue.Lease)
-
 	k.DeleteLease(ctx, crudValue.Uuid, crudValue.Key)
 
-	//calculateLeaseRefund := func() uint64 {
-	//	bytes := len(crudValue.Uuid) + len(crudValue.Key) + len(crudValue.Value)
-	//	unusedOriginalLease := crudValue.Height + curLeaseBlocks - ctx.BlockHeight()
-	//
-	//	if unusedOriginalLease <= 0 {
-	//		return 0
-	//	}
-	//
-	//	percentUnused := float64(unusedOriginalLease) / float64(curLeaseBlocks)
-	//	originalLeaseCost := CalculateGasForLease(crudValue.Lease, bytes)
-	//	return uint64(float64(originalLeaseCost) * percentUnused)
-	//}
-	//
-	//// Charge for lease gas
-	//func() {
-	//	gasForNewLease := CalculateGasForLease(crudValue.Lease, len(crudValue.Uuid)+len(crudValue.Key)+len(crudValue.Value))
-	//
-	//	blzGasMeter := ctx.GasMeter().(ante.BluzelleGasMeterInterface)
-	//
-	//	gasRefund := calculateLeaseRefund()
-	//	if gasForNewLease > gasRefund {
-	//		gasForLease := gasForNewLease - gasRefund
-	//		//ctx.GasMeter().ConsumeGas(gasForLease, "lease")
-	//		blzGasMeter.ConsumeBillableGas(gasForLease, "lease")
-	//	}
-	//}()
+	k.consumeGasForUpdatedLease(ctx, crudValue)
 
-	crudValue.Height = ctx.BlockHeight()
-	//keeper.SetValue(ctx, keeper.GetKVStore(ctx), UUID, key, blzValue)
-	k.SetLease(ctx, crudValue.Uuid, crudValue.Key, crudValue.Height, crudValue.Lease)
+	k.SetLease(ctx, crudValue.Uuid, crudValue.Key, ctx.BlockHeight(), crudValue.Lease)
+}
+
+
+
+func (k Keeper) calculateLeaseRefund (ctx *sdk.Context, crudValue *types.CrudValue) uint64 {
+
+	curCrudValue := k.GetCrudValue(ctx, crudValue.Uuid, crudValue.Key)
+	curLeaseBlocks := k.ConvertLeaseToBlocks(curCrudValue.Lease)
+	totalBytes := len(curCrudValue.Uuid) + len(curCrudValue.Key) + len(curCrudValue.Value)
+	unusedOriginalLease := curCrudValue.Height + curLeaseBlocks - ctx.BlockHeight()
+
+	if unusedOriginalLease <= 0 {
+		return 0
+	}
+
+	percentUnused := float64(unusedOriginalLease) / float64(curLeaseBlocks)
+	originalLeaseGas := CalculateGasForLease(curCrudValue.Lease, totalBytes)
+	return uint64(float64(originalLeaseGas) * percentUnused)
+}
+
+func (k Keeper) consumeGasForUpdatedLease (ctx *sdk.Context, crudValue *types.CrudValue) {
+
+	gasForNewLease := CalculateGasForLease(crudValue.Lease, len(crudValue.Uuid)+len(crudValue.Key)+len(crudValue.Value))
+
+	gasRefund := k.calculateLeaseRefund(ctx, crudValue)
+
+	if gasForNewLease > gasRefund {
+		gasForLease := gasForNewLease - gasRefund
+		ctx.GasMeter().ConsumeGas(gasForLease, "lease")
+	}
 }
 
 func NewLease(

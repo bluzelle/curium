@@ -61,5 +61,4 @@ describe('tx.Update()', function () {
         })).to.be.rejectedWith(/key not found/)
     });
 
-
 });

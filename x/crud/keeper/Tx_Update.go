@@ -28,8 +28,10 @@ func (k msgServer) Update(goCtx context.Context, msg *types.MsgUpdate) (*types.M
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
 	}
 
-	k.SetCrudValue(&ctx, *CrudValue)
+
 	k.UpdateLease(&ctx, CrudValue)
+
+	k.SetCrudValue(&ctx, *CrudValue)
 
 	return &types.MsgUpdateResponse{}, nil
 }

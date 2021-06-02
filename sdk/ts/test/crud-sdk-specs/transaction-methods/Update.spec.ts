@@ -4,7 +4,7 @@ import {
     defaultLease,
     encodeData,
     getSdk,
-    newSdkClient
+    newSdkClient, zeroLease
 } from "../../helpers/client-helpers/sdk-helpers";
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
 import {bluzelle, BluzelleSdk, DbSdk} from "../../../src/bz-sdk/bz-sdk";
@@ -17,10 +17,12 @@ describe('tx.Update()', function () {
 
     let sdk: BluzelleSdk;
     let uuid: string;
+    let creator: string;
     beforeEach(async () => {
         useChaiAsPromised();
         sdk = await getSdk();
         uuid = Date.now().toString()
+        creator = sdk.db.address
     });
 
     it('should work with empty value', async () => {
@@ -197,5 +199,69 @@ describe('tx.Update()', function () {
             lease: defaultLease,
             metadata: new Uint8Array()
         })).to.be.rejectedWith(/incorrect owner/);
+    });
+
+    it('should not charge for an update for new, lower lease time', () => {
+
+        let totalCost = 0;
+
+        return sdk.db.tx.Create({
+            creator,
+            uuid,
+            key: 'myKey',
+            value: encodeData('myValue'),
+            metadata: new Uint8Array(),
+            lease: defaultLease
+        })
+
+            .then(() => sdk.bank.q.Balance({
+            address: creator,
+            denom: "ubnt"
+        }))
+            .then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
+            .then(amt =>
+                totalCost += amt
+            )
+            .then(() => sdk.db.tx.Update({
+                creator,
+                uuid,
+                key: 'myKey',
+                value: encodeData('myValue'),
+                lease: {...zeroLease, years: 1},
+                metadata: new Uint8Array()
+            }))
+            .then(() => sdk.bank.q.Balance({
+                address: creator,
+                denom: "ubnt"
+            }))
+            .then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
+            .then(amt => expect(totalCost - amt).to.be.closeTo(0, 5))
+
+    });
+
+    it('should allow for long lease updates', () => {
+        return sdk.db.tx.Create({
+            creator,
+            uuid,
+            key: 'myKey',
+            value: encodeData('myValue'),
+            metadata: new Uint8Array(),
+            lease: defaultLease
+        })
+            .then(() => sdk.db.tx.Update({
+                creator,
+                uuid,
+                key: 'myKey',
+                value: encodeData('newValue'),
+                lease: {...zeroLease, years: 1},
+                metadata: new Uint8Array()
+            }))
+            .then(() => sdk.db.q.Read({
+                uuid,
+                key: 'myKey'
+            }))
+            .then(resp => decodeData(resp.value))
+            .then(val => expect(val).to.equal('newValue'))
     })
+
 });

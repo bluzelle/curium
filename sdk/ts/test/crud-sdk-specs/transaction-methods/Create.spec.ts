@@ -14,24 +14,25 @@ import {localChain} from "../../config";
 import {CalculateGasForLease} from "../../helpers/client-helpers/client-helpers";
 
 
-
 describe('tx.Create()', function () {
     this.timeout(DEFAULT_TIMEOUT);
 
     let sdk: BluzelleSdk;
     let uuid: string;
+    let creator: string;
     beforeEach(async () => {
         useChaiAsPromised();
         sdk = await getSdk();
         uuid = Date.now().toString()
+        creator = sdk.db.address;
     });
 
     it('should create a key-value and charge accordingly', async () => {
 
         const initialBal: number = await sdk.bank.q.Balance({
-                address: sdk.bank.address,
-                denom: 'ubnt'
-            }).then(resp => resp.balance? parseInt(resp.balance.amount): 0)
+            address: sdk.bank.address,
+            denom: 'ubnt'
+        }).then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
 
         await sdk.db.tx.Create({
             creator: sdk.db.address,
@@ -45,7 +46,7 @@ describe('tx.Create()', function () {
         const finalBal: number = await sdk.bank.q.Balance({
             address: sdk.bank.address,
             denom: 'ubnt'
-        }).then(resp => resp.balance? parseInt(resp.balance.amount): 0)
+        }).then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
 
         await expect(initialBal - finalBal).to.equal(0.002 * CalculateGasForLease(defaultLease, 'uuid'.length + 'key'.length + 'value'.length))
 
@@ -103,7 +104,8 @@ describe('tx.Create()', function () {
         await sdk.db.tx.Read({
             creator: sdk.db.address,
             uuid,
-            key: 'symbolskeys'})
+            key: 'symbolskeys'
+        })
             .then(resp => resp.value)
             .then(decodeData)
             .then(readResponse => expect(readResponse).to.equal(symbols));
@@ -123,12 +125,14 @@ describe('tx.Create()', function () {
 
     it('can store json', async () => {
         const json = JSON.stringify({foo: 10, bar: 'baz', t: true, arr: [1, 2, 3]});
-        await sdk.db.tx.Create({creator: sdk.db.address,
+        await sdk.db.tx.Create({
+            creator: sdk.db.address,
             uuid,
             key: 'jsonskeys',
             value: new TextEncoder().encode(json),
             lease: {days: 10} as Lease,
-            metadata: new Uint8Array()})
+            metadata: new Uint8Array()
+        })
 
         await sdk.db.tx.Read({
             creator: sdk.db.address,
@@ -163,7 +167,8 @@ describe('tx.Create()', function () {
             key: 'mykeyss',
             value: new TextEncoder().encode('myvalue'),
             lease: defaultLease,
-            metadata: new Uint8Array()});
+            metadata: new Uint8Array()
+        });
 
         await expect(sdk2.db.tx.Create({
             creator: sdk2.db.address,
@@ -271,6 +276,57 @@ describe('tx.Create()', function () {
         })).to.be.rejectedWith(/incorrect owner/);
 
     });
+
+    it('should charge the same amount for equally-lengthed data', async () => {
+
+        let firstCreateCost: number = 0;
+        let secondCreateCost: number = 0;
+
+        await sdk.bank.q.Balance({
+            address: sdk.bank.address,
+            denom: 'ubnt'
+        }).then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
+            .then(amt => firstCreateCost += amt)
+            .then(() => sdk.db.tx.Create({
+                creator,
+                uuid,
+                key: 'key1',
+                value: encodeData('value1'),
+                lease: defaultLease,
+                metadata: new Uint8Array()
+            }))
+
+            .then(() => sdk.bank.q.Balance({
+                address: sdk.bank.address,
+                denom: 'ubnt'
+            }))
+            .then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
+            .then(amt => firstCreateCost -= amt)
+
+        await sdk.bank.q.Balance({
+            address: sdk.bank.address,
+            denom: 'ubnt'
+        }).then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
+            .then(amt => secondCreateCost += amt)
+            .then(() => sdk.db.tx.Create({
+                creator,
+                uuid,
+                key: 'key2',
+                value: encodeData('value1'),
+                lease: defaultLease,
+                metadata: new Uint8Array()
+            }))
+
+            .then(() => sdk.bank.q.Balance({
+                address: sdk.bank.address,
+                denom: 'ubnt'
+            }))
+            .then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
+            .then(amt => secondCreateCost -= amt)
+
+        await expect(firstCreateCost).to.be.closeTo(secondCreateCost, 3)
+    })
+
 })
 
 
