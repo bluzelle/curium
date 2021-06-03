@@ -92,7 +92,6 @@ const uploadFile = (ctx: Context): Promise<Context> =>
                 mime: ctx.mimeType
             })
         }).then(resp => resp.json()).then(({id}) => ({...ctx, id})))
-        .then(() => ctx)
 
 
 

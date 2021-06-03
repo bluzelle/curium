@@ -6,6 +6,7 @@ import (
 	"github.com/bluzelle/curium/x/nft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/zeebo/bencode"
+	"os"
 )
 
 func (k msgServer) PublishFile(goCtx context.Context, msg *types.MsgPublishFile) (*types.MsgPublishFileResponse, error) {
@@ -14,5 +15,6 @@ func (k msgServer) PublishFile(goCtx context.Context, msg *types.MsgPublishFile)
 	var metainfo metainfo.MetaInfo
 	bencode.DecodeBytes(msg.Metainfo, &metainfo)
 	k.btClient.RetrieveFile(&metainfo)
+	os.Symlink(k.homeDir + "/nft/" + msg.Hash, k.homeDir + "/nft/" + msg.Id)
 	return &types.MsgPublishFileResponse{}, nil
 }

@@ -6,7 +6,7 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
   const body = JSON.parse(req.body);
   getSdk()
       .then((sdk: BluzelleSdk) => sdk.nft.tx.CreateNft({
-          id: body.id,
+          id: Date.now().toString(),
           hash: body.hash,
           mime: body.mime,
           meta: 'whatever metadata you want',
