@@ -9,11 +9,6 @@ import (
 func (k msgServer) RegisterPeer(goCtx context.Context, msg *types.MsgRegisterPeer) (*types.MsgRegisterPeerResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	err := k.CheckIsNftAdmin(msg.Creator)
-	if err != nil {
-		return nil, err
-	}
-
 	store := k.GetPeerStore(ctx)
 	var peer types.Peer
 	peer.Id = msg.Id

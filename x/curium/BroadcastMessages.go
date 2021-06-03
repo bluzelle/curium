@@ -8,11 +8,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	tx2 "github.com/cosmos/cosmos-sdk/types/tx"
+	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	signing2 "github.com/cosmos/cosmos-sdk/x/auth/signing"
-
 	"google.golang.org/grpc"
 	"time"
 )
@@ -37,9 +36,9 @@ func (krr KeyRingReader) GetAddress(name string) (sdk.AccAddress, error) {
 }
 
 
-type MsgBroadcaster func (ctx sdk.Context, msgs []types.Msg, from string) (*coretypes.ResultBroadcastTxCommit, error)
-func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) func(ctx sdk.Context, msgs []types.Msg, from string)(*coretypes.ResultBroadcastTxCommit, error) {
-	return func (ctx sdk.Context, msgs []types.Msg, from string) (*tx2.BroadcastTxResponse, error) {
+type MsgBroadcaster func (ctx sdk.Context, msgs []types.Msg, from string) (*txtypes.BroadcastTxResponse, error)
+func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) func(ctx sdk.Context, msgs []types.Msg, from string)(*txtypes.BroadcastTxResponse, error) {
+	return func (ctx sdk.Context, msgs []types.Msg, from string) (*txtypes.BroadcastTxResponse, error) {
 		// Choose your codec: Amino or Protobuf. Here, we use Protobuf, given by the
 		// following function.
 		encCfg := simapp.MakeTestEncodingConfig()
@@ -132,12 +131,12 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) func(
 		// Broadcast the tx via gRPC. We create a new client for the Protobuf Tx
 		// service.
 		//	var ctx context.Context
-		txClient := tx2.NewServiceClient(grpcConn)
+		txClient := txtypes.NewServiceClient(grpcConn)
 		// We then call the BroadcastTx method on this client.
 		res, err := txClient.BroadcastTx(
 			txCtx,
-			&tx2.BroadcastTxRequest{
-				Mode:    tx2.BroadcastMode_BROADCAST_MODE_BLOCK,
+			&txtypes.BroadcastTxRequest{
+				Mode:    txtypes.BroadcastMode_BROADCAST_MODE_BLOCK,
 				TxBytes: txBytes, // Proto-binary of the signed transaction, see previous step.
 			},
 		)

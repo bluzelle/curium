@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+const PIECE_SIZE = 128
+
 type TorrentClient struct {
 	Id       string
 	DataDir  string
@@ -54,7 +56,7 @@ func (tc *TorrentClient) RetrieveFile(metaInfo *metainfo.MetaInfo) {
 func (tc TorrentClient) TorrentFromFile(filePath string) (*metainfo.MetaInfo, error) {
 	private := true
 	info := metainfo.Info{
-		PieceLength: 32 * 1024,
+		PieceLength: PIECE_SIZE * 1024,
 		Private:     &private,
 		Source:      "Bluzelle NFT",
 	}

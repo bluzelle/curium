@@ -10,7 +10,7 @@ import (
 
 func (k msgServer) PublishFile(goCtx context.Context, msg *types.MsgPublishFile) (*types.MsgPublishFileResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	_ = ctx
+	k.Logger(ctx).Info("Publish file message received", "id", msg.Id)
 	var metainfo metainfo.MetaInfo
 	bencode.DecodeBytes(msg.Metainfo, &metainfo)
 	k.btClient.RetrieveFile(&metainfo)

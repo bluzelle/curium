@@ -45,6 +45,9 @@ func NewKeeper(
 	// this line is used by starport scaffolding # ibc/keeper/parameter
 ) *Keeper {
 	btClient, err := torrentClient.NewTorrentClient(btDirectory, btPort)
+	if ensureNftUserExists(keyringReader) == false {
+		panic("nft user does not exist in keyring")
+	}
 	if err != nil {
 		panic(err)
 	}
@@ -61,6 +64,11 @@ func NewKeeper(
 		curiumKeeper: curiumKeeper,
 		// this line is used by starport scaffolding # ibc/keeper/return
 	}
+}
+
+func ensureNftUserExists(reader *curium.KeyRingReader) bool {
+	_, err := reader.GetAddress("nft")
+	return err == nil
 }
 
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
