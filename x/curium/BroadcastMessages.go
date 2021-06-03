@@ -8,6 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
@@ -51,7 +52,7 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) func(
 			return nil, err
 		}
 
-		gas := uint64(4000000)
+		gas := uint64(40000000)
 		txBuilder.SetGasLimit(gas)
 
 		txBuilder.SetFeeAmount(types.NewCoins(types.NewCoin("ubnt", types.NewInt(10000000))))
@@ -143,7 +144,9 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) func(
 		if err != nil {
 			return nil, err
 		}
-
+		if res.TxResponse.Code != 0 {
+			return nil, sdkerrors.New(res.TxResponse.Codespace, res.TxResponse.Code, res.TxResponse.RawLog)
+		}
 		return res, nil
 	}
 
