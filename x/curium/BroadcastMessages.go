@@ -51,7 +51,7 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) func(
 			return nil, err
 		}
 
-		gas := uint64(400000)
+		gas := uint64(4000000)
 		txBuilder.SetGasLimit(gas)
 
 		txBuilder.SetFeeAmount(types.NewCoins(types.NewCoin("ubnt", types.NewInt(10000000))))
