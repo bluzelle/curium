@@ -107,9 +107,9 @@ func (k Keeper) MyRemoteIp() (string, error) {
 	if err != nil {return "", err}
 	var result map[string]string
 	json.Unmarshal(bz, &result)
-//	return result["ip"], nil
+	return result["ip"], nil
 // TODO: NEEDED FOR LOCAL TESTING
-return "127.0.0.1", nil
+//return "127.0.0.1", nil
 }
 
 func httpGet(url string) ([]byte, error) {
