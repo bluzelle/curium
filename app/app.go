@@ -16,14 +16,19 @@ package app
 
 import (
 	"encoding/json"
+	"github.com/bluzelle/curium/app/ante/gasmeter"
 	"github.com/bluzelle/curium/x/aggregator"
+	"github.com/bluzelle/curium/x/curium"
+	"github.com/bluzelle/curium/x/nft"
 	"github.com/bluzelle/curium/x/oracle"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"math"
 	"os"
+	"strconv"
 	"time"
 
 	appAnte "github.com/bluzelle/curium/app/ante"
-	bluzellechain "github.com/bluzelle/curium/types"
+	devel "github.com/bluzelle/curium/types"
 	"github.com/bluzelle/curium/x/crud"
 	"github.com/bluzelle/curium/x/tax"
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
@@ -57,13 +62,32 @@ var (
 	DefaultLeaseBlockHeight = int64(math.Floor(10 * 86400 / 5.5)) // (10 days of blocks * seconds/day) / seconds per block
 )
 
+func isFirstNode() bool {
+	_, valid := os.LookupEnv("BLZD")
+	return !valid
+}
+
+func getHomeDir() string {
+	if devel.IsDevelopment() && !isFirstNode() {
+		return os.ExpandEnv("$HOME/$BLZD")
+	}
+	return os.ExpandEnv("$HOME/.blzd")
+}
+
+func getCLIDir () string {
+	if devel.IsDevelopment() && !isFirstNode() {
+		return os.ExpandEnv("$HOME/$BLZCLI")
+	}
+	return os.ExpandEnv("$HOME/.blzcli")
+}
+
 // constants
 var (
 	// default home directories for the application CLI
-	DefaultCLIHome = os.ExpandEnv("$HOME/.blzcli")
+	DefaultCLIHome = getCLIDir()
 
 	// DefaultNodeHome sets the folder where the application data and configuration will be stored
-	DefaultNodeHome = os.ExpandEnv("$HOME/.blzd")
+	DefaultNodeHome = getHomeDir()
 
 	// ModuleBasicManager is in charge of setting up basic module elements
 	ModuleBasics = module.NewBasicManager(
@@ -81,6 +105,8 @@ var (
 		faucet.AppModuleBasic{},
 		oracle.AppModuleBasic{},
 		aggregator.AppModuleBasic{},
+		nft.AppModuleBasic{},
+		curium.AppModuleBasic{},
 	)
 
 	// account permissions
@@ -107,6 +133,67 @@ func IsCrudEnabled(nodeHome string) bool {
 		}
 	}
 	return enabled
+}
+
+func getNftFileDir (nodeHome string) (string, error) {
+	viper.SetConfigName("app")
+	viper.SetConfigType("toml")
+	viper.AddConfigPath(nodeHome + "/config/")
+
+	if viper.ReadInConfig() == nil {
+
+		if viper.IsSet("nft-file-dir") {
+			return viper.GetString("nft-file-dir"), nil
+		}
+
+	}
+	return "", sdkerrors.New("nft", 1, "No nft file directory specified in app.toml")
+}
+
+func getNftP2PPort (nodeHome string) (string, error) {
+	viper.SetConfigName("app")
+	viper.SetConfigType("toml")
+	viper.AddConfigPath(nodeHome + "/config/")
+
+	if viper.ReadInConfig() == nil {
+
+		if viper.IsSet("nft-p2p-port") {
+			return viper.GetString("nft-p2p-port"), nil
+		}
+
+	}
+	return "", sdkerrors.New("nft", 1, "No nft p2p port specified in app.toml")
+}
+
+func getRpcLadder (nodeHome string) (string, error) {
+	viper.SetConfigName("config")
+	viper.SetConfigType("toml")
+	viper.AddConfigPath(nodeHome + "/config/")
+
+	if viper.ReadInConfig() == nil {
+
+		if viper.IsSet("rpc.laddr") {
+			return viper.GetString("rpc.laddr"), nil
+		}
+
+	}
+	return "", sdkerrors.New("nft", 1, "No rpc laddr url specified in config.toml")
+}
+
+
+func getMinGasPrices (nodeHome string) (string, error) {
+	viper.SetConfigName("app")
+	viper.SetConfigType("toml")
+	viper.AddConfigPath(nodeHome + "/config/")
+
+	if viper.ReadInConfig() == nil {
+
+		if viper.IsSet("minimum-gas-prices") {
+			return viper.GetString("minimum-gas-prices"), nil
+		}
+
+	}
+	return "", sdkerrors.New("crud", 1, "Minimum gas prices not specified in app.toml")
 }
 
 func MakeCodec() *codec.Codec {
@@ -139,7 +226,9 @@ type CRUDApp struct {
 	oracleKeeper   oracle.Keeper
 	faucetKeeper   faucet.Keeper
 	aggKeeper      aggregator.Keeper
-
+	nftKeeper 	   *nft.Keeper
+	curiumKeeper   *curium.Keeper
+	gasMeterKeeper *gasmeter.GasMeterKeeper
 	// Module Manager
 	mm *module.Manager
 }
@@ -154,7 +243,7 @@ func NewCRUDApp(
 	cdc := MakeCodec()
 
 	// BaseApp handles interactions with Tendermint through the ABCI protocol
-	bApp := bam.NewBaseApp(bluzellechain.AppName, logger, db, auth.DefaultTxDecoder(cdc), baseAppOptions...)
+	bApp := bam.NewBaseApp(devel.AppName, logger, db, auth.DefaultTxDecoder(cdc), baseAppOptions...)
 
 	bApp.SetAppVersion(version.Version)
 
@@ -165,6 +254,8 @@ func NewCRUDApp(
 		tax.StoreKey,
 		faucet.StoreKey, crud.LeaseKey, crud.OwnerKey,
 		oracle.StoreKey,aggregator.StoreKey,
+		nft.StoreKey, nft.MemStoreKey,
+		curium.StoreKey, curium.MemStoreKey,
 	)
 
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
@@ -268,11 +359,6 @@ func NewCRUDApp(
 		crud.MaxKeeperSizes{MaxKeysSize: maxKeysSize, MaxKeyValuesSize: maxKeyValuesSize, MaxDefaultLeaseBlocks: DefaultLeaseBlockHeight},
 	)
 
-	app.taxKeeper = tax.NewKeeper(
-		keys[tax.StoreKey],
-		app.cdc,
-	)
-
 	app.oracleKeeper = oracle.NewKeeper(
 		app.cdc,
 		keys[oracle.StoreKey],
@@ -295,6 +381,44 @@ func NewCRUDApp(
 		keys[faucet.StoreKey],
 		app.cdc)
 
+	app.gasMeterKeeper = gasmeter.NewGasMeterKeeper()
+
+	app.taxKeeper = tax.NewKeeper(
+		keys[tax.StoreKey],
+		app.cdc,
+		app.supplyKeeper,
+	)
+
+	laddr, _ := getRpcLadder(DefaultNodeHome)
+
+	app.curiumKeeper = curium.NewKeeper(
+		app.cdc,
+		keys[curium.StoreKey],
+		keys[curium.MemStoreKey],
+		laddr,
+		app.accountKeeper,
+		app.gasMeterKeeper,
+		)
+
+	nftFileDir, _ := getNftFileDir(DefaultNodeHome)
+	nft2P2pPort, _ := getNftP2PPort(DefaultNodeHome)
+	nftP2PPort, _  := strconv.Atoi(nft2P2pPort)
+
+	msgBroadcaster := app.curiumKeeper.NewMsgBroadcaster(DefaultCLIHome, cdc)
+
+
+	app.nftKeeper = nft.NewKeeper(
+		app.cdc,
+		keys[nft.StoreKey],
+		keys[nft.MemStoreKey],
+		DefaultNodeHome + "/" + nftFileDir,
+		nftP2PPort,
+		DefaultNodeHome,
+		msgBroadcaster,
+		app.curiumKeeper,
+		curium.NewKeyringReader(DefaultCLIHome),
+		)
+
 	// check flags...
 	bluzelleCrud := IsCrudEnabled(DefaultNodeHome)
 	logger.Info("Module setup", crudModuleEntry, bluzelleCrud)
@@ -304,7 +428,7 @@ func NewCRUDApp(
 		auth.NewAppModule(app.accountKeeper),
 		bank.NewAppModule(app.bankKeeper, app.accountKeeper),
 		crud.NewAppModule(!bluzelleCrud, app.crudKeeper, app.bankKeeper),
-		tax.NewAppModule(app.taxKeeper),
+		tax.NewAppModule(app.taxKeeper, *app.gasMeterKeeper),
 		faucet.NewAppModule(app.faucetKeeper), // faucet module
 		supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
 		gov.NewAppModule(app.govKeeper, app.accountKeeper, app.supplyKeeper),
@@ -313,10 +437,12 @@ func NewCRUDApp(
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
 		oracle.NewAppModule(app.oracleKeeper),
 		aggregator.NewAppModule(app.aggKeeper),
+		nft.NewAppModule(*app.nftKeeper),
+		curium.NewAppModule(*app.curiumKeeper),
 	)
 
 	app.mm.SetOrderBeginBlockers(distr.ModuleName, slashing.ModuleName, oracle.ModuleName)
-	app.mm.SetOrderEndBlockers(gov.ModuleName, staking.ModuleName, aggregator.ModuleName)
+	app.mm.SetOrderEndBlockers(gov.ModuleName, staking.ModuleName, aggregator.ModuleName, nft.ModuleName, curium.ModuleName, tax.ModuleName)
 
 	// Sets the order of Genesis - Order matters, genutil is to always come last
 	// NOTE: The genutils moodule must occur after staking so that pools are
@@ -360,7 +486,11 @@ func NewCRUDApp(
 	return app
 }
 
+
 func addAnteHandler(app *CRUDApp) {
+
+	minGasPriceString, _ := getMinGasPrices(DefaultNodeHome)
+	minGasPriceCoins, _ := sdk.ParseDecCoins(minGasPriceString)
 
 	// The AnteHandler handles signature verification and transaction pre-processing
 	app.SetAnteHandler(
@@ -370,6 +500,8 @@ func addAnteHandler(app *CRUDApp) {
 			app.taxKeeper,
 			app.bankKeeper,
 			auth.DefaultSigVerificationGasConsumer,
+			app.gasMeterKeeper,
+			minGasPriceCoins,
 		),
 	)
 

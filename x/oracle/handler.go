@@ -3,7 +3,7 @@ package oracle
 import (
 	"bytes"
 	"fmt"
-	"github.com/bluzelle/curium/app/ante"
+	"github.com/bluzelle/curium/app/ante/gasmeter"
 	"github.com/bluzelle/curium/x/oracle/keeper"
 	"github.com/bluzelle/curium/x/oracle/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -13,7 +13,7 @@ import (
 // NewHandler creates an sdk.Handler for all the oracle type messages
 func NewHandler(k keeper.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
-		ctx = ctx.WithEventManager(sdk.NewEventManager()).WithGasMeter(ante.NewDummyGasMeter())
+		ctx = ctx.WithEventManager(sdk.NewEventManager()).WithGasMeter(gasmeter.NewFreeGasMeter(0))
 		switch msg := msg.(type) {
 		case types.MsgOracleVoteProof:
 			return handleMsgOracleVoteProof(ctx, k, msg)

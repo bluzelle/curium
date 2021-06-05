@@ -1,7 +1,7 @@
 import {expect} from 'chai'
 import {API, bluzelle} from "bluzelle";
 import {deleteSources} from "../oracle-utils";
-import {getBzClient} from "../bluzelle-client";
+import {getBzClient} from "../../../helpers/bluzelle-client";
 import {feedSources} from "../sources";
 import {listOracleSources, addOracleSource} from 'oracle-js'
 

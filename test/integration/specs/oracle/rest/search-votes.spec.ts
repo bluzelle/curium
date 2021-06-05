@@ -1,5 +1,5 @@
 import {API} from "../../../../../../blzjs/client";
-import {getBzClient} from "../bluzelle-client";
+import {getBzClient} from "../../../helpers/bluzelle-client";
 import {addVote, deleteVotes} from "../oracle-utils";
 import {expect} from "chai";
 import {passThrough} from "promise-passthrough";

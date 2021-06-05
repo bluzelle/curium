@@ -1,4 +1,4 @@
-import {getBzClient} from "./bluzelle-client";
+import {getBzClient} from "../../helpers/bluzelle-client";
 import {passThroughAwait} from "promise-passthrough";
 import {expect} from 'chai'
 

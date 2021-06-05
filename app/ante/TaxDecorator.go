@@ -1,12 +1,10 @@
 package ante
 
 import (
-	"github.com/bluzelle/curium/app/ante/feeCalculator"
 	"github.com/bluzelle/curium/x/tax"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bank "github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/gov/types"
 )
@@ -47,8 +45,6 @@ func (td TaxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, nex
 			return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a FeeTx")
 		}
 
-		taxInfo := td.tk.GetTaxInfo(ctx)
-
 		feePayer := feeTx.FeePayer()
 		feePayerAcc := td.ak.GetAccount(ctx, feePayer)
 
@@ -60,9 +56,6 @@ func (td TaxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, nex
 			return ctx, err
 		}
 
-		if err := collectFeeTax(ctx, tx, td.supplyKeeper, taxInfo.Collector, taxInfo.FeeBp); err != nil {
-			return ctx, err
-		}
 	}
 	return next(ctx, tx, simulate)
 }
@@ -101,19 +94,4 @@ func collectTransactionTax(ctx sdk.Context, dfd TaxDecorator, tx sdk.Tx, fees sd
 
 }
 
-
-func collectFeeTax( ctx sdk.Context, tx sdk.Tx, supplyKeeper types.SupplyKeeper, taxCollectorAcc sdk.AccAddress, feebp int64) error {
-
-	gasFee := feeCalculator.CalculateGasFee(tx, ctx)
-	taxFees := sdk.NewCoins(sdk.NewInt64Coin("ubnt", gasFee.AmountOf("ubnt").Int64() * feebp / 10000))
-
-	if !taxFees.IsZero() {
-		err := supplyKeeper.SendCoinsFromModuleToAccount(ctx, authtypes.FeeCollectorName, taxCollectorAcc, taxFees)
-		if err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
-		}
-	}
-
-	return nil
-}
 

@@ -2,7 +2,7 @@ package tax
 
 import (
 	"encoding/json"
-
+	"github.com/bluzelle/curium/app/ante/gasmeter"
 	"github.com/bluzelle/curium/x/tax/client/cli"
 	"github.com/bluzelle/curium/x/tax/client/rest"
 	"github.com/bluzelle/curium/x/tax/internal/types"
@@ -57,14 +57,16 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 
 type AppModule struct {
 	AppModuleBasic
-	keeper Keeper
+	keeper         Keeper
+	gasMeterKeeper gasmeter.GasMeterKeeper
 }
 
-func NewAppModule(k Keeper) AppModule {
+func NewAppModule(k Keeper, gasMeterKeeper gasmeter.GasMeterKeeper) AppModule {
 
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
 		keeper:         k,
+		gasMeterKeeper: gasMeterKeeper,
 	}
 }
 
@@ -92,7 +94,21 @@ func (am AppModule) NewQuerierHandler() sdk.Querier {
 
 func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
 
-func (am AppModule) EndBlock(sdk.Context, abci.RequestEndBlock) []abci.ValidatorUpdate {
+func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
+	gasMeters := am.gasMeterKeeper.GetAllGasMeters()
+
+	errors := make([]error, 0)
+	for _,gasMeter := range gasMeters {
+		gm := *gasMeter
+		err := am.keeper.ChargeFeeTax(ctx, gm)
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
+
+	if len(errors) > 0 {
+		am.keeper.Logger(ctx).Error("Error charging fee tax", "errors", errors)
+	}
 	return []abci.ValidatorUpdate{}
 }
 

@@ -1,5 +1,5 @@
 import {BLOCK, blzcli, STANDARD_GAS} from "../helpers/blzcli";
-import {getBzClient} from "./oracle/bluzelle-client";
+import {getBzClient} from "../helpers/bluzelle-client";
 import {passThroughAwait} from "promise-passthrough";
 import {expect} from 'chai'
 import {addOracleSource} from 'oracle-js'
