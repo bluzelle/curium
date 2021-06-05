@@ -24,6 +24,22 @@ curl https://raw.githubusercontent.com/cosmos/cosmos-sdk/master/proto/cosmos/dis
 curl https://raw.githubusercontent.com/cosmos/cosmos-sdk/master/proto/cosmos/distribution/v1beta1/query.proto > proto/cosmos/distribution/v1beta1/query.proto
 curl https://raw.githubusercontent.com/cosmos/cosmos-sdk/master/proto/cosmos/distribution/v1beta1/tx.proto > proto/cosmos/distribution/v1beta1/tx.proto
 
+mkdir -p proto/cosmos/tx/v1beta1
+curl https://raw.githubusercontent.com/cosmos/cosmos-sdk/master/proto/cosmos/tx/v1beta1/tx.proto > proto/cosmos/tx/v1beta1/tx.proto
+curl https://raw.githubusercontent.com/cosmos/cosmos-sdk/master/proto/cosmos/tx/v1beta1/service.proto > proto/cosmos/tx/v1beta1/service.proto
+
+mkdir -p proto/cosmos/tx/signing/v1beta1
+curl https://raw.githubusercontent.com/cosmos/cosmos-sdk/master/proto/cosmos/tx/signing/v1beta1/signing.proto > proto/cosmos/tx/signing/v1beta1/signing.proto
+
+mkdir -p proto/cosmos/crypto/multisig/v1beta1
+curl https://raw.githubusercontent.com/cosmos/cosmos-sdk/master/proto/cosmos/crypto/multisig/v1beta1/multisig.proto > proto/cosmos/crypto/multisig/v1beta1/multisig.proto
+
+mkdir -p proto/cosmos/base/abci/v1beta1
+curl https://raw.githubusercontent.com/cosmos/cosmos-sdk/master/proto/cosmos/base/abci/v1beta1/abci.proto > proto/cosmos/base/abci/v1beta1/abci.proto
+
+mkdir -p proto/tendermint/abci
+curl https://raw.githubusercontent.com/tendermint/tendermint/master/proto/tendermint/abci/types.proto > proto/tendermint/abci/types.proto
+
 mkdir -p proto/tendermint/types
 curl https://raw.githubusercontent.com/tendermint/tendermint/master/proto/tendermint/types/types.proto > proto/tendermint/types/types.proto
 curl https://raw.githubusercontent.com/tendermint/tendermint/master/proto/tendermint/types/validator.proto > proto/tendermint/types/validator.proto
@@ -76,5 +92,13 @@ protoc \
   "./proto/cosmos/staking/v1beta1/tx.proto" \
   "./proto/cosmos/distribution/v1beta1/distribution.proto" \
   "./proto/cosmos/distribution/v1beta1/query.proto" \
-  "./proto/cosmos/distribution/v1beta1/tx.proto"
+  "./proto/cosmos/distribution/v1beta1/tx.proto" \
+  "./proto/cosmos/tx/v1beta1/tx.proto" \
+  "./proto/cosmos/tx/v1beta1/service.proto" \
+  "./proto/cosmos/tx/signing/v1beta1/signing.proto" \
+  "./proto/cosmos/crypto/multisig/v1beta1/multisig.proto" \
+  "./proto/cosmos/base/abci/v1beta1/abci.proto" \
+  "./proto/tendermint/abci/types.proto"
+
+
 
