@@ -73,7 +73,7 @@ func AccountTxsHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		events := []string{
 			fmt.Sprintf("tx.height>=%d", start),
-			fmt.Sprintf("tx.height<=%d", start+NUM_OF_BLOCKS),
+			fmt.Sprintf("tx.height<%d", start+NUM_OF_BLOCKS),
 			"message.action='send'",
 			fmt.Sprintf("transfer.recipient='%s'", vars["address"]),
 		}
