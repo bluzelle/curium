@@ -70,6 +70,9 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) func(
 
 		addr := keys.GetAddress()
 		accnt := accKeeper.GetAccount(ctx, addr)
+		if accnt == nil {
+			return nil, sdkerrors.New("curium", 2, "Cannot broadcast message, accnt does not exist")
+		}
 
 		privArmor, err := kr.ExportPrivKeyArmor(from, "")
 		if err != nil {
