@@ -20,8 +20,7 @@ import {QueryClientImpl as DistributionQueryClientImpl} from '../codec/cosmos/di
 import {MsgClientImpl as DistributionMsgClientImpl} from '../codec/cosmos/distribution/v1beta1/tx'
 import * as DistributionMsgTypes from '../codec/cosmos/distribution/v1beta1/tx'
 
-import {MsgClientImpl as TxMsgClientImpl} from '../codec/cosmos/tx/v1beta1/tx'
-import * as DistributionMsgTypes from '../codec/cosmos/distribution/v1beta1/tx'
+
 
 import {newCommunicationService} from "../client-lib/CommunicationService";
 import {Left, Right} from "monet";
@@ -36,7 +35,7 @@ export type NftSdk = SDK<NftQueryClientImpl, NftMsgClientImpl>
 export type BankSdk = SDK<BankQueryClientImpl, BankMsgClientImpl>
 export type StakingSdk = SDK<StakingQueryClientImpl, StakingMsgClientImpl>
 export type DistributionSdk = SDK<DistributionQueryClientImpl, DistributionMsgClientImpl>
-export type TxSdk = SDK<>
+
 export type BluzelleSdk = { db: DbSdk, nft: NftSdk, bank: BankSdk, staking: StakingSdk, helpers: {nft: NftHelpers}, distribution: DistributionSdk }
 export interface Bluzelle {
     (options: SDKOptions): Promise<BluzelleSdk>,
