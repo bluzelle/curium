@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" inherit-compiler-output="true">
-    <exclude-output />
-    <content url="file://$MODULE_DIR$">
-      <excludeFolder url="file://$MODULE_DIR$/sdk/lib" />
-      <excludeFolder url="file://$MODULE_DIR$/sdk/proto" />
-      <excludeFolder url="file://$MODULE_DIR$/sdk/ts/proto" />
-      <excludeFolder url="file://$MODULE_DIR$/sdk/ts/lib" />
-    </content>
-    <orderEntry type="inheritedJdk" />
-    <orderEntry type="sourceFolder" forTests="false" />
+<module version="4">
+  <component name="TemplatesService">
+    <option name="TEMPLATE_FOLDERS">
+      <list>
+        <option value="$MODULE_DIR$/sdk/ts/node_modules/bitcoinjs-lib/src/templates" />
+      </list>
+    </option>
   </component>
 </module>

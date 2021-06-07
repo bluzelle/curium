@@ -43,6 +43,7 @@ curl https://raw.githubusercontent.com/tendermint/tendermint/master/proto/tender
 mkdir -p proto/tendermint/types
 curl https://raw.githubusercontent.com/tendermint/tendermint/master/proto/tendermint/types/types.proto > proto/tendermint/types/types.proto
 curl https://raw.githubusercontent.com/tendermint/tendermint/master/proto/tendermint/types/validator.proto > proto/tendermint/types/validator.proto
+curl https://raw.githubusercontent.com/tendermint/tendermint/master/proto/tendermint/types/params.proto > proto/tendermint/types/params.proto
 
 mkdir -p proto/tendermint/crypto
 curl https://raw.githubusercontent.com/tendermint/tendermint/master/proto/tendermint/crypto/proof.proto > proto/tendermint/crypto/proof.proto
@@ -98,7 +99,8 @@ protoc \
   "./proto/cosmos/tx/signing/v1beta1/signing.proto" \
   "./proto/cosmos/crypto/multisig/v1beta1/multisig.proto" \
   "./proto/cosmos/base/abci/v1beta1/abci.proto" \
-  "./proto/tendermint/abci/types.proto"
+  "./proto/tendermint/abci/types.proto" \
+  "./proto/tendermint/types/params.proto"
 
 
 
