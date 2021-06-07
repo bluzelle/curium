@@ -78,7 +78,7 @@ const uploadFile = (ctx: Context): Promise<Context> =>
         .then(ctx => ({...ctx, hash: sha256(ctx.data)}))
         .then(passThroughAwait(ctx =>
             Promise.all(ctx.chunks.map((chunk, chunkNum) =>
-                fetch(`http://localhost:1317/nft/upload/${ctx.hash}/${chunkNum}`, {
+                fetch(`http://nft2.bluzelle.com:1317/nft/upload/${ctx.hash}/${chunkNum}`, {
                     method: 'POST',
                     body: chunk
                 })
