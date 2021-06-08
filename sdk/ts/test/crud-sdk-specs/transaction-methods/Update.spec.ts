@@ -203,7 +203,7 @@ describe('tx.Update()', function () {
 
     it('should not charge for an update for new, lower lease time', () => {
 
-        let totalCost = 0;
+        let balAfterCreate = 0;
 
         return sdk.db.tx.Create({
             creator,
@@ -220,14 +220,14 @@ describe('tx.Update()', function () {
         }))
             .then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
             .then(amt =>
-                totalCost += amt
+                balAfterCreate += amt
             )
             .then(() => sdk.db.tx.Update({
                 creator,
                 uuid,
                 key: 'myKey',
                 value: encodeData('myValue'),
-                lease: {...zeroLease, years: 1},
+                lease: {...zeroLease, minutes: 30},
                 metadata: new Uint8Array()
             }))
             .then(() => sdk.bank.q.Balance({
@@ -235,7 +235,7 @@ describe('tx.Update()', function () {
                 denom: "ubnt"
             }))
             .then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
-            .then(amt => expect(totalCost - amt).to.be.closeTo(0, 5))
+            .then(amt => expect(balAfterCreate - amt).to.be.closeTo(0, 5))
 
     });
 

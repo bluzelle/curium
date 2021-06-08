@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/server"
 	"io"
 	"os"
 	"path/filepath"
@@ -386,7 +387,10 @@ func New(
 	)
 	votingModule := voting.NewAppModule(appCodec, app.votingKeeper)
 
-	app.gasMeterKeeper = ante.NewGasMeterKeeper()
+	minGasPriceString := cast.ToString(appOpts.Get(server.FlagMinGasPrices))
+	minGasPriceCoins, _ := sdk.ParseDecCoins(minGasPriceString)
+
+	app.gasMeterKeeper = ante.NewGasMeterKeeper(minGasPriceCoins)
 
 	app.crudKeeper = *crudkeeper.NewKeeper(
 		appCodec,

@@ -72,4 +72,4 @@ func (g *freeGasMeter) String() string {
 	return fmt.Sprintf("FreeGasMeter:\n  limit: %d\n  consumed: %d", g.limit, g.consumed)
 }
 
-func (g *freeGasMeter) Charge (ctx *sdk.Context, bankKeeper authtypes.BankKeeper, accountKeeper authante.AccountKeeper) error {return nil}
+func (g *freeGasMeter) Charge (ctx *sdk.Context, bankKeeper authtypes.BankKeeper, accountKeeper authante.AccountKeeper, gasPrice sdk.DecCoins) error {return nil}

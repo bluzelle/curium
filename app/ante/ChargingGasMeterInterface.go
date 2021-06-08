@@ -14,5 +14,5 @@ type ChargingGasMeterInterface interface {
 	IsPastLimit() bool
 	IsOutOfGas() bool
 	String() string
-	Charge(ctx *sdk.Context, bankKeeper authtypes.BankKeeper, accountKeeper authante.AccountKeeper) error
+	Charge(ctx *sdk.Context, bankKeeper authtypes.BankKeeper, accountKeeper authante.AccountKeeper, gasPrice sdk.DecCoins) error
 }

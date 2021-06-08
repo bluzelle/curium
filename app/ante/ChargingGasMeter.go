@@ -64,8 +64,8 @@ func (g *chargingGasMeter) String() string {
 	return fmt.Sprintf("BluzelleGasMeter:\n  limit: %d\n  consumed: %d", g.limit, g.consumed)
 }
 
-func (g *chargingGasMeter) Charge(ctx *sdk.Context, bankKeeper authtypes.BankKeeper, accountKeeper authante.AccountKeeper) error {
-	gasFee := calculateGasFee(ctx, g)
+func (g *chargingGasMeter) Charge(ctx *sdk.Context, bankKeeper authtypes.BankKeeper, accountKeeper authante.AccountKeeper, gasPrice sdk.DecCoins) error {
+	gasFee := calculateGasFee(g, gasPrice)
 
 	acc := accountKeeper.GetAccount(*ctx, g.payerAccount)
 
@@ -93,16 +93,11 @@ func deductFees(ctx *sdk.Context, bankKeeper authtypes.BankKeeper, acc authtypes
 	return nil
 }
 
-func calculateGasFee(ctx *sdk.Context, gm *chargingGasMeter) sdk.Coins {
-	var gasPrices sdk.Dec
-	gasPrices = ctx.MinGasPrices().AmountOf("ubnt")
+func calculateGasFee(gm *chargingGasMeter, gasPrice sdk.DecCoins) sdk.Coins {
 
-	if gasPrices.IsZero() {
-		gasPrice := 0.002
-		gasPrices, _ = sdk.NewDecFromStr(fmt.Sprintf("%f", gasPrice))
-	}
+	gasPriceAmount := gasPrice.AmountOf("ubnt")
 
 	gasConsumed := gm.GasConsumed()
-	gasFee := gasPrices.MulInt64(int64(gasConsumed)).RoundInt64()
+	gasFee := gasPriceAmount.MulInt64(int64(gasConsumed)).RoundInt64()
 	return sdk.NewCoins(sdk.NewCoin("ubnt", sdk.NewInt(gasFee)))
 }

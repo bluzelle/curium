@@ -8,11 +8,13 @@ import (
 
 type GasMeterKeeper struct {
 	gasMeters []*sdk.GasMeter
+	minGasPrices sdk.DecCoins
 }
 
-func NewGasMeterKeeper () *GasMeterKeeper {
+func NewGasMeterKeeper (minGasPrices sdk.DecCoins) *GasMeterKeeper {
 	return &GasMeterKeeper{
 		gasMeters: make([]*sdk.GasMeter, 0),
+		minGasPrices: minGasPrices,
 	}
 }
 
@@ -23,7 +25,7 @@ func (gk *GasMeterKeeper) ChargeAll (ctx *sdk.Context, bankKeeper bankkeeper.Kee
 	for _,gasMeter := range gk.gasMeters {
 		gm := *gasMeter
 		chargingGm := gm.(ChargingGasMeterInterface)
-		err := chargingGm.Charge(ctx, bankKeeper, accountKeeper)
+		err := chargingGm.Charge(ctx, bankKeeper, accountKeeper, gk.minGasPrices)
 		_ = err
 
 	}

@@ -1,7 +1,7 @@
 import {DEFAULT_TIMEOUT, defaultGasParams, sentryWithClient} from "../../helpers/client-helpers/client-helpers";
 import {expect} from "chai";
 import {BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
-import {encodeData, getSdk, zeroLease} from "../../helpers/client-helpers/sdk-helpers";
+import {defaultLease, encodeData, getSdk, zeroLease} from "../../helpers/client-helpers/sdk-helpers";
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
 
 describe('tx.RenewLease()', function () {
@@ -82,5 +82,73 @@ describe('tx.RenewLease()', function () {
             lease: {...zeroLease, seconds: 100}
         })).to.be.rejectedWith(/key not found/)
     })
-    // ... fee charges, etc.
+
+    it('should not charge for renewing a shorter lease', () => {
+        let balAfterCreate = 0;
+
+        return sdk.db.tx.Create({
+            creator,
+            uuid,
+            key: 'myKey',
+            value: encodeData('myValue'),
+            metadata: new Uint8Array(),
+            lease: defaultLease
+        })
+
+            .then(() => sdk.bank.q.Balance({
+                address: creator,
+                denom: "ubnt"
+            }))
+            .then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
+            .then(amt =>
+                balAfterCreate += amt
+            )
+            .then(() => sdk.db.tx.RenewLease({
+                creator,
+                uuid,
+                key: 'myKey',
+                lease: {...zeroLease, seconds: 120},
+            }))
+            .then(() => sdk.bank.q.Balance({
+                address: creator,
+                denom: "ubnt"
+            }))
+            .then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
+            .then(amt => expect(balAfterCreate - amt).to.be.closeTo(0, 5))
+    });
+
+    it('should charge more for renewing a longer lease', () => {
+        let balAfterCreate = 0;
+
+        return sdk.db.tx.Create({
+            creator,
+            uuid,
+            key: 'myKey',
+            value: encodeData('myValue'),
+            metadata: new Uint8Array(),
+            lease: defaultLease
+        })
+
+            .then(() => sdk.bank.q.Balance({
+                address: creator,
+                denom: "ubnt"
+            }))
+            .then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
+            .then(amt =>
+                balAfterCreate += amt
+            )
+            .then(() => sdk.db.tx.RenewLease({
+                creator,
+                uuid,
+                key: 'myKey',
+                lease: {...zeroLease, days: 1},
+            }))
+            .then(() => sdk.bank.q.Balance({
+                address: creator,
+                denom: "ubnt"
+            }))
+            .then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
+            .then(amt => expect(balAfterCreate - amt).to.be.closeTo(0, 5))
+    })
+
 });

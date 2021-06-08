@@ -35,8 +35,9 @@ func (k msgServer) RenewLease(goCtx context.Context, msg *types.MsgRenewLease) (
 		msg.Lease,
 		ctx.BlockHeight())
 
-	k.SetCrudValue(&ctx, *newCrudValue)
+
 	k.UpdateLease(&ctx, newCrudValue)
+	k.SetCrudValue(&ctx, *newCrudValue)
 
 	return &types.MsgRenewLeaseResponse{}, nil
 }
