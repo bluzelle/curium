@@ -1,16 +1,14 @@
 import {Arguments, Argv} from "yargs";
-import yargs from 'yargs'
 import {join} from "path";
 
+export const command = 'crud <method>'
+export const desc = 'query crud method'
 
-export const command = 'q <module>'
-export const desc = 'query method'
-export const aliases = ['query']
 export const builder = (yargs: Argv) => {
     return yargs
-        .commandDir(join(__dirname,`q`),{
-        extensions: ['ts']
-    })
+        .commandDir(join(__dirname,`crud`),{
+            extensions: ['ts']
+        })
         .help()
         .demandCommand()
 }
