@@ -2,7 +2,7 @@ import {bluzelle, BluzelleSdk} from "@bluzelle/sdk-js";
 import {memoize} from 'lodash'
 
 export const getSdk = memoize<() => Promise<BluzelleSdk>>(() => bluzelle({
-    mnemonic:  "fold anxiety volcano carry car source inner number world wild tilt then loan weapon maze rug install youth novel pepper negative supreme hollow spoil",
+    mnemonic:  "shift base upon protect coconut twelve cigar craft symbol horse acid distance doctor ugly another pledge auto owner amateur spatial resist cactus mansion helmet",
     url: "http://nft2.bluzelle.com:26657",
     gasPrice: 0.002,
     maxGas: 1000000000
