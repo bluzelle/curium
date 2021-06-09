@@ -1,0 +1,13 @@
+{
+  "name": "crud-demo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@bluzelle/sdk-js": "^1.0.10",
+    "promise-passthrough": "^1.0.5"
+  },
+  "scripts": {
+    "start": "ts-node src/crud-demo.ts"
+  }
+}
