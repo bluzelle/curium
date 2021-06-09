@@ -13,7 +13,7 @@ export default function Home() {
     const onFileSelected = (ev: ChangeEvent<HTMLInputElement>) => {
         setState('uploading')
         ev.target.files?.[0].arrayBuffer()
-            .then(data => uploadFile({data, mimeType: contentType(ev.target.files?.[0].name || '')} as Context))
+            .then(data => uploadFile("https://client.sentry.testnet.private.bluzelle.com:1317", {data, mimeType: contentType(ev.target.files?.[0].name || '')} as Context))
             .then(ctx => setState(`done:${ctx.id}`))
     }
 
@@ -37,7 +37,6 @@ export default function Home() {
                     {state.includes('done:') ? (
                         <>
                             <NodeLink port={1317} id={state.replace('done:', '')}/>
-                            <NodeLink port={1327} id={state.replace('done:', '')}/>
                         </>
                     ) : (state)}
                 </div>
@@ -49,7 +48,7 @@ export default function Home() {
 
 const NodeLink: React.FC<{ port: number, id: string }> = ({port, id}) => (
     <div style={{padding: 5}}>
-        <a href={`http://localhost:${port}/nft/data/${id}`} target="_blank">
+        <a href={`https://client.sentry.testnet.private.bluzelle.com:${port}/nft/data/${id}`} target="_blank">
             node:{port}
         </a>
     </div>
@@ -72,13 +71,13 @@ const splitDataIntoChunks = (data: ArrayBuffer, chunkSize = 500 * 1024): Promise
     )
 
 
-const uploadFile = (ctx: Context): Promise<Context> =>
+const uploadFile = (url: string, ctx: Context): Promise<Context> =>
     splitDataIntoChunks(ctx.data)
         .then(chunks => ({...ctx, chunks}) as Context)
         .then(ctx => ({...ctx, hash: sha256(ctx.data)}))
         .then(passThroughAwait(ctx =>
             Promise.all(ctx.chunks.map((chunk, chunkNum) =>
-                fetch(`http://nft2.bluzelle.com:1317/nft/upload/${ctx.hash}/${chunkNum}`, {
+                fetch(`${url}/nft/upload/${ctx.hash}/${chunkNum}`, {
                     method: 'POST',
                     body: chunk
                 })
