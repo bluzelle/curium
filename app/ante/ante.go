@@ -20,7 +20,8 @@ func NewAnteHandler(
 		//auth.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
 		NewSetUpContextDecorator(gasMeterKeeper, bankKeeper),
 		auth.NewRejectExtensionOptionsDecorator(),
-		auth.NewMempoolFeeDecorator(),
+		//auth.NewMempoolFeeDecorator(),
+		NewMempoolFeeDecorator(),
 		auth.NewValidateBasicDecorator(),
 		auth.TxTimeoutHeightDecorator{},
 		auth.NewValidateMemoDecorator(ak),
@@ -28,7 +29,7 @@ func NewAnteHandler(
 		auth.NewRejectFeeGranterDecorator(),
 		auth.NewSetPubKeyDecorator(ak), // SetPubKeyDecorator must be called before all signature verification decorators
 		auth.NewValidateSigCountDecorator(ak),
-		//NewDeductFeeDecorator(ak, bankKeeper),
+		//auth.NewDeductFeeDecorator(ak, bankKeeper),
 		auth.NewSigGasConsumeDecorator(ak, sigGasConsumer),
 		auth.NewSigVerificationDecorator(ak, signModeHandler),
 		auth.NewIncrementSequenceDecorator(ak),

@@ -98,6 +98,7 @@ func calculateGasFee(gm *chargingGasMeter, gasPrice sdk.DecCoins) sdk.Coins {
 	gasPriceAmount := gasPrice.AmountOf("ubnt")
 
 	gasConsumed := gm.GasConsumed()
+
 	gasFee := gasPriceAmount.MulInt64(int64(gasConsumed)).RoundInt64()
 	return sdk.NewCoins(sdk.NewCoin("ubnt", sdk.NewInt(gasFee)))
 }

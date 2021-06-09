@@ -327,6 +327,30 @@ describe('tx.Create()', function () {
         await expect(firstCreateCost).to.be.closeTo(secondCreateCost, 3)
     })
 
+    it('should still charge for a failed transaction', () => {
+        let initialCost = 0;
+        return sdk.bank.q.Balance({
+            address: sdk.bank.address,
+            denom: 'ubnt'
+        })
+            .then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
+            .then(amt => initialCost+= amt)
+            .then(() => sdk.db.tx.Create({
+            creator: sdk.db.address,
+            uuid,
+            key: '',
+            value: new TextEncoder().encode('secondvalue'),
+            lease: {days: 10} as Lease,
+            metadata: new Uint8Array()
+        }))
+            .catch(x => x)
+            .then(() => sdk.bank.q.Balance({
+                address: sdk.bank.address,
+                denom: 'ubnt'
+            }))
+            .then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
+            .then(amt => expect(amt).to.be.lessThan(initialCost))
+    })
 })
 
 

@@ -4,7 +4,7 @@ interface Config {
 }
 
 export const localChain: Config = {
-    mnemonic: "gauge add student clever morning excess fiction grief tide grid dutch web weekend ivory throw jump artist few keen inhale evil delay sudden neck",
+    mnemonic: "salon opinion dumb edit wave recall nominee street skull accident guard tortoise pelican morning ready gaze claw warrior curious double length fan nasty transfer",
     endpoint: "http://localhost:26657"
 }
 
