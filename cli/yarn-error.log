@@ -1,5 +1,5 @@
 Arguments: 
-  /usr/local/Cellar/node/15.8.0/bin/node /usr/local/Cellar/yarn/1.22.10/libexec/bin/yarn.js add tsc @types/tsc
+  /usr/local/Cellar/node/15.8.0/bin/node /usr/local/Cellar/yarn/1.22.10/libexec/bin/yarn.js add monet @types/monet
 
 PATH: 
   /usr/local/go/bin:/Users/avendauz/go/bin:/Users/avendauz/google-cloud-sdk/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/Applications/Wireshark.app/Contents/MacOS
@@ -14,7 +14,7 @@ Platform:
   darwin x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@types%2ftsc: Not found
+  Error: https://registry.yarnpkg.com/@types%2fmonet: Not found
       at Request.params.callback [as _callback] (/usr/local/Cellar/yarn/1.22.10/libexec/lib/cli.js:66988:18)
       at Request.self.callback (/usr/local/Cellar/yarn/1.22.10/libexec/lib/cli.js:140749:22)
       at Request.emit (node:events:378:20)
