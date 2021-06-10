@@ -58,8 +58,8 @@ describe('tx.GetNShortestLeases', function () {
         }).then(resp => resp.keyLeases)
 
 
-        expect((result.find(({key}) => key === 'seconds')?.leaseBlocks || Long.fromInt(0)).toInt() * 5.5).to.be.closeTo(30, 12);
-        expect((result.find(({key}) => key === 'minutes')?.leaseBlocks || Long.fromInt(0)).toInt() * 5.5).to.be.closeTo(60, 12);
+        expect((result.find(({key}) => key === 'seconds')?.seconds || 0)).to.be.closeTo(30, 12);
+        expect((result.find(({key}) => key === 'minutes')?.seconds || 0)).to.be.closeTo(60, 12);
     });
 
     it('should show all leases if n > current num of leases', async () => {
@@ -137,7 +137,7 @@ describe('tx.GetNShortestLeases', function () {
             num: 2
         }).then(resp => resp.keyLeases)
 
-        expect((result.find(({key}) => key === 'seconds')?.leaseBlocks || Long.fromInt(0)).toInt() * 5.5).to.be.closeTo(60, 20);
-        expect((result.find(({key}) => key === 'minutes')?.leaseBlocks || Long.fromInt(0)).toInt() * 5.5).to.be.closeTo(60, 20);
+        expect((result.find(({key}) => key === 'seconds')?.seconds || 0)).to.be.closeTo(60, 20);
+        expect((result.find(({key}) => key === 'minutes')?.seconds || 0)).to.be.closeTo(60, 20);
     });
 });

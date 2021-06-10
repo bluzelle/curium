@@ -16,7 +16,7 @@ func (k msgServer) GetLease(goCtx context.Context, msg *types.MsgGetLease) (*typ
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %s doesn't exist", msg.Key))
 	}
 
-	lease := k.GetRemainingLeaseBlocks(&ctx, msg.Uuid, msg.Key)
+	leaseSeconds := k.GetRemainingLeaseSeconds(&ctx, msg.Uuid, msg.Key)
 
-	return &types.MsgGetLeaseResponse{Uuid: msg.Uuid, Key: msg.Key, LeaseBlocks: lease}, nil
+	return &types.MsgGetLeaseResponse{Uuid: msg.Uuid, Key: msg.Key, Seconds: leaseSeconds}, nil
 }

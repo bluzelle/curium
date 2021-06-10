@@ -124,7 +124,7 @@ message QueryGetLeaseRequest {
 message QueryGetLeaseResponse {
 	string uuid = 1;
 	string key = 2;
-	int64 leaseBlocks = 3;
+	uint32 seconds = 3;
 }
 
 message QueryGetNShortestLeasesRequest {

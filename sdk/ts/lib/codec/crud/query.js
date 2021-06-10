@@ -1090,11 +1090,7 @@ exports.QueryGetLeaseRequest = {
         return message;
     },
 };
-const baseQueryGetLeaseResponse = {
-    uuid: "",
-    key: "",
-    leaseBlocks: long_1.default.ZERO,
-};
+const baseQueryGetLeaseResponse = { uuid: "", key: "", seconds: 0 };
 exports.QueryGetLeaseResponse = {
     encode(message, writer = minimal_1.default.Writer.create()) {
         if (message.uuid !== "") {
@@ -1103,8 +1099,8 @@ exports.QueryGetLeaseResponse = {
         if (message.key !== "") {
             writer.uint32(18).string(message.key);
         }
-        if (!message.leaseBlocks.isZero()) {
-            writer.uint32(24).int64(message.leaseBlocks);
+        if (message.seconds !== 0) {
+            writer.uint32(24).uint32(message.seconds);
         }
         return writer;
     },
@@ -1122,7 +1118,7 @@ exports.QueryGetLeaseResponse = {
                     message.key = reader.string();
                     break;
                 case 3:
-                    message.leaseBlocks = reader.int64();
+                    message.seconds = reader.uint32();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -1145,11 +1141,11 @@ exports.QueryGetLeaseResponse = {
         else {
             message.key = "";
         }
-        if (object.leaseBlocks !== undefined && object.leaseBlocks !== null) {
-            message.leaseBlocks = long_1.default.fromString(object.leaseBlocks);
+        if (object.seconds !== undefined && object.seconds !== null) {
+            message.seconds = Number(object.seconds);
         }
         else {
-            message.leaseBlocks = long_1.default.ZERO;
+            message.seconds = 0;
         }
         return message;
     },
@@ -1157,8 +1153,7 @@ exports.QueryGetLeaseResponse = {
         const obj = {};
         message.uuid !== undefined && (obj.uuid = message.uuid);
         message.key !== undefined && (obj.key = message.key);
-        message.leaseBlocks !== undefined &&
-            (obj.leaseBlocks = (message.leaseBlocks || long_1.default.ZERO).toString());
+        message.seconds !== undefined && (obj.seconds = message.seconds);
         return obj;
     },
     fromPartial(object) {
@@ -1175,11 +1170,11 @@ exports.QueryGetLeaseResponse = {
         else {
             message.key = "";
         }
-        if (object.leaseBlocks !== undefined && object.leaseBlocks !== null) {
-            message.leaseBlocks = object.leaseBlocks;
+        if (object.seconds !== undefined && object.seconds !== null) {
+            message.seconds = object.seconds;
         }
         else {
-            message.leaseBlocks = long_1.default.ZERO;
+            message.seconds = 0;
         }
         return message;
     },

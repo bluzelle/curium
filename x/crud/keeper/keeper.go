@@ -98,10 +98,10 @@ func (k Keeper) ConvertLeaseToBlocks(lease *types.Lease) int64 {
 	return int64(float64(lease.GetSeconds()+lease.GetMinutes()*60+lease.GetHours()*3600+lease.GetDays()*3600*24+lease.GetYears()*365*3600*24) / 5.5)
 }
 
-func (k Keeper) GetRemainingLeaseBlocks(ctx *sdk.Context, uuid string, key string) int64 {
+func (k Keeper) GetRemainingLeaseSeconds(ctx *sdk.Context, uuid string, key string) uint32 {
 	crudValue := k.GetCrudValue(ctx, uuid, key)
 
-	return k.ConvertLeaseToBlocks(crudValue.Lease) + crudValue.Height - ctx.BlockHeight()
+	return uint32(float32(k.ConvertLeaseToBlocks(crudValue.Lease) + crudValue.Height - ctx.BlockHeight()) * 5.5)
 }
 
 func (k Keeper) GetNShortestLeaseBlocks(ctx *sdk.Context, owner string, uuid string, num uint32) ([]*types.KeyLease, error) {
@@ -112,11 +112,11 @@ func (k Keeper) GetNShortestLeaseBlocks(ctx *sdk.Context, owner string, uuid str
 
 	for i := range keys {
 
-		remainingBlocks := k.GetRemainingLeaseBlocks(ctx, uuid, keys[i])
+		remainingLeaseSeconds := k.GetRemainingLeaseSeconds(ctx, uuid, keys[i])
 
 		curKeyLease := &types.KeyLease{
-			Key:         keys[i],
-			LeaseBlocks: remainingBlocks,
+			Key:     keys[i],
+			Seconds: remainingLeaseSeconds,
 		}
 
 		keyLeases = append(keyLeases, curKeyLease)
@@ -138,11 +138,11 @@ func (k Keeper) QueryNShortestLeaseBlocks(ctx *sdk.Context, owner string, uuid s
 
 	for i := range keys {
 
-		remainingBlocks := k.GetRemainingLeaseBlocks(ctx, uuid, keys[i])
+		remainingLeaseSeconds := k.GetRemainingLeaseSeconds(ctx, uuid, keys[i])
 
 		curKeyLease := &types.KeyLease{
 			Key:         keys[i],
-			LeaseBlocks: remainingBlocks,
+			Seconds: remainingLeaseSeconds,
 		}
 
 		keyLeases = append(keyLeases, curKeyLease)

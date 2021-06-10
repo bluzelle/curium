@@ -13,7 +13,7 @@ export interface KeyValueLease {
 }
 export interface KeyLease {
     key: string;
-    leaseBlocks: Long;
+    seconds: number;
 }
 export declare const KeyValue: {
     encode(message: KeyValue, writer?: _m0.Writer): _m0.Writer;

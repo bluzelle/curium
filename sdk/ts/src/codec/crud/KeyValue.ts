@@ -18,7 +18,7 @@ export interface KeyValueLease {
 
 export interface KeyLease {
   key: string;
-  leaseBlocks: Long;
+  seconds: number;
 }
 
 const baseKeyValue: object = { key: "" };
@@ -195,7 +195,7 @@ export const KeyValueLease = {
   },
 };
 
-const baseKeyLease: object = { key: "", leaseBlocks: Long.ZERO };
+const baseKeyLease: object = { key: "", seconds: 0 };
 
 export const KeyLease = {
   encode(
@@ -205,8 +205,8 @@ export const KeyLease = {
     if (message.key !== "") {
       writer.uint32(10).string(message.key);
     }
-    if (!message.leaseBlocks.isZero()) {
-      writer.uint32(16).int64(message.leaseBlocks);
+    if (message.seconds !== 0) {
+      writer.uint32(16).uint32(message.seconds);
     }
     return writer;
   },
@@ -222,7 +222,7 @@ export const KeyLease = {
           message.key = reader.string();
           break;
         case 2:
-          message.leaseBlocks = reader.int64() as Long;
+          message.seconds = reader.uint32();
           break;
         default:
           reader.skipType(tag & 7);
@@ -239,10 +239,10 @@ export const KeyLease = {
     } else {
       message.key = "";
     }
-    if (object.leaseBlocks !== undefined && object.leaseBlocks !== null) {
-      message.leaseBlocks = Long.fromString(object.leaseBlocks);
+    if (object.seconds !== undefined && object.seconds !== null) {
+      message.seconds = Number(object.seconds);
     } else {
-      message.leaseBlocks = Long.ZERO;
+      message.seconds = 0;
     }
     return message;
   },
@@ -250,8 +250,7 @@ export const KeyLease = {
   toJSON(message: KeyLease): unknown {
     const obj: any = {};
     message.key !== undefined && (obj.key = message.key);
-    message.leaseBlocks !== undefined &&
-      (obj.leaseBlocks = (message.leaseBlocks || Long.ZERO).toString());
+    message.seconds !== undefined && (obj.seconds = message.seconds);
     return obj;
   },
 
@@ -262,10 +261,10 @@ export const KeyLease = {
     } else {
       message.key = "";
     }
-    if (object.leaseBlocks !== undefined && object.leaseBlocks !== null) {
-      message.leaseBlocks = object.leaseBlocks as Long;
+    if (object.seconds !== undefined && object.seconds !== null) {
+      message.seconds = object.seconds;
     } else {
-      message.leaseBlocks = Long.ZERO;
+      message.seconds = 0;
     }
     return message;
   },

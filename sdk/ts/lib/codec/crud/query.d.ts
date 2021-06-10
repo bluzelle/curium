@@ -65,7 +65,7 @@ export interface QueryGetLeaseRequest {
 export interface QueryGetLeaseResponse {
     uuid: string;
     key: string;
-    leaseBlocks: Long;
+    seconds: number;
 }
 export interface QueryGetNShortestLeasesRequest {
     uuid: string;

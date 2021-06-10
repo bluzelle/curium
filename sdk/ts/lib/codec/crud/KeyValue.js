@@ -169,14 +169,14 @@ exports.KeyValueLease = {
         return message;
     },
 };
-const baseKeyLease = { key: "", leaseBlocks: long_1.default.ZERO };
+const baseKeyLease = { key: "", seconds: 0 };
 exports.KeyLease = {
     encode(message, writer = minimal_1.default.Writer.create()) {
         if (message.key !== "") {
             writer.uint32(10).string(message.key);
         }
-        if (!message.leaseBlocks.isZero()) {
-            writer.uint32(16).int64(message.leaseBlocks);
+        if (message.seconds !== 0) {
+            writer.uint32(16).uint32(message.seconds);
         }
         return writer;
     },
@@ -191,7 +191,7 @@ exports.KeyLease = {
                     message.key = reader.string();
                     break;
                 case 2:
-                    message.leaseBlocks = reader.int64();
+                    message.seconds = reader.uint32();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -208,19 +208,18 @@ exports.KeyLease = {
         else {
             message.key = "";
         }
-        if (object.leaseBlocks !== undefined && object.leaseBlocks !== null) {
-            message.leaseBlocks = long_1.default.fromString(object.leaseBlocks);
+        if (object.seconds !== undefined && object.seconds !== null) {
+            message.seconds = Number(object.seconds);
         }
         else {
-            message.leaseBlocks = long_1.default.ZERO;
+            message.seconds = 0;
         }
         return message;
     },
     toJSON(message) {
         const obj = {};
         message.key !== undefined && (obj.key = message.key);
-        message.leaseBlocks !== undefined &&
-            (obj.leaseBlocks = (message.leaseBlocks || long_1.default.ZERO).toString());
+        message.seconds !== undefined && (obj.seconds = message.seconds);
         return obj;
     },
     fromPartial(object) {
@@ -231,11 +230,11 @@ exports.KeyLease = {
         else {
             message.key = "";
         }
-        if (object.leaseBlocks !== undefined && object.leaseBlocks !== null) {
-            message.leaseBlocks = object.leaseBlocks;
+        if (object.seconds !== undefined && object.seconds !== null) {
+            message.seconds = object.seconds;
         }
         else {
-            message.leaseBlocks = long_1.default.ZERO;
+            message.seconds = 0;
         }
         return message;
     },

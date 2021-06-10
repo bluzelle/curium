@@ -110,7 +110,7 @@ export interface MsgGetLease {
 export interface MsgGetLeaseResponse {
   uuid: string;
   key: string;
-  leaseBlocks: Long;
+  seconds: number;
 }
 
 export interface MsgRead {
@@ -1822,11 +1822,7 @@ export const MsgGetLease = {
   },
 };
 
-const baseMsgGetLeaseResponse: object = {
-  uuid: "",
-  key: "",
-  leaseBlocks: Long.ZERO,
-};
+const baseMsgGetLeaseResponse: object = { uuid: "", key: "", seconds: 0 };
 
 export const MsgGetLeaseResponse = {
   encode(
@@ -1839,8 +1835,8 @@ export const MsgGetLeaseResponse = {
     if (message.key !== "") {
       writer.uint32(18).string(message.key);
     }
-    if (!message.leaseBlocks.isZero()) {
-      writer.uint32(24).int64(message.leaseBlocks);
+    if (message.seconds !== 0) {
+      writer.uint32(24).uint32(message.seconds);
     }
     return writer;
   },
@@ -1859,7 +1855,7 @@ export const MsgGetLeaseResponse = {
           message.key = reader.string();
           break;
         case 3:
-          message.leaseBlocks = reader.int64() as Long;
+          message.seconds = reader.uint32();
           break;
         default:
           reader.skipType(tag & 7);
@@ -1881,10 +1877,10 @@ export const MsgGetLeaseResponse = {
     } else {
       message.key = "";
     }
-    if (object.leaseBlocks !== undefined && object.leaseBlocks !== null) {
-      message.leaseBlocks = Long.fromString(object.leaseBlocks);
+    if (object.seconds !== undefined && object.seconds !== null) {
+      message.seconds = Number(object.seconds);
     } else {
-      message.leaseBlocks = Long.ZERO;
+      message.seconds = 0;
     }
     return message;
   },
@@ -1893,8 +1889,7 @@ export const MsgGetLeaseResponse = {
     const obj: any = {};
     message.uuid !== undefined && (obj.uuid = message.uuid);
     message.key !== undefined && (obj.key = message.key);
-    message.leaseBlocks !== undefined &&
-      (obj.leaseBlocks = (message.leaseBlocks || Long.ZERO).toString());
+    message.seconds !== undefined && (obj.seconds = message.seconds);
     return obj;
   },
 
@@ -1910,10 +1905,10 @@ export const MsgGetLeaseResponse = {
     } else {
       message.key = "";
     }
-    if (object.leaseBlocks !== undefined && object.leaseBlocks !== null) {
-      message.leaseBlocks = object.leaseBlocks as Long;
+    if (object.seconds !== undefined && object.seconds !== null) {
+      message.seconds = object.seconds;
     } else {
-      message.leaseBlocks = Long.ZERO;
+      message.seconds = 0;
     }
     return message;
   },

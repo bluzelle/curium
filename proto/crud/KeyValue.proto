@@ -17,5 +17,5 @@ message KeyValueLease {
 
 message KeyLease {
   string key = 1;
-  int64 leaseBlocks = 2;
+  uint32 seconds = 2;
 }

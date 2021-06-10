@@ -221,7 +221,7 @@ export class API {
                 uuid: this.config.uuid,
                 key
             }))
-            .then(resp => Math.round(resp.leaseBlocks.toInt() * BLOCK_TIME_IN_SECONDS))
+            .then(resp => resp.seconds)
             // .catch(res => {
             //     throw res.error === 'Not Found' ? `key "${key}" not found` : res.error
             // })

@@ -15,7 +15,7 @@ func (k Keeper) GetLease(goCtx context.Context, req *types.QueryGetLeaseRequest)
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %s doesn't exist", req.Key))
 	}
 
-	lease := k.GetRemainingLeaseBlocks(&ctx, req.Uuid, req.Key)
+	leaseSeconds := k.GetRemainingLeaseSeconds(&ctx, req.Uuid, req.Key)
 
-	return &types.QueryGetLeaseResponse{Uuid: req.Uuid, Key: req.Key, LeaseBlocks: lease}, nil
+	return &types.QueryGetLeaseResponse{Uuid: req.Uuid, Key: req.Key, Seconds: leaseSeconds}, nil
 }

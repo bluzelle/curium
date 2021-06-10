@@ -38,7 +38,7 @@ describe('q.GetLease()', function () {
         expect(await sdk.db.q.GetLease({
             uuid,
             key: 'myKey'
-        }).then(resp => resp.leaseBlocks.toInt() * 5.5)).to.be.lessThan(28);
+        }).then(resp => resp.seconds)).to.be.lessThan(28);
     })
 
     it('should throw an error if lease has already expired', async () => {
