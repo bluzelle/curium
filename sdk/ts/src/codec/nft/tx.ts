@@ -5,9 +5,20 @@ import _m0 from "protobufjs/minimal";
 export const protobufPackage = "bluzelle.curium.nft";
 
 /** this line is used by starport scaffolding # proto/tx/message */
+export interface MsgRegisterPeer {
+  creator: string;
+  id: string;
+  address: string;
+  port: Long;
+}
+
+export interface MsgRegisterPeerResponse {}
+
 export interface MsgPublishFile {
   creator: string;
   id: string;
+  hash: string;
+  metainfo: Uint8Array;
 }
 
 export interface MsgPublishFileResponse {}
@@ -22,10 +33,10 @@ export interface MsgFileReceivedResponse {}
 
 export interface MsgCreateNft {
   id: string;
+  hash: string;
   creator: string;
   mime: string;
   meta: string;
-  host: string;
 }
 
 export interface MsgCreateNftResponse {
@@ -37,7 +48,6 @@ export interface MsgUpdateNft {
   creator: string;
   mime: string;
   meta: string;
-  host: string;
 }
 
 export interface MsgUpdateNftResponse {}
@@ -49,7 +59,174 @@ export interface MsgDeleteNft {
 
 export interface MsgDeleteNftResponse {}
 
-const baseMsgPublishFile: object = { creator: "", id: "" };
+const baseMsgRegisterPeer: object = {
+  creator: "",
+  id: "",
+  address: "",
+  port: Long.UZERO,
+};
+
+export const MsgRegisterPeer = {
+  encode(
+    message: MsgRegisterPeer,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.id !== "") {
+      writer.uint32(18).string(message.id);
+    }
+    if (message.address !== "") {
+      writer.uint32(26).string(message.address);
+    }
+    if (!message.port.isZero()) {
+      writer.uint32(32).uint64(message.port);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgRegisterPeer {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgRegisterPeer } as MsgRegisterPeer;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.id = reader.string();
+          break;
+        case 3:
+          message.address = reader.string();
+          break;
+        case 4:
+          message.port = reader.uint64() as Long;
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgRegisterPeer {
+    const message = { ...baseMsgRegisterPeer } as MsgRegisterPeer;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.id !== undefined && object.id !== null) {
+      message.id = String(object.id);
+    } else {
+      message.id = "";
+    }
+    if (object.address !== undefined && object.address !== null) {
+      message.address = String(object.address);
+    } else {
+      message.address = "";
+    }
+    if (object.port !== undefined && object.port !== null) {
+      message.port = Long.fromString(object.port);
+    } else {
+      message.port = Long.UZERO;
+    }
+    return message;
+  },
+
+  toJSON(message: MsgRegisterPeer): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.id !== undefined && (obj.id = message.id);
+    message.address !== undefined && (obj.address = message.address);
+    message.port !== undefined &&
+      (obj.port = (message.port || Long.UZERO).toString());
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgRegisterPeer>): MsgRegisterPeer {
+    const message = { ...baseMsgRegisterPeer } as MsgRegisterPeer;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.id !== undefined && object.id !== null) {
+      message.id = object.id;
+    } else {
+      message.id = "";
+    }
+    if (object.address !== undefined && object.address !== null) {
+      message.address = object.address;
+    } else {
+      message.address = "";
+    }
+    if (object.port !== undefined && object.port !== null) {
+      message.port = object.port as Long;
+    } else {
+      message.port = Long.UZERO;
+    }
+    return message;
+  },
+};
+
+const baseMsgRegisterPeerResponse: object = {};
+
+export const MsgRegisterPeerResponse = {
+  encode(
+    _: MsgRegisterPeerResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): MsgRegisterPeerResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseMsgRegisterPeerResponse,
+    } as MsgRegisterPeerResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgRegisterPeerResponse {
+    const message = {
+      ...baseMsgRegisterPeerResponse,
+    } as MsgRegisterPeerResponse;
+    return message;
+  },
+
+  toJSON(_: MsgRegisterPeerResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(
+    _: DeepPartial<MsgRegisterPeerResponse>
+  ): MsgRegisterPeerResponse {
+    const message = {
+      ...baseMsgRegisterPeerResponse,
+    } as MsgRegisterPeerResponse;
+    return message;
+  },
+};
+
+const baseMsgPublishFile: object = { creator: "", id: "", hash: "" };
 
 export const MsgPublishFile = {
   encode(
@@ -62,6 +239,12 @@ export const MsgPublishFile = {
     if (message.id !== "") {
       writer.uint32(18).string(message.id);
     }
+    if (message.hash !== "") {
+      writer.uint32(26).string(message.hash);
+    }
+    if (message.metainfo.length !== 0) {
+      writer.uint32(34).bytes(message.metainfo);
+    }
     return writer;
   },
 
@@ -69,6 +252,7 @@ export const MsgPublishFile = {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseMsgPublishFile } as MsgPublishFile;
+    message.metainfo = new Uint8Array();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -77,6 +261,12 @@ export const MsgPublishFile = {
           break;
         case 2:
           message.id = reader.string();
+          break;
+        case 3:
+          message.hash = reader.string();
+          break;
+        case 4:
+          message.metainfo = reader.bytes();
           break;
         default:
           reader.skipType(tag & 7);
@@ -88,6 +278,7 @@ export const MsgPublishFile = {
 
   fromJSON(object: any): MsgPublishFile {
     const message = { ...baseMsgPublishFile } as MsgPublishFile;
+    message.metainfo = new Uint8Array();
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = String(object.creator);
     } else {
@@ -98,6 +289,14 @@ export const MsgPublishFile = {
     } else {
       message.id = "";
     }
+    if (object.hash !== undefined && object.hash !== null) {
+      message.hash = String(object.hash);
+    } else {
+      message.hash = "";
+    }
+    if (object.metainfo !== undefined && object.metainfo !== null) {
+      message.metainfo = bytesFromBase64(object.metainfo);
+    }
     return message;
   },
 
@@ -105,6 +304,11 @@ export const MsgPublishFile = {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
     message.id !== undefined && (obj.id = message.id);
+    message.hash !== undefined && (obj.hash = message.hash);
+    message.metainfo !== undefined &&
+      (obj.metainfo = base64FromBytes(
+        message.metainfo !== undefined ? message.metainfo : new Uint8Array()
+      ));
     return obj;
   },
 
@@ -119,6 +323,16 @@ export const MsgPublishFile = {
       message.id = object.id;
     } else {
       message.id = "";
+    }
+    if (object.hash !== undefined && object.hash !== null) {
+      message.hash = object.hash;
+    } else {
+      message.hash = "";
+    }
+    if (object.metainfo !== undefined && object.metainfo !== null) {
+      message.metainfo = object.metainfo;
+    } else {
+      message.metainfo = new Uint8Array();
     }
     return message;
   },
@@ -314,10 +528,10 @@ export const MsgFileReceivedResponse = {
 
 const baseMsgCreateNft: object = {
   id: "",
+  hash: "",
   creator: "",
   mime: "",
   meta: "",
-  host: "",
 };
 
 export const MsgCreateNft = {
@@ -328,17 +542,17 @@ export const MsgCreateNft = {
     if (message.id !== "") {
       writer.uint32(10).string(message.id);
     }
+    if (message.hash !== "") {
+      writer.uint32(18).string(message.hash);
+    }
     if (message.creator !== "") {
-      writer.uint32(18).string(message.creator);
+      writer.uint32(26).string(message.creator);
     }
     if (message.mime !== "") {
-      writer.uint32(26).string(message.mime);
+      writer.uint32(34).string(message.mime);
     }
     if (message.meta !== "") {
-      writer.uint32(34).string(message.meta);
-    }
-    if (message.host !== "") {
-      writer.uint32(42).string(message.host);
+      writer.uint32(42).string(message.meta);
     }
     return writer;
   },
@@ -354,16 +568,16 @@ export const MsgCreateNft = {
           message.id = reader.string();
           break;
         case 2:
-          message.creator = reader.string();
+          message.hash = reader.string();
           break;
         case 3:
-          message.mime = reader.string();
+          message.creator = reader.string();
           break;
         case 4:
-          message.meta = reader.string();
+          message.mime = reader.string();
           break;
         case 5:
-          message.host = reader.string();
+          message.meta = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -380,6 +594,11 @@ export const MsgCreateNft = {
     } else {
       message.id = "";
     }
+    if (object.hash !== undefined && object.hash !== null) {
+      message.hash = String(object.hash);
+    } else {
+      message.hash = "";
+    }
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = String(object.creator);
     } else {
@@ -395,21 +614,16 @@ export const MsgCreateNft = {
     } else {
       message.meta = "";
     }
-    if (object.host !== undefined && object.host !== null) {
-      message.host = String(object.host);
-    } else {
-      message.host = "";
-    }
     return message;
   },
 
   toJSON(message: MsgCreateNft): unknown {
     const obj: any = {};
     message.id !== undefined && (obj.id = message.id);
+    message.hash !== undefined && (obj.hash = message.hash);
     message.creator !== undefined && (obj.creator = message.creator);
     message.mime !== undefined && (obj.mime = message.mime);
     message.meta !== undefined && (obj.meta = message.meta);
-    message.host !== undefined && (obj.host = message.host);
     return obj;
   },
 
@@ -419,6 +633,11 @@ export const MsgCreateNft = {
       message.id = object.id;
     } else {
       message.id = "";
+    }
+    if (object.hash !== undefined && object.hash !== null) {
+      message.hash = object.hash;
+    } else {
+      message.hash = "";
     }
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = object.creator;
@@ -434,11 +653,6 @@ export const MsgCreateNft = {
       message.meta = object.meta;
     } else {
       message.meta = "";
-    }
-    if (object.host !== undefined && object.host !== null) {
-      message.host = object.host;
-    } else {
-      message.host = "";
     }
     return message;
   },
@@ -505,13 +719,7 @@ export const MsgCreateNftResponse = {
   },
 };
 
-const baseMsgUpdateNft: object = {
-  id: "",
-  creator: "",
-  mime: "",
-  meta: "",
-  host: "",
-};
+const baseMsgUpdateNft: object = { id: "", creator: "", mime: "", meta: "" };
 
 export const MsgUpdateNft = {
   encode(
@@ -529,9 +737,6 @@ export const MsgUpdateNft = {
     }
     if (message.meta !== "") {
       writer.uint32(34).string(message.meta);
-    }
-    if (message.host !== "") {
-      writer.uint32(42).string(message.host);
     }
     return writer;
   },
@@ -554,9 +759,6 @@ export const MsgUpdateNft = {
           break;
         case 4:
           message.meta = reader.string();
-          break;
-        case 5:
-          message.host = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -588,11 +790,6 @@ export const MsgUpdateNft = {
     } else {
       message.meta = "";
     }
-    if (object.host !== undefined && object.host !== null) {
-      message.host = String(object.host);
-    } else {
-      message.host = "";
-    }
     return message;
   },
 
@@ -602,7 +799,6 @@ export const MsgUpdateNft = {
     message.creator !== undefined && (obj.creator = message.creator);
     message.mime !== undefined && (obj.mime = message.mime);
     message.meta !== undefined && (obj.meta = message.meta);
-    message.host !== undefined && (obj.host = message.host);
     return obj;
   },
 
@@ -627,11 +823,6 @@ export const MsgUpdateNft = {
       message.meta = object.meta;
     } else {
       message.meta = "";
-    }
-    if (object.host !== undefined && object.host !== null) {
-      message.host = object.host;
-    } else {
-      message.host = "";
     }
     return message;
   },
@@ -803,6 +994,7 @@ export const MsgDeleteNftResponse = {
 /** Msg defines the Msg service. */
 export interface Msg {
   /** this line is used by starport scaffolding # proto/tx/rpc */
+  RegisterPeer(request: MsgRegisterPeer): Promise<MsgRegisterPeerResponse>;
   PublishFile(request: MsgPublishFile): Promise<MsgPublishFileResponse>;
   FileReceived(request: MsgFileReceived): Promise<MsgFileReceivedResponse>;
   CreateNft(request: MsgCreateNft): Promise<MsgCreateNftResponse>;
@@ -815,6 +1007,18 @@ export class MsgClientImpl implements Msg {
   constructor(rpc: Rpc) {
     this.rpc = rpc;
   }
+  RegisterPeer(request: MsgRegisterPeer): Promise<MsgRegisterPeerResponse> {
+    const data = MsgRegisterPeer.encode(request).finish();
+    const promise = this.rpc.request(
+      "bluzelle.curium.nft.Msg",
+      "RegisterPeer",
+      data
+    );
+    return promise.then((data) =>
+      MsgRegisterPeerResponse.decode(new _m0.Reader(data))
+    );
+  }
+
   PublishFile(request: MsgPublishFile): Promise<MsgPublishFileResponse> {
     const data = MsgPublishFile.encode(request).finish();
     const promise = this.rpc.request(
@@ -882,6 +1086,39 @@ interface Rpc {
     method: string,
     data: Uint8Array
   ): Promise<Uint8Array>;
+}
+
+declare var self: any | undefined;
+declare var window: any | undefined;
+var globalThis: any = (() => {
+  if (typeof globalThis !== "undefined") return globalThis;
+  if (typeof self !== "undefined") return self;
+  if (typeof window !== "undefined") return window;
+  if (typeof global !== "undefined") return global;
+  throw "Unable to locate global object";
+})();
+
+const atob: (b64: string) => string =
+  globalThis.atob ||
+  ((b64) => globalThis.Buffer.from(b64, "base64").toString("binary"));
+function bytesFromBase64(b64: string): Uint8Array {
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; ++i) {
+    arr[i] = bin.charCodeAt(i);
+  }
+  return arr;
+}
+
+const btoa: (bin: string) => string =
+  globalThis.btoa ||
+  ((bin) => globalThis.Buffer.from(bin, "binary").toString("base64"));
+function base64FromBytes(arr: Uint8Array): string {
+  const bin: string[] = [];
+  for (let i = 0; i < arr.byteLength; ++i) {
+    bin.push(String.fromCharCode(arr[i]));
+  }
+  return btoa(bin.join(""));
 }
 
 type Builtin =

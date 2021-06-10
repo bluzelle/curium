@@ -24,7 +24,6 @@ const uploadNft = (nft) => (params, data) => {
         .then(() => nft.tx.CreateNft({
         id: hash,
         creator: nft.address,
-        host: nft.url,
         ...params
     }))
         .then(promise_passthrough_1.passThroughAwait(waitForFullReplication(nft)))

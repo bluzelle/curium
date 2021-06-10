@@ -19,12 +19,14 @@ func (mfd MempoolFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 
 	feeCoins := feeTx.GetFee()
 	gas := feeTx.GetGas()
+	check := feeCoins.Empty()
+	_ = check
 
-	specifiedGasPrice := sdk.NewDecCoinsFromCoins(feeCoins[0]).QuoDec(sdk.NewDec(int64(gas)))[0]
 	// Ensure that the provided fees meet a minimum threshold for the validator,
 	// if this is a CheckTx. This is only for local mempool purposes, and thus
 	// is only ran on check tx.
 	if ctx.IsCheckTx() && !simulate {
+		specifiedGasPrice := sdk.NewDecCoinsFromCoins(feeCoins[0]).QuoDec(sdk.NewDec(int64(gas)))[0]
 		minGasPrice := ctx.MinGasPrices()[0]
 
 		if specifiedGasPrice.IsLT(minGasPrice) {
