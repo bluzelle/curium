@@ -2,10 +2,6 @@ import {Argv,} from "yargs";
 import {TextEncoder} from "util";
 import {getSdkByName} from "../../../helpers/sdk-helpers";
 
-
-export const getCrudCmdType = (cmd: string, msgTypes: Record<string, any>): any =>
-    msgTypes[cmd];
-
 export const command = 'upsert <uuid> <key> <value> <lease>'
 export const desc = 'Upsert a key-value from the database'
 export const builder = (yargs: Argv) => {

@@ -4,9 +4,6 @@ import {TextEncoder} from "util";
 import {getSdkByName} from "../../../helpers/sdk-helpers";
 
 
-export const getCrudCmdType = (cmd: string, msgTypes: Record<string, any>): any =>
-    msgTypes[cmd];
-
 export const command = 'update <uuid> <key> <value> <lease>'
 export const desc = 'Update a key-value from the database'
 export const builder = (yargs: Argv) => {

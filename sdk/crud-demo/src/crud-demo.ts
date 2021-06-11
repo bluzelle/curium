@@ -146,7 +146,7 @@ const main = async () => {
         gasPrice: 0.002,
         maxGas: 10000000,
         url: "https://client.sentry.testnet.private.bluzelle.com:26657",
-        mnemonic: "almost bicycle text waste humor have win wonder ski planet raccoon solve grocery auction label pet only decrease sugar blush tank diagram rigid civil"
+        mnemonic: "tuna ceiling phrase chunk insane apology toy meat noble follow disease between undo doll pattern feed whip century outside disease tag treat crunch police"
     })
     await sdk.db.tx.Create({
         creator: sdk.db.address,

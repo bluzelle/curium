@@ -4,8 +4,10 @@ interface Config {
 }
 
 export const localChain: Config = {
-    mnemonic: "frown army section slide armed genre oppose poet history purse trouble pizza loud execute board scheme poverty book gentle derive forest brass control palace",
-    endpoint: "http://localhost:26657"
+   // mnemonic: "frown army section slide armed genre oppose poet history purse trouble pizza loud execute board scheme poverty book gentle derive forest brass control palace",
+    mnemonic: "tuna ceiling phrase chunk insane apology toy meat noble follow disease between undo doll pattern feed whip century outside disease tag treat crunch police",
+    //endpoint: "http://localhost:26657"
+    endpoint: "https://client.sentry.testnet.private.bluzelle.com:26657"
 }
 
 // export const localChain: Config = {

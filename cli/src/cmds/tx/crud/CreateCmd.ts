@@ -12,7 +12,6 @@ export const builder = (yargs: Argv) => {
 }
 export const handler = (argv: {uuid: string, key: string, value: string, lease: string, from: string, gas: string, gas_price: string, node: string}) => {
     return getSdkByName(argv.from, argv.gas_price, argv.gas, argv.node)
-        .then(x => x)
         .then(sdk =>
             sdk.db.tx.Create({
                 creator: sdk.db.address,
