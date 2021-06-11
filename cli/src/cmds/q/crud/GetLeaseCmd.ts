@@ -8,8 +8,8 @@ export const builder = (yargs: Argv) => {
     return yargs
         .help()
 }
-export const handler = (argv: QueryGetLeaseRequest) => {
-    return getQuerySdk()
+export const handler = (argv: QueryGetLeaseRequest & {node: string}) => {
+    return getQuerySdk(argv.node)
         .then(sdk => sdk.db.q.GetLease({
             uuid: argv.uuid,
             key: argv.key

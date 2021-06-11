@@ -17,11 +17,12 @@ var getSdkByName = function (name, gasPrice, gas, url) {
     }); });
 };
 exports.getSdkByName = getSdkByName;
-var getQuerySdk = function () {
+var getQuerySdk = function (url) {
+    if (url === void 0) { url = "http://localhost:26657"; }
     return sdk_js_1.bluzelle({
         gasPrice: 0,
         maxGas: 0,
-        url: "http://localhost:26657",
+        url: url,
         mnemonic: sdk_js_1.bluzelle.newMnemonic()
     });
 };

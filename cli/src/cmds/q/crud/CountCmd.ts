@@ -9,8 +9,8 @@ export const builder = (yargs: Argv) => {
     return yargs
         .help()
 }
-export const handler = (argv: QueryCountRequest) => {
-    return getQuerySdk()
+export const handler = (argv: QueryCountRequest & {node: string}) => {
+    return getQuerySdk(argv.node)
         // .then(sdk => sdk.db.q.Count({
         //     uuid: argv.uuid
         // }))

@@ -7,6 +7,10 @@ exports.desc = 'query crud method';
 var builder = function (yargs) {
     return yargs
         .commandDir(path_1.join(__dirname, "crud"))
+        .option('node', {
+        describe: 'node to connect to',
+        type: 'string'
+    })
         .help()
         .demandCommand();
 };

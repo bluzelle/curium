@@ -1,5 +1,5 @@
 {
-  "name": "cli",
+  "name": "@bluzelle/sdk-cli",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
@@ -17,6 +17,6 @@
     "build": "yarn tsc"
   },
   "bin": {
-    "blzcli": "./lib/cli.js"
+    "blzcli": "./dist/cli.js"
   }
 }

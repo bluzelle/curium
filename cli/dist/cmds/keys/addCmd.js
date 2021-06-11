@@ -51,19 +51,14 @@ var builder = function (yargs) {
 exports.builder = builder;
 var handler = function (argv) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, console.log("WRITTEN")];
-            case 1:
-                _a.sent();
-                return [2 /*return*/, fs_1.promises.appendFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/" + argv.user + ".txt"), "frown army section slide armed genre oppose poet history purse trouble pizza loud execute board scheme poverty book gentle derive forest brass control palace", { flag: 'ax' })
-                        .then(console.log.bind(null, "FINISHED"))
-                        .then(function () { return fs_1.promises.readFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/" + argv.user + ".txt"), null); })
-                        .then(function (buf) { return new TextDecoder().decode(buf); })
-                        .then(console.log)
-                        .catch(function () {
-                        console.log(argv.user + " already exists");
-                    })];
-        }
+        return [2 /*return*/, fs_1.promises.appendFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/" + argv.user + ".txt"), "swarm hill bar quit female truth ticket pulp pull album isolate thing solar purpose sound enjoy strike bundle hobby planet setup type hen grant", { flag: 'ax' })
+                .then(console.log.bind(null, "FINISHED"))
+                .then(function () { return fs_1.promises.readFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/" + argv.user + ".txt"), null); })
+                .then(function (buf) { return new TextDecoder().decode(buf); })
+                .then(console.log)
+                .catch(function () {
+                console.log(argv.user + " already exists");
+            })];
     });
 }); };
 exports.handler = handler;

@@ -10,8 +10,8 @@ export const builder = (yargs: Argv) => {
     return yargs
         .help()
 }
-export const handler = (argv: QueryReadRequest) => {
-    return getQuerySdk()
+export const handler = (argv: QueryReadRequest & {node: string}) => {
+    return getQuerySdk(argv.node)
         .then(sdk => sdk.db.q.Read({
             uuid: argv.uuid,
             key: argv.key

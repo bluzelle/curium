@@ -9,8 +9,8 @@ export const builder = (yargs: Argv) => {
     return yargs
         .help()
 }
-export const handler = (argv: QuerySearchRequest) => {
-    return getQuerySdk()
+export const handler = (argv: QuerySearchRequest & {node: string}) => {
+    return getQuerySdk(argv.node)
         .then(sdk => sdk.db.q.Search({
             uuid: argv.uuid,
             searchString: argv.searchString

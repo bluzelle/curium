@@ -13,11 +13,11 @@ export const getSdkByName = (name: string, gasPrice: string, gas: string, url: s
         }))
 }
 
-export const getQuerySdk = (): Promise<BluzelleSdk> =>
+export const getQuerySdk = (url: string): Promise<BluzelleSdk> =>
     bluzelle({
         gasPrice: 0,
         maxGas: 0,
-        url: "http://localhost:26657",
+        url,
         mnemonic: bluzelle.newMnemonic()
 
     })

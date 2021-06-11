@@ -11,8 +11,8 @@ export const builder = (yargs: Argv) => {
     return yargs
         .help()
 }
-export const handler = (argv: QueryKeyValuesRequest) => {
-    return getQuerySdk()
+export const handler = (argv: QueryKeyValuesRequest & {node: string}) => {
+    return getQuerySdk(argv.node)
         .then(sdk => sdk.db.q.KeyValues({
             uuid: argv.uuid
         }))

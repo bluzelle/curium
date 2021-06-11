@@ -8,8 +8,8 @@ export const builder = (yargs: Argv) => {
     return yargs
         .help()
 }
-export const handler = (argv: QueryHasRequest) => {
-    return getQuerySdk()
+export const handler = (argv: QueryHasRequest & {node: string}) => {
+    return getQuerySdk(argv.node)
         .then(sdk => sdk.db.q.Has({
             uuid: argv.uuid,
             key: argv.key
