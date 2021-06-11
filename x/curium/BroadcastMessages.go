@@ -58,7 +58,7 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) func(
 
 		txBuilder.SetFeeAmount(types.NewCoins(types.NewCoin("ubnt", types.NewInt(10000000))))
 		txBuilder.SetMemo("memo")
-		txBuilder.SetTimeoutHeight(uint64(ctx.BlockHeight() + 2))
+		txBuilder.SetTimeoutHeight(uint64(ctx.BlockHeight() + 20))
 
 		kr, err := keyring.New("curium", keyring.BackendTest, keyringDir, nil)
 		if err != nil {
@@ -131,7 +131,7 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) func(
 		}
 		defer grpcConn.Close()
 
-		txCtx, _ := context.WithDeadline(context.Background(), time.Now().Add(time.Second*60))
+		txCtx, _ := context.WithDeadline(context.Background(), time.Now().Add(time.Second*20))
 
 		// Broadcast the tx via gRPC. We create a new client for the Protobuf Tx
 		// service.
