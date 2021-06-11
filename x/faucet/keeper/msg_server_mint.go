@@ -10,6 +10,8 @@ import (
 func (k msgServer) Mint(goCtx context.Context, msg *types.MsgMint) (*types.MsgMintResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	k.Logger(ctx).Debug("mint message received", "msg", msg)
+
 	addr, err := sdk.AccAddressFromBech32(msg.Address)
 	if err != nil {
 		return nil, err
@@ -23,6 +25,9 @@ func (k msgServer) Mint(goCtx context.Context, msg *types.MsgMint) (*types.MsgMi
 	if err != nil {
 		return nil, err
 	}
+
+	k.Logger(ctx).Debug("coins minted", "msg", msg)
+
 
 	return &types.MsgMintResponse{}, nil
 }
