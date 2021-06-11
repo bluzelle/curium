@@ -131,7 +131,7 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) func(
 		}
 		defer grpcConn.Close()
 
-		txCtx, _ := context.WithDeadline(context.Background(), time.Now().Add(time.Second*20))
+		txCtx, _ := context.WithDeadline(context.Background(), time.Now().Add(time.Second*60))
 
 		// Broadcast the tx via gRPC. We create a new client for the Protobuf Tx
 		// service.
