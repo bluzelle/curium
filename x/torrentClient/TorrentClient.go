@@ -91,7 +91,6 @@ func (tc *TorrentClient) AddPeer(id string, ip string, port int) {
 	b := &strings.Builder{}
 	b.WriteString(fmt.Sprintf("%s:%d", ip, port))
 
-
 	var arr [20]byte
 	copy(arr[:], id)
 	peerInfo := torrent.PeerInfo{

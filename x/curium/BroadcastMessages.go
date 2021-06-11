@@ -17,7 +17,8 @@ import (
 	"time"
 )
 
-type KeyRingReader struct {keyringDir string}
+type KeyRingReader struct{ keyringDir string }
+
 func NewKeyRingReader(keyringDir string) *KeyRingReader {
 	return &KeyRingReader{
 		keyringDir: keyringDir,
@@ -36,10 +37,10 @@ func (krr KeyRingReader) GetAddress(name string) (sdk.AccAddress, error) {
 
 }
 
+type MsgBroadcaster func(ctx sdk.Context, msgs []types.Msg, from string) (*txtypes.BroadcastTxResponse, error)
 
-type MsgBroadcaster func (ctx sdk.Context, msgs []types.Msg, from string) (*txtypes.BroadcastTxResponse, error)
-func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) func(ctx sdk.Context, msgs []types.Msg, from string)(*txtypes.BroadcastTxResponse, error) {
-	return func (ctx sdk.Context, msgs []types.Msg, from string) (*txtypes.BroadcastTxResponse, error) {
+func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) func(ctx sdk.Context, msgs []types.Msg, from string) (*txtypes.BroadcastTxResponse, error) {
+	return func(ctx sdk.Context, msgs []types.Msg, from string) (*txtypes.BroadcastTxResponse, error) {
 		// Choose your codec: Amino or Protobuf. Here, we use Protobuf, given by the
 		// following function.
 		encCfg := simapp.MakeTestEncodingConfig()
@@ -130,7 +131,7 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) func(
 		}
 		defer grpcConn.Close()
 
-		txCtx, _ := context.WithDeadline(context.Background(), time.Now().Add(time.Second*10))
+		txCtx, _ := context.WithDeadline(context.Background(), time.Now().Add(time.Second*20))
 
 		// Broadcast the tx via gRPC. We create a new client for the Protobuf Tx
 		// service.
@@ -154,4 +155,3 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) func(
 	}
 
 }
-

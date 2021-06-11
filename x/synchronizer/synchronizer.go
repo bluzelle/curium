@@ -59,7 +59,7 @@ func StartSynchronizer(ctx sdk.Context, k keeper.Keeper) {
 				now := time.Now()
 				waitTime := now.Truncate(time.Minute).Add(time.Minute).Sub(now)
 				c := time.After(waitTime)
-				<- c
+				<-c
 				runSynchronizer(&k)
 			}
 		}()

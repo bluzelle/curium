@@ -148,7 +148,7 @@ func (k Keeper) GetNumKeysOwned(ctx *sdk.Context, uuid string) (int, error) {
 	var numKeys = 0
 
 	for ; iterator.Valid(); iterator.Next() {
-		numKeys+=1
+		numKeys += 1
 	}
 	return numKeys, nil
 }

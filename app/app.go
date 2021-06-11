@@ -92,6 +92,9 @@ import (
 	"github.com/bluzelle/curium/x/crud"
 	crudkeeper "github.com/bluzelle/curium/x/crud/keeper"
 	crudtypes "github.com/bluzelle/curium/x/crud/types"
+	"github.com/bluzelle/curium/x/faucet"
+	faucetkeeper "github.com/bluzelle/curium/x/faucet/keeper"
+	faucettypes "github.com/bluzelle/curium/x/faucet/types"
 	"github.com/bluzelle/curium/x/nft"
 	nftkeeper "github.com/bluzelle/curium/x/nft/keeper"
 	nfttypes "github.com/bluzelle/curium/x/nft/types"
@@ -148,6 +151,7 @@ var (
 		vesting.AppModuleBasic{},
 		curium.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
+		faucet.AppModuleBasic{},
 		nft.AppModuleBasic{},
 		voting.AppModuleBasic{},
 		synchronizer.AppModuleBasic{},
@@ -163,6 +167,7 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
+		faucettypes.ModuleName:			{authtypes.Minter},
 	}
 )
 
@@ -220,6 +225,8 @@ type App struct {
 	curiumKeeper curiumkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
+	faucetKeeper faucetkeeper.Keeper
+
 	nftKeeper nftkeeper.Keeper
 
 	votingKeeper *votingkeeper.Keeper
@@ -239,7 +246,7 @@ type App struct {
 func New(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool, skipUpgradeHeights map[int64]bool,
 	homePath string, invCheckPeriod uint, encodingConfig appparams.EncodingConfig,
-// this line is used by starport scaffolding # stargate/app/newArgument
+	// this line is used by starport scaffolding # stargate/app/newArgument
 	appOpts servertypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),
 ) *App {
 	appCodec := encodingConfig.Marshaler
@@ -259,6 +266,7 @@ func New(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		curiumtypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
+		faucettypes.StoreKey,
 		nfttypes.StoreKey,
 		votingtypes.StoreKey,
 		synchronizertypes.StoreKey,
@@ -362,12 +370,21 @@ func New(
 	msgBroadcaster := curium.NewMsgBroadcaster(&app.AccountKeeper, cast.ToString(appOpts.Get(flags.FlagHome)))
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
+	app.faucetKeeper = *faucetkeeper.NewKeeper(
+		appCodec,
+		keys[faucettypes.StoreKey],
+		keys[faucettypes.MemStoreKey],
+		app.BankKeeper,
+		msgBroadcaster,
+		curium.NewKeyRingReader(appOpts.Get(flags.FlagHome).(string)),
+	)
+	faucetModule := faucet.NewAppModule(appCodec, app.faucetKeeper)
 
 	app.nftKeeper = *nftkeeper.NewKeeper(
 		appCodec,
 		keys[nfttypes.StoreKey],
 		keys[nfttypes.MemStoreKey],
-		appOpts.Get(flags.FlagHome).(string) + "/" + appOpts.Get("nft-file-dir").(string),
+		appOpts.Get(flags.FlagHome).(string)+"/"+appOpts.Get("nft-file-dir").(string),
 		int(appOpts.Get("nft-p2p-port").(int64)),
 		msgBroadcaster,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
@@ -464,6 +481,7 @@ func New(
 		transferModule,
 		curium.NewAppModule(appCodec, app.curiumKeeper),
 		// this line is used by starport scaffolding # stargate/app/appModule
+		faucetModule,
 		nftModule,
 		votingModule,
 		synchronizerModule,
@@ -502,6 +520,7 @@ func New(
 		ibctransfertypes.ModuleName,
 		curiumtypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
+		faucettypes.ModuleName,
 		nfttypes.ModuleName,
 		votingtypes.ModuleName,
 		synchronizertypes.ModuleName,
@@ -689,6 +708,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
+	paramsKeeper.Subspace(faucettypes.ModuleName)
 	paramsKeeper.Subspace(nfttypes.ModuleName)
 	paramsKeeper.Subspace(votingtypes.ModuleName)
 	paramsKeeper.Subspace(synchronizertypes.ModuleName)

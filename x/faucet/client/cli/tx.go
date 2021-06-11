@@ -8,7 +8,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	// "github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/bluzelle/curium/x/voting/types"
+	"github.com/bluzelle/curium/x/faucet/types"
 )
 
 var (
@@ -30,6 +30,7 @@ func GetTxCmd() *cobra.Command {
 	}
 
 	// this line is used by starport scaffolding # 1
+	cmd.AddCommand(CmdMint())
 
 	return cmd
 }
