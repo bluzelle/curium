@@ -1,7 +1,7 @@
 import {Argv} from "yargs";
-import {getSdk} from "../../../../../sdk/ts/test/helpers/client-helpers/sdk-helpers";
-import {QueryMyKeysRequest} from "../../../../../sdk/ts/src/codec/crud/query";
+
 import {getQuerySdk} from "../../../helpers/sdk-helpers";
+import {QueryMyKeysRequest} from "@bluzelle/sdk-js/lib/codec/crud/query";
 
 export const command = 'myKeys <address> <uuid>'
 export const desc = 'Read all keys in uuid owned by given address'
