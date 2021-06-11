@@ -32,7 +32,7 @@ func NewKeeper(cdc codec.Marshaler, storeKey, memKey sdk.StoreKey, laddr string)
 		cdc:      cdc,
 		storeKey: storeKey,
 		memKey:   memKey,
-		rpcPort: port,
+		rpcPort:  port,
 	}
 }
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
@@ -49,8 +49,6 @@ func (k Keeper) IsCaughtUp() bool {
 	lastBlockTime = time.Now()
 	return result
 }
-
-
 
 type NetInfoResult struct {
 	Result NetInfo `json:"result"`
@@ -104,12 +102,14 @@ func (k Keeper) GetNetInfo() (*NetInfo, error) {
 
 func (k Keeper) MyRemoteIp() (string, error) {
 	bz, err := httpGet("https://api.ipify.org?format=json")
-	if err != nil {return "", err}
+	if err != nil {
+		return "", err
+	}
 	var result map[string]string
 	json.Unmarshal(bz, &result)
 	return result["ip"], nil
-// TODO: NEEDED FOR LOCAL TESTING
-//return "127.0.0.1", nil
+	// TODO: NEEDED FOR LOCAL TESTING
+	//return "127.0.0.1", nil
 }
 
 func httpGet(url string) ([]byte, error) {
@@ -121,4 +121,3 @@ func httpGet(url string) ([]byte, error) {
 	body, err := io.ReadAll(resp.Body)
 	return body, err
 }
-

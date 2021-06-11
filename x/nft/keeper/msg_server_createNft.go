@@ -28,10 +28,8 @@ func (k msgServer) CreateNft(goCtx context.Context, msg *types.MsgCreateNft) (*t
 	if err != nil {
 		return nil, sdkerrors.New("nft", 2, fmt.Sprintf("unable to move nft files: %s", msg.Hash))
 	}
-	
 
-
-	if _, err := os.Stat(k.homeDir+"/nft/" + msg.Hash); err == nil {
+	if _, err := os.Stat(k.homeDir + "/nft/" + msg.Hash); err == nil {
 		metainfo, err := k.btClient.TorrentFromFile(msg.Hash)
 		if err != nil {
 			return nil, sdkerrors.New("nft", 2, fmt.Sprintf("unable to create torrent for file", msg.Hash))
@@ -52,14 +50,11 @@ func (k msgServer) CreateNft(goCtx context.Context, msg *types.MsgCreateNft) (*t
 	if err != nil {
 		return nil, sdkerrors.New("nft", 2, fmt.Sprintf("unable to create torrent:  %s", msg.Hash))
 	}
-	
-	
 
 	return &types.MsgCreateNftResponse{
 		Id: msg.Id,
 	}, nil
 }
-
 
 func (k Keeper) seedFile(ctx sdk.Context, metainfo *metainfo.MetaInfo) error {
 	err := k.btClient.SeedFile(metainfo)
@@ -69,7 +64,7 @@ func (k Keeper) seedFile(ctx sdk.Context, metainfo *metainfo.MetaInfo) error {
 	return nil
 }
 
-func (k Keeper) broadcastPublishFile(ctx sdk.Context, id, hash string, metainfo *metainfo.MetaInfo) error{
+func (k Keeper) broadcastPublishFile(ctx sdk.Context, id, hash string, metainfo *metainfo.MetaInfo) error {
 	metaBytes, err := bencode.EncodeBytes(metainfo)
 	if err != nil {
 		return err
@@ -81,9 +76,9 @@ func (k Keeper) broadcastPublishFile(ctx sdk.Context, id, hash string, metainfo 
 	}
 
 	publishMsg := types.MsgPublishFile{
-		Creator: addr.String(),
-		Id:      id,
-		Hash: hash,
+		Creator:  addr.String(),
+		Id:       id,
+		Hash:     hash,
 		Metainfo: metaBytes,
 	}
 

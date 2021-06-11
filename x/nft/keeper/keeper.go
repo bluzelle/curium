@@ -18,16 +18,16 @@ import (
 
 type (
 	Keeper struct {
-		cdc         codec.Marshaler
-		storeKey    sdk.StoreKey
-		memKey      sdk.StoreKey
-		btClient    *torrentClient.TorrentClient
-		btDirectory string
-		btPort      int
+		cdc            codec.Marshaler
+		storeKey       sdk.StoreKey
+		memKey         sdk.StoreKey
+		btClient       *torrentClient.TorrentClient
+		btDirectory    string
+		btPort         int
 		msgBroadcaster curium.MsgBroadcaster
-		homeDir string
-		keyringReader *curium.KeyRingReader
-		curiumKeeper *curiumkeeper.Keeper
+		homeDir        string
+		keyringReader  *curium.KeyRingReader
+		curiumKeeper   *curiumkeeper.Keeper
 		// this line is used by starport scaffolding # ibc/keeper/attribute
 	}
 )
@@ -52,16 +52,16 @@ func NewKeeper(
 		panic(err)
 	}
 	return &Keeper{
-		cdc:         cdc,
-		storeKey:    storeKey,
-		memKey:      memKey,
-		btClient:    btClient,
-		btDirectory: btDirectory,
-		btPort:      btPort,
+		cdc:            cdc,
+		storeKey:       storeKey,
+		memKey:         memKey,
+		btClient:       btClient,
+		btDirectory:    btDirectory,
+		btPort:         btPort,
 		msgBroadcaster: msgBroadcaster,
-		homeDir: homeDir,
-		keyringReader: keyringReader,
-		curiumKeeper: curiumKeeper,
+		homeDir:        homeDir,
+		keyringReader:  keyringReader,
+		curiumKeeper:   curiumKeeper,
 		// this line is used by starport scaffolding # ibc/keeper/return
 	}
 }
@@ -79,9 +79,9 @@ func (k Keeper) GetPeerStore(ctx sdk.Context) prefix.Store {
 	return prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.PeerKey))
 }
 
-func (k Keeper) CheckIsNftAdmin(address string) error{
+func (k Keeper) CheckIsNftAdmin(address string) error {
 	nftAdmin, err := k.keyringReader.GetAddress("nft")
-	if err !=  nil {
+	if err != nil {
 		return sdkerrors.New("nft", 1, fmt.Sprintf("peer request with invalid admin: %s", err.Error()))
 	}
 	if address != nftAdmin.String() {
@@ -90,7 +90,7 @@ func (k Keeper) CheckIsNftAdmin(address string) error{
 	return nil
 }
 
-func (k Keeper) GetMyNodeId(ctx sdk.Context) string{
+func (k Keeper) GetMyNodeId(ctx sdk.Context) string {
 	status, err := k.curiumKeeper.GetStatus()
 	if err != nil {
 		k.Logger(ctx).Error("unable to get node id", err)
@@ -124,5 +124,3 @@ func (k Keeper) BroadcastRegisterBtPeer(ctx sdk.Context) {
 		fmt.Println(result)
 	}
 }
-
-

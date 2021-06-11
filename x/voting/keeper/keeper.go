@@ -23,16 +23,16 @@ import (
 
 type (
 	Keeper struct {
-		cdc           codec.Marshaler
-		storeKey      sdk.StoreKey
-		memKey        sdk.StoreKey
-		stakingKeeper stakingkeeper.Keeper
+		cdc            codec.Marshaler
+		storeKey       sdk.StoreKey
+		memKey         sdk.StoreKey
+		stakingKeeper  stakingkeeper.Keeper
 		msgBroadcaster curium.MsgBroadcaster
-		homeDir       string
-		accKeeper     authkeeper.AccountKeeper
-		voteQueue     []*types.MsgVote
-		proofQueue    []*types.MsgVoteProof
-		voteHandlers  map[string]types.VoteHandler
+		homeDir        string
+		accKeeper      authkeeper.AccountKeeper
+		voteQueue      []*types.MsgVote
+		proofQueue     []*types.MsgVoteProof
+		voteHandlers   map[string]types.VoteHandler
 
 		// this line is used by starport scaffolding # ibc/keeper/attribute
 	}
@@ -46,16 +46,16 @@ func NewKeeper(
 	msgBroadcaster curium.MsgBroadcaster,
 	homeDir string,
 
-// this line is used by starport scaffolding # ibc/keeper/parameter
+	// this line is used by starport scaffolding # ibc/keeper/parameter
 ) *Keeper {
 	return &Keeper{
-		cdc:           cdc,
-		storeKey:      storeKey,
-		memKey:        memKey,
-		stakingKeeper: stakingKeeper,
+		cdc:            cdc,
+		storeKey:       storeKey,
+		memKey:         memKey,
+		stakingKeeper:  stakingKeeper,
 		msgBroadcaster: msgBroadcaster,
 		homeDir:        homeDir,
-		voteHandlers:  map[string]types.VoteHandler{},
+		voteHandlers:   map[string]types.VoteHandler{},
 		// this line is used by starport scaffolding # ibc/keeper/return
 	}
 }
