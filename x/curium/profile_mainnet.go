@@ -1,6 +1,7 @@
 // +build !testnet
 
 package curium
+import "fmt"
 
 
 func init() {
