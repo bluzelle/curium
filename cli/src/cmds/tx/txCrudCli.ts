@@ -6,9 +6,7 @@ export const desc = 'transaction crud method'
 
 export const builder = (yargs: Argv) => {
     return yargs
-        .commandDir(join(__dirname,`crud`),{
-            extensions: ['ts']
-        })
+        .commandDir(join(__dirname,`crud`))
         .option('from', {
             describe: 'payer address',
             type: "string"

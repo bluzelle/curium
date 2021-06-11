@@ -7,9 +7,7 @@ export const desc = 'query method'
 export const aliases = ['query']
 export const builder = (yargs: Argv) => {
     return yargs
-        .commandDir(join(__dirname,`q`),{
-        extensions: ['ts']
-    })
+        .commandDir(join(__dirname,`q`))
         .help()
         .demandCommand()
 }
