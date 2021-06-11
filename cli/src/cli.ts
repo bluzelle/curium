@@ -1,6 +1,5 @@
-
+#!/usr/bin/env node
 import yargs from 'yargs'
-import {getSdk} from "../../sdk/ts/test/helpers/client-helpers/sdk-helpers";
 
 import {join} from 'path'
 

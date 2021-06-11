@@ -1,5 +1,4 @@
 import {Arguments, Argv} from "yargs";
-import yargs from 'yargs'
 import {join} from "path";
 
 

@@ -1,4 +1,4 @@
-import yargs, {Argv} from "yargs";
+import {Argv} from "yargs";
 import {join} from "path";
 
 

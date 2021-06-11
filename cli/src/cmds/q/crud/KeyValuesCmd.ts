@@ -1,7 +1,9 @@
 import {Argv} from "yargs";
-import {getSdk} from "../../../../../sdk/ts/test/helpers/client-helpers/sdk-helpers";
-import {QueryKeyValuesRequest} from "../../../../../sdk/ts/src/codec/crud/query";
-import {KeyValue} from "../../../../../sdk/ts/src/codec/crud/KeyValue";
+
+
+import {getQuerySdk} from "../../../helpers/sdk-helpers";
+import {KeyValue} from "@bluzelle/sdk-js/lib/codec/crud/KeyValue";
+import {QueryKeyValuesRequest} from "@bluzelle/sdk-js/lib/codec/crud/query";
 
 export const command = 'keyValues <uuid>'
 export const desc = 'Read all keys-values in uuid from the database'
@@ -10,7 +12,7 @@ export const builder = (yargs: Argv) => {
         .help()
 }
 export const handler = (argv: QueryKeyValuesRequest) => {
-    return getSdk()
+    return getQuerySdk()
         .then(sdk => sdk.db.q.KeyValues({
             uuid: argv.uuid
         }))

@@ -1,6 +1,6 @@
 import {Argv} from "yargs";
-import {getSdk} from "../../../../../sdk/ts/test/helpers/client-helpers/sdk-helpers";
-import {QueryHasRequest} from "../../../../../sdk/ts/src/codec/crud/query";
+import {getQuerySdk} from "../../../helpers/sdk-helpers";
+import {QueryHasRequest} from "@bluzelle/sdk-js/lib/codec/crud/query";
 
 export const command = 'has <uuid> <key>'
 export const desc = 'Check if the specified key exists in given uuid'
@@ -9,7 +9,7 @@ export const builder = (yargs: Argv) => {
         .help()
 }
 export const handler = (argv: QueryHasRequest) => {
-    return getSdk()
+    return getQuerySdk()
         .then(sdk => sdk.db.q.Has({
             uuid: argv.uuid,
             key: argv.key

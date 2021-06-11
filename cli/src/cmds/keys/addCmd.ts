@@ -1,9 +1,8 @@
 import {Argv} from "yargs";
-import * as fs from "fs"
-import {newMnemonic} from "../../../../sdk/ts/src/bz-sdk/bz-sdk";
+
 import path from "path";
-import {Some} from "monet";
 import {promises} from "fs";
+import {newMnemonic} from "@bluzelle/sdk-js";
 
 export const command = 'add <user>'
 export const desc = 'Add key to local system and generate mnemonic'

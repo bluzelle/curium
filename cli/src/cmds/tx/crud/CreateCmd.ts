@@ -1,17 +1,17 @@
-import {defaultLease, getSdk} from "../../../../../sdk/ts/test/helpers/client-helpers/sdk-helpers";
-import {Argv} from "yargs";
-import * as CrudMsgTypes from "../../../../../sdk/ts/lib/codec/crud/tx";
+
+import {Argv,} from "yargs";
 import {TextEncoder} from "util";
-import {bluzelle} from "../../../../../sdk/ts/src/bz-sdk/bz-sdk";
+import {getSdkByName} from "../../../helpers/sdk-helpers";
 
 
 export const getCrudCmdType = (cmd: string, msgTypes: Record<string, any>): any =>
     msgTypes[cmd];
 
-export const command = 'crud Create [uuid] [key] [value]'
+export const command = 'create <uuid> <key> <value> <lease>'
 export const desc = 'Create a key-value from the database'
 export const builder = (yargs: Argv) => {
     return yargs
+        .command('uuid', 'uuid to create key-value in')
         .option('from', {
             describe: 'payer address',
             type: "string"
@@ -24,26 +24,27 @@ export const builder = (yargs: Argv) => {
             describe: 'minimum gas price in ubnt i.e. 0.02ubnt',
             type: "string"
         })
-        .demandOption(['from', 'gas', 'gas_price'], 'Must fill transaction details')
+        .option('node', {
+            describe: 'node to connect to',
+            type: 'string'
+        })
+        .demandOption(['from', 'gas', 'gas_price', 'node'], 'Must fill transaction details')
         .help()
         .argv
 }
-export const handler = (argv: {uuid: string, key: string, value: string, from: string, gas: string, gas_price: string}) => {
-    return bluzelle({
-        gasPrice: parseFloat(argv.gas_price),
-        maxGas: parseInt(argv.gas),
-        url: "http://localhost:26657"
-    })
+export const handler = (argv: {uuid: string, key: string, value: string, from: string, gas: string, gas_price: string, node: string}) => {
+    return getSdkByName(argv.from, argv.gas_price, argv.gas, argv.node)
+        .then(x => x)
         .then(sdk =>
             sdk.db.tx.Create({
                 creator: sdk.db.address,
                 uuid: argv.uuid,
                 key: argv.key,
                 value: new TextEncoder().encode(argv.value),
-                lease: defaultLease,
+                lease: {days: 0, years: 0, minutes: 0, seconds: 0, hours: 0},
                 metadata: new Uint8Array()
             })
         )
-        .then(x => x)
         .then(console.log.bind(null, "KEY-VALUE SUCCESSFULLY CREATED"))
+        .catch(x => x)
 }

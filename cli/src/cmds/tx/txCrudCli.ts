@@ -2,7 +2,7 @@ import {Arguments, Argv} from "yargs";
 import {join} from "path";
 
 export const command = 'crud <method>'
-export const desc = 'query crud method'
+export const desc = 'transaction crud method'
 
 export const builder = (yargs: Argv) => {
     return yargs

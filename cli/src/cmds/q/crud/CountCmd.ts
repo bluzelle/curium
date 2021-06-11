@@ -1,6 +1,7 @@
 import {Argv} from "yargs";
-import {getSdk} from "../../../../../sdk/ts/test/helpers/client-helpers/sdk-helpers";
-import {QueryCountRequest} from "../../../../../sdk/ts/src/codec/crud/query";
+
+import {getQuerySdk} from "../../../helpers/sdk-helpers";
+import {QueryCountRequest} from "@bluzelle/sdk-js/lib/codec/crud/query";
 
 export const command = 'count <uuid>'
 export const desc = 'Query total number of key-values in given uuid'
@@ -9,7 +10,7 @@ export const builder = (yargs: Argv) => {
         .help()
 }
 export const handler = (argv: QueryCountRequest) => {
-    return getSdk()
+    return getQuerySdk()
         .then(sdk => sdk.db.q.Count({
             uuid: argv.uuid,
         }))

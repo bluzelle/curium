@@ -1,6 +1,6 @@
 import {Argv} from "yargs";
-import {getSdk} from "../../../../../sdk/ts/test/helpers/client-helpers/sdk-helpers";
-import {QueryKeysRequest} from "../../../../../sdk/ts/src/codec/crud/query";
+import {getQuerySdk} from "../../../helpers/sdk-helpers";
+import {QueryKeysRequest} from "@bluzelle/sdk-js/lib/codec/crud/query";
 
 export const command = 'keys <uuid>'
 export const desc = 'Read all keys in uuid from the database'
@@ -9,7 +9,7 @@ export const builder = (yargs: Argv) => {
         .help()
 }
 export const handler = (argv: QueryKeysRequest) => {
-    return getSdk()
+    return getQuerySdk()
         .then(sdk => sdk.db.q.Keys({
             uuid: argv.uuid
         }))

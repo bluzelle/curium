@@ -1,6 +1,8 @@
-import {getSdk} from "../../../../../sdk/ts/test/helpers/client-helpers/sdk-helpers";
-import {Arguments, Argv} from "yargs";
-import {QueryReadRequest} from "../../../../../sdk/ts/src/codec/crud/query";
+
+import {Argv} from "yargs";
+
+import {getQuerySdk} from "../../../helpers/sdk-helpers";
+import {QueryReadRequest} from "@bluzelle/sdk-js/lib/codec/crud/query";
 
 export const command = 'read <uuid> <key>'
 export const desc = 'Read a key-value from the database'
@@ -9,7 +11,7 @@ export const builder = (yargs: Argv) => {
         .help()
 }
 export const handler = (argv: QueryReadRequest) => {
-    return getSdk()
+    return getQuerySdk()
         .then(sdk => sdk.db.q.Read({
             uuid: argv.uuid,
             key: argv.key

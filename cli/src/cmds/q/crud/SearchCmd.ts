@@ -1,7 +1,7 @@
 import {Argv} from "yargs";
-import {getSdk} from "../../../../../sdk/ts/test/helpers/client-helpers/sdk-helpers";
-import {QuerySearchRequest} from "../../../../../sdk/ts/src/codec/crud/query";
-import {KeyValue} from "../../../../../sdk/ts/src/codec/crud/KeyValue";
+import {getQuerySdk} from "../../../helpers/sdk-helpers";
+import {QuerySearchRequest} from "@bluzelle/sdk-js/lib/codec/crud/query";
+import {KeyValue} from "@bluzelle/sdk-js/lib/codec/crud/KeyValue";
 
 export const command = 'search <uuid> <searchString>'
 export const desc = 'Search uuid according to given search string'
@@ -10,7 +10,7 @@ export const builder = (yargs: Argv) => {
         .help()
 }
 export const handler = (argv: QuerySearchRequest) => {
-    return getSdk()
+    return getQuerySdk()
         .then(sdk => sdk.db.q.Search({
             uuid: argv.uuid,
             searchString: argv.searchString
