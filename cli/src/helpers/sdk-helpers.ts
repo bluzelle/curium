@@ -6,7 +6,7 @@ import {bluzelle, BluzelleSdk} from "@bluzelle/sdk-js";
 export const getSdkByName = (name: string, gasPrice: string, gas: string, url: string): Promise<BluzelleSdk> => {
     return promises.readFile(path.resolve(__dirname, `${process.env.HOME}/.curium/${name}.txt`))
         .then(mnemonic => bluzelle({
-            gasPrice: parseInt(gasPrice),
+            gasPrice: parseFloat(gasPrice),
             maxGas: parseInt(gas),
             url,
             mnemonic: mnemonic.toString()

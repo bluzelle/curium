@@ -1,20 +1,22 @@
-
 import {Argv,} from "yargs";
 import {TextEncoder} from "util";
 import {getSdkByName} from "../../../helpers/sdk-helpers";
 
-export const command = 'create <uuid> <key> <value> <lease>'
-export const desc = 'Create a key-value from the database'
+
+export const getCrudCmdType = (cmd: string, msgTypes: Record<string, any>): any =>
+    msgTypes[cmd];
+
+export const command = 'upsert <uuid> <key> <value> <lease>'
+export const desc = 'Upsert a key-value from the database'
 export const builder = (yargs: Argv) => {
     return yargs
-        .usage('create [uuid] [key] [value] [lease]')
+        .usage('upsert [uuid] [key] [value] [lease]')
         .help()
 }
 export const handler = (argv: {uuid: string, key: string, value: string, lease: string, from: string, gas: string, gas_price: string, node: string}) => {
     return getSdkByName(argv.from, argv.gas_price, argv.gas, argv.node)
-        .then(x => x)
         .then(sdk =>
-            sdk.db.tx.Create({
+            sdk.db.tx.Upsert({
                 creator: sdk.db.address,
                 uuid: argv.uuid,
                 key: argv.key,
@@ -23,5 +25,5 @@ export const handler = (argv: {uuid: string, key: string, value: string, lease: 
                 metadata: new Uint8Array()
             })
         )
-        .then(console.log.bind(null, "KEY-VALUE SUCCESSFULLY CREATED"))
+        .then(console.log.bind(null, "KEY-VALUE SUCCESSFULLY UPSERTED"))
 }
