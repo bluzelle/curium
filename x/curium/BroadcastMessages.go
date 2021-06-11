@@ -58,7 +58,7 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) func(
 
 		txBuilder.SetFeeAmount(types.NewCoins(types.NewCoin("ubnt", types.NewInt(10000000))))
 		txBuilder.SetMemo("memo")
-		txBuilder.SetTimeoutHeight(uint64(ctx.BlockHeight() + 2))
+		txBuilder.SetTimeoutHeight(uint64(ctx.BlockHeight() + 6))
 
 		kr, err := keyring.New("curium", keyring.BackendTest, keyringDir, nil)
 		if err != nil {
