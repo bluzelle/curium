@@ -1,9 +1,15 @@
-// +build !testnet
+// +build testnet
 
 package curium
 
+import "fmt"
+
+func init() {
+	fmt.Println("******* Starting in testnet mode ********")
+}
+
 func IsTestnet() bool {
-	return false
+	return true
 }
 
 func IsMainnet() bool {
