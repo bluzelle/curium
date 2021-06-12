@@ -16,9 +16,6 @@ func (k msgServer) Read(goCtx context.Context, msg *types.MsgRead) (*types.MsgRe
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %s doesn't exist", msg.Key))
 	}
 
-	return &types.MsgReadResponse{
-		Value: k.GetCrudValue(&ctx, msg.Uuid, msg.Key).Value,
-		Key:   msg.Key,
-	}, nil
+	return &types.MsgReadResponse{}, nil
 
 }
