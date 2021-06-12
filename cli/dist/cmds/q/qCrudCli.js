@@ -9,7 +9,8 @@ var builder = function (yargs) {
         .commandDir(path_1.join(__dirname, "crud"))
         .option('node', {
         describe: 'node to connect to',
-        type: 'string'
+        type: 'string',
+        default: 'http://localhost:26657'
     })
         .help()
         .demandCommand();

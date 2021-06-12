@@ -10,7 +10,7 @@ var builder = function (yargs) {
 };
 exports.builder = builder;
 var handler = function (argv) {
-    return sdk_helpers_1.getQuerySdk()
+    return sdk_helpers_1.getQuerySdk(argv.node)
         .then(function (sdk) { return sdk.db.q.GetLease({
         uuid: argv.uuid,
         key: argv.key

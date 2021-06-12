@@ -10,11 +10,11 @@ var builder = function (yargs) {
 };
 exports.builder = builder;
 var handler = function (argv) {
-    return sdk_helpers_1.getQuerySdk()
-        // .then(sdk => sdk.db.q.Count({
-        //     uuid: argv.uuid
-        // }))
-        // .then(data => data.count)
+    return sdk_helpers_1.getQuerySdk(argv.node)
+        .then(function (sdk) { return sdk.db.q.Count({
+        uuid: argv.uuid
+    }); })
+        .then(function (data) { return data.count; })
         .then(console.log);
 };
 exports.handler = handler;

@@ -3,7 +3,7 @@ import {join} from "path";
 
 
 export const command = 'q <module>'
-export const desc = 'query method'
+export const desc = 'query method for specified module'
 export const aliases = ['query']
 export const builder = (yargs: Argv) => {
     return yargs
