@@ -1,6 +1,9 @@
 package app
 
 import (
+//	"github.com/bluzelle/curium/x/voting"
+	//votingkeeper "github.com/bluzelle/curium/x/voting/keeper"
+	//votingtypes "github.com/bluzelle/curium/x/voting/types"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/server"
 	"io"
@@ -101,9 +104,9 @@ import (
 //	"github.com/bluzelle/curium/x/synchronizer"
 //	synchronizerkeeper "github.com/bluzelle/curium/x/synchronizer/keeper"
 //	synchronizertypes "github.com/bluzelle/curium/x/synchronizer/types"
-	"github.com/bluzelle/curium/x/voting"
-	votingkeeper "github.com/bluzelle/curium/x/voting/keeper"
-	votingtypes "github.com/bluzelle/curium/x/voting/types"
+//	"github.com/bluzelle/curium/x/voting"
+//	votingkeeper "github.com/bluzelle/curium/x/voting/keeper"
+//	votingtypes "github.com/bluzelle/curium/x/voting/types"
 )
 
 const Name = "curium"
@@ -153,7 +156,7 @@ var (
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 		faucet.AppModuleBasic{},
 		nft.AppModuleBasic{},
-		voting.AppModuleBasic{},
+//		voting.AppModuleBasic{},
 //		synchronizer.AppModuleBasic{},
 		crud.AppModuleBasic{},
 	)
@@ -229,7 +232,7 @@ type App struct {
 
 	nftKeeper nftkeeper.Keeper
 
-	votingKeeper *votingkeeper.Keeper
+//	votingKeeper *votingkeeper.Keeper
 
 //	synchronizerKeeper synchronizerkeeper.Keeper
 
@@ -268,7 +271,7 @@ func New(
 		// this line is used by starport scaffolding # stargate/app/storeKey
 		faucettypes.StoreKey,
 		nfttypes.StoreKey,
-		votingtypes.StoreKey,
+//		votingtypes.StoreKey,
 //		synchronizertypes.StoreKey,
 		crudtypes.StoreKey,
 	)
@@ -394,15 +397,15 @@ func New(
 
 	nftModule := nft.NewAppModule(appCodec, app.nftKeeper)
 
-	app.votingKeeper = votingkeeper.NewKeeper(
-		appCodec,
-		keys[votingtypes.StoreKey],
-		keys[votingtypes.MemStoreKey],
-		app.StakingKeeper,
-		msgBroadcaster,
-		cast.ToString(appOpts.Get(flags.FlagHome)),
-	)
-	votingModule := voting.NewAppModule(appCodec, app.votingKeeper)
+	//app.votingKeeper = votingkeeper.NewKeeper(
+	//	appCodec,
+	//	keys[votingtypes.StoreKey],
+	//	keys[votingtypes.MemStoreKey],
+	//	app.StakingKeeper,
+	//	msgBroadcaster,
+	//	cast.ToString(appOpts.Get(flags.FlagHome)),
+	//)
+	//votingModule := voting.NewAppModule(appCodec, app.votingKeeper)
 
 	minGasPriceString := cast.ToString(appOpts.Get(server.FlagMinGasPrices))
 	minGasPriceCoins, _ := sdk.ParseDecCoins(minGasPriceString)
@@ -483,7 +486,7 @@ func New(
 		// this line is used by starport scaffolding # stargate/app/appModule
 		faucetModule,
 		nftModule,
-		votingModule,
+//		votingModule,
 //		synchronizerModule,
 		crudModule,
 	)
@@ -497,7 +500,7 @@ func New(
 		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName, crudtypes.ModuleName,
 	)
 
-	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, /*synchronizertypes.ModuleName,*/ votingtypes.ModuleName, nfttypes.ModuleName, crudtypes.ModuleName)
+	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, /*synchronizertypes.ModuleName, votingtypes.ModuleName ,*/ nfttypes.ModuleName, crudtypes.ModuleName)
 
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
@@ -522,7 +525,7 @@ func New(
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 		faucettypes.ModuleName,
 		nfttypes.ModuleName,
-		votingtypes.ModuleName,
+//		votingtypes.ModuleName,
 //		synchronizertypes.ModuleName,
 		crudtypes.ModuleName,
 	)
@@ -710,7 +713,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 	paramsKeeper.Subspace(faucettypes.ModuleName)
 	paramsKeeper.Subspace(nfttypes.ModuleName)
-	paramsKeeper.Subspace(votingtypes.ModuleName)
+//	paramsKeeper.Subspace(votingtypes.ModuleName)
 //	paramsKeeper.Subspace(synchronizertypes.ModuleName)
 	paramsKeeper.Subspace(crudtypes.ModuleName)
 
