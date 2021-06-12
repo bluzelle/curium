@@ -13,8 +13,8 @@ export const getSdk = (): Promise<BluzelleSdk> => {
     return bluzelle({
         mnemonic: localChain.mnemonic,
         url: localChain.endpoint,
-        gasPrice: 0.00001,
-        maxGas: 100000000
+        gasPrice: 0.002,
+        maxGas: 1000000000
     })
 }
 

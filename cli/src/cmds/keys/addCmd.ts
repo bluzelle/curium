@@ -11,7 +11,7 @@ export const builder = (yargs: Argv) => {
         .help()
 }
 export const handler = async (argv: {user: string})  => {
-    return promises.appendFile(path.resolve(__dirname, `${process.env.HOME}/.curium/${argv.user}.txt`), "swarm hill bar quit female truth ticket pulp pull album isolate thing solar purpose sound enjoy strike bundle hobby planet setup type hen grant", {flag: 'ax'})
+    return promises.appendFile(path.resolve(__dirname, `${process.env.HOME}/.curium/${argv.user}.txt`), "sheriff ribbon enact flash giraffe hard sphere embody bundle pupil yellow client misery route meadow fever famous churn author fan come gravity receive card", {flag: 'ax'})
         .then(console.log.bind(null, "FINISHED"))
         .then(() => promises.readFile(path.resolve(__dirname, `${process.env.HOME}/.curium/${argv.user}.txt`), null))
         .then(buf => new TextDecoder().decode(buf))

@@ -93,7 +93,7 @@ describe('leasing', function () {
             creator,
             key: 'leaseKey12',
             uuid
-        }).then(resp => resp.leaseBlocks.toInt() * 5.5)).to.be.closeTo(7260, 20)
+        }).then(resp => resp.seconds)).to.be.closeTo(7260, 20)
     });
 
 });

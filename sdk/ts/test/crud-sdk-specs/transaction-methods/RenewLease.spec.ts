@@ -31,7 +31,7 @@ describe('tx.RenewLease()', function () {
             creator,
             uuid,
             key: 'key'
-        }).then(resp => resp.leaseBlocks.toInt() * 5.5)).to.be.closeTo(86400, 12);
+        }).then(resp => resp.seconds)).to.be.closeTo(86400, 12);
 
         await sdk.db.tx.RenewLease({
             creator,
@@ -43,7 +43,7 @@ describe('tx.RenewLease()', function () {
             creator,
             uuid,
             key: 'key'
-        }).then(resp => resp.leaseBlocks.toInt() * 5.5)).to.be.closeTo(172800, 12);
+        }).then(resp => resp.seconds)).to.be.closeTo(172800, 12);
     });
 
     it('should reduce the lease time', async () => {
@@ -59,7 +59,7 @@ describe('tx.RenewLease()', function () {
             creator,
             uuid,
             key: 'key'
-        }).then(resp => resp.leaseBlocks.toInt() * 5.5)).to.be.closeTo(10000, 12);
+        }).then(resp => resp.seconds)).to.be.closeTo(10000, 12);
 
         await sdk.db.tx.RenewLease({
             creator,
@@ -71,7 +71,7 @@ describe('tx.RenewLease()', function () {
             creator,
             uuid,
             key: 'key'
-        }).then(resp => resp.leaseBlocks.toInt() * 5.5)).to.be.closeTo(100, 12);
+        }).then(resp => resp.seconds)).to.be.closeTo(100, 12);
     });
 
     it('should throw an error when trying to renew a non-existent lease', () => {

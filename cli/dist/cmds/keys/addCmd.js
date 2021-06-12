@@ -51,7 +51,7 @@ var builder = function (yargs) {
 exports.builder = builder;
 var handler = function (argv) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        return [2 /*return*/, fs_1.promises.appendFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/" + argv.user + ".txt"), "swarm hill bar quit female truth ticket pulp pull album isolate thing solar purpose sound enjoy strike bundle hobby planet setup type hen grant", { flag: 'ax' })
+        return [2 /*return*/, fs_1.promises.appendFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/" + argv.user + ".txt"), "sheriff ribbon enact flash giraffe hard sphere embody bundle pupil yellow client misery route meadow fever famous churn author fan come gravity receive card", { flag: 'ax' })
                 .then(console.log.bind(null, "FINISHED"))
                 .then(function () { return fs_1.promises.readFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/" + argv.user + ".txt"), null); })
                 .then(function (buf) { return new TextDecoder().decode(buf); })

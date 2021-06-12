@@ -39,12 +39,12 @@ describe('tx.RenewLeaseAll()', function () {
             creator,
             uuid,
             key: 'key1'
-        }).then(resp => resp.leaseBlocks.toInt() * 5.5)).to.be.closeTo(86400, 12);
+        }).then(resp => resp.seconds)).to.be.closeTo(86400, 12);
         expect(await sdk.db.tx.GetLease({
             creator,
             uuid,
             key: 'key2'
-        }).then(resp => resp.leaseBlocks.toInt() * 5.5)).to.be.closeTo(86400 * 2, 12);
+        }).then(resp => resp.seconds)).to.be.closeTo(86400 * 2, 12);
 
         await sdk.db.tx.RenewLeasesAll({
             creator,
@@ -55,12 +55,12 @@ describe('tx.RenewLeaseAll()', function () {
             creator,
             uuid,
             key: 'key1'
-        }).then(resp => resp.leaseBlocks.toInt() * 5.5)).to.be.closeTo(86400 * 2, 12);
+        }).then(resp => resp.seconds)).to.be.closeTo(86400 * 2, 12);
         expect(await sdk.db.tx.GetLease({
             creator,
             uuid,
             key: 'key2'
-        }).then(resp => resp.leaseBlocks.toInt() * 5.5)).to.be.closeTo(86400 * 2, 12);
+        }).then(resp => resp.seconds)).to.be.closeTo(86400 * 2, 12);
     });
 
     it.skip('should only allow owner of uuid to renew leases', async () => {
@@ -87,13 +87,13 @@ describe('tx.RenewLeaseAll()', function () {
             creator,
             uuid,
             key: 'key1'
-        }).then(resp => resp.leaseBlocks.toInt() * 5.5)).to.be.closeTo(86400, 12);
+        }).then(resp => resp.seconds)).to.be.closeTo(86400, 12);
 
         expect(await sdk.db.tx.GetLease({
             creator,
             uuid,
             key: 'key2'
-        }).then(resp => resp.leaseBlocks.toInt() * 5.5)).to.be.closeTo(86400 * 2, 12);
+        }).then(resp => resp.seconds)).to.be.closeTo(86400 * 2, 12);
 
         await expect(otherSdk.db.tx.RenewLeasesAll({
             creator: otherSdk.db.address,
@@ -105,12 +105,12 @@ describe('tx.RenewLeaseAll()', function () {
             creator,
             uuid,
             key: 'key1'
-        }).then(resp => resp.leaseBlocks.toInt() * 5.5)).to.be.closeTo(86400, 12);
+        }).then(resp => resp.seconds)).to.be.closeTo(86400, 12);
         expect(await sdk.db.tx.GetLease({
             creator,
             uuid,
             key: 'key2'
-        }).then(resp => resp.leaseBlocks.toInt() * 5.5)).to.be.closeTo(86400 * 2, 12);
+        }).then(resp => resp.seconds)).to.be.closeTo(86400 * 2, 12);
 
     });
 

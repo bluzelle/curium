@@ -124,7 +124,7 @@ describe('tx.Update()', function () {
             creator: sdk.db.address,
             uuid,
             key: 'highLease7'
-        }).then(resp => resp.leaseBlocks.toInt() * 5.5)).to.be.closeTo(3 * 60, 30)
+        }).then(resp => resp.seconds)).to.be.closeTo(3 * 60, 30)
     });
 
     it('should expire beyond updated lease time', async () => {
