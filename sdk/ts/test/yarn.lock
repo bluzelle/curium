@@ -256,6 +256,13 @@
   resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.2.16.tgz#f09cc36e18d28274f942e7201147cce34d97e8c8"
   integrity sha512-vI5iOAsez9+roLS3M3+Xx7w+WRuDtSmF8bQkrbcIJ2sC1PcDgVoA0WGpa+bIrJ+y8zqY2oi//fUctkxtIcXJCw==
 
+"@types/fs-extra@^9.0.11":
+  version "9.0.11"
+  resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-9.0.11.tgz#8cc99e103499eab9f347dbc6ca4e99fb8d2c2b87"
+  integrity sha512-mZsifGG4QeQ7hlkhO56u7zt/ycBgGxSVsFI/6lGTU34VtwkiqrrSDgw0+ygs8kFGWcXnFQWMrzF2h7TtDFNixA==
+  dependencies:
+    "@types/node" "*"
+
 "@types/lodash@^4.14.168":
   version "4.14.168"
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.168.tgz#fe24632e79b7ade3f132891afff86caa5e5ce008"
@@ -1016,6 +1023,10 @@ curium-control@bluzelle/curium-control#devel, daemon-manager@bluzelle/curium-con
     ts-node "^8.8.2"
     typescript "^3.8.3"
 
+curium-control@bluzelle/curium-control#stargate:
+  version "0.0.0"
+  resolved "git+ssh://git@github.com/bluzelle/curium-control.git#5d0557b06811fcfd112cf68acf62cdbe903c0225"
+
 debug@4, debug@4.3.1, debug@^4.1.0, debug@^4.1.1:
   version "4.3.1"
   resolved "https://registry.yarnpkg.com/debug/-/debug-4.3.1.tgz#f0d229c505e0c6d8c49ac553d1b13dc183f6b2ee"
@@ -1327,6 +1338,15 @@ fs-constants@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/fs-constants/-/fs-constants-1.0.0.tgz#6be0de9be998ce16af8afc24497b9ee9b7ccd9ad"
   integrity sha512-y6OAwoSIf7FyjMIv94u+b5rdheZEjzR63GTyZJm5qh4Bi+2YgwLCcI/fPFZkL5PSixOt6ZNKm+w+Hfp/Bciwow==
+
+fs-extra@^10.0.0:
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-10.0.0.tgz#9ff61b655dde53fb34a82df84bb214ce802e17c1"
+  integrity sha512-C5owb14u9eJwizKGdchcDUQeFtlSHHthBk8pbX9Vc1PFZrLombudjDnNns88aYslCyF6IY5SUw3Roz6xShcEIQ==
+  dependencies:
+    graceful-fs "^4.2.0"
+    jsonfile "^6.0.1"
+    universalify "^2.0.0"
 
 fs-extra@^8.1.0:
   version "8.1.0"
@@ -1775,6 +1795,15 @@ jsonfile@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/jsonfile/-/jsonfile-4.0.0.tgz#8771aae0799b64076b76640fca058f9c10e33ecb"
   integrity sha1-h3Gq4HmbZAdrdmQPygWPnBDjPss=
+  optionalDependencies:
+    graceful-fs "^4.1.6"
+
+jsonfile@^6.0.1:
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/jsonfile/-/jsonfile-6.1.0.tgz#bc55b2634793c679ec6403094eb13698a6ec0aae"
+  integrity sha512-5dgndWOriYSm5cnYaJNhalLNDKOqFwyDB/rr1E9ZsGciGvKPs8R2xYGCacuf3z6K1YKDz182fd+fY3cn3pMqXQ==
+  dependencies:
+    universalify "^2.0.0"
   optionalDependencies:
     graceful-fs "^4.1.6"
 
@@ -2756,6 +2785,48 @@ test-exclude@^6.0.0:
     glob "^7.1.4"
     minimatch "^3.0.4"
 
+testing@bluzelle/curium-test#aven:
+  version "1.0.0"
+  resolved "git+ssh://git@github.com/bluzelle/curium-test.git#1920e1bc86cc021bd7d3d98f479b4ee12a6571d4"
+  dependencies:
+    "@cosmostation/cosmosjs" "^0.9.5"
+    "@types/asciichart" "^1.5.3"
+    "@types/base-64" "^0.1.3"
+    "@types/chai" "^4.2.11"
+    "@types/chai-as-promised" "^7.1.3"
+    "@types/fs-extra" "^9.0.11"
+    "@types/lodash" "^4.14.168"
+    "@types/mocha" "^8.0.0"
+    "@types/node" "^14.0.24"
+    "@types/node-fetch" "^2.5.8"
+    "@types/object-hash" "^1.3.3"
+    "@types/puppeteer" "^3.0.1"
+    "@types/tar-fs" "^2.0.0"
+    asciichart "^1.5.25"
+    axios "^0.19.2"
+    base-64 "^1.0.0"
+    chai "^4.2.0"
+    chai-as-promised "^7.1.1"
+    curium-control bluzelle/curium-control#stargate
+    delay "^4.4.0"
+    directory-tree "^2.2.4"
+    fs-extra "^10.0.0"
+    get-port "^5.1.1"
+    lodash "^4.17.19"
+    mocha "^8.0.1"
+    mocha-simple-html-reporter "^1.1.0"
+    mocha-unfunk-reporter "^0.4.0"
+    monet "^0.9.1"
+    node-docker-api "^1.1.22"
+    nyc "^15.0.0"
+    object-hash "^2.0.3"
+    promise-passthrough "^1.0.5"
+    puppeteer "^5.2.1"
+    ruby-spawn "^1.2.0"
+    tar-fs "^2.1.0"
+    ts-node "^8.10.2"
+    typescript "^3.9.7"
+
 testing@bluzelle/curium-test#devel:
   version "1.0.0"
   resolved "git+ssh://git@github.com/bluzelle/curium-test.git#10fc77ebd5bf51361c08d341c18b043c577d6962"
@@ -2932,6 +3003,11 @@ universalify@^0.1.0:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/universalify/-/universalify-0.1.2.tgz#b646f69be3942dabcecc9d6639c80dc105efaa66"
   integrity sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg==
+
+universalify@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/universalify/-/universalify-2.0.0.tgz#75a4984efedc4b08975c5aeb73f530d02df25717"
+  integrity sha512-hAZsKq7Yy11Zu1DE0OzWjw7nnLZmJZYTDZZyEFHZdUhV8FkH5MCfoU1XMaxXovpyW5nq5scPqq0ZDP9Zyl04oQ==
 
 unorm@^1.3.3:
   version "1.6.0"

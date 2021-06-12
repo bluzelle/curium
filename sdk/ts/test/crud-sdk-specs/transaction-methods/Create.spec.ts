@@ -12,6 +12,7 @@ import {Lease} from "../../../src/codec/crud/lease";
 import {getPrintableChars} from "testing/lib/helpers/testHelpers";
 import {localChain} from "../../config";
 import {CalculateGasForLease} from "../../helpers/client-helpers/client-helpers";
+import {getSwarm} from "testing/lib/helpers/swarmHelpers";
 
 
 describe('tx.Create()', function () {
@@ -22,9 +23,12 @@ describe('tx.Create()', function () {
     let creator: string;
     beforeEach(async () => {
         useChaiAsPromised();
-        sdk = await getSdk();
-        uuid = Date.now().toString()
-        creator = sdk.db.address;
+        await getSwarm()
+            .then(s => s.getValidators()[0].getAuth())
+            .then(auth => getSdk(auth.mnemonic))
+            .then(newSdk => sdk = newSdk)
+            .then(() => uuid = Date.now().toString())
+            .then(() =>  creator = sdk.db.address;)
     });
 
     it('should create a key-value and charge accordingly', async () => {

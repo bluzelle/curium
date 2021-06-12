@@ -9,10 +9,10 @@ export const defaultLease: Lease =  {minutes: 0, seconds: 0, years: 0, hours: 1,
 export const zeroLease : Lease = {minutes: 0, seconds: 0, years: 0, hours: 0, days: 0}
 
 
-export const getSdk = (): Promise<BluzelleSdk> => {
+export const getSdk = (mnemonic: string): Promise<BluzelleSdk> => {
     return bluzelle({
-        mnemonic: localChain.mnemonic,
-        url: localChain.endpoint,
+        mnemonic,
+        url: 'http:/localhost:26657',
         gasPrice: 0.002,
         maxGas: 1000000000
     })

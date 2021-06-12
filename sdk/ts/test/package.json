@@ -6,7 +6,7 @@
   "dependencies": {
     "@types/mocha": "^8.2.2",
     "@types/typescript": "^2.0.0",
-    "testing": "bluzelle/curium-test#devel",
+    "testing": "bluzelle/curium-test#aven",
     "ts-node": "^9.1.1",
     "typescript": "^4.2.4",
     "zx": "^1.8.0"
