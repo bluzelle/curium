@@ -98,9 +98,9 @@ import (
 	"github.com/bluzelle/curium/x/nft"
 	nftkeeper "github.com/bluzelle/curium/x/nft/keeper"
 	nfttypes "github.com/bluzelle/curium/x/nft/types"
-	"github.com/bluzelle/curium/x/synchronizer"
-	synchronizerkeeper "github.com/bluzelle/curium/x/synchronizer/keeper"
-	synchronizertypes "github.com/bluzelle/curium/x/synchronizer/types"
+//	"github.com/bluzelle/curium/x/synchronizer"
+//	synchronizerkeeper "github.com/bluzelle/curium/x/synchronizer/keeper"
+//	synchronizertypes "github.com/bluzelle/curium/x/synchronizer/types"
 	"github.com/bluzelle/curium/x/voting"
 	votingkeeper "github.com/bluzelle/curium/x/voting/keeper"
 	votingtypes "github.com/bluzelle/curium/x/voting/types"
@@ -154,7 +154,7 @@ var (
 		faucet.AppModuleBasic{},
 		nft.AppModuleBasic{},
 		voting.AppModuleBasic{},
-		synchronizer.AppModuleBasic{},
+//		synchronizer.AppModuleBasic{},
 		crud.AppModuleBasic{},
 	)
 
@@ -231,7 +231,7 @@ type App struct {
 
 	votingKeeper *votingkeeper.Keeper
 
-	synchronizerKeeper synchronizerkeeper.Keeper
+//	synchronizerKeeper synchronizerkeeper.Keeper
 
 	crudKeeper crudkeeper.Keeper
 
@@ -269,7 +269,7 @@ func New(
 		faucettypes.StoreKey,
 		nfttypes.StoreKey,
 		votingtypes.StoreKey,
-		synchronizertypes.StoreKey,
+//		synchronizertypes.StoreKey,
 		crudtypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -425,17 +425,17 @@ func New(
 	)
 	crudModule := crud.NewAppModule(appCodec, app.crudKeeper)
 
-	app.synchronizerKeeper = *synchronizerkeeper.NewKeeper(
-		appCodec,
-		keys[synchronizertypes.StoreKey],
-		keys[synchronizertypes.MemStoreKey],
-		app.AccountKeeper,
-		app.crudKeeper,
-		app.votingKeeper,
-		app.curiumKeeper,
-		cast.ToString(appOpts.Get(flags.FlagHome)),
-	)
-	synchronizerModule := synchronizer.NewAppModule(appCodec, app.synchronizerKeeper)
+	//app.synchronizerKeeper = *synchronizerkeeper.NewKeeper(
+	//	appCodec,
+	//	keys[synchronizertypes.StoreKey],
+	//	keys[synchronizertypes.MemStoreKey],
+	//	app.AccountKeeper,
+	//	app.crudKeeper,
+	//	app.votingKeeper,
+	//	app.curiumKeeper,
+	//	cast.ToString(appOpts.Get(flags.FlagHome)),
+	//)
+	//synchronizerModule := synchronizer.NewAppModule(appCodec, app.synchronizerKeeper)
 
 	app.GovKeeper = govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
@@ -484,7 +484,7 @@ func New(
 		faucetModule,
 		nftModule,
 		votingModule,
-		synchronizerModule,
+//		synchronizerModule,
 		crudModule,
 	)
 
@@ -497,7 +497,7 @@ func New(
 		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName, crudtypes.ModuleName,
 	)
 
-	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, synchronizertypes.ModuleName, votingtypes.ModuleName, nfttypes.ModuleName, crudtypes.ModuleName)
+	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, /*synchronizertypes.ModuleName,*/ votingtypes.ModuleName, nfttypes.ModuleName, crudtypes.ModuleName)
 
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
@@ -523,7 +523,7 @@ func New(
 		faucettypes.ModuleName,
 		nfttypes.ModuleName,
 		votingtypes.ModuleName,
-		synchronizertypes.ModuleName,
+//		synchronizertypes.ModuleName,
 		crudtypes.ModuleName,
 	)
 
@@ -711,7 +711,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(faucettypes.ModuleName)
 	paramsKeeper.Subspace(nfttypes.ModuleName)
 	paramsKeeper.Subspace(votingtypes.ModuleName)
-	paramsKeeper.Subspace(synchronizertypes.ModuleName)
+//	paramsKeeper.Subspace(synchronizertypes.ModuleName)
 	paramsKeeper.Subspace(crudtypes.ModuleName)
 
 	return paramsKeeper
