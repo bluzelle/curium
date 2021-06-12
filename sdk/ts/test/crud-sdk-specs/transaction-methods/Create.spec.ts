@@ -1,7 +1,7 @@
 import {
     decodeData,
     DEFAULT_TIMEOUT,
-    defaultLease, encodeData,
+    defaultLease, encodeData, getMintedAccountMnemonic,
     getSdk,
     newSdkClient
 } from "../../helpers/client-helpers/sdk-helpers";
@@ -11,12 +11,11 @@ import {bluzelle, BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
 import {Lease} from "../../../src/codec/crud/lease";
 import {getPrintableChars} from "testing/lib/helpers/testHelpers";
 import {localChain} from "../../config";
-import {CalculateGasForLease} from "../../helpers/client-helpers/client-helpers";
-import {getSwarm} from "testing/lib/helpers/swarmHelpers";
+import {getSwarm, SINGLE_SENTRY_SWARM} from "testing/lib/helpers/swarmHelpers";
 
 
 describe('tx.Create()', function () {
-    this.timeout(DEFAULT_TIMEOUT);
+    //this.timeout(DEFAULT_TIMEOUT);
 
     let sdk: BluzelleSdk;
     let uuid: string;
@@ -24,37 +23,14 @@ describe('tx.Create()', function () {
     beforeEach(async () => {
         useChaiAsPromised();
         await getSwarm()
-            .then(s => s.getValidators()[0].getAuth())
-            .then(auth => getSdk(auth.mnemonic))
+            .then(() => getMintedAccountMnemonic())
+            .then(getSdk)
             .then(newSdk => sdk = newSdk)
             .then(() => uuid = Date.now().toString())
-            .then(() =>  creator = sdk.db.address;)
+            .then(() =>  creator = sdk.db.address)
     });
 
-    it('should create a key-value and charge accordingly', async () => {
-
-        const initialBal: number = await sdk.bank.q.Balance({
-            address: sdk.bank.address,
-            denom: 'ubnt'
-        }).then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
-
-        await sdk.db.tx.Create({
-            creator: sdk.db.address,
-            uuid,
-            key: 'key1',
-            value: new TextEncoder().encode('value'),
-            lease: defaultLease,
-            metadata: new Uint8Array()
-        })
-
-        const finalBal: number = await sdk.bank.q.Balance({
-            address: sdk.bank.address,
-            denom: 'ubnt'
-        }).then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
-
-        await expect(initialBal - finalBal).to.equal(0.002 * CalculateGasForLease(defaultLease, 'uuid'.length + 'key'.length + 'value'.length))
-
-    });
+    it('should not do anything, just bring up swarm', () => {})
 
     it('should throw an error if key already exists', () => {
         return sdk.db.tx.Create({

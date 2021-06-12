@@ -2,20 +2,27 @@ import {localChain} from "../../config"
 import {bluzelle, BluzelleSdk, DbSdk} from "../../../src/bz-sdk/bz-sdk";
 import {range} from "lodash";
 import {Lease} from "../../../src/codec/crud/lease";
+global.fetch = require('node-fetch')
 
 
 export const DEFAULT_TIMEOUT = 800000;
 export const defaultLease: Lease =  {minutes: 0, seconds: 0, years: 0, hours: 1, days: 0}
 export const zeroLease : Lease = {minutes: 0, seconds: 0, years: 0, hours: 0, days: 0}
-
+process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = '0';
 
 export const getSdk = (mnemonic: string): Promise<BluzelleSdk> => {
     return bluzelle({
         mnemonic,
-        url: 'http:/localhost:26657',
+        url: 'http://localhost:26667',
         gasPrice: 0.002,
         maxGas: 1000000000
     })
+}
+
+export const getMintedAccountMnemonic = (): Promise<string> => {
+    return fetch('http://localhost:1327/mint')
+        .then(resp => resp.json())
+        .then(obj => obj.result.mnemonic)
 }
 
 export const convertBase64ToString = (base64Encoded: string): string =>
