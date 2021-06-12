@@ -141,7 +141,7 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) func(
 		res, err := txClient.BroadcastTx(
 			txCtx,
 			&txtypes.BroadcastTxRequest{
-				Mode:    txtypes.BroadcastMode_BROADCAST_MODE_BLOCK,
+				Mode:    txtypes.BroadcastMode_BROADCAST_MODE_ASYNC,
 				TxBytes: txBytes, // Proto-binary of the signed transaction, see previous step.
 			},
 		)
