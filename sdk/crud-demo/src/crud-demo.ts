@@ -142,11 +142,12 @@ const uuid = Date.now().toString()
 let sdk: BluzelleSdk
 
 const main = async () => {
+
     sdk = await bluzelle({
         gasPrice: 0.002,
         maxGas: 10000000,
-        url: "https://client.sentry.testnet.private.bluzelle.com:26657",
-        mnemonic: "sheriff ribbon enact flash giraffe hard sphere embody bundle pupil yellow client misery route meadow fever famous churn author fan come gravity receive card"
+        url: "http://localhost:26667",
+        mnemonic: "armor armor shop farm grab twice address month tired tide pulse dove banner spider fold leader wink planet stable future major orchard solar culture"
     })
     await sdk.db.tx.Create({
         creator: sdk.db.address,

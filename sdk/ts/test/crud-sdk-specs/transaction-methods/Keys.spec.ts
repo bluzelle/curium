@@ -11,19 +11,43 @@ import {
 } from "../../helpers/client-helpers/sdk-helpers";
 import Long from 'long'
 import delay from "delay";
+import {useChaiAsPromised} from "testing/lib/globalHelpers";
+import {getSwarm} from "testing/lib/helpers/swarmHelpers";
+import {Lease} from "../../../src/codec/crud/lease";
 
 describe('tx.Keys()', function () {
 
-    this.timeout(DEFAULT_TIMEOUT);
-    let sdk: BluzelleSdk ;
+    let sdk: BluzelleSdk;
     let uuid: string;
     let creator: string;
-
     beforeEach(async () => {
-        sdk = await getSdk();
-        uuid = Date.now().toString();
-        creator = sdk.db.address;
+        useChaiAsPromised();
+        await getSwarm([(config) => ({
+            ...config,
+            targetBranch: 'stargate-old'
+        })])
+            .then(s => s.getValidators()[0].getAuth())
+            .then(auth => getSdk(auth.mnemonic))
+            .then(newSdk => sdk = newSdk)
+            .then(() => uuid = Date.now().toString())
+            .then(() =>  creator = sdk.db.address)
     });
+
+    it('should return the list of keys', () => {
+        return sdk.db.tx.Create({
+            creator: sdk.db.address,
+            uuid,
+            key: 'someKey',
+            value: new TextEncoder().encode('someValue'),
+            lease: {days: 10} as Lease,
+            metadata: new Uint8Array()
+        })
+            .then(() => sdk.db.q.Keys({
+                uuid,
+            }))
+            .then(resp => resp.keys)
+            .then(keys => expect(keys[0]).to.equal('someKey'))
+    })
 
     it('should return a empty list if there are no keys', async () => {
         expect(await sdk.db.tx.Keys({

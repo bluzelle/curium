@@ -2,6 +2,8 @@ import {localChain} from "../../config"
 import {bluzelle, BluzelleSdk, DbSdk} from "../../../src/bz-sdk/bz-sdk";
 import {range} from "lodash";
 import {Lease} from "../../../src/codec/crud/lease";
+import delay from "delay";
+import {passThroughAwait} from "promise-passthrough";
 global.fetch = require('node-fetch')
 
 
@@ -13,16 +15,23 @@ process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = '0';
 export const getSdk = (mnemonic: string): Promise<BluzelleSdk> => {
     return bluzelle({
         mnemonic,
-        url: 'http://localhost:26667',
+        url: 'http//localhost:26667',
         gasPrice: 0.002,
         maxGas: 1000000000
     })
 }
 
-export const getMintedAccountMnemonic = (): Promise<string> => {
+export const getMintedAccount = (): Promise<any> => {
     return fetch('http://localhost:1327/mint')
         .then(resp => resp.json())
-        .then(obj => obj.result.mnemonic)
+        .then(obj => obj.result)
+        .then(passThroughAwait(() => delay(5000)))
+}
+
+export const checkBalance = (address: string): Promise<boolean> => {
+    return fetch(`http://localhost:1327/bank/balances/${address}`)
+        .then(resp => resp.json())
+        .then(resp => !!resp.result[0]?.amount)
 }
 
 export const convertBase64ToString = (base64Encoded: string): string =>

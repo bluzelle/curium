@@ -1,8 +1,9 @@
 import {
+    checkBalance,
     decodeData,
     DEFAULT_TIMEOUT,
     defaultLease,
-    encodeData,
+    encodeData, getMintedAccount,
     getSdk,
     newSdkClient, zeroLease
 } from "../../helpers/client-helpers/sdk-helpers";
@@ -10,6 +11,7 @@ import {useChaiAsPromised} from "testing/lib/globalHelpers";
 import {bluzelle, BluzelleSdk, DbSdk} from "../../../src/bz-sdk/bz-sdk";
 import {expect} from "chai";
 import delay from "delay";
+import {getSwarm} from "testing/lib/helpers/swarmHelpers";
 
 
 describe('tx.Update()', function () {
@@ -20,9 +22,16 @@ describe('tx.Update()', function () {
     let creator: string;
     beforeEach(async () => {
         useChaiAsPromised();
-        sdk = await getSdk();
-        uuid = Date.now().toString()
-        creator = sdk.db.address
+        await getSwarm([(config) => ({
+            ...config,
+            targetBranch: 'stargate'
+        })])
+        const {mnemonic, address} = await getMintedAccount()
+        await checkBalance(address)
+            .then(() => getSdk(mnemonic))
+            .then(newSdk => sdk = newSdk)
+            .then(() => uuid = Date.now().toString())
+            .then(() => creator = sdk.db.address)
     });
 
     it('should work with empty value', async () => {
@@ -78,8 +87,7 @@ describe('tx.Update()', function () {
             lease: defaultLease,
             metadata: new Uint8Array()
         });
-        expect(await sdk.db.tx.Read({
-            creator: sdk.db.address,
+        expect(await sdk.db.q.Read({
             uuid,
             key: 'myKey'
         }).then(resp => decodeData(resp.value))).to.equal('secondValue');

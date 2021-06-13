@@ -1,7 +1,9 @@
 import {
+    checkBalance,
+    createKeys,
     decodeData,
     DEFAULT_TIMEOUT,
-    defaultLease, encodeData, getMintedAccountMnemonic,
+    defaultLease, encodeData, getMintedAccount,
     getSdk,
     newSdkClient
 } from "../../helpers/client-helpers/sdk-helpers";
@@ -12,7 +14,7 @@ import {Lease} from "../../../src/codec/crud/lease";
 import {getPrintableChars} from "testing/lib/helpers/testHelpers";
 import {localChain} from "../../config";
 import {getSwarm, SINGLE_SENTRY_SWARM} from "testing/lib/helpers/swarmHelpers";
-
+import {times} from 'lodash'
 
 describe('tx.Create()', function () {
     //this.timeout(DEFAULT_TIMEOUT);
@@ -20,17 +22,55 @@ describe('tx.Create()', function () {
     let sdk: BluzelleSdk;
     let uuid: string;
     let creator: string;
-    beforeEach(async () => {
-        useChaiAsPromised();
-        await getSwarm()
-            .then(() => getMintedAccountMnemonic())
+    beforeEach(() => {
+        //useChaiAsPromised();
+        return getSwarm([(config) => ({
+            ...config,
+            targetBranch: 'stargate'
+        })])
+            .then(s => s.getValidators()[0].getAuth())
+            .then(auth => auth.mnemonic)
             .then(getSdk)
             .then(newSdk => sdk = newSdk)
             .then(() => uuid = Date.now().toString())
-            .then(() =>  creator = sdk.db.address)
+            .then(() => creator = sdk.db.address)
     });
 
-    it('should not do anything, just bring up swarm', () => {})
+    it('should just do a create', () => {
+        return sdk.db.tx.Create({
+            creator: sdk.db.address,
+            uuid,
+            key: 'someKey',
+            value: new TextEncoder().encode('someValue'),
+            lease: {days: 10} as Lease,
+            metadata: new Uint8Array()
+        })
+            .then(() => sdk.db.q.Read({
+                uuid,
+                key: 'someKey'
+            }))
+            .then(resp => new TextDecoder().decode(resp.value))
+            .then(val => expect(val).to.equal('someValue'))
+    })
+
+    it('should do multiple creates', async () => {
+
+        await Promise.all(times(10).map(idx => sdk.db.tx.Create({
+            creator,
+            uuid,
+            key: `key-${idx}`,
+            value: new TextEncoder().encode(`value-${idx}`),
+            lease: defaultLease,
+            metadata: new Uint8Array()
+        })))
+
+        await Promise.all(times(10).map(idx => sdk.db.q.Read({
+            uuid,
+            key: `key-${idx}`
+        })))
+            .then(arrayValues => arrayValues.map(val => new TextDecoder().decode(val.value)))
+            .then(decodedValues => expect(decodedValues).to.deep.equal(times(10).map(idx => `value-${idx}`)))
+    })
 
     it('should throw an error if key already exists', () => {
         return sdk.db.tx.Create({
@@ -61,8 +101,7 @@ describe('tx.Create()', function () {
             lease: {days: 10} as Lease,
             metadata: new Uint8Array()
         })
-        await sdk.db.tx.Read({
-            creator: sdk.db.address,
+        await sdk.db.q.Read({
             uuid,
             key: longKey
         })
