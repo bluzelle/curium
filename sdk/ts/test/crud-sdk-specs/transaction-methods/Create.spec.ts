@@ -22,10 +22,9 @@ describe('tx.Create()', function () {
     let sdk: BluzelleSdk;
     let uuid: string;
     let creator: string;
-    beforeEach( () => {
-        return getSwarm()
-            .then(() => getMintedAccount())
-            .then(({mnemonic}) => getSdk(mnemonic))
+    beforeEach(async function () {
+        useChaiAsPromised();
+        return getSdk("phrase lonely draw rubber either tuna harbor route decline burger inquiry aisle scrub south style chronic trouble biology coil defy fashion warfare blanket shuffle")
             .then(newSdk => sdk = newSdk)
             .then(() => uuid = Date.now().toString())
             .then(() => creator = sdk.db.address)
@@ -40,8 +39,7 @@ describe('tx.Create()', function () {
             lease: {days: 10} as Lease,
             metadata: new Uint8Array()
         })
-            .then(() => sdk.db.tx.Read({
-                creator: sdk.db.address,
+            .then(() => sdk.db.q.Read({
                 uuid,
                 key: 'someKey'
             }))
@@ -116,8 +114,7 @@ describe('tx.Create()', function () {
             lease: {days: 10} as Lease,
             metadata: new Uint8Array()
         })
-        await sdk.db.tx.Read({
-            creator: sdk.db.address,
+        await sdk.db.q.Read({
             uuid,
             key: 'symbolskeys'
         })
@@ -149,8 +146,7 @@ describe('tx.Create()', function () {
             metadata: new Uint8Array()
         })
 
-        await sdk.db.tx.Read({
-            creator: sdk.db.address,
+        await sdk.db.q.Read({
             uuid,
             key: 'jsonskeys'
         })
@@ -217,8 +213,7 @@ describe('tx.Create()', function () {
             metadata: new Uint8Array()
         })).to.be.rejectedWith(/incorrect owner/)
 
-        await expect(sdk.db.tx.Read({
-            creator: sdk.db.address,
+        await expect(sdk.db.q.Read({
             uuid,
             key: `imposterEntry to ${uuid}`
         })).to.be.rejectedWith(/key not found/)
@@ -275,8 +270,7 @@ describe('tx.Create()', function () {
             metadata: new Uint8Array()
         }));
 
-        expect(await otherSdk.db.tx.Read({
-            creator: otherSdk.db.address,
+        expect(await otherSdk.db.q.Read({
             uuid,
             key: 'I took this uuid'
         }).then(resp => decodeData(resp.value))).to.equal('my uuid');
