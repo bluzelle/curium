@@ -15,10 +15,8 @@ describe('tx.Create()', function () {
     let creator: string;
     beforeEach(async function () {
         useChaiAsPromised();
-        const {mnemonic, address} = await getMintedAccount()
-        await checkBalance(address)
-            .then(bool => bool || this.fail)
-            .then(() => getSdk(mnemonic))
+        return getMintedAccount()
+            .then(({mnemonic}) => getSdk(mnemonic))
             .then(newSdk => sdk = newSdk)
             .then(() => uuid = Date.now().toString())
             .then(() => creator = sdk.db.address)
@@ -33,7 +31,8 @@ describe('tx.Create()', function () {
             lease: {days: 10} as Lease,
             metadata: new Uint8Array()
         })
-            .then(() => sdk.db.q.Read({
+            .then(() => sdk.db.tx.Read({
+                creator,
                 uuid,
                 key: 'someKey'
             }))

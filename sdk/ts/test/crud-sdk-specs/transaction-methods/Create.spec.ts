@@ -13,7 +13,7 @@ import {bluzelle, BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
 import {Lease} from "../../../src/codec/crud/lease";
 import {getPrintableChars} from "testing/lib/helpers/testHelpers";
 import {localChain} from "../../config";
-import {getSwarm, SINGLE_SENTRY_SWARM} from "testing/lib/helpers/swarmHelpers";
+import {getSentry, getSwarm, getValidator, SINGLE_SENTRY_SWARM} from "testing/lib/helpers/swarmHelpers";
 import {times} from 'lodash'
 
 describe('tx.Create()', function () {
@@ -22,15 +22,10 @@ describe('tx.Create()', function () {
     let sdk: BluzelleSdk;
     let uuid: string;
     let creator: string;
-    beforeEach(() => {
-        //useChaiAsPromised();
-        return getSwarm([(config) => ({
-            ...config,
-            targetBranch: 'stargate'
-        })])
-            .then(s => s.getValidators()[0].getAuth())
-            .then(auth => auth.mnemonic)
-            .then(getSdk)
+    beforeEach( () => {
+        return getSwarm()
+            .then(() => getMintedAccount())
+            .then(({mnemonic}) => getSdk(mnemonic))
             .then(newSdk => sdk = newSdk)
             .then(() => uuid = Date.now().toString())
             .then(() => creator = sdk.db.address)
@@ -45,7 +40,8 @@ describe('tx.Create()', function () {
             lease: {days: 10} as Lease,
             metadata: new Uint8Array()
         })
-            .then(() => sdk.db.q.Read({
+            .then(() => sdk.db.tx.Read({
+                creator: sdk.db.address,
                 uuid,
                 key: 'someKey'
             }))

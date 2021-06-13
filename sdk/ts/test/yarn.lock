@@ -2266,7 +2266,7 @@ test-exclude@^6.0.0:
 
 testing@bluzelle/curium-test#aven:
   version "1.0.0"
-  resolved "git+ssh://git@github.com/bluzelle/curium-test.git#21fb2ba3f43c917632fa1998bc148e3eb90b7286"
+  resolved "git+ssh://git@github.com/bluzelle/curium-test.git#b0a589817ad109bb32e680ac1d6d741abf0ead41"
   dependencies:
     "@cosmostation/cosmosjs" "^0.9.5"
     "@types/asciichart" "^1.5.3"
