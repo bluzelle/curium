@@ -16,10 +16,13 @@ describe('tx.Upsert()', function () {
 
     let sdk: BluzelleSdk;
     let uuid: string;
-    beforeEach(async () => {
+    let creator: string
+    beforeEach(() => {
         useChaiAsPromised();
-        sdk = await getSdk();
-        uuid = Date.now().toString()
+        return getSdk("phrase lonely draw rubber either tuna harbor route decline burger inquiry aisle scrub south style chronic trouble biology coil defy fashion warfare blanket shuffle")
+            .then(newSdk => sdk = newSdk)
+            .then(() => uuid = Date.now().toString())
+            .then(() => creator = sdk.db.address)
     });
     it('should work with empty value', async () => {
         await sdk.db.tx.Upsert({
@@ -93,7 +96,7 @@ describe('tx.Upsert()', function () {
         }).then(resp => decodeData(resp.value))).to.equal('secondValue');
     });
 
-    it('should create a key if it does not exist', async function () {
+    it('should create a key if it does not exist', async () => {
         await sdk.db.tx.Upsert({
             creator: sdk.db.address,
             uuid,
@@ -110,7 +113,24 @@ describe('tx.Upsert()', function () {
         }).then(resp => decodeData(resp.value))).to.equal('aValue');
     });
 
-    it('should only allow the original owner to update a key', async function() {
+    it('should create a key if it does not exist non async', () => {
+        return sdk.db.tx.Upsert({
+            creator: sdk.db.address,
+            uuid,
+            key: 'nonExistingKey',
+            value: encodeData('aValue'),
+            metadata: new Uint8Array(),
+            lease: defaultLease
+        })
+            .then(() => sdk.db.tx.Read({
+                creator: sdk.db.address,
+                uuid,
+                key: 'nonExistingKey'
+            }))
+            .then(resp => expect(decodeData(resp.value)).to.equal('aValue'))
+    });
+
+    it('should only allow the original owner to update a key', async function () {
         const otherSdk = await newSdkClient(sdk)
 
         await sdk.db.tx.Upsert({
@@ -165,7 +185,24 @@ describe('tx.Upsert()', function () {
             }).then(resp => decodeData(resp.value))).to.equal('slashKey'))
     });
 
-    it ('should only allow original owner of uuid to upsert (create)', async () => {
+    it('should allow / in the key non async', () => {
+        return sdk.db.tx.Upsert({
+            creator: sdk.db.address,
+            uuid,
+            key: '/',
+            value: encodeData('slashKey'),
+            metadata: new Uint8Array(),
+            lease: defaultLease
+        })
+            .then(() => sdk.db.tx.Read({
+                creator: sdk.db.address,
+                uuid,
+                key: '/'
+            }))
+            .then(resp => expect(decodeData(resp.value)).to.equal('slashKey'))
+    });
+
+    it('should only allow original owner of uuid to upsert (create)', async () => {
         const otherSdk = await newSdkClient(sdk)
 
         await sdk.db.tx.Upsert({

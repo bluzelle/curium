@@ -16,10 +16,13 @@ describe('tx.Read()', function () {
 
     let sdk: BluzelleSdk;
     let uuid: string;
-    beforeEach(async () => {
+    let creator: string
+    beforeEach(() => {
         useChaiAsPromised();
-        sdk = await getSdk();
-        uuid = Date.now().toString();
+        return getSdk("phrase lonely draw rubber either tuna harbor route decline burger inquiry aisle scrub south style chronic trouble biology coil defy fashion warfare blanket shuffle")
+            .then(newSdk => sdk = newSdk)
+            .then(() => uuid = Date.now().toString())
+            .then(() => creator = sdk.db.address)
     });
     it('should work with empty value', async () => {
         await sdk.db.tx.Create({
@@ -35,6 +38,23 @@ describe('tx.Read()', function () {
             uuid,
             key: 'key'
         }).then(resp => decodeData(resp.value))).to.equal('');
+    })
+
+    it('should work with empty value non async', () => {
+        return sdk.db.tx.Create({
+            creator: sdk.db.address,
+            uuid,
+            key: 'key',
+            value: encodeData(''),
+            lease: defaultLease,
+            metadata: new Uint8Array()
+        })
+            .then(() => sdk.db.tx.Read({
+            creator: sdk.db.address,
+            uuid,
+            key: 'key'
+        }))
+            .then(resp => expect(decodeData(resp.value)).to.equal(''))
     })
 
     it('should retrieve values in order', async () => {

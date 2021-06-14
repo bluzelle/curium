@@ -60,7 +60,7 @@ const txRpc = (options: SDKOptions, communicationService: CommunicationService, 
 };
 
 export const mnemonicToAddress = memoize<(mnemonic: string) => Promise<string>>((mnemonic: string): Promise<string> =>
-    DirectSecp256k1HdWallet.fromMnemonic(mnemonic, undefined, 'bluzelle')
+    DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {prefix: 'bluzelle'})
         .then(wallet => wallet.getAccounts())
         .then(x => x[0].address))
 

@@ -5,10 +5,9 @@
   "main": "lib/bz-sdk/bz-sdk.js",
   "license": "MIT",
   "dependencies": {
-    "@cosmjs/proto-signing": "0.25.0-alpha.2",
-    "@cosmjs/stargate": "0.25.0-alpha.2",
-    "@cosmjs/tendermint-rpc": "0.25.0-alpha.2",
-    "@cosmostation/cosmosjs": "^0.9.5",
+    "@cosmjs/proto-signing": "^0.25.4",
+    "@cosmjs/stargate": "^0.25.4",
+    "@cosmjs/tendermint-rpc": "^0.25.4",
     "@types/bip39": "^3.0.0",
     "@types/lodash": "^4.14.168",
     "@types/node": "^14.14.41",

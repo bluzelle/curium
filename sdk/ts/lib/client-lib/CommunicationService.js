@@ -13,7 +13,7 @@ const tx_1 = require("@cosmjs/proto-signing/build/codec/cosmos/tx/v1beta1/tx");
 const Registry_1 = require("./Registry");
 const TOKEN_NAME = 'ubnt';
 const dummyMessageResponse = new Uint8Array();
-const mnemonicToAddress = (mnemonic) => proto_signing_1.DirectSecp256k1HdWallet.fromMnemonic(mnemonic, undefined, 'bluzelle')
+const mnemonicToAddress = (mnemonic) => proto_signing_1.DirectSecp256k1HdWallet.fromMnemonic(mnemonic, { prefix: 'bluzelle' })
     .then(wallet => wallet.getAccounts())
     .then(x => x[0].address);
 exports.mnemonicToAddress = mnemonicToAddress;
@@ -40,15 +40,12 @@ const withTransaction = (service, fn, { memo }) => {
 };
 exports.withTransaction = withTransaction;
 const sendMessage = (ctx, message, gasInfo) => {
-    var _a;
-    return ctx.transactionMessageQueue ? Promise.resolve((_a = ctx.transactionMessageQueue) === null || _a === void 0 ? void 0 : _a.items.push({
-        message, gasInfo
-    }))
-        .then(() => (dummyMessageResponse))
-        : sendMessages(ctx, newTransactionMessageQueue([{
-                message,
-                gasInfo
-            }], ''));
+    return new Promise((resolve) => {
+        msgChain = msgChain
+            .then(() => transmitTransaction(ctx, [{ message, gasInfo }], { memo: '' })
+            .then(x => x)
+            .then(resolve));
+    });
 };
 exports.sendMessage = sendMessage;
 const sendMessages = (service, queue, retrans = false) => new Promise((resolve, reject) => {
@@ -71,7 +68,7 @@ const sendMessages = (service, queue, retrans = false) => new Promise((resolve, 
         .then(() => delay_1.default(getDelayBetweenRequests(JSON.stringify(queue.items).length, service.url)));
 });
 const getDelayBetweenRequests = (length, url) => monet_1.Right(length)
-    .flatMap(length => length < 500 ? monet_1.Left(200) : monet_1.Right(length))
+    .flatMap(length => length < 500 ? monet_1.Left(1000) : monet_1.Right(length))
     .flatMap(length => /localhost/.test(url) ? monet_1.Left(500) : monet_1.Left(500))
     .cata(t => t, () => 3000);
 let chainId;
@@ -89,16 +86,18 @@ const transmitTransaction = (service, messages, { memo }) => {
     }))
         .then((txRaw) => Uint8Array.from(tx_1.TxRaw.encode(txRaw).finish()))
         .then((signedTx) => cosmos.broadcastTx(signedTx))
-        .then(res => checkErrors(res))
-        .then(x => { var _a, _b; return (_b = (_a = x) === null || _a === void 0 ? void 0 : _a.data[0].data) !== null && _b !== void 0 ? _b : new Uint8Array(); })
-        .catch((e) => {
-        if (/incorrect acccount sequence/.test(e)) {
-            (service.accountRequested = undefined);
-        }
-        else {
-            throw e;
-        }
-    }));
+        .then(x => x)
+        //.then(res => checkErrors(res as BroadcastTxFailure))
+        //.then(x => (x as any)?.data[0].data ?? new Uint8Array())
+        .then(() => new Uint8Array())
+    // .catch((e) => {
+    //     if(/incorrect acccount sequence/.test(e)) {
+    //         (service.accountRequested = undefined)
+    //     } else {
+    //         throw e
+    //     }
+    // })
+    );
 };
 let msgChain = Promise.resolve();
 const getSequence = (service, cosmos) => (service.accountRequested ? (service.accountRequested = service.accountRequested
@@ -136,7 +135,7 @@ const combineGas = (transactions) => transactions.reduce((gasInfo, transaction) 
     };
 }, {});
 // Inside an async function...
-const getSigner = (mnemonic) => proto_signing_1.DirectSecp256k1HdWallet.fromMnemonic(mnemonic, undefined, "bluzelle");
+const getSigner = (mnemonic) => proto_signing_1.DirectSecp256k1HdWallet.fromMnemonic(mnemonic, { prefix: 'bluzelle' });
 const getClient = (service) => getSigner(service.mnemonic)
     .then(signer => stargate_1.SigningStargateClient.connectWithSigner(service.url, signer, {
     registry: Registry_1.myRegistry,

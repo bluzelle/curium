@@ -37,7 +37,7 @@ const txRpc = (options, communicationService, msgTypes) => {
         }
     });
 };
-exports.mnemonicToAddress = lodash_1.memoize((mnemonic) => proto_signing_1.DirectSecp256k1HdWallet.fromMnemonic(mnemonic, undefined, 'bluzelle')
+exports.mnemonicToAddress = lodash_1.memoize((mnemonic) => proto_signing_1.DirectSecp256k1HdWallet.fromMnemonic(mnemonic, { prefix: 'bluzelle' })
     .then(wallet => wallet.getAccounts())
     .then(x => x[0].address));
 //# sourceMappingURL=rpc.js.map

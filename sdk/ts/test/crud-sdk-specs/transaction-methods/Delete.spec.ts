@@ -18,10 +18,13 @@ describe('tx.Delete()', function () {
 
     let sdk: BluzelleSdk;
     let uuid: string;
-    beforeEach(async () => {
+    let creator: string;
+    beforeEach(() =>  {
         useChaiAsPromised();
-        sdk = await getSdk();
-        uuid = Date.now().toString()
+        return getSdk("phrase lonely draw rubber either tuna harbor route decline burger inquiry aisle scrub south style chronic trouble biology coil defy fashion warfare blanket shuffle")
+            .then(newSdk => sdk = newSdk)
+            .then(() => uuid = Date.now().toString())
+            .then(() => creator = sdk.db.address)
     });
 
     // it('should resolve to chain information', async () => {
@@ -40,8 +43,7 @@ describe('tx.Delete()', function () {
             lease: defaultLease,
             metadata: new Uint8Array()
         });
-        expect(await sdk.db.tx.Read({
-            creator: sdk.db.address,
+        expect(await sdk.db.q.Read({
            uuid,
             key: 'myKeys'
         }).then(resp => resp.value).then(decodeData)).to.equal('myValue');
@@ -73,8 +75,7 @@ describe('tx.Delete()', function () {
             key: 'emptyValue'
         });
 
-        await expect(sdk.db.tx.Read({
-            creator: sdk.db.address,
+        await expect(sdk.db.q.Read({
             uuid,
             key: 'emptyValue'
         })).to.be.rejectedWith(/key not found/);
@@ -124,8 +125,7 @@ describe('tx.Delete()', function () {
             key: 'myKey'
         })).to.be.rejectedWith(/incorrect owner/)
 
-        expect(await sdk.db.tx.Read({
-            creator: sdk.db.address,
+        expect(await sdk.db.q.Read({
             uuid,
             key: 'myKey'
         }).then(resp => decodeData(resp.value))).to.equal('myValue')

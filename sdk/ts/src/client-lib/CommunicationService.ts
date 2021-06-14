@@ -37,7 +37,7 @@ export interface WithTransactionsOptions {
 }
 
 export const mnemonicToAddress = (mnemonic: string): Promise<string> =>
-    DirectSecp256k1HdWallet.fromMnemonic(mnemonic, undefined, 'bluzelle')
+    DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {prefix: 'bluzelle'})
         .then(wallet => wallet.getAccounts())
         .then(x => x[0].address)
 
@@ -68,14 +68,15 @@ export const withTransaction = <T>(service: CommunicationService, fn: () => T, {
 
 
 export const sendMessage = <T, R>(ctx: CommunicationService, message: Message<T>, gasInfo: GasInfo): Promise<Uint8Array> => {
-    return ctx.transactionMessageQueue ? Promise.resolve(ctx.transactionMessageQueue?.items.push({
-            message, gasInfo
-        }))
-            .then(() => (dummyMessageResponse))
-        : sendMessages(ctx, newTransactionMessageQueue([{
-            message,
-            gasInfo
-        }], ''))
+    return new Promise((resolve) => {
+        msgChain = msgChain
+            .then(() =>
+               transmitTransaction(ctx, [{message, gasInfo}], {memo: ''})
+                   .then(x => x)
+                    .then(resolve)
+            )
+    })
+
 }
 
 
@@ -105,7 +106,7 @@ const sendMessages = (service: CommunicationService, queue: TransactionMessageQu
 
 const getDelayBetweenRequests = (length: number, url: string): number =>
     Right<number, number>(length)
-        .flatMap(length => length < 500 ? Left(200) : Right(length))
+        .flatMap(length => length < 500 ? Left(1000) : Right(length))
         .flatMap(length => /localhost/.test(url) ? Left(500) : Left(500))
         .cata(t => t, () => 3000)
 
@@ -127,15 +128,17 @@ const transmitTransaction = (service: CommunicationService, messages: MessageQue
                 )
                 .then((txRaw: TxRaw) => Uint8Array.from(TxRaw.encode(txRaw).finish()))
                 .then((signedTx: Uint8Array) => cosmos.broadcastTx(signedTx))
-                .then(res => checkErrors(res as BroadcastTxFailure))
-                .then(x => (x as any)?.data[0].data ?? new Uint8Array())
-                .catch((e) => {
-                    if(/incorrect acccount sequence/.test(e)) {
-                        (service.accountRequested = undefined)
-                    } else {
-                        throw e
-                    }
-                })
+                .then(x => x)
+                //.then(res => checkErrors(res as BroadcastTxFailure))
+                //.then(x => (x as any)?.data[0].data ?? new Uint8Array())
+                .then(() => new Uint8Array())
+                // .catch((e) => {
+                //     if(/incorrect acccount sequence/.test(e)) {
+                //         (service.accountRequested = undefined)
+                //     } else {
+                //         throw e
+                //     }
+                // })
 
         )
 
@@ -203,9 +206,7 @@ const combineGas = (transactions: MessageQueueItem<any>[]): GasInfo =>
 // Inside an async function...
 const getSigner = (mnemonic: string) => DirectSecp256k1HdWallet.fromMnemonic(
     mnemonic,
-    undefined,
-    "bluzelle",
-);
+    {prefix: 'bluzelle'});
 
 
 export const getClient = (service: CommunicationService) =>

@@ -17,6 +17,7 @@ export const getSdk = (mnemonic: string): Promise<BluzelleSdk> => {
     return bluzelle({
         mnemonic,
         url: 'http://localhost:26667',
+        //url: 'https://client.sentry.testnet.private.bluzelle.com:26657',
         gasPrice: 0.002,
         maxGas: 1000000000
     })

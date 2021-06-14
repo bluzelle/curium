@@ -20,15 +20,9 @@ describe('tx.Update()', function () {
     let sdk: BluzelleSdk;
     let uuid: string;
     let creator: string;
-    beforeEach(async () => {
+    beforeEach(() => {
         useChaiAsPromised();
-        await getSwarm([(config) => ({
-            ...config,
-            targetBranch: 'stargate'
-        })])
-        const {mnemonic, address} = await getMintedAccount()
-        await checkBalance(address)
-            .then(() => getSdk(mnemonic))
+        return getSdk("phrase lonely draw rubber either tuna harbor route decline burger inquiry aisle scrub south style chronic trouble biology coil defy fashion warfare blanket shuffle")
             .then(newSdk => sdk = newSdk)
             .then(() => uuid = Date.now().toString())
             .then(() => creator = sdk.db.address)
@@ -47,7 +41,8 @@ describe('tx.Update()', function () {
             creator: sdk.db.address,
             uuid,
             key: 'emptykey1'
-        }).then(resp => decodeData(resp.value))).to.equal('value');
+        }).then(resp => decodeData(resp.value))).to.equal('value1');
+
         await sdk.db.tx.Update({
             creator: sdk.db.address,
             uuid,

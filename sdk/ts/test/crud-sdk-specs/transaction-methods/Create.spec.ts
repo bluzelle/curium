@@ -15,6 +15,7 @@ import {getPrintableChars} from "testing/lib/helpers/testHelpers";
 import {localChain} from "../../config";
 import {getSentry, getSwarm, getValidator, SINGLE_SENTRY_SWARM} from "testing/lib/helpers/swarmHelpers";
 import {times} from 'lodash'
+import {passThrough, passThroughAwait} from "promise-passthrough";
 
 describe('tx.Create()', function () {
     //this.timeout(DEFAULT_TIMEOUT);
@@ -22,7 +23,7 @@ describe('tx.Create()', function () {
     let sdk: BluzelleSdk;
     let uuid: string;
     let creator: string;
-    beforeEach(async function () {
+    beforeEach(() =>  {
         useChaiAsPromised();
         return getSdk("phrase lonely draw rubber either tuna harbor route decline burger inquiry aisle scrub south style chronic trouble biology coil defy fashion warfare blanket shuffle")
             .then(newSdk => sdk = newSdk)
@@ -39,30 +40,81 @@ describe('tx.Create()', function () {
             lease: {days: 10} as Lease,
             metadata: new Uint8Array()
         })
-            .then(() => sdk.db.q.Read({
+            .then(() => sdk.db.tx.Read({
+                creator,
                 uuid,
                 key: 'someKey'
             }))
             .then(resp => new TextDecoder().decode(resp.value))
             .then(val => expect(val).to.equal('someValue'))
+    });
+
+    it('should do multiple creates in sequence', () => {
+        return sdk.db.tx.Create({
+            creator: sdk.db.address,
+            uuid,
+            key: 'keyA',
+            value: encodeData('someValue'),
+            lease: {days: 10} as Lease,
+            metadata: new Uint8Array()
+        })
+            .then(() => console.log('did first create'))
+            .then(() => sdk.db.tx.Create({
+                creator: sdk.db.address,
+                uuid,
+                key: 'keyB',
+                value: encodeData('someValue'),
+                lease: {days: 10} as Lease,
+                metadata: new Uint8Array()
+            }))
+            .then(() => console.log('did second create'))
+            .then(() => sdk.db.tx.Create({
+                creator: sdk.db.address,
+                uuid,
+                key: 'keyC',
+                value: encodeData('someValue'),
+                lease: {days: 10} as Lease,
+                metadata: new Uint8Array()
+            }))
+            .then(() => console.log('did third create'))
+            .then(() => sdk.db.q.Read({
+                uuid,
+                key: 'keyA'
+            }))
+            .then(resp => decodeData(resp.value))
+            .then(val => expect(val).to.equal('someValue'))
+            .then(() => sdk.db.q.Read({
+                uuid,
+                key: 'keyB'
+            }))
+            .then(resp => decodeData(resp.value))
+            .then(val => expect(val).to.equal('someValue'))
+            .then(() => sdk.db.q.Read({
+                uuid,
+                key: 'keyC'
+            }))
+            .then(resp => decodeData(resp.value))
+            .then(val => expect(val).to.equal('someValue'))
     })
 
     it('should do multiple creates', async () => {
 
-        await Promise.all(times(10).map(idx => sdk.db.tx.Create({
+        await Promise.all(times(3).map(idx => sdk.db.tx.Create({
             creator,
             uuid,
             key: `key-${idx}`,
-            value: new TextEncoder().encode(`value-${idx}`),
+            value: encodeData(`value-${idx}`),
             lease: defaultLease,
             metadata: new Uint8Array()
-        })))
+        })
+            .then(() => console.log(`=============created key-${idx}, value-${idx}`))))
 
-        await Promise.all(times(10).map(idx => sdk.db.q.Read({
+        await Promise.all(times(3).map(idx => sdk.db.q.Read({
             uuid,
             key: `key-${idx}`
-        })))
-            .then(arrayValues => arrayValues.map(val => new TextDecoder().decode(val.value)))
+        })
+            .then(passThrough(() => console.log(`//////////// read key ${idx}`)))))
+            .then(arrayValues => arrayValues.map(val => decodeData(val.value)))
             .then(decodedValues => expect(decodedValues).to.deep.equal(times(10).map(idx => `value-${idx}`)))
     })
 
