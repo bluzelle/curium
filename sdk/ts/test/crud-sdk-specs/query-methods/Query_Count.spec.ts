@@ -2,17 +2,20 @@ import {expect} from "chai";
 import {BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
 import {getSdk, createKeys} from "../../helpers/client-helpers/sdk-helpers";
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
+import {useChaiAsPromised} from "testing/lib/globalHelpers";
 
 describe('q.Count()', function () {
     this.timeout(DEFAULT_TIMEOUT);
     let sdk: BluzelleSdk;
     let uuid: string
-
-    beforeEach(async () => {
-        sdk = await getSdk();
-        uuid = Date.now().toString()
+    let creator: string
+    beforeEach(() => {
+        useChaiAsPromised();
+        return getSdk("phrase lonely draw rubber either tuna harbor route decline burger inquiry aisle scrub south style chronic trouble biology coil defy fashion warfare blanket shuffle")
+            .then(newSdk => sdk = newSdk)
+            .then(() => uuid = Date.now().toString())
+            .then(() => creator = sdk.db.address)
     });
-
     it('should return 0 if no keys', async () => {
         expect(await sdk.db.q.Count({
             uuid

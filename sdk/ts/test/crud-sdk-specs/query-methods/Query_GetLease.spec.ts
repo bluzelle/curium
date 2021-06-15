@@ -1,9 +1,9 @@
-import {DEFAULT_TIMEOUT} from "../../helpers/client-helpers/client-helpers";
 import {BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
 import {encodeData, getSdk, zeroLease} from "../../helpers/client-helpers/sdk-helpers";
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
 import {expect} from "chai";
 import delay from "delay"
+import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
 
 describe('q.GetLease()', function () {
     this.timeout(DEFAULT_TIMEOUT);
@@ -11,11 +11,12 @@ describe('q.GetLease()', function () {
     let sdk: BluzelleSdk;
     let uuid: string;
     let creator: string;
-    beforeEach(async () => {
-        sdk = await getSdk();
+    beforeEach(() => {
         useChaiAsPromised();
-        uuid = Date.now().toString();
-        creator = sdk.db.address
+        return getSdk("phrase lonely draw rubber either tuna harbor route decline burger inquiry aisle scrub south style chronic trouble biology coil defy fashion warfare blanket shuffle")
+            .then(newSdk => sdk = newSdk)
+            .then(() => uuid = Date.now().toString())
+            .then(() => creator = sdk.db.address)
     });
 
     it('should throw exception if key does not exist', async () => {

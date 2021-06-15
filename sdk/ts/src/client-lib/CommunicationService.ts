@@ -8,7 +8,7 @@ import {DirectSecp256k1HdWallet, EncodeObject} from "@cosmjs/proto-signing";
 
 import {TxRaw} from "@cosmjs/proto-signing/build/codec/cosmos/tx/v1beta1/tx";
 import {myRegistry} from "./Registry";
-import {BroadcastTxFailure, BroadcastTxResponse, SigningStargateClient} from "@cosmjs/stargate";
+import {BroadcastTxFailure, BroadcastTxResponse, isBroadcastTxFailure, SigningStargateClient} from "@cosmjs/stargate";
 import {BroadcastTxCommitResponse, broadcastTxCommitSuccess, Client, Tendermint34Client} from "@cosmjs/tendermint-rpc";
 import {passThroughAwait} from "promise-passthrough";
 
@@ -116,10 +116,8 @@ const getDelayBetweenRequests = (length: number, url: string): number =>
 let chainId: string
 const transmitTransaction = (service: CommunicationService, messages: MessageQueueItem<any>[], {memo}: { memo: string }): Promise<any> => {
     let cosmos: SigningStargateClient;
-    let tendermint: Tendermint34Client
-    return Tendermint34Client.connect('http://localhost:26657')
-        .then(tender => tendermint = tender)
-        .then(() => getClient(service))
+
+    return getClient(service)
         .then(c => cosmos = c)
         .then(client => getChainId(client).then(cId => chainId = cId))
         .then(() => getSequence(service, cosmos))
@@ -132,24 +130,12 @@ const transmitTransaction = (service: CommunicationService, messages: MessageQue
                     })
                 )
                 .then((txRaw: TxRaw) => Uint8Array.from(TxRaw.encode(txRaw).finish()))
-                //.then((signedTx: Uint8Array) => tendermint.broadcastTxCommit({tx: signedTx}))
-                .then(x => x)
-                //.then(resp => broadcastTxCommitSuccess(resp) ? resp : function () {throw ({checkTx: resp.checkTx, deliverTx: resp.deliverTx})} ())
                 .then((signedTx: Uint8Array) => cosmos.broadcastTx(signedTx, 30000, 1000))
-                .then(resp => ({hash: resp.transactionHash, height: resp.height}))
-                .then(console.log)
-                //.then(resp => pollForCommit(resp, tendermint))
-                //.then(successCom => tendermint.txSearchAll({query: `tx.hash='${Buffer.from(successCom.hash).toString('hex').toUpperCase()}'`}))
-                //.then(successCom => tendermint.tx({hash: successCom.hash}))
-                //.then(txResult => txResult.result.data)
-                //.then(txSearch => txSearch.txs[0].result.data)
-                //.then(resp => resp.deliverTx?.data || new Uint8Array())
+                .then(resp => isBroadcastTxFailure(resp)? function (){throw resp.rawLog}() : resp)
                 .then(() => new Uint8Array())
                 .catch((e) => {
                     if (/account sequence mismatch/.test(e)) {
                         (service.accountRequested = undefined)
-                        console.log(e)
-                        throw(e)
                     } else {
                         throw e
                     }
@@ -158,13 +144,6 @@ const transmitTransaction = (service: CommunicationService, messages: MessageQue
 
 }
 
-const pollForCommit = async (resp: BroadcastTxCommitResponse, tm: Tendermint34Client): Promise<void> => {
-    return new Promise(async (resolve) => {
-        await tm.txSearch({query: `tx.hash='${Buffer.from(resp.hash).toString('hex').toUpperCase()}'`})
-            .then(results => results.txs.length != 0)? resolve() :
-            await setTimeout(() => pollForCommit(resp, tm), 3000)
-    })
-}
 
 let msgChain = Promise.resolve()
 

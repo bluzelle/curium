@@ -8,11 +8,13 @@ describe('tx.KeyValues()', function () {
     this.timeout(DEFAULT_TIMEOUT);
     let sdk: BluzelleSdk;
     let uuid: string
-
-    beforeEach(async () => {
-        useChaiAsPromised()
-        sdk = await getSdk();
-        uuid = Date.now().toString()
+    let creator: string
+    beforeEach(() => {
+        useChaiAsPromised();
+        return getSdk("phrase lonely draw rubber either tuna harbor route decline burger inquiry aisle scrub south style chronic trouble biology coil defy fashion warfare blanket shuffle")
+            .then(newSdk => sdk = newSdk)
+            .then(() => uuid = Date.now().toString())
+            .then(() => creator = sdk.db.address)
     });
 
     it('should be able to handle empty values', async () => {

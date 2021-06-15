@@ -58,7 +58,7 @@ const sendMessages = (service, queue, retrans = false) => new Promise((resolve, 
             .then(resolve)
             .catch(e => monet_1.Some(retrans)
             .filter(retrans => retrans === false)
-            .filter(() => /incorrect account sequence/.test(e))
+            .filter(() => /account sequence mismatch/.test(e))
             .map(() => service.seq = 0)
             .map(() => service.account = 0)
             .map(() => delete service.accountRequested)
@@ -71,9 +71,9 @@ const sendMessages = (service, queue, retrans = false) => new Promise((resolve, 
         .then(() => delay_1.default(getDelayBetweenRequests(JSON.stringify(queue.items).length, service.url)));
 });
 const getDelayBetweenRequests = (length, url) => monet_1.Right(length)
-    .flatMap(length => length < 500 ? monet_1.Left(1000) : monet_1.Right(length))
+    .flatMap(length => length < 500 ? monet_1.Left(3000) : monet_1.Right(length))
     .flatMap(length => /localhost/.test(url) ? monet_1.Left(500) : monet_1.Left(500))
-    .cata(t => t, () => 3000);
+    .cata(t => t, () => 5000);
 let chainId;
 const transmitTransaction = (service, messages, { memo }) => {
     let cosmos;
@@ -88,12 +88,11 @@ const transmitTransaction = (service, messages, { memo }) => {
         sequence: account.seq
     }))
         .then((txRaw) => Uint8Array.from(tx_1.TxRaw.encode(txRaw).finish()))
-        .then((signedTx) => cosmos.broadcastTx(signedTx, cosmos.broadcastTimeoutMs))
-        .then(x => x)
+        .then((signedTx) => cosmos.broadcastTx(signedTx, 30000, 1000))
+        .then(resp => stargate_1.isBroadcastTxFailure(resp) ? function () { throw resp.rawLog; }() : resp)
         .then(() => new Uint8Array())
-        .catch(x => x)
         .catch((e) => {
-        if (/incorrect acccount sequence/.test(e)) {
+        if (/account sequence mismatch/.test(e)) {
             (service.accountRequested = undefined);
         }
         else {
@@ -141,7 +140,7 @@ const getSigner = (mnemonic) => proto_signing_1.DirectSecp256k1HdWallet.fromMnem
 const getClient = (service) => getSigner(service.mnemonic)
     .then(signer => stargate_1.SigningStargateClient.connectWithSigner(service.url, signer, {
     registry: Registry_1.myRegistry,
-    broadcastTimeoutMs: 120000,
+    broadcastTimeoutMs: 300000,
 }));
 exports.getClient = getClient;
 const getChainId = lodash_1.memoize((client) => client.getChainId());
