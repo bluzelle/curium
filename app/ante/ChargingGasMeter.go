@@ -9,36 +9,42 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
-type chargingGasMeter struct {
-	limit       storetypes.Gas
-	consumed    storetypes.Gas
-	payerAccount sdk.AccAddress
+type ChargingGasMeter struct {
+	limit         storetypes.Gas
+	consumed      storetypes.Gas
+	PayerAccount  sdk.AccAddress
+	MinGasPrice   sdk.DecCoins
+	bankKeeper    authtypes.BankKeeper
+	accountKeeper authante.AccountKeeper
 }
 
-func NewChargingGasMeter(limit storetypes.Gas, payerAccount sdk.AccAddress) storetypes.GasMeter {
-	return &chargingGasMeter{
-		limit:       limit,
-		consumed:    0,
-		payerAccount: payerAccount,
+func NewChargingGasMeter(bankKeeper authtypes.BankKeeper, accountKeeper authante.AccountKeeper, limit storetypes.Gas, payerAccount sdk.AccAddress, minGasPrice sdk.DecCoins) storetypes.GasMeter {
+	return &ChargingGasMeter{
+		limit:         limit,
+		consumed:      0,
+		PayerAccount:  payerAccount,
+		MinGasPrice:   minGasPrice,
+		bankKeeper:    bankKeeper,
+		accountKeeper: accountKeeper,
 	}
 }
 
-func (g *chargingGasMeter) GasConsumed() storetypes.Gas {
+func (g *ChargingGasMeter) GasConsumed() storetypes.Gas {
 	return g.consumed
 }
 
-func (g *chargingGasMeter) Limit() storetypes.Gas {
+func (g *ChargingGasMeter) Limit() storetypes.Gas {
 	return g.limit
 }
 
-func (g *chargingGasMeter) GasConsumedToLimit() storetypes.Gas {
+func (g *ChargingGasMeter) GasConsumedToLimit() storetypes.Gas {
 	if g.IsPastLimit() {
 		return g.limit
 	}
 	return g.consumed
 }
 
-func (g *chargingGasMeter) ConsumeGas(amount storetypes.Gas, descriptor string) {
+func (g *ChargingGasMeter) ConsumeGas(amount storetypes.Gas, descriptor string) {
 	var overflow bool
 	// TODO: Should we set the consumed field after overflow checking?
 	g.consumed, overflow = addUint64Overflow(g.consumed, amount)
@@ -52,24 +58,24 @@ func (g *chargingGasMeter) ConsumeGas(amount storetypes.Gas, descriptor string) 
 
 }
 
-func (g *chargingGasMeter) IsPastLimit() bool {
+func (g *ChargingGasMeter) IsPastLimit() bool {
 	return g.consumed > g.limit && g.limit != 0
 }
 
-func (g *chargingGasMeter) IsOutOfGas() bool {
+func (g *ChargingGasMeter) IsOutOfGas() bool {
 	return g.consumed >= g.limit
 }
 
-func (g *chargingGasMeter) String() string {
+func (g *ChargingGasMeter) String() string {
 	return fmt.Sprintf("BluzelleGasMeter:\n  limit: %d\n  consumed: %d", g.limit, g.consumed)
 }
 
-func (g *chargingGasMeter) Charge(ctx *sdk.Context, bankKeeper authtypes.BankKeeper, accountKeeper authante.AccountKeeper, gasPrice sdk.DecCoins) error {
-	gasFee := calculateGasFee(g, gasPrice)
+func (g *ChargingGasMeter) Charge(ctx sdk.Context) error {
+	gasFee := calculateGasFee(g)
 
-	acc := accountKeeper.GetAccount(*ctx, g.payerAccount)
+	acc := g.accountKeeper.GetAccount(ctx, g.PayerAccount)
 
-	err := deductFees(ctx, bankKeeper, acc, gasFee)
+	err := deductFees(&ctx, g.bankKeeper, acc, gasFee)
 
 	if err != nil {
 		return err
@@ -93,9 +99,11 @@ func deductFees(ctx *sdk.Context, bankKeeper authtypes.BankKeeper, acc authtypes
 	return nil
 }
 
-func calculateGasFee(gm *chargingGasMeter, gasPrice sdk.DecCoins) sdk.Coins {
+func calculateGasFee(gm *ChargingGasMeter) sdk.Coins {
 
-	gasPriceAmount := gasPrice.AmountOf("ubnt")
+	minGasPrice := gm.MinGasPrice
+
+	gasPriceAmount := minGasPrice.AmountOf("ubnt")
 
 	gasConsumed := gm.GasConsumed()
 

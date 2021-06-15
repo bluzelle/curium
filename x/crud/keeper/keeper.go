@@ -3,16 +3,12 @@ package keeper
 import (
 	"bytes"
 	"fmt"
-	"github.com/bluzelle/curium/app/ante"
-	curiumkeeper "github.com/bluzelle/curium/x/curium/keeper"
-	"github.com/cosmos/cosmos-sdk/types/query"
-	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-
 	"github.com/bluzelle/curium/x/crud/types"
+	curiumkeeper "github.com/bluzelle/curium/x/curium/keeper"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/query"
 	"github.com/tendermint/tendermint/libs/log"
 	"sort"
 	"strconv"
@@ -23,9 +19,6 @@ type (
 	Keeper struct {
 		cdc          codec.Marshaler
 		curiumKeeper curiumkeeper.Keeper
-		GasMeterKeeper *ante.GasMeterKeeper
-		BankKeeper bankkeeper.Keeper
-		AccountKeeper authkeeper.AccountKeeper
 		storeKey     sdk.StoreKey
 		memKey       sdk.StoreKey
 		mks          MaxKeeperSizes
@@ -50,9 +43,6 @@ func MakeLeaseKey(blockHeight int64, UUID string, key string) []byte {
 func NewKeeper(
 	cdc codec.Marshaler,
 	curiumKeeper curiumkeeper.Keeper,
-	GasMeterKeeper *ante.GasMeterKeeper,
-	BankKeeper bankkeeper.Keeper,
-	AccountKeeper authkeeper.AccountKeeper,
 	storeKey sdk.StoreKey,
 	memKey sdk.StoreKey,
 	mks MaxKeeperSizes,
@@ -61,9 +51,6 @@ func NewKeeper(
 	return &Keeper{
 		cdc:          cdc,
 		curiumKeeper: curiumKeeper,
-		GasMeterKeeper: GasMeterKeeper,
-		BankKeeper: BankKeeper,
-		AccountKeeper: AccountKeeper,
 		storeKey:     storeKey,
 		memKey:       memKey,
 		mks:          mks,

@@ -24,7 +24,7 @@ describe('tx.Create()', function () {
     let sdk: BluzelleSdk;
     let uuid: string;
     let creator: string;
-    beforeEach(() =>  {
+    beforeEach(() => {
         useChaiAsPromised();
         return getSdk("phrase lonely draw rubber either tuna harbor route decline burger inquiry aisle scrub south style chronic trouble biology coil defy fashion warfare blanket shuffle")
             .then(newSdk => sdk = newSdk)
@@ -42,10 +42,10 @@ describe('tx.Create()', function () {
             lease: {days: 10} as Lease,
             metadata: new Uint8Array()
         })
-            .then(() => start=Date.now()-start)
             .then(x => x)
-            .then(() => sdk.db.tx.Read({
-                creator,
+            .then(() => start = Date.now() - start)
+            .then(x => x)
+            .then(() => sdk.db.q.Read({
                 uuid,
                 key: 'someKey'
             }))
@@ -103,7 +103,7 @@ describe('tx.Create()', function () {
 
     it('should do multiple creates in parallel', () => {
 
-        return Promise.all(times(7).map(idx => sdk.db.tx.Create({
+        return Promise.all(times(15).map(idx => sdk.db.tx.Create({
             creator,
             uuid,
             key: `key-${idx}`,
@@ -112,14 +112,13 @@ describe('tx.Create()', function () {
             metadata: new Uint8Array()
         })
             .then(() => console.log(`=============created key-${idx}, value-${idx}, in uuid ${uuid}`))))
-            .then(() => delay(10000))
-            .then(() => Promise.all(times(7).map(idx => sdk.db.q.Read({
-            uuid,
-            key: `key-${idx}`
-        })
-            .then(passThrough(() => console.log(`//////////// read key ${idx}`)))))
-            .then(arrayValues => arrayValues.map(val => decodeData(val.value)))
-            .then(decodedValues => expect(decodedValues).to.deep.equal(times(7).map(idx => `value-${idx}`))))
+            .then(() => Promise.all(times(15).map(idx => sdk.db.q.Read({
+                uuid,
+                key: `key-${idx}`
+            })
+                .then(passThrough(() => console.log(`//////////// read key ${idx}`)))))
+                .then(arrayValues => arrayValues.map(val => decodeData(val.value)))
+                .then(decodedValues => expect(decodedValues).to.deep.equal(times(15).map(idx => `value-${idx}`))))
     });
 
     it('should do multiple creates in withTransaction()', async () => {
@@ -399,36 +398,37 @@ describe('tx.Create()', function () {
                 lease: defaultLease,
                 metadata: new Uint8Array()
             }))
-
+            .then(() => delay(10000))
             .then(() => sdk.bank.q.Balance({
                 address: sdk.bank.address,
                 denom: 'ubnt'
             }))
             .then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
             .then(amt => firstCreateCost -= amt)
+            .then(cost => expect(cost).to.be.greaterThan(0))
 
-        await sdk.bank.q.Balance({
-            address: sdk.bank.address,
-            denom: 'ubnt'
-        }).then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
-            .then(amt => secondCreateCost += amt)
-            .then(() => sdk.db.tx.Create({
-                creator,
-                uuid,
-                key: 'key2',
-                value: encodeData('value1'),
-                lease: defaultLease,
-                metadata: new Uint8Array()
-            }))
-
-            .then(() => sdk.bank.q.Balance({
-                address: sdk.bank.address,
-                denom: 'ubnt'
-            }))
-            .then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
-            .then(amt => secondCreateCost -= amt)
-
-        await expect(firstCreateCost).to.be.closeTo(secondCreateCost, 3)
+        // await sdk.bank.q.Balance({
+        //     address: sdk.bank.address,
+        //     denom: 'ubnt'
+        // }).then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
+        //     .then(amt => secondCreateCost += amt)
+        //     .then(() => sdk.db.tx.Create({
+        //         creator,
+        //         uuid,
+        //         key: 'key2',
+        //         value: encodeData('value1'),
+        //         lease: defaultLease,
+        //         metadata: new Uint8Array()
+        //     }))
+        //
+        //     .then(() => sdk.bank.q.Balance({
+        //         address: sdk.bank.address,
+        //         denom: 'ubnt'
+        //     }))
+        //     .then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
+        //     .then(amt => secondCreateCost -= amt)
+        //
+        // await expect(firstCreateCost).to.be.closeTo(secondCreateCost, 3)
     })
 
     it('should still charge for a failed transaction', () => {
@@ -438,15 +438,15 @@ describe('tx.Create()', function () {
             denom: 'ubnt'
         })
             .then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
-            .then(amt => initialCost+= amt)
+            .then(amt => initialCost += amt)
             .then(() => sdk.db.tx.Create({
-            creator: sdk.db.address,
-            uuid,
-            key: '',
-            value: new TextEncoder().encode('secondvalue'),
-            lease: {days: 10} as Lease,
-            metadata: new Uint8Array()
-        }))
+                creator: sdk.db.address,
+                uuid,
+                key: '',
+                value: new TextEncoder().encode('secondvalue'),
+                lease: {days: 10} as Lease,
+                metadata: new Uint8Array()
+            }))
             .catch(x => x)
             .then(() => sdk.bank.q.Balance({
                 address: sdk.bank.address,

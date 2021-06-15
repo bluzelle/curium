@@ -4,9 +4,9 @@ import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"strings"
 )
 
 var (
@@ -27,12 +27,16 @@ type GasTx interface {
 type SetUpContextDecorator struct{
 	gasMeterKeeper *GasMeterKeeper
 	bankKeeper authtypes.BankKeeper
+	accountKeeper authante.AccountKeeper
+	minGasPriceCoins sdk.DecCoins
 }
 
-func NewSetUpContextDecorator(gasMeterKeeper *GasMeterKeeper, bankKeeper authtypes.BankKeeper) SetUpContextDecorator {
+func NewSetUpContextDecorator(gasMeterKeeper *GasMeterKeeper, bankKeeper authtypes.BankKeeper, accountKeeper authante.AccountKeeper, minGasPriceCoins sdk.DecCoins) SetUpContextDecorator {
 	return SetUpContextDecorator{
 		gasMeterKeeper: gasMeterKeeper,
 		bankKeeper: bankKeeper,
+		accountKeeper: accountKeeper,
+		minGasPriceCoins: minGasPriceCoins,
 	}
 }
 
@@ -43,11 +47,11 @@ func (sud SetUpContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate
 	if !ok {
 		// Set a gas meter with limit 0 as to prevent an infinite gas meter attack
 		// during runTx.
-		newCtx = SetGasMeter(simulate, ctx, 0, sud.gasMeterKeeper, tx)
+		newCtx = SetGasMeter(simulate, ctx, 0, sud.gasMeterKeeper, sud.bankKeeper, sud.accountKeeper, tx, sud.minGasPriceCoins)
 		return newCtx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be GasTx")
 	}
 
-	newCtx = SetGasMeter(simulate, ctx, gasTx.GetGas(), sud.gasMeterKeeper, tx)
+	newCtx = SetGasMeter(simulate, ctx, gasTx.GetGas(), sud.gasMeterKeeper, sud.bankKeeper, sud.accountKeeper, tx, sud.minGasPriceCoins)
 
 	// Decorator will catch an OutOfGasPanic caused in the next antehandler
 	// AnteHandlers must have their own defer/recover in order for the BaseApp
@@ -73,7 +77,7 @@ func (sud SetUpContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate
 }
 
 // SetGasMeter returns a new context with a gas meter set from a given context.
-func SetGasMeter(simulate bool, ctx sdk.Context, gasLimit uint64, gk *GasMeterKeeper, tx sdk.Tx) sdk.Context {
+func SetGasMeter(simulate bool, ctx sdk.Context, gasLimit uint64, gk *GasMeterKeeper, bankKeeper authtypes.BankKeeper, accountKeeper authante.AccountKeeper, tx sdk.Tx, minGasPriceCoins sdk.DecCoins) sdk.Context {
 	// In various cases such as simulation and during the genesis block, we do not
 	// meter any gas utilization.
 	if simulate || ctx.BlockHeight() == 0 {
@@ -83,10 +87,9 @@ func SetGasMeter(simulate bool, ctx sdk.Context, gasLimit uint64, gk *GasMeterKe
 	feePayer := feeTx.FeePayer()
 
 	msgModule := tx.GetMsgs()[0].Route()
-	isCrud := strings.Contains(msgModule, "crud")
 
-	if isCrud {
-		gm := NewChargingGasMeter(gasLimit, feePayer)
+	if msgModule == "crud" && !simulate && !ctx.IsCheckTx() {
+		gm := NewChargingGasMeter(bankKeeper, accountKeeper, gasLimit, feePayer, minGasPriceCoins)
 
 		gk.AddGasMeter(&gm)
 		return ctx.WithGasMeter(gm)

@@ -160,6 +160,13 @@ func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
 
 // EndBlock executes all ABCI EndBlock logic respective to the capability module. It
 // returns no validator updates.
-func (am AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
+func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
+	errors := am.keeper.GasMeterKeeper.ChargeAll(ctx)
+
+	if len(errors) > 0 {
+		am.keeper.Logger(ctx).Error("unable to charge gas", "errors", errors)
+	}
+
+	am.keeper.GasMeterKeeper.ClearAll()
 	return []abci.ValidatorUpdate{}
 }

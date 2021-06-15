@@ -3,6 +3,7 @@ package keeper
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/bluzelle/curium/app/ante"
 	"github.com/ethereum/go-ethereum/common/math"
 	"io"
 	"net/http"
@@ -22,10 +23,11 @@ type (
 		storeKey sdk.StoreKey
 		memKey   sdk.StoreKey
 		rpcPort  uint64
+		GasMeterKeeper *ante.GasMeterKeeper
 	}
 )
 
-func NewKeeper(cdc codec.Marshaler, storeKey, memKey sdk.StoreKey, laddr string) *Keeper {
+func NewKeeper(cdc codec.Marshaler, storeKey, memKey sdk.StoreKey, laddr string, gasMeterKeeper *ante.GasMeterKeeper) *Keeper {
 	regex, _ := regexp.Compile(".*:")
 	port, _ := math.ParseUint64(regex.ReplaceAllString(laddr, ""))
 	return &Keeper{
@@ -33,6 +35,7 @@ func NewKeeper(cdc codec.Marshaler, storeKey, memKey sdk.StoreKey, laddr string)
 		storeKey: storeKey,
 		memKey:   memKey,
 		rpcPort:  port,
+		GasMeterKeeper: gasMeterKeeper,
 	}
 }
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {

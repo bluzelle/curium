@@ -1,7 +1,7 @@
 package app
 
 import (
-//	"github.com/bluzelle/curium/x/voting"
+	//	"github.com/bluzelle/curium/x/voting"
 	//votingkeeper "github.com/bluzelle/curium/x/voting/keeper"
 	//votingtypes "github.com/bluzelle/curium/x/voting/types"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -101,12 +101,12 @@ import (
 	"github.com/bluzelle/curium/x/nft"
 	nftkeeper "github.com/bluzelle/curium/x/nft/keeper"
 	nfttypes "github.com/bluzelle/curium/x/nft/types"
-//	"github.com/bluzelle/curium/x/synchronizer"
-//	synchronizerkeeper "github.com/bluzelle/curium/x/synchronizer/keeper"
-//	synchronizertypes "github.com/bluzelle/curium/x/synchronizer/types"
-//	"github.com/bluzelle/curium/x/voting"
-//	votingkeeper "github.com/bluzelle/curium/x/voting/keeper"
-//	votingtypes "github.com/bluzelle/curium/x/voting/types"
+	//	"github.com/bluzelle/curium/x/synchronizer"
+	//	synchronizerkeeper "github.com/bluzelle/curium/x/synchronizer/keeper"
+	//	synchronizertypes "github.com/bluzelle/curium/x/synchronizer/types"
+	//	"github.com/bluzelle/curium/x/voting"
+	//	votingkeeper "github.com/bluzelle/curium/x/voting/keeper"
+	//	votingtypes "github.com/bluzelle/curium/x/voting/types"
 )
 
 const Name = "curium"
@@ -363,11 +363,14 @@ func New(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
+	app.gasMeterKeeper = ante.NewGasMeterKeeper()
+
 	app.curiumKeeper = *curiumkeeper.NewKeeper(
 		appCodec,
 		keys[curiumtypes.StoreKey],
 		keys[curiumtypes.MemStoreKey],
 		appOpts.Get("rpc.laddr").(string),
+		app.gasMeterKeeper,
 	)
 
 	msgBroadcaster := curium.NewMsgBroadcaster(&app.AccountKeeper, cast.ToString(appOpts.Get(flags.FlagHome)))
@@ -407,17 +410,13 @@ func New(
 	//)
 	//votingModule := voting.NewAppModule(appCodec, app.votingKeeper)
 
-	minGasPriceString := cast.ToString(appOpts.Get(server.FlagMinGasPrices))
-	minGasPriceCoins, _ := sdk.ParseDecCoins(minGasPriceString)
 
-	app.gasMeterKeeper = ante.NewGasMeterKeeper(minGasPriceCoins)
+
+
 
 	app.crudKeeper = *crudkeeper.NewKeeper(
 		appCodec,
 		app.curiumKeeper,
-		app.gasMeterKeeper,
-		app.BankKeeper,
-		app.AccountKeeper,
 		keys[crudtypes.StoreKey],
 		keys[crudtypes.MemStoreKey],
 		crudkeeper.MaxKeeperSizes{
@@ -500,7 +499,7 @@ func New(
 		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName, crudtypes.ModuleName,
 	)
 
-	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, /*synchronizertypes.ModuleName, votingtypes.ModuleName ,*/ nfttypes.ModuleName, crudtypes.ModuleName)
+	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, /*synchronizertypes.ModuleName, votingtypes.ModuleName ,*/ nfttypes.ModuleName, crudtypes.ModuleName, curiumtypes.ModuleName)
 
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
@@ -539,6 +538,9 @@ func New(
 	app.MountTransientStores(tkeys)
 	app.MountMemoryStores(memKeys)
 
+	minGasPriceString := cast.ToString(appOpts.Get(server.FlagMinGasPrices))
+	minGasPriceCoins, _ := sdk.ParseDecCoins(minGasPriceString)
+
 	// initialize BaseApp
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
@@ -547,6 +549,7 @@ func New(
 			app.AccountKeeper, app.BankKeeper, authante.DefaultSigVerificationGasConsumer,
 			encodingConfig.TxConfig.SignModeHandler(),
 			app.gasMeterKeeper,
+			app.AccountKeeper, minGasPriceCoins,
 		),
 	)
 	app.SetEndBlocker(app.EndBlocker)

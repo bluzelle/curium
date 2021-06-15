@@ -15,10 +15,12 @@ func NewAnteHandler(
 	sigGasConsumer auth.SignatureVerificationGasConsumer,
 	signModeHandler signing.SignModeHandler,
 	gasMeterKeeper *GasMeterKeeper,
+	accountKeeper auth.AccountKeeper,
+	minGasPriceCoins sdk.DecCoins,
 ) sdk.AnteHandler {
 	return sdk.ChainAnteDecorators(
 		//auth.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
-		NewSetUpContextDecorator(gasMeterKeeper, bankKeeper),
+		NewSetUpContextDecorator(gasMeterKeeper, bankKeeper, accountKeeper, minGasPriceCoins),
 		auth.NewRejectExtensionOptionsDecorator(),
 		//auth.NewMempoolFeeDecorator(),
 		NewMempoolFeeDecorator(),

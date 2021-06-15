@@ -4,12 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/spf13/cobra"
-
-	abci "github.com/tendermint/tendermint/abci/types"
-
 	"github.com/bluzelle/curium/x/crud/client/cli"
 	"github.com/bluzelle/curium/x/crud/client/rest"
 	"github.com/bluzelle/curium/x/crud/keeper"
@@ -19,6 +13,10 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	"github.com/gorilla/mux"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/spf13/cobra"
+	abci "github.com/tendermint/tendermint/abci/types"
 	// this line is used by starport scaffolding # ibc/module/import
 )
 
@@ -162,8 +160,6 @@ func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
 // EndBlock executes all ABCI EndBlock logic respective to the capability module. It
 // returns no validator updates.
 func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-	//am.keeper.ProcessLeasesAtBlockHeight(&ctx, ctx.BlockHeight())
-	//am.keeper.GasMeterKeeper.ChargeAll(&ctx, am.keeper.BankKeeper, am.keeper.AccountKeeper)
-	//am.keeper.GasMeterKeeper.ClearAll()
+	am.keeper.ProcessLeasesAtBlockHeight(&ctx, ctx.BlockHeight())
 	return []abci.ValidatorUpdate{}
 }

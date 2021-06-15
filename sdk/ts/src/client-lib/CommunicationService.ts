@@ -13,7 +13,7 @@ import {BroadcastTxCommitResponse, broadcastTxCommitSuccess, Client, Tendermint3
 import {passThroughAwait} from "promise-passthrough";
 
 const TOKEN_NAME = 'ubnt';
-globalThis.btoa
+
 interface MessageQueueItem<T> {
     message: Message<T>
     gasInfo: GasInfo
@@ -132,19 +132,24 @@ const transmitTransaction = (service: CommunicationService, messages: MessageQue
                     })
                 )
                 .then((txRaw: TxRaw) => Uint8Array.from(TxRaw.encode(txRaw).finish()))
-                .then((signedTx: Uint8Array) => tendermint.broadcastTxCommit({tx: signedTx}))
+                //.then((signedTx: Uint8Array) => tendermint.broadcastTxCommit({tx: signedTx}))
                 .then(x => x)
-                .then(resp => broadcastTxCommitSuccess(resp) ? resp : function () {throw ({checkTx: resp.checkTx, deliverTx: resp.deliverTx})} ())
-                //.then((signedTx: Uint8Array) => cosmos.broadcastTx(signedTx, cosmos.broadcastTimeoutMs, 0))
-                //.then(passThroughAwait(resp => delay(3000)))
+                //.then(resp => broadcastTxCommitSuccess(resp) ? resp : function () {throw ({checkTx: resp.checkTx, deliverTx: resp.deliverTx})} ())
+                .then((signedTx: Uint8Array) => cosmos.broadcastTx(signedTx, 30000, 1000))
+                .then(resp => ({hash: resp.transactionHash, height: resp.height}))
+                .then(console.log)
+                //.then(resp => pollForCommit(resp, tendermint))
                 //.then(successCom => tendermint.txSearchAll({query: `tx.hash='${Buffer.from(successCom.hash).toString('hex').toUpperCase()}'`}))
                 //.then(successCom => tendermint.tx({hash: successCom.hash}))
                 //.then(txResult => txResult.result.data)
                 //.then(txSearch => txSearch.txs[0].result.data)
-                .then(resp => resp.deliverTx?.data || new Uint8Array())
+                //.then(resp => resp.deliverTx?.data || new Uint8Array())
+                .then(() => new Uint8Array())
                 .catch((e) => {
                     if (/account sequence mismatch/.test(e)) {
                         (service.accountRequested = undefined)
+                        console.log(e)
+                        throw(e)
                     } else {
                         throw e
                     }
@@ -153,10 +158,11 @@ const transmitTransaction = (service: CommunicationService, messages: MessageQue
 
 }
 
-const pollForSuccess = async (resp: BroadcastTxCommitResponse): Promise<void> => {
-    return new Promise((resolve) => {
-        return broadcastTxCommitSuccess(resp) ? resolve() :
-            pollForSuccess(resp)
+const pollForCommit = async (resp: BroadcastTxCommitResponse, tm: Tendermint34Client): Promise<void> => {
+    return new Promise(async (resolve) => {
+        await tm.txSearch({query: `tx.hash='${Buffer.from(resp.hash).toString('hex').toUpperCase()}'`})
+            .then(results => results.txs.length != 0)? resolve() :
+            await setTimeout(() => pollForCommit(resp, tm), 3000)
     })
 }
 
@@ -176,20 +182,15 @@ const getSequence = (service: CommunicationService, cosmos: SigningStargateClien
             )
     ) : (
         mnemonicToAddress(service.mnemonic)
-            .then(address => service.accountRequested = cosmos.getSequence(address)
-                .then(({accountNumber, sequence}) => {
-                    service.seq = sequence
-                    service.account = accountNumber
-                }))))
-        // .then(address =>
-        //     service.accountRequested = cosmos.getAccount(address)
-        //     .then((data: any) => {
-        //         if (!data) {
-        //             throw 'Invalid account: check your mnemonic'
-        //         }
-        //         service.seq = data.sequence
-        //         service.account = data.accountNumber
-        //     }))
+        .then(address =>
+            service.accountRequested = cosmos.getAccount(address)
+            .then((data: any) => {
+                if (!data) {
+                    throw 'Invalid account: check your mnemonic'
+                }
+                service.seq = data.sequence
+                service.account = data.accountNumber
+            }))))
 
         .then(() => ({
             seq: service.seq,
@@ -236,7 +237,7 @@ export const getClient = (service: CommunicationService) =>
             signer,
             {
                 registry: myRegistry,
-                broadcastTimeoutMs: 120000,
+                broadcastTimeoutMs: 300000,
             }
         ));
 
