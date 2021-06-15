@@ -16,6 +16,7 @@ import {localChain} from "../../config";
 import {getSentry, getSwarm, getValidator, SINGLE_SENTRY_SWARM} from "testing/lib/helpers/swarmHelpers";
 import {times} from 'lodash'
 import {passThrough, passThroughAwait} from "promise-passthrough";
+import delay from "delay";
 
 describe('tx.Create()', function () {
     //this.timeout(DEFAULT_TIMEOUT);
@@ -97,9 +98,9 @@ describe('tx.Create()', function () {
             .then(val => expect(val).to.equal('someValue'))
     })
 
-    it('should do multiple creates', async () => {
+    it('should do multiple creates in parallel', () => {
 
-        await Promise.all(times(3).map(idx => sdk.db.tx.Create({
+        return Promise.all(times(15).map(idx => sdk.db.tx.Create({
             creator,
             uuid,
             key: `key-${idx}`,
@@ -107,7 +108,46 @@ describe('tx.Create()', function () {
             lease: defaultLease,
             metadata: new Uint8Array()
         })
-            .then(() => console.log(`=============created key-${idx}, value-${idx}`))))
+            .then(() => console.log(`=============created key-${idx}, value-${idx}, in uuid ${uuid}`))))
+            .then(() => delay(10000))
+            .then(() => Promise.all(times(15).map(idx => sdk.db.q.Read({
+            uuid,
+            key: `key-${idx}`
+        })
+            .then(passThrough(() => console.log(`//////////// read key ${idx}`)))))
+            .then(arrayValues => arrayValues.map(val => decodeData(val.value)))
+            .then(decodedValues => expect(decodedValues).to.deep.equal(times(15).map(idx => `value-${idx}`))))
+    });
+
+    it('should do multiple creates in withTransaction()', async () => {
+        await sdk.db.withTransaction(() => {
+            sdk.db.tx.Create({
+                creator,
+                uuid,
+                key: `key-0`,
+                value: encodeData(`value-0`),
+                lease: defaultLease,
+                metadata: new Uint8Array()
+            });
+            sdk.db.tx.Create({
+                creator,
+                uuid,
+                key: `key-1`,
+                value: encodeData(`value-1`),
+                lease: defaultLease,
+                metadata: new Uint8Array()
+            });
+            sdk.db.tx.Create({
+                creator,
+                uuid,
+                key: `key-2`,
+                value: encodeData(`value-2`),
+                lease: defaultLease,
+                metadata: new Uint8Array()
+            });
+        }, {memo: ''});
+
+        //await delay(60000)
 
         await Promise.all(times(3).map(idx => sdk.db.q.Read({
             uuid,
@@ -115,7 +155,7 @@ describe('tx.Create()', function () {
         })
             .then(passThrough(() => console.log(`//////////// read key ${idx}`)))))
             .then(arrayValues => arrayValues.map(val => decodeData(val.value)))
-            .then(decodedValues => expect(decodedValues).to.deep.equal(times(10).map(idx => `value-${idx}`)))
+            .then(decodedValues => expect(decodedValues).to.deep.equal(times(3).map(idx => `value-${idx}`)))
     })
 
     it('should throw an error if key already exists', () => {

@@ -12,8 +12,8 @@ exports.builder = builder;
 var handler = function (argv) {
     return sdk_helpers_1.getQuerySdk(argv.node)
         .then(function (sdk) { return sdk.db.q.Read({
-        uuid: argv.uuid,
-        key: argv.key
+        uuid: argv.uuid.toString(),
+        key: argv.key.toString()
     }); })
         .then(function (data) { return new TextDecoder().decode(data.value); })
         .then(console.log);

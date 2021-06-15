@@ -254,8 +254,6 @@ export interface Params {
   historicalEntries: number;
   /** bond_denom defines the bondable coin denomination. */
   bondDenom: string;
-  /** power_reduction is the amount of staking tokens required for 1 unit of consensus-engine power */
-  powerReduction: string;
 }
 
 /**
@@ -2042,7 +2040,6 @@ const baseParams: object = {
   maxEntries: 0,
   historicalEntries: 0,
   bondDenom: "",
-  powerReduction: "",
 };
 
 export const Params = {
@@ -2064,9 +2061,6 @@ export const Params = {
     }
     if (message.bondDenom !== "") {
       writer.uint32(42).string(message.bondDenom);
-    }
-    if (message.powerReduction !== "") {
-      writer.uint32(50).string(message.powerReduction);
     }
     return writer;
   },
@@ -2092,9 +2086,6 @@ export const Params = {
           break;
         case 5:
           message.bondDenom = reader.string();
-          break;
-        case 6:
-          message.powerReduction = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -2134,11 +2125,6 @@ export const Params = {
     } else {
       message.bondDenom = "";
     }
-    if (object.powerReduction !== undefined && object.powerReduction !== null) {
-      message.powerReduction = String(object.powerReduction);
-    } else {
-      message.powerReduction = "";
-    }
     return message;
   },
 
@@ -2154,8 +2140,6 @@ export const Params = {
     message.historicalEntries !== undefined &&
       (obj.historicalEntries = message.historicalEntries);
     message.bondDenom !== undefined && (obj.bondDenom = message.bondDenom);
-    message.powerReduction !== undefined &&
-      (obj.powerReduction = message.powerReduction);
     return obj;
   },
 
@@ -2188,11 +2172,6 @@ export const Params = {
       message.bondDenom = object.bondDenom;
     } else {
       message.bondDenom = "";
-    }
-    if (object.powerReduction !== undefined && object.powerReduction !== null) {
-      message.powerReduction = object.powerReduction;
-    } else {
-      message.powerReduction = "";
     }
     return message;
   },

@@ -13,8 +13,8 @@ export const builder = (yargs: Argv) => {
 export const handler = (argv: QueryReadRequest & {node: string}) => {
     return getQuerySdk(argv.node)
         .then(sdk => sdk.db.q.Read({
-            uuid: argv.uuid,
-            key: argv.key
+            uuid: argv.uuid.toString(),
+            key: argv.key.toString()
         }))
         .then(data => new TextDecoder().decode(data.value))
         .then(console.log)

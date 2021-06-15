@@ -8,9 +8,9 @@ const monet_1 = require("monet");
 const lodash_1 = require("lodash");
 const delay_1 = __importDefault(require("delay"));
 const proto_signing_1 = require("@cosmjs/proto-signing");
-const stargate_1 = require("@cosmjs/stargate");
 const tx_1 = require("@cosmjs/proto-signing/build/codec/cosmos/tx/v1beta1/tx");
 const Registry_1 = require("./Registry");
+const stargate_1 = require("@cosmjs/stargate");
 const TOKEN_NAME = 'ubnt';
 const dummyMessageResponse = new Uint8Array();
 const mnemonicToAddress = (mnemonic) => proto_signing_1.DirectSecp256k1HdWallet.fromMnemonic(mnemonic, { prefix: 'bluzelle' })
@@ -40,12 +40,15 @@ const withTransaction = (service, fn, { memo }) => {
 };
 exports.withTransaction = withTransaction;
 const sendMessage = (ctx, message, gasInfo) => {
-    return new Promise((resolve) => {
-        msgChain = msgChain
-            .then(() => transmitTransaction(ctx, [{ message, gasInfo }], { memo: '' })
-            .then(x => x)
-            .then(resolve));
-    });
+    var _a;
+    return ctx.transactionMessageQueue ? Promise.resolve((_a = ctx.transactionMessageQueue) === null || _a === void 0 ? void 0 : _a.items.push({
+        message, gasInfo
+    }))
+        .then(() => (dummyMessageResponse))
+        : sendMessages(ctx, newTransactionMessageQueue([{
+                message,
+                gasInfo
+            }], ''));
 };
 exports.sendMessage = sendMessage;
 const sendMessages = (service, queue, retrans = false) => new Promise((resolve, reject) => {
@@ -85,19 +88,18 @@ const transmitTransaction = (service, messages, { memo }) => {
         sequence: account.seq
     }))
         .then((txRaw) => Uint8Array.from(tx_1.TxRaw.encode(txRaw).finish()))
-        .then((signedTx) => cosmos.broadcastTx(signedTx))
+        .then((signedTx) => cosmos.broadcastTx(signedTx, cosmos.broadcastTimeoutMs))
         .then(x => x)
-        //.then(res => checkErrors(res as BroadcastTxFailure))
-        //.then(x => (x as any)?.data[0].data ?? new Uint8Array())
         .then(() => new Uint8Array())
-    // .catch((e) => {
-    //     if(/incorrect acccount sequence/.test(e)) {
-    //         (service.accountRequested = undefined)
-    //     } else {
-    //         throw e
-    //     }
-    // })
-    );
+        .catch(x => x)
+        .catch((e) => {
+        if (/incorrect acccount sequence/.test(e)) {
+            (service.accountRequested = undefined);
+        }
+        else {
+            throw e;
+        }
+    }));
 };
 let msgChain = Promise.resolve();
 const getSequence = (service, cosmos) => (service.accountRequested ? (service.accountRequested = service.accountRequested
@@ -139,6 +141,7 @@ const getSigner = (mnemonic) => proto_signing_1.DirectSecp256k1HdWallet.fromMnem
 const getClient = (service) => getSigner(service.mnemonic)
     .then(signer => stargate_1.SigningStargateClient.connectWithSigner(service.url, signer, {
     registry: Registry_1.myRegistry,
+    broadcastTimeoutMs: 120000,
 }));
 exports.getClient = getClient;
 const getChainId = lodash_1.memoize((client) => client.getChainId());

@@ -1639,7 +1639,6 @@ const baseParams = {
     maxEntries: 0,
     historicalEntries: 0,
     bondDenom: "",
-    powerReduction: "",
 };
 exports.Params = {
     encode(message, writer = minimal_1.default.Writer.create()) {
@@ -1657,9 +1656,6 @@ exports.Params = {
         }
         if (message.bondDenom !== "") {
             writer.uint32(42).string(message.bondDenom);
-        }
-        if (message.powerReduction !== "") {
-            writer.uint32(50).string(message.powerReduction);
         }
         return writer;
     },
@@ -1684,9 +1680,6 @@ exports.Params = {
                     break;
                 case 5:
                     message.bondDenom = reader.string();
-                    break;
-                case 6:
-                    message.powerReduction = reader.string();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -1728,12 +1721,6 @@ exports.Params = {
         else {
             message.bondDenom = "";
         }
-        if (object.powerReduction !== undefined && object.powerReduction !== null) {
-            message.powerReduction = String(object.powerReduction);
-        }
-        else {
-            message.powerReduction = "";
-        }
         return message;
     },
     toJSON(message) {
@@ -1748,8 +1735,6 @@ exports.Params = {
         message.historicalEntries !== undefined &&
             (obj.historicalEntries = message.historicalEntries);
         message.bondDenom !== undefined && (obj.bondDenom = message.bondDenom);
-        message.powerReduction !== undefined &&
-            (obj.powerReduction = message.powerReduction);
         return obj;
     },
     fromPartial(object) {
@@ -1784,12 +1769,6 @@ exports.Params = {
         }
         else {
             message.bondDenom = "";
-        }
-        if (object.powerReduction !== undefined && object.powerReduction !== null) {
-            message.powerReduction = object.powerReduction;
-        }
-        else {
-            message.powerReduction = "";
         }
         return message;
     },

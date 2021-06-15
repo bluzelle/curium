@@ -5,9 +5,12 @@ import {Message} from "../legacyAdapter/types/Message";
 import {memoize} from 'lodash'
 import delay from "delay";
 import {DirectSecp256k1HdWallet, EncodeObject} from "@cosmjs/proto-signing";
-import {BroadcastTxFailure, BroadcastTxResponse, SigningStargateClient} from "@cosmjs/stargate";
+
 import {TxRaw} from "@cosmjs/proto-signing/build/codec/cosmos/tx/v1beta1/tx";
 import {myRegistry} from "./Registry";
+import {BroadcastTxFailure, BroadcastTxResponse, SigningStargateClient} from "@cosmjs/stargate";
+import {BroadcastTxCommitResponse, broadcastTxCommitSuccess, Client, Tendermint34Client} from "@cosmjs/tendermint-rpc";
+import {passThroughAwait} from "promise-passthrough";
 
 const TOKEN_NAME = 'ubnt';
 
@@ -68,15 +71,14 @@ export const withTransaction = <T>(service: CommunicationService, fn: () => T, {
 
 
 export const sendMessage = <T, R>(ctx: CommunicationService, message: Message<T>, gasInfo: GasInfo): Promise<Uint8Array> => {
-    return new Promise((resolve) => {
-        msgChain = msgChain
-            .then(() =>
-               transmitTransaction(ctx, [{message, gasInfo}], {memo: ''})
-                   .then(x => x)
-                    .then(resolve)
-            )
-    })
-
+    return ctx.transactionMessageQueue ? Promise.resolve(ctx.transactionMessageQueue?.items.push({
+            message, gasInfo
+        }))
+            .then(() => (dummyMessageResponse))
+        : sendMessages(ctx, newTransactionMessageQueue([{
+            message,
+            gasInfo
+        }], ''))
 }
 
 
@@ -89,7 +91,7 @@ const sendMessages = (service: CommunicationService, queue: TransactionMessageQu
                         .catch(e =>
                             Some(retrans)
                                 .filter(retrans => retrans === false)
-                                .filter(() => /incorrect account sequence/.test(e))
+                                .filter(() => /account sequence mismatch/.test(e))
                                 .map(() => service.seq = 0)
                                 .map(() => service.account = 0)
                                 .map(() => delete service.accountRequested)
@@ -106,15 +108,18 @@ const sendMessages = (service: CommunicationService, queue: TransactionMessageQu
 
 const getDelayBetweenRequests = (length: number, url: string): number =>
     Right<number, number>(length)
-        .flatMap(length => length < 500 ? Left(1000) : Right(length))
+        .flatMap(length => length < 500 ? Left(3000) : Right(length))
         .flatMap(length => /localhost/.test(url) ? Left(500) : Left(500))
-        .cata(t => t, () => 3000)
+        .cata(t => t, () => 5000)
 
 
 let chainId: string
 const transmitTransaction = (service: CommunicationService, messages: MessageQueueItem<any>[], {memo}: { memo: string }): Promise<any> => {
     let cosmos: SigningStargateClient;
-    return getClient(service)
+    let tendermint: Tendermint34Client
+    return Tendermint34Client.connect('http://localhost:26657')
+        .then(tender => tendermint = tender)
+        .then(() => getClient(service))
         .then(c => cosmos = c)
         .then(client => getChainId(client).then(cId => chainId = cId))
         .then(() => getSequence(service, cosmos))
@@ -127,21 +132,30 @@ const transmitTransaction = (service: CommunicationService, messages: MessageQue
                     })
                 )
                 .then((txRaw: TxRaw) => Uint8Array.from(TxRaw.encode(txRaw).finish()))
-                .then((signedTx: Uint8Array) => cosmos.broadcastTx(signedTx))
-                .then(x => x)
-                //.then(res => checkErrors(res as BroadcastTxFailure))
-                //.then(x => (x as any)?.data[0].data ?? new Uint8Array())
+                .then((signedTx: Uint8Array) => tendermint.broadcastTxCommit({tx: signedTx}))
+                .then(resp => broadcastTxCommitSuccess(resp) ? resp : function () {throw ({checkTx: resp.checkTx, deliverTx: resp.deliverTx})} ())
+                //.then(passThroughAwait(resp => pollForSuccess(resp)))
+                .then(console.log)
+                // .then(resp => tendermint.subscribeTx(`tx.hash = ${resp.hash}`))
+                //.then((signedTx: Uint8Array) => cosmos.broadcastTx(signedTx, cosmos.broadcastTimeoutMs, 0))
+                //.then(x => cosmos.searchTx(`tx.hash=${x.transactionHash}`))
                 .then(() => new Uint8Array())
-                // .catch((e) => {
-                //     if(/incorrect acccount sequence/.test(e)) {
-                //         (service.accountRequested = undefined)
-                //     } else {
-                //         throw e
-                //     }
-                // })
-
+                .catch((e) => {
+                    if (/account sequence mismatch/.test(e)) {
+                        (service.accountRequested = undefined)
+                    } else {
+                        throw e
+                    }
+                })
         )
 
+}
+
+const pollForSuccess = async (resp: BroadcastTxCommitResponse): Promise<void> => {
+    return new Promise((resolve) => {
+        return broadcastTxCommitSuccess(resp) ? resolve() :
+            pollForSuccess(resp)
+    })
 }
 
 let msgChain = Promise.resolve()
@@ -160,17 +174,21 @@ const getSequence = (service: CommunicationService, cosmos: SigningStargateClien
             )
     ) : (
         mnemonicToAddress(service.mnemonic)
-            .then(address =>
-                service.accountRequested = cosmos.getAccount(address)
-                .then((data: any) => {
-                    if (!data) {
-                        throw 'Invalid account: check your mnemonic'
-                    }
-                    service.seq = data.sequence
-                    service.account = data.accountNumber
-                }))
+            .then(address => service.accountRequested = cosmos.getSequence(address)
+                .then(({accountNumber, sequence}) => {
+                    service.seq = sequence
+                    service.account = accountNumber
+                }))))
+        // .then(address =>
+        //     service.accountRequested = cosmos.getAccount(address)
+        //     .then((data: any) => {
+        //         if (!data) {
+        //             throw 'Invalid account: check your mnemonic'
+        //         }
+        //         service.seq = data.sequence
+        //         service.account = data.accountNumber
+        //     }))
 
-    ))
         .then(() => ({
             seq: service.seq,
             account: service.account
@@ -216,6 +234,7 @@ export const getClient = (service: CommunicationService) =>
             signer,
             {
                 registry: myRegistry,
+                broadcastTimeoutMs: 120000,
             }
         ));
 

@@ -200,8 +200,6 @@ export interface Params {
     historicalEntries: number;
     /** bond_denom defines the bondable coin denomination. */
     bondDenom: string;
-    /** power_reduction is the amount of staking tokens required for 1 unit of consensus-engine power */
-    powerReduction: string;
 }
 /**
  * DelegationResponse is equivalent to Delegation except that it contains a
