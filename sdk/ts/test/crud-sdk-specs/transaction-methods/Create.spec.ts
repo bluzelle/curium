@@ -33,6 +33,7 @@ describe('tx.Create()', function () {
     });
 
     it('should just do a create', () => {
+        let start = Date.now()
         return sdk.db.tx.Create({
             creator: sdk.db.address,
             uuid,
@@ -41,6 +42,8 @@ describe('tx.Create()', function () {
             lease: {days: 10} as Lease,
             metadata: new Uint8Array()
         })
+            .then(() => start=Date.now()-start)
+            .then(x => x)
             .then(() => sdk.db.tx.Read({
                 creator,
                 uuid,
@@ -100,7 +103,7 @@ describe('tx.Create()', function () {
 
     it('should do multiple creates in parallel', () => {
 
-        return Promise.all(times(15).map(idx => sdk.db.tx.Create({
+        return Promise.all(times(7).map(idx => sdk.db.tx.Create({
             creator,
             uuid,
             key: `key-${idx}`,
@@ -110,13 +113,13 @@ describe('tx.Create()', function () {
         })
             .then(() => console.log(`=============created key-${idx}, value-${idx}, in uuid ${uuid}`))))
             .then(() => delay(10000))
-            .then(() => Promise.all(times(15).map(idx => sdk.db.q.Read({
+            .then(() => Promise.all(times(7).map(idx => sdk.db.q.Read({
             uuid,
             key: `key-${idx}`
         })
             .then(passThrough(() => console.log(`//////////// read key ${idx}`)))))
             .then(arrayValues => arrayValues.map(val => decodeData(val.value)))
-            .then(decodedValues => expect(decodedValues).to.deep.equal(times(15).map(idx => `value-${idx}`))))
+            .then(decodedValues => expect(decodedValues).to.deep.equal(times(7).map(idx => `value-${idx}`))))
     });
 
     it('should do multiple creates in withTransaction()', async () => {

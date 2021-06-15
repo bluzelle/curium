@@ -34,10 +34,7 @@ func (k msgServer) Create(goCtx context.Context, msg *types.MsgCreate) (*types.M
 
 	k.SetOwner(&ctx, msg.Uuid, msg.Key, msg.Creator)
 
-	curGas := ctx.GasMeter().GasConsumed()
-	_ = curGas
 	k.ConsumeGasForMsg(&ctx, msg.Lease, msg.Uuid, msg.Key, msg.Value)
-	afterGas := ctx.GasMeter().GasConsumed()
-	_ = afterGas
+
 	return &types.MsgCreateResponse{}, nil
 }

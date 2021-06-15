@@ -13,7 +13,7 @@ import {BroadcastTxCommitResponse, broadcastTxCommitSuccess, Client, Tendermint3
 import {passThroughAwait} from "promise-passthrough";
 
 const TOKEN_NAME = 'ubnt';
-
+globalThis.btoa
 interface MessageQueueItem<T> {
     message: Message<T>
     gasInfo: GasInfo
@@ -133,13 +133,15 @@ const transmitTransaction = (service: CommunicationService, messages: MessageQue
                 )
                 .then((txRaw: TxRaw) => Uint8Array.from(TxRaw.encode(txRaw).finish()))
                 .then((signedTx: Uint8Array) => tendermint.broadcastTxCommit({tx: signedTx}))
+                .then(x => x)
                 .then(resp => broadcastTxCommitSuccess(resp) ? resp : function () {throw ({checkTx: resp.checkTx, deliverTx: resp.deliverTx})} ())
-                //.then(passThroughAwait(resp => pollForSuccess(resp)))
-                .then(console.log)
-                // .then(resp => tendermint.subscribeTx(`tx.hash = ${resp.hash}`))
                 //.then((signedTx: Uint8Array) => cosmos.broadcastTx(signedTx, cosmos.broadcastTimeoutMs, 0))
-                //.then(x => cosmos.searchTx(`tx.hash=${x.transactionHash}`))
-                .then(() => new Uint8Array())
+                //.then(passThroughAwait(resp => delay(3000)))
+                //.then(successCom => tendermint.txSearchAll({query: `tx.hash='${Buffer.from(successCom.hash).toString('hex').toUpperCase()}'`}))
+                //.then(successCom => tendermint.tx({hash: successCom.hash}))
+                //.then(txResult => txResult.result.data)
+                //.then(txSearch => txSearch.txs[0].result.data)
+                .then(resp => resp.deliverTx?.data || new Uint8Array())
                 .catch((e) => {
                     if (/account sequence mismatch/.test(e)) {
                         (service.accountRequested = undefined)
