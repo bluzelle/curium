@@ -37,8 +37,7 @@ describe('tx.Count()', function () {
             key: keys[0]
         });
 
-        expect(await sdk.db.tx.Count({
-            creator: sdk.db.address,
+        expect(await sdk.db.q.Count({
             uuid
         }).then(resp => resp.count)).to.equal(4);
     });

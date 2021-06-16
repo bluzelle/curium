@@ -146,8 +146,8 @@ const main = async () => {
     sdk = await bluzelle({
         gasPrice: 0.002,
         maxGas: 10000000,
-        url: "http://localhost:26667",
-        mnemonic: "armor armor shop farm grab twice address month tired tide pulse dove banner spider fold leader wink planet stable future major orchard solar culture"
+        url: "https://client.sentry.testnet.private.bluzelle.com:26657",
+        mnemonic: "urge crisp birth cotton rely reflect demise carry donor nut daughter ankle spoil breeze usual name absurd stumble typical early announce before machine street"
     })
     await sdk.db.tx.Create({
         creator: sdk.db.address,

@@ -68,14 +68,9 @@ var builder = function (yargs) {
 exports.builder = builder;
 var handler = function (argv) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        return [2 /*return*/, createUsersFile()
-                .then(function () { return appendNewUser(argv.user); })
-                .then(function () { return fs_1.promises.readFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/Users"), null); })
-                .then(sdk_helpers_1.decodeBufferFromFile)
-                .then(sdk_helpers_1.parseToJsonObject)
-                .then(function (x) { return x; })
-                .then(function (userRecord) { return userRecord['Users'][argv.user]; })
-                .then(function (x) { return x; })
+        return [2 /*return*/, makeCliDir()
+                .then(function () { return createUserFile(argv.user); })
+                .then(function () { return readUserMnemonic(argv.user); })
                 .then(console.log)
                 .catch(function (e) {
                 console.log(e);
@@ -83,15 +78,20 @@ var handler = function (argv) { return __awaiter(void 0, void 0, void 0, functio
     });
 }); };
 exports.handler = handler;
-var appendNewUser = function (username, mnemonic) {
+var writeNewUser = function (username, mnemonic) {
     if (mnemonic === void 0) { mnemonic = sdk_js_1.newMnemonic(); }
-    var newUser = JSON.parse("{\"" + username + "\": \"" + mnemonic + "\"}");
-    return fs_1.promises.readFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/Users"))
+    return fs_1.promises.readFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/"))
         .then(sdk_helpers_1.decodeBufferFromFile)
         .then(sdk_helpers_1.parseToJsonObject)
         .then(function (x) { return x; })
+        .then(function (x) { return (__assign({}, x)); })
+        .then(function (x) { return x; })
         .then(function (curUsers) { return (__assign({}, curUsers)); })
         .then(function (curUsers) { return fs_1.promises.appendFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/Users"), JSON.stringify(curUsers), { flag: 'w+' }); });
+};
+var readUserMnemonic = function (user) {
+    return fs_1.promises.readFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/cli/" + user + ".info"))
+        .then(sdk_helpers_1.decodeBufferFromFile);
 };
 var promptForMnemonic = function () {
     return new Promise(function (resolve) { return readline.question("Please provide BIP39 mnemonic", function (mnemonic) {
@@ -99,10 +99,14 @@ var promptForMnemonic = function () {
         return resolve(mnemonic);
     }); });
 };
-var createUsersFile = function () {
-    return fs_1.promises.access(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/Users"))
+var createUserFile = function (user, mnemonic) {
+    if (mnemonic === void 0) { mnemonic = sdk_js_1.newMnemonic(); }
+    return fs_1.promises.access(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/cli/" + user + ".info"))
         .catch(function (e) { return e.stack.match(/no such file/) ?
-        fs_1.promises.writeFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/Users"), JSON.stringify({}), { flag: 'wx' })
+        fs_1.promises.writeFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/cli/" + user + ".info"), mnemonic, { flag: 'wx' })
         :
             function () { throw e; }(); });
+};
+var makeCliDir = function () {
+    return fs_1.promises.mkdir(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/cli"), { mode:  });
 };

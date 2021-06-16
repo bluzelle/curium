@@ -7,9 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var yargs_1 = __importDefault(require("yargs"));
 var path_1 = require("path");
 yargs_1.default(process.argv.slice(2))
-    .commandDir(path_1.join(__dirname, 'cmds'), {
-    extensions: ['ts']
-})
+    .commandDir(path_1.join(__dirname, 'cmds'))
     .help()
     .demandCommand()
     .argv;
