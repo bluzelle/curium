@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import {BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
-import {defaultGasParams, newBzClient} from "../../helpers/client-helpers/client-helpers";
+
 import {
     createKeys,
     decodeData,
@@ -16,10 +16,11 @@ describe('tx.DeleteAll()', function () {
     this.timeout(DEFAULT_TIMEOUT);
     let sdk: BluzelleSdk;
     let uuid: string
-    beforeEach(async () => {
-        useChaiAsPromised()
-        sdk = await getSdk();
-        uuid = Date.now().toString()
+    beforeEach(() => {
+        useChaiAsPromised();
+        return getSdk("phrase lonely draw rubber either tuna harbor route decline burger inquiry aisle scrub south style chronic trouble biology coil defy fashion warfare blanket shuffle")
+            .then(newSdk => sdk = newSdk)
+            .then(() => uuid = Date.now().toString())
     });
 
     it('should throw an error if there are no keys', async () => {
@@ -161,8 +162,7 @@ describe('tx.DeleteAll()', function () {
             metadata: new Uint8Array()
         }));
 
-        expect(await otherSdk.db.tx.KeyValues({
-            creator: otherSdk.db.address,
+        expect(await otherSdk.db.q.KeyValues({
             uuid,
         }).then(resp => resp.keyValues)).to.deep.equal([{key: 'I took this uuid', value: encodeData('my uuid')}]);
 

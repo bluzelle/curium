@@ -3,6 +3,7 @@ import {BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
 import {encodeData, getSdk, zeroLease} from "../../helpers/client-helpers/sdk-helpers";
 import Long from 'long'
+import {useChaiAsPromised} from "testing/lib/globalHelpers";
 
 describe('tx.GetNShortestLeases', function () {
     this.timeout(DEFAULT_TIMEOUT);
@@ -10,10 +11,12 @@ describe('tx.GetNShortestLeases', function () {
     let sdk: BluzelleSdk;
     let uuid: string;
     let creator: string
-    beforeEach(async () => {
-        sdk = await getSdk();
-        uuid = Date.now().toString();
-        creator = sdk.db.address;
+    beforeEach(() => {
+        useChaiAsPromised();
+        return getSdk("phrase lonely draw rubber either tuna harbor route decline burger inquiry aisle scrub south style chronic trouble biology coil defy fashion warfare blanket shuffle")
+            .then(newSdk => sdk = newSdk)
+            .then(() => uuid = Date.now().toString())
+            .then(() => creator = sdk.db.address)
     });
 
     it('should return the first 2 shortest leases', async () => {

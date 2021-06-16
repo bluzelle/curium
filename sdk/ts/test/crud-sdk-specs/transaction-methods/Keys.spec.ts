@@ -20,17 +20,12 @@ describe('tx.Keys()', function () {
     let sdk: BluzelleSdk;
     let uuid: string;
     let creator: string;
-    beforeEach(async () => {
+    beforeEach(() => {
         useChaiAsPromised();
-        await getSwarm([(config) => ({
-            ...config,
-            targetBranch: 'stargate-old'
-        })])
-            .then(s => s.getValidators()[0].getAuth())
-            .then(auth => getSdk(auth.mnemonic))
+        return getSdk("phrase lonely draw rubber either tuna harbor route decline burger inquiry aisle scrub south style chronic trouble biology coil defy fashion warfare blanket shuffle")
             .then(newSdk => sdk = newSdk)
             .then(() => uuid = Date.now().toString())
-            .then(() =>  creator = sdk.db.address)
+            .then(() => creator = sdk.db.address)
     });
 
     it('should return the list of keys', () => {

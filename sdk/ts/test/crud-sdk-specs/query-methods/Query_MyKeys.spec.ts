@@ -1,9 +1,9 @@
 import {expect} from "chai";
 import {bluzelle, BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
-import {defaultGasParams} from "../../helpers/client-helpers/client-helpers";
 import {defaultLease, encodeData, getSdk, newSdkClient, zeroLease} from "../../helpers/client-helpers/sdk-helpers";
 import delay from "delay";
+import {useChaiAsPromised} from "testing/lib/globalHelpers";
 
 describe('q.MyKeys()', function () {
     this.timeout(DEFAULT_TIMEOUT);
@@ -11,11 +11,12 @@ describe('q.MyKeys()', function () {
     let uuid: string;
     let otherUuid: string;
     let creator: string;
-    beforeEach(async () => {
-        sdk = await getSdk();
-        uuid = Date.now().toString()
-        otherUuid = 'other' + uuid;
-        creator = sdk.db.address;
+    beforeEach(() => {
+        useChaiAsPromised();
+        return getSdk("phrase lonely draw rubber either tuna harbor route decline burger inquiry aisle scrub south style chronic trouble biology coil defy fashion warfare blanket shuffle")
+            .then(newSdk => sdk = newSdk)
+            .then(() => uuid = Date.now().toString())
+            .then(() => creator = sdk.db.address)
     });
 
     it('should return a list of only keys in all my uuids', async () => {

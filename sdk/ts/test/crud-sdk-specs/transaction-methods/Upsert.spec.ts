@@ -34,8 +34,7 @@ describe('tx.Upsert()', function () {
             lease: defaultLease
         })
 
-        expect(await sdk.db.tx.Read({
-            creator: sdk.db.address,
+        expect(await sdk.db.q.Read({
             uuid,
             key: 'key1'
         }).then(resp => decodeData(resp.value))).to.equal('value');
@@ -49,8 +48,8 @@ describe('tx.Upsert()', function () {
             lease: defaultLease
         })
 
-        expect(await sdk.db.tx.Read({
-            creator: sdk.db.address,
+        expect(await sdk.db.q.Read({
+
             uuid,
             key: 'key1'
         }).then(resp => decodeData(resp.value))).to.equal('');
@@ -74,8 +73,8 @@ describe('tx.Upsert()', function () {
             lease: defaultLease
         })
 
-        expect(await sdk.db.tx.Read({
-            creator: sdk.db.address,
+        expect(await sdk.db.q.Read({
+
             uuid,
             key: 'myKey'
         }).then(resp => decodeData(resp.value))).to.equal('firstValue');
@@ -89,8 +88,8 @@ describe('tx.Upsert()', function () {
             lease: defaultLease
         })
 
-        expect(await sdk.db.tx.Read({
-            creator: sdk.db.address,
+        expect(await sdk.db.q.Read({
+
             uuid,
             key: 'myKey'
         }).then(resp => decodeData(resp.value))).to.equal('secondValue');
@@ -106,8 +105,8 @@ describe('tx.Upsert()', function () {
             lease: defaultLease
         })
 
-        expect(await sdk.db.tx.Read({
-            creator: sdk.db.address,
+        expect(await sdk.db.q.Read({
+
             uuid,
             key: 'nonExistingKey'
         }).then(resp => decodeData(resp.value))).to.equal('aValue');
@@ -122,8 +121,8 @@ describe('tx.Upsert()', function () {
             metadata: new Uint8Array(),
             lease: defaultLease
         })
-            .then(() => sdk.db.tx.Read({
-                creator: sdk.db.address,
+            .then(() => sdk.db.q.Read({
+
                 uuid,
                 key: 'nonExistingKey'
             }))
@@ -178,8 +177,8 @@ describe('tx.Upsert()', function () {
             metadata: new Uint8Array(),
             lease: defaultLease
         })
-            .then(async () => expect(await sdk.db.tx.Read({
-                creator: sdk.db.address,
+            .then(async () => expect(await sdk.db.q.Read({
+
                 uuid,
                 key: '/'
             }).then(resp => decodeData(resp.value))).to.equal('slashKey'))
@@ -194,8 +193,8 @@ describe('tx.Upsert()', function () {
             metadata: new Uint8Array(),
             lease: defaultLease
         })
-            .then(() => sdk.db.tx.Read({
-                creator: sdk.db.address,
+            .then(() => sdk.db.q.Read({
+
                 uuid,
                 key: '/'
             }))

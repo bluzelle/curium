@@ -1,20 +1,21 @@
 import {expect} from "chai";
 import delay from "delay";
-import {DbSdk} from "../../../src/bz-sdk/bz-sdk";
+import {BluzelleSdk, DbSdk} from "../../../src/bz-sdk/bz-sdk";
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
 import {decodeData, encodeData, getSdk} from "../../helpers/client-helpers/sdk-helpers";
 import {Lease} from "../../../src/codec/crud/lease";
 
 describe('leasing', function () {
 
-    let sdk: DbSdk;
+    let sdk: BluzelleSdk;
     let uuid: string;
     let creator: string;
-    beforeEach(async () => {
+    beforeEach(() => {
         useChaiAsPromised();
-        sdk = await getSdk().then(client => sdk = client.db);
-        uuid = Date.now().toString();
-        creator = sdk.address;
+        return getSdk("phrase lonely draw rubber either tuna harbor route decline burger inquiry aisle scrub south style chronic trouble biology coil defy fashion warfare blanket shuffle")
+            .then(newSdk => sdk = newSdk)
+            .then(() => uuid = Date.now().toString())
+            .then(() => creator = sdk.db.address)
     });
 
     // ['days', 'hours', 'minutes', 'seconds'].forEach(async (unit) => {
@@ -25,7 +26,7 @@ describe('leasing', function () {
     // });
 
     it('should expire key-value beyond lease time', async () => {
-        await sdk.tx.Create({
+        await sdk.db.tx.Create({
             creator,
             uuid,
             key: 'leaseKey',
@@ -33,16 +34,14 @@ describe('leasing', function () {
             lease:  {minutes: 1, hours: 0, days: 0, seconds: 0, years: 0},
             metadata: new Uint8Array()
         });
-        expect(await sdk.tx.Read({
-            creator,
+        expect(await sdk.db.q.Read({
             key: 'leaseKey',
             uuid
         }).then(resp => decodeData(resp.value))).to.equal('myValue')
 
         await delay(60000);
 
-        await expect(sdk.tx.Read({
-            creator,
+        await expect(sdk.db.q.Read({
             key: 'leaseKey',
             uuid
         })).to.be.rejectedWith(/key not found/)
@@ -50,7 +49,7 @@ describe('leasing', function () {
     });
 
     it('should allow still read within lease time', async () => {
-        await sdk.tx.Create({
+        await sdk.db.tx.Create({
             creator,
             uuid,
             key: 'leaseKey2',
@@ -58,16 +57,14 @@ describe('leasing', function () {
             lease:  {minutes: 1, hours: 1, days: 0, seconds: 0, years: 0},
             metadata: new Uint8Array()
         });
-        expect(await sdk.tx.Read({
-            creator,
+        expect(await sdk.db.q.Read({
             key: 'leaseKey2',
             uuid
         }).then(resp => decodeData(resp.value))).to.equal('myValue')
 
         await delay(60000);
 
-        expect(await sdk.tx.Read({
-            creator: sdk.address,
+        expect(await sdk.db.q.Read({
             key: 'leaseKey2',
             uuid,
         }).then(resp => decodeData(resp.value))).to.equal('myValue')
@@ -75,7 +72,7 @@ describe('leasing', function () {
     });
 
     it('getLease()', async () => {
-        await sdk.tx.Create({
+        await sdk.db.tx.Create({
             creator,
             uuid,
             key: 'leaseKey12',
@@ -83,14 +80,12 @@ describe('leasing', function () {
             lease:  {minutes: 1, hours: 2, days: 0, seconds: 0, years: 0},
             metadata: new Uint8Array()
         });
-        expect(await sdk.tx.Read({
-            creator,
+        expect(await sdk.db.q.Read({
             key: 'leaseKey12',
             uuid
         }).then(resp => decodeData(resp.value))).to.equal('myValue')
 
-        expect(await sdk.tx.GetLease({
-            creator,
+        expect(await sdk.db.q.GetLease({
             key: 'leaseKey12',
             uuid
         }).then(resp => resp.seconds)).to.be.closeTo(7260, 20)

@@ -16,10 +16,12 @@ describe('q.Read()', function () {
 
     let sdk: BluzelleSdk;
     let uuid: string;
-    beforeEach(async () => {
+    beforeEach(() => {
         useChaiAsPromised();
-        sdk = await getSdk();
-        uuid = Date.now().toString();
+        return getSdk("phrase lonely draw rubber either tuna harbor route decline burger inquiry aisle scrub south style chronic trouble biology coil defy fashion warfare blanket shuffle")
+            .then(newSdk => sdk = newSdk)
+            .then(() => uuid = Date.now().toString())
+
     });
 
     it('should immediately retrieve values from the store', () => {

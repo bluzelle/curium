@@ -1,6 +1,5 @@
 import {expect} from "chai";
 import {BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
-import {defaultGasParams} from "../../helpers/client-helpers/client-helpers";
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
 import {encodeData, getSdk, defaultLease, newSdkClient} from "../../helpers/client-helpers/sdk-helpers";
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
@@ -10,11 +9,12 @@ describe('tx.Rename()', function () {
     this.timeout(DEFAULT_TIMEOUT);
     let sdk: BluzelleSdk;
     let uuid: string;
-    beforeEach(async () => {
-        useChaiAsPromised()
-        sdk = await getSdk();
-        uuid = Date.now().toString()
-    })
+    beforeEach(() => {
+        useChaiAsPromised();
+        return getSdk("phrase lonely draw rubber either tuna harbor route decline burger inquiry aisle scrub south style chronic trouble biology coil defy fashion warfare blanket shuffle")
+            .then(newSdk => sdk = newSdk)
+            .then(() => uuid = Date.now().toString())
+    });
 
     it('should not allow a rename of empty key', async () => {
 

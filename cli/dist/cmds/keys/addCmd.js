@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -42,6 +53,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = exports.builder = exports.desc = exports.command = void 0;
 var path_1 = __importDefault(require("path"));
 var fs_1 = require("fs");
+var sdk_js_1 = require("@bluzelle/sdk-js");
+var sdk_helpers_1 = require("../../helpers/sdk-helpers");
+var readline = require('readline').createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
 exports.command = 'add <user>';
 exports.desc = 'Add key to local system and generate mnemonic';
 var builder = function (yargs) {
@@ -51,14 +68,41 @@ var builder = function (yargs) {
 exports.builder = builder;
 var handler = function (argv) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        return [2 /*return*/, fs_1.promises.appendFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/" + argv.user + ".txt"), "sheriff ribbon enact flash giraffe hard sphere embody bundle pupil yellow client misery route meadow fever famous churn author fan come gravity receive card", { flag: 'ax' })
-                .then(console.log.bind(null, "FINISHED"))
-                .then(function () { return fs_1.promises.readFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/" + argv.user + ".txt"), null); })
-                .then(function (buf) { return new TextDecoder().decode(buf); })
+        return [2 /*return*/, createUsersFile()
+                .then(function () { return appendNewUser(argv.user); })
+                .then(function () { return fs_1.promises.readFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/Users"), null); })
+                .then(sdk_helpers_1.decodeBufferFromFile)
+                .then(sdk_helpers_1.parseToJsonObject)
+                .then(function (x) { return x; })
+                .then(function (userRecord) { return userRecord['Users'][argv.user]; })
+                .then(function (x) { return x; })
                 .then(console.log)
-                .catch(function () {
-                console.log(argv.user + " already exists");
+                .catch(function (e) {
+                console.log(e);
             })];
     });
 }); };
 exports.handler = handler;
+var appendNewUser = function (username, mnemonic) {
+    if (mnemonic === void 0) { mnemonic = sdk_js_1.newMnemonic(); }
+    var newUser = JSON.parse("{\"" + username + "\": \"" + mnemonic + "\"}");
+    return fs_1.promises.readFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/Users"))
+        .then(sdk_helpers_1.decodeBufferFromFile)
+        .then(sdk_helpers_1.parseToJsonObject)
+        .then(function (x) { return x; })
+        .then(function (curUsers) { return (__assign({}, curUsers)); })
+        .then(function (curUsers) { return fs_1.promises.appendFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/Users"), JSON.stringify(curUsers), { flag: 'w+' }); });
+};
+var promptForMnemonic = function () {
+    return new Promise(function (resolve) { return readline.question("Please provide BIP39 mnemonic", function (mnemonic) {
+        readline.close();
+        return resolve(mnemonic);
+    }); });
+};
+var createUsersFile = function () {
+    return fs_1.promises.access(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/Users"))
+        .catch(function (e) { return e.stack.match(/no such file/) ?
+        fs_1.promises.writeFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/Users"), JSON.stringify({}), { flag: 'wx' })
+        :
+            function () { throw e; }(); });
+};

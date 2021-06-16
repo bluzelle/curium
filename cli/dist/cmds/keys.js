@@ -6,7 +6,13 @@ exports.command = 'keys <method>';
 exports.desc = 'generate keys';
 var builder = function (yargs) {
     return yargs
-        .commandDir(path_1.join(__dirname, "keys"))
+        .commandDir(path_1.join(__dirname, "keys"), {
+        extensions: ['ts']
+    })
+        .option('recover', {
+        describe: 'recover account by providing mnemonic',
+        default: false
+    })
         .help()
         .demandCommand();
 };

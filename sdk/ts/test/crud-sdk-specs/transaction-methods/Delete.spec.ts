@@ -9,9 +9,9 @@ import {
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
 import {BluzelleSdk, DbSdk} from "../../../src/bz-sdk/bz-sdk";
 import {expect} from "chai";
-import {Lease} from "../../../src/codec/crud/lease";
+
 import {createKeys} from "../../helpers/client-helpers/sdk-helpers";
-import {defaultRegistryTypes} from "@cosmjs/stargate";
+
 
 describe('tx.Delete()', function () {
     this.timeout(DEFAULT_TIMEOUT);

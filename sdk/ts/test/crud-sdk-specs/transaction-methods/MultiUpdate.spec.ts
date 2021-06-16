@@ -15,10 +15,11 @@ describe('tx.MultiUpdate()', function () {
     this.timeout(DEFAULT_TIMEOUT);
     let sdk: BluzelleSdk;
     let uuid: string;
-    beforeEach(async () => {
-        sdk = await getSdk();
-        uuid = Date.now().toString()
+    beforeEach(() => {
         useChaiAsPromised();
+        return getSdk("phrase lonely draw rubber either tuna harbor route decline burger inquiry aisle scrub south style chronic trouble biology coil defy fashion warfare blanket shuffle")
+            .then(newSdk => sdk = newSdk)
+            .then(() => uuid = Date.now().toString())
     });
 
     it('should throw an error if a key does not exist', () => {
@@ -57,14 +58,12 @@ describe('tx.MultiUpdate()', function () {
             keyValues: encodeKeyValues([{key: 'key1', value: 'value1'}, {key: 'key2', value: ''}])
 
         });
-        expect(await sdk.db.tx.Read({
-            creator: sdk.db.address,
+        expect(await sdk.db.q.Read({
             key: 'key1',
             uuid
         }).then(resp => decodeData(resp.value))).to.equal('value1');
 
-        expect(await sdk.db.tx.Read({
-            creator: sdk.db.address,
+        expect(await sdk.db.q.Read({
             key: 'key2',
             uuid
         }).then(resp => decodeData(resp.value))).to.equal('');
@@ -80,8 +79,7 @@ describe('tx.MultiUpdate()', function () {
             metadata: new Uint8Array()
         });
 
-        expect(await sdk.db.tx.Read({
-            creator: sdk.db.address,
+        expect(await sdk.db.q.Read({
             key: 'key1',
             uuid
         }).then(resp => decodeData(resp.value))).to.equal('value1');
@@ -93,8 +91,7 @@ describe('tx.MultiUpdate()', function () {
                 keyValues: encodeKeyValues([{key: 'key1', value: 'newVal'}, {key: 'key2', value: 'newVal'}])
             })
         )
-        expect(await sdk.db.tx.Read({
-            creator: sdk.db.address,
+        expect(await sdk.db.q.Read({
             key: 'key1',
             uuid
         }).then(resp => decodeData(resp.value))).to.equal('value1');
@@ -116,8 +113,7 @@ describe('tx.MultiUpdate()', function () {
             keyValues: encodeKeyValues([{key: 'key', value: 'newVal'}])
         });
 
-        expect(await sdk.db.tx.Read({
-            creator: sdk.db.address,
+        expect(await sdk.db.q.Read({
             key: 'key',
             uuid
         }).then(resp => decodeData(resp.value))).to.equal('newVal');
@@ -131,20 +127,17 @@ describe('tx.MultiUpdate()', function () {
             keyValues: encodeKeyValues([{key: keys[0], value: 'newValue1'}, {key: keys[2], value: 'newValue2'}])
         });
 
-        expect(await sdk.db.tx.Read({
-            creator: sdk.db.address,
+        expect(await sdk.db.q.Read({
             key: keys[0],
             uuid
         }).then(resp => decodeData(resp.value))).to.equal('newValue1');
 
-        expect(await sdk.db.tx.Read({
-            creator: sdk.db.address,
+        expect(await sdk.db.q.Read({
             key: keys[1],
             uuid
         }).then(resp => decodeData(resp.value))).to.equal(values[1]);
 
-        expect(await sdk.db.tx.Read({
-            creator: sdk.db.address,
+        expect(await sdk.db.q.Read({
             key: keys[2],
             uuid
         }).then(resp => decodeData(resp.value))).to.equal('newValue2');
@@ -170,8 +163,7 @@ describe('tx.MultiUpdate()', function () {
 
         })).to.be.rejectedWith(/incorrect owner/)
 
-        expect(await otherSdk.db.tx.Read({
-            creator: otherSdk.db.address,
+        expect(await otherSdk.db.q.Read({
             key: 'key',
             uuid
         }).then(resp => decodeData(resp.value))).to.equal('value1');

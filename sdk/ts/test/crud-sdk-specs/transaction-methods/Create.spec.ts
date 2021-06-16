@@ -431,29 +431,24 @@ describe('tx.Create()', function () {
         // await expect(firstCreateCost).to.be.closeTo(secondCreateCost, 3)
     })
 
-    it('should still charge for a failed transaction', () => {
-        let initialCost = 0;
-        return sdk.bank.q.Balance({
-            address: sdk.bank.address,
-            denom: 'ubnt'
+
+
+    it('should throw an error for insufficient funds, no account exists', () => {
+        return bluzelle({
+            mnemonic: bluzelle.newMnemonic(),
+            url: 'http://localhost:26667',
+            gasPrice: 0.002,
+            maxGas: 1000000000
         })
-            .then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
-            .then(amt => initialCost += amt)
-            .then(() => sdk.db.tx.Create({
+            .then(unfundedSdk => unfundedSdk.db.tx.Create({
                 creator: sdk.db.address,
                 uuid,
-                key: '',
-                value: new TextEncoder().encode('secondvalue'),
-                lease: {days: 10} as Lease,
+                key: 'myKey',
+                value: encodeData('myValue'),
+                lease: defaultLease,
                 metadata: new Uint8Array()
             }))
-            .catch(x => x)
-            .then(() => sdk.bank.q.Balance({
-                address: sdk.bank.address,
-                denom: 'ubnt'
-            }))
-            .then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
-            .then(amt => expect(amt).to.be.lessThan(initialCost))
+            .catch(e => expect(e).to.match(/Invalid account/))
     })
 })
 

@@ -37,11 +37,10 @@ describe('tx.Update()', function () {
             metadata: new Uint8Array(),
             lease: defaultLease
         });
-        expect(await sdk.db.tx.Read({
-            creator: sdk.db.address,
+        expect(await sdk.db.q.Read({
             uuid,
             key: 'emptykey1'
-        }).then(resp => decodeData(resp.value))).to.equal('value1');
+        }).then(resp => decodeData(resp.value))).to.equal('value');
 
         await sdk.db.tx.Update({
             creator: sdk.db.address,
@@ -51,8 +50,7 @@ describe('tx.Update()', function () {
             metadata: new Uint8Array(),
             lease: defaultLease
         });
-        expect(await sdk.db.tx.Read({
-            creator: sdk.db.address,
+        expect(await sdk.db.q.Read({
             uuid,
             key: 'emptykey1'
         }).then(resp => decodeData(resp.value))).to.equal('');
@@ -108,8 +106,7 @@ describe('tx.Update()', function () {
             metadata: new Uint8Array(),
             lease: defaultLease
         });
-        expect(await sdk.db.tx.Read({
-            creator: sdk.db.address,
+        expect(await sdk.db.q.Read({
             uuid,
             key: 'highLease7'
         }).then(resp => decodeData(resp.value))).to.equal('firstValue');
@@ -123,8 +120,7 @@ describe('tx.Update()', function () {
             metadata: new Uint8Array()
         });
 
-        expect(await sdk.db.tx.GetLease({
-            creator: sdk.db.address,
+        expect(await sdk.db.q.GetLease({
             uuid,
             key: 'highLease7'
         }).then(resp => resp.seconds)).to.be.closeTo(3 * 60, 30)
@@ -139,8 +135,8 @@ describe('tx.Update()', function () {
             metadata: new Uint8Array(),
             lease: defaultLease
         });
-        expect(await sdk.db.tx.Read({
-            creator: sdk.db.address,
+        expect(await sdk.db.q.Read({
+
             uuid,
             key: 'highLease4'
         }).then(resp => decodeData(resp.value))).to.equal('firstValue');
@@ -156,8 +152,8 @@ describe('tx.Update()', function () {
 
         await delay(60000)
 
-        await expect(sdk.db.tx.Read({
-            creator: sdk.db.address,
+        await expect(sdk.db.q.Read({
+
             uuid,
             key: 'highLease4'
         })).to.be.rejectedWith(/key highLease4 doesn't exist/)
@@ -265,6 +261,6 @@ describe('tx.Update()', function () {
             }))
             .then(resp => decodeData(resp.value))
             .then(val => expect(val).to.equal('newValue'))
-    })
+    });
 
 });

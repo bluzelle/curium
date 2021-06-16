@@ -1,8 +1,9 @@
-import {DEFAULT_TIMEOUT, defaultGasParams, sentryWithClient} from "../../helpers/client-helpers/client-helpers";
+
 import {expect} from "chai";
 import {BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
 import {defaultLease, encodeData, getSdk, zeroLease} from "../../helpers/client-helpers/sdk-helpers";
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
+import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
 
 describe('tx.RenewLease()', function () {
     this.timeout(DEFAULT_TIMEOUT);
@@ -11,11 +12,12 @@ describe('tx.RenewLease()', function () {
     let uuid: string;
     let creator: string;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         useChaiAsPromised();
-        sdk = await getSdk();
-        uuid = Date.now().toString();
-        creator = sdk.db.address;
+        return getSdk("phrase lonely draw rubber either tuna harbor route decline burger inquiry aisle scrub south style chronic trouble biology coil defy fashion warfare blanket shuffle")
+            .then(newSdk => sdk = newSdk)
+            .then(() => uuid = Date.now().toString())
+            .then(() => creator = sdk.db.address)
     });
 
     it('should increase the lease time in days', async () => {
@@ -27,8 +29,7 @@ describe('tx.RenewLease()', function () {
             lease: {...zeroLease, days: 1},
             metadata: new Uint8Array()
         })
-        expect(await sdk.db.tx.GetLease({
-            creator,
+        expect(await sdk.db.q.GetLease({
             uuid,
             key: 'key'
         }).then(resp => resp.seconds)).to.be.closeTo(86400, 12);
@@ -39,8 +40,7 @@ describe('tx.RenewLease()', function () {
             key: 'key',
             lease: {...zeroLease, days: 2}
         });
-        expect(await sdk.db.tx.GetLease({
-            creator,
+        expect(await sdk.db.q.GetLease({
             uuid,
             key: 'key'
         }).then(resp => resp.seconds)).to.be.closeTo(172800, 12);
@@ -55,8 +55,7 @@ describe('tx.RenewLease()', function () {
             lease: {...zeroLease, seconds: 10000},
             metadata: new Uint8Array()
         })
-        expect(await sdk.db.tx.GetLease({
-            creator,
+        expect(await sdk.db.q.GetLease({
             uuid,
             key: 'key'
         }).then(resp => resp.seconds)).to.be.closeTo(10000, 12);
@@ -67,8 +66,7 @@ describe('tx.RenewLease()', function () {
             key: 'key',
             lease: {...zeroLease, seconds: 100}
         });
-        expect(await sdk.db.tx.GetLease({
-            creator,
+        expect(await sdk.db.q.GetLease({
             uuid,
             key: 'key'
         }).then(resp => resp.seconds)).to.be.closeTo(100, 12);
@@ -148,7 +146,7 @@ describe('tx.RenewLease()', function () {
                 denom: "ubnt"
             }))
             .then(resp => resp.balance ? parseInt(resp.balance.amount) : 0)
-            .then(amt => expect(balAfterCreate - amt).to.be.closeTo(0, 5))
+            .then(amt => expect(balAfterCreate - amt).to.be.greaterThan(0))
     })
 
 });
