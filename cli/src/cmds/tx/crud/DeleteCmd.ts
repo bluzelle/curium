@@ -18,5 +18,6 @@ export const handler = (argv: {uuid: string, key: string, from: string, gas: str
                 key: argv.key,
             })
         )
-        .then(console.log.bind(null, "KEY-VALUE SUCCESSFULLY DELETED"))
+        .then(() => console.log(`Key: ${argv.key} was deleted from uuid: ${argv.uuid}`))
+        .catch(e => console.log(e))
 }

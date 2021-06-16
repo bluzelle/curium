@@ -15,4 +15,5 @@ export const handler = (argv: QueryGetLeaseRequest & {node: string}) => {
             key: argv.key
         }))
         .then(console.log)
+        .catch(console.log)
 }

@@ -18,4 +18,5 @@ export const handler = (argv: QueryKeyValuesRequest & {node: string}) => {
         }))
         .then(data => data.keyValues.map((KV: KeyValue) => ({...KV, value: new TextDecoder().decode(KV.value)})))
         .then(console.log)
+        .catch(console.log)
 }

@@ -1,5 +1,4 @@
 import {Argv,} from "yargs";
-import {TextEncoder} from "util";
 import {getSdkByName} from "../../../helpers/sdk-helpers";
 
 export const command = 'rename <uuid> <key> <newKey>'
@@ -20,5 +19,6 @@ export const handler = (argv: {uuid: string, key: string, newKey: string, from: 
                 newKey: argv.newKey
             })
         )
-        .then(() => console.log("KEY-VALUE SUCCESSFULLY RENAMED"))
+        .then(() => console.log(`Key: ${argv.key} was renamed to ${argv.newKey} in uuid: ${argv.uuid}`))
+        .catch(e => console.log(e))
 }

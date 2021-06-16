@@ -26,6 +26,7 @@ var handler = function (argv) {
         uuid: argv.uuid
     }); })
         .then(function (data) { return data.keyValues.map(function (KV) { return (__assign(__assign({}, KV), { value: new TextDecoder().decode(KV.value) })); }); })
-        .then(console.log);
+        .then(console.log)
+        .catch(console.log);
 };
 exports.handler = handler;

@@ -1,6 +1,6 @@
 import { SDKOptions } from '../client-lib/rpc';
 import { BluzelleSdk } from "../bz-sdk/bz-sdk";
-import { Lease } from "../codec/hackathon-crud/lease";
+import { Lease } from "../codec/crud/lease";
 export interface SearchOptions {
     page?: number;
     limit?: number;

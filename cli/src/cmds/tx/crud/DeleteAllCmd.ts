@@ -17,5 +17,6 @@ export const handler = (argv: {uuid: string, from: string, gas: string, gas_pric
                 uuid: argv.uuid,
             })
         )
-        .then(console.log.bind(null, `${argv.uuid} HAS BEEN CLEARED SUCCESSFULLY`))
+        .then(() => console.log(`Uuid: ${argv.uuid} has been cleared`))
+        .catch(e => console.log(e))
 }

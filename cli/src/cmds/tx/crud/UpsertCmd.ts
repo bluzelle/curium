@@ -21,5 +21,6 @@ export const handler = (argv: {uuid: string, key: string, value: string, lease: 
                 metadata: new Uint8Array()
             })
         )
-        .then(console.log.bind(null, "KEY-VALUE SUCCESSFULLY UPSERTED"))
+        .then(() => console.log(`Key: ${argv.key}, value: ${argv.value} successfully upserted in uuid: ${argv.uuid}`))
+        .catch(e => console.log(e))
 }

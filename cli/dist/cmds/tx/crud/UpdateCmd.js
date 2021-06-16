@@ -23,6 +23,7 @@ var handler = function (argv) {
             metadata: new Uint8Array()
         });
     })
-        .then(console.log.bind(null, "KEY-VALUE SUCCESSFULLY UPDATED"));
+        .then(function () { return console.log("Key: " + argv.key + ", value: " + argv.value + " successfully updated in uuid: " + argv.uuid); })
+        .catch(function (e) { return console.log(e); });
 };
 exports.handler = handler;

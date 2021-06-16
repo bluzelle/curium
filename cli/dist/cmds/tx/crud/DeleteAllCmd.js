@@ -19,6 +19,7 @@ var handler = function (argv) {
             uuid: argv.uuid,
         });
     })
-        .then(console.log.bind(null, argv.uuid + " HAS BEEN CLEARED SUCCESSFULLY"));
+        .then(function () { return console.log("Uuid: " + argv.uuid + " has been cleared"); })
+        .catch(function (e) { return console.log(e); });
 };
 exports.handler = handler;

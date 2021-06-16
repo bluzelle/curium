@@ -2,8 +2,7 @@ import {Argv} from "yargs";
 import path from "path";
 import {promises} from "fs";
 import {newMnemonic} from "@bluzelle/sdk-js";
-import {privateEncrypt, privateDecrypt} from "crypto";
-import {decodeBufferFromFile} from "../../helpers/sdk-helpers";
+import {decodeBufferFromFile, readUserMnemonic} from "../../helpers/sdk-helpers";
 
 const readline = require('readline').createInterface({
     input: process.stdin,
@@ -21,21 +20,17 @@ export const builder = (yargs: Argv) => {
         })
         .help()
 }
-export const handler = async (argv: { user: string, recover: boolean}) => {
+export const handler = (argv: { user: string, recover: boolean}) => {
     return makeCliDir()
         .then(() => promptForMnemonic(argv.recover))
         .then(mnemonic => createUserFile(argv.user, mnemonic))
         .then(() => readUserMnemonic(argv.user))
         .then(console.log)
-        .catch(e => {
-            console.log(e)
-        })
+        .catch(e => console.log(e))
 
 }
 
-const readUserMnemonic = (user: string): Promise<string> =>
-    promises.readFile(path.resolve(__dirname, `${process.env.HOME}/.curium/cli/${user}.info`))
-        .then(decodeBufferFromFile)
+
 
 
 const promptForMnemonic = (recover: boolean): Promise<string> =>

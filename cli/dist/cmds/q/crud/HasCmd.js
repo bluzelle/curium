@@ -16,6 +16,7 @@ var handler = function (argv) {
         key: argv.key
     }); })
         .then(function (data) { return data.has; })
-        .then(console.log);
+        .then(console.log)
+        .catch(console.log);
 };
 exports.handler = handler;

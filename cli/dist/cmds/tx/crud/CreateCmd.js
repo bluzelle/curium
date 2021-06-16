@@ -23,6 +23,7 @@ var handler = function (argv) {
             metadata: new Uint8Array()
         });
     })
-        .then(console.log.bind(null, "KEY-VALUE SUCCESSFULLY CREATED"));
+        .then(function () { return console.log("Key: " + argv.key + ", value: " + argv.value + " was created in uuid: " + argv.uuid); })
+        .catch(function (e) { return console.log(e); });
 };
 exports.handler = handler;

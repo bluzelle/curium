@@ -20,6 +20,7 @@ var handler = function (argv) {
             key: argv.key,
         });
     })
-        .then(console.log.bind(null, "KEY-VALUE SUCCESSFULLY DELETED"));
+        .then(function () { return console.log("Key: " + argv.key + " was deleted from uuid: " + argv.uuid); })
+        .catch(function (e) { return console.log(e); });
 };
 exports.handler = handler;

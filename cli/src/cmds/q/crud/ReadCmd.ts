@@ -18,4 +18,5 @@ export const handler = (argv: QueryReadRequest & {node: string}) => {
         }))
         .then(data => new TextDecoder().decode(data.value))
         .then(console.log)
+        .catch(console.log)
 }

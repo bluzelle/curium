@@ -1,7 +1,12 @@
 import {bluzelle, BluzelleSdk} from "@bluzelle/sdk-js";
 
 console.log("STARTING CRUD DEMO")
+sdk.bank.tx.Send({
+    amount: [{
 
+    }], fromAddress: "", toAddress: ""
+
+})
 const populateUuid = (sdk: BluzelleSdk) =>
     sdk.db.withTransaction(() => {
         sdk.db.tx.Create({
@@ -148,6 +153,9 @@ const main = async () => {
         maxGas: 10000000,
         url: "https://client.sentry.testnet.private.bluzelle.com:26657",
         mnemonic: "urge crisp birth cotton rely reflect demise carry donor nut daughter ankle spoil breeze usual name absurd stumble typical early announce before machine street"
+    })
+    sdk.bank.q.Balance({
+
     })
     await sdk.db.tx.Create({
         creator: sdk.db.address,

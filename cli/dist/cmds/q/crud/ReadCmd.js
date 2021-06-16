@@ -16,6 +16,7 @@ var handler = function (argv) {
         key: argv.key.toString()
     }); })
         .then(function (data) { return new TextDecoder().decode(data.value); })
-        .then(console.log);
+        .then(console.log)
+        .catch(console.log);
 };
 exports.handler = handler;

@@ -24,6 +24,7 @@ export const builder = (yargs: Argv) => {
             type: 'string'
         })
         .demandOption(['from', 'gas', 'gas_price', 'node'], 'Must fill transaction details')
+
         .help()
         .demandCommand()
 }

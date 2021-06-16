@@ -21,9 +21,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.newMnemonic = exports.bluzelle = void 0;
 const rpc_1 = require("../client-lib/rpc");
-const query_1 = require("../codec/hackathon-crud/query");
-const tx_1 = require("../codec/hackathon-crud/tx");
-const CrudMsgTypes = __importStar(require("../codec/hackathon-crud/tx"));
+const query_1 = require("../codec/crud/query");
+const tx_1 = require("../codec/crud/tx");
+const CrudMsgTypes = __importStar(require("../codec/crud/tx"));
 const query_2 = require("../codec/nft/query");
 const tx_2 = require("../codec/nft/tx");
 const NftMsgTypes = __importStar(require("../codec/nft/tx"));

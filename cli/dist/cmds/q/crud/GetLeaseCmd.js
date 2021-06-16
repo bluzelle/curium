@@ -15,6 +15,7 @@ var handler = function (argv) {
         uuid: argv.uuid,
         key: argv.key
     }); })
-        .then(console.log);
+        .then(console.log)
+        .catch(console.log);
 };
 exports.handler = handler;

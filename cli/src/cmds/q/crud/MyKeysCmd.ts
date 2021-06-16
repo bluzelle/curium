@@ -17,4 +17,5 @@ export const handler = (argv: QueryMyKeysRequest & {node: string}) => {
         }))
         .then(data => data.keys)
         .then(console.log)
+        .catch(console.log)
 }
