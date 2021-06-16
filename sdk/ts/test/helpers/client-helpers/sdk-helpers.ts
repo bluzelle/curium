@@ -25,7 +25,7 @@ export const getSdk = (mnemonic: string): Promise<BluzelleSdk> => {
 
 export const getMintedAccount = (): Promise<any> => {
     return delay(10000)
-        .then(() => fetch('http://localhost:1327/mint'))
+        .then(() => fetch('https://client.sentry.testnet.private.bluzelle.com:26657/mint'))
         .then(resp => resp.json())
         .then(obj => obj.result)
         .then(passThroughAwait(() => delay(10000)))

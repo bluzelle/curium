@@ -4,10 +4,8 @@ import path from "path";
 import {bluzelle, BluzelleSdk} from "@bluzelle/sdk-js";
 
 export const getSdkByName = (name: string, gasPrice: string, gas: string, url: string): Promise<BluzelleSdk> => {
-    return promises.readFile(path.resolve(__dirname, `${process.env.HOME}/.curium/cli/Users`))
+    return promises.readFile(path.resolve(__dirname, `${process.env.HOME}/.curium/cli/${name}.info`))
         .then(decodeBufferFromFile)
-        .then(parseToJsonObject)
-        .then(usersRecord => usersRecord[name])
         .then(mnemonic => bluzelle({
             gasPrice: parseFloat(gasPrice),
             maxGas: parseInt(gas),

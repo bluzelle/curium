@@ -131,7 +131,7 @@ const transmitTransaction = (service: CommunicationService, messages: MessageQue
                 )
                 .then((txRaw: TxRaw) => Uint8Array.from(TxRaw.encode(txRaw).finish()))
                 .then((signedTx: Uint8Array) => cosmos.broadcastTx(signedTx, 30000, 1000))
-                .then(resp => isBroadcastTxFailure(resp)? function (){throw resp.rawLog}() : resp)
+                .then(checkInternalErrors)
                 .then(() => new Uint8Array())
                 .catch((e) => {
                     if (/account sequence mismatch/.test(e)) {
@@ -177,12 +177,12 @@ const getSequence = (service: CommunicationService, cosmos: SigningStargateClien
         }));
 
 
-const checkErrors = (res: BroadcastTxFailure): BroadcastTxResponse => {
-    if (!res.data) {
+
+const checkInternalErrors = (res: BroadcastTxResponse): BroadcastTxResponse => {
+    if (isBroadcastTxFailure(res) || res.rawLog?.match(/fail/)) {
         throw res.rawLog
     }
     return res
-
 }
 
 const getFeeInfo = ({max_fee, gas_price = 0.002, max_gas = 10000000}: GasInfo) => ({

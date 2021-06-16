@@ -8,10 +8,8 @@ var fs_1 = require("fs");
 var path_1 = __importDefault(require("path"));
 var sdk_js_1 = require("@bluzelle/sdk-js");
 var getSdkByName = function (name, gasPrice, gas, url) {
-    return fs_1.promises.readFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/cli/Users"))
+    return fs_1.promises.readFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/cli/" + name + ".info"))
         .then(exports.decodeBufferFromFile)
-        .then(exports.parseToJsonObject)
-        .then(function (usersRecord) { return usersRecord[name]; })
         .then(function (mnemonic) { return sdk_js_1.bluzelle({
         gasPrice: parseFloat(gasPrice),
         maxGas: parseInt(gas),

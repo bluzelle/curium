@@ -7,11 +7,6 @@ exports.desc = 'generate keys';
 var builder = function (yargs) {
     return yargs
         .commandDir(path_1.join(__dirname, "keys"))
-        .option('recover', {
-        describe: 'recover account by providing mnemonic',
-        default: false,
-        demandOption: true
-    })
         .help()
         .demandCommand();
 };

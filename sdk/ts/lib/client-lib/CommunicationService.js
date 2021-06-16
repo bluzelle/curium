@@ -89,7 +89,7 @@ const transmitTransaction = (service, messages, { memo }) => {
     }))
         .then((txRaw) => Uint8Array.from(tx_1.TxRaw.encode(txRaw).finish()))
         .then((signedTx) => cosmos.broadcastTx(signedTx, 30000, 1000))
-        .then(resp => stargate_1.isBroadcastTxFailure(resp) ? function () { throw resp.rawLog; }() : resp)
+        .then(checkInternalErrors)
         .then(() => new Uint8Array())
         .catch((e) => {
         if (/account sequence mismatch/.test(e)) {
@@ -115,8 +115,9 @@ const getSequence = (service, cosmos) => (service.accountRequested ? (service.ac
     seq: service.seq,
     account: service.account
 }));
-const checkErrors = (res) => {
-    if (!res.data) {
+const checkInternalErrors = (res) => {
+    var _a;
+    if (stargate_1.isBroadcastTxFailure(res) || ((_a = res.rawLog) === null || _a === void 0 ? void 0 : _a.match(/fail/))) {
         throw res.rawLog;
     }
     return res;

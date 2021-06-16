@@ -1,15 +1,4 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -63,13 +52,19 @@ exports.command = 'add <user>';
 exports.desc = 'Add key to local system and generate mnemonic';
 var builder = function (yargs) {
     return yargs
+        .option('recover', {
+        describe: 'recover account by providing mnemonic',
+        type: 'boolean',
+        default: false
+    })
         .help();
 };
 exports.builder = builder;
 var handler = function (argv) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         return [2 /*return*/, makeCliDir()
-                .then(function () { return createUserFile(argv.user); })
+                .then(function () { return promptForMnemonic(argv.recover); })
+                .then(function (mnemonic) { return createUserFile(argv.user, mnemonic); })
                 .then(function () { return readUserMnemonic(argv.user); })
                 .then(console.log)
                 .catch(function (e) {
@@ -78,35 +73,21 @@ var handler = function (argv) { return __awaiter(void 0, void 0, void 0, functio
     });
 }); };
 exports.handler = handler;
-var writeNewUser = function (username, mnemonic) {
-    if (mnemonic === void 0) { mnemonic = sdk_js_1.newMnemonic(); }
-    return fs_1.promises.readFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/"))
-        .then(sdk_helpers_1.decodeBufferFromFile)
-        .then(sdk_helpers_1.parseToJsonObject)
-        .then(function (x) { return x; })
-        .then(function (x) { return (__assign({}, x)); })
-        .then(function (x) { return x; })
-        .then(function (curUsers) { return (__assign({}, curUsers)); })
-        .then(function (curUsers) { return fs_1.promises.appendFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/Users"), JSON.stringify(curUsers), { flag: 'w+' }); });
-};
 var readUserMnemonic = function (user) {
     return fs_1.promises.readFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/cli/" + user + ".info"))
         .then(sdk_helpers_1.decodeBufferFromFile);
 };
-var promptForMnemonic = function () {
-    return new Promise(function (resolve) { return readline.question("Please provide BIP39 mnemonic", function (mnemonic) {
+var promptForMnemonic = function (recover) {
+    return recover ? new Promise(function (resolve) { return readline.question("Please provide BIP39 mnemonic\n", function (mnemonic) {
         readline.close();
         return resolve(mnemonic);
-    }); });
+    }); }) : Promise.resolve(sdk_js_1.newMnemonic());
 };
 var createUserFile = function (user, mnemonic) {
-    if (mnemonic === void 0) { mnemonic = sdk_js_1.newMnemonic(); }
-    return fs_1.promises.access(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/cli/" + user + ".info"))
-        .catch(function (e) { return e.stack.match(/no such file/) ?
-        fs_1.promises.writeFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/cli/" + user + ".info"), mnemonic, { flag: 'wx' })
-        :
-            function () { throw e; }(); });
+    return fs_1.promises.writeFile(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/cli/" + user + ".info"), mnemonic, { flag: 'wx' })
+        .catch(function (e) { return e.stack.match(/already exists/) ? function () { throw "User already exists"; }() : e; });
 };
 var makeCliDir = function () {
-    return fs_1.promises.mkdir(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/cli"), { mode:  });
+    return fs_1.promises.mkdir(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/cli"))
+        .catch(function (e) { return e.stack.match(/already exists/) ? {} : e; });
 };

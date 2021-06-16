@@ -10,7 +10,7 @@ import {
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
 import {expect} from 'chai'
 import {bluzelle, BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
-import {Lease} from "../../../src/codec/crud/lease";
+import {Lease} from "../../../src/codec/hackathon-crud/lease";
 import {getPrintableChars} from "testing/lib/helpers/testHelpers";
 import {localChain} from "../../config";
 import {getSentry, getSwarm, getValidator, SINGLE_SENTRY_SWARM} from "testing/lib/helpers/swarmHelpers";
@@ -431,25 +431,6 @@ describe('tx.Create()', function () {
         // await expect(firstCreateCost).to.be.closeTo(secondCreateCost, 3)
     })
 
-
-
-    it('should throw an error for insufficient funds, no account exists', () => {
-        return bluzelle({
-            mnemonic: bluzelle.newMnemonic(),
-            url: 'http://localhost:26667',
-            gasPrice: 0.002,
-            maxGas: 1000000000
-        })
-            .then(unfundedSdk => unfundedSdk.db.tx.Create({
-                creator: sdk.db.address,
-                uuid,
-                key: 'myKey',
-                value: encodeData('myValue'),
-                lease: defaultLease,
-                metadata: new Uint8Array()
-            }))
-            .catch(e => expect(e).to.match(/Invalid account/))
-    })
 })
 
 
