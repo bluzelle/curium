@@ -1,0 +1,14 @@
+syntax = "proto3";
+package bluzelle.curium.crud;
+
+option go_package = "github.com/bluzelle/curium/x/crud/types";
+
+message PagingRequest {
+  string startKey = 1;
+  uint64 limit = 2;
+}
+
+message PagingResponse {
+  string nextKey = 1;
+  uint64 total = 2;
+}

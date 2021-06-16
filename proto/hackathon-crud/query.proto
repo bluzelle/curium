@@ -1,0 +1,144 @@
+syntax = "proto3";
+package bluzelle.curium.crud;
+
+import "google/api/annotations.proto";
+import "hackathon-crud/Paging.proto";
+import "hackathon-crud/KeyValue.proto";
+// this line is used by starport scaffolding # 1
+
+option go_package = "github.com/bluzelle/curium/x/crud/types";
+
+// Query defines the gRPC querier service.
+service Query {
+    // this line is used by starport scaffolding # 2
+	rpc Read(QueryReadRequest) returns (QueryReadResponse) {
+		option (google.api.http).get = "/bluzelle/curium/crud/Read/{uuid}/{key}";
+	}
+	rpc Keys(QueryKeysRequest) returns (QueryKeysResponse) {
+		option (google.api.http).get = "/bluzelle/curium/crud/Keys/{uuid}";
+	}
+	rpc MyKeys(QueryMyKeysRequest) returns (QueryMyKeysResponse) {
+		option (google.api.http).get = "/bluzelle/curium/crud/MyKeys/{address}";
+	}
+	rpc Count(QueryCountRequest) returns (QueryCountResponse) {
+		option (google.api.http).get = "/bluzelle/curium/crud/Count/{uuid}";
+	}
+	rpc Has(QueryHasRequest) returns (QueryHasResponse) {
+		option (google.api.http).get = "/bluzelle/curium/crud/Has/{uuid}/{key}";
+	}
+
+	rpc Search(QuerySearchRequest) returns (QuerySearchResponse) {
+		option (google.api.http).get = "/bluzelle/curium/crud/search/{uuid}/{searchString}";
+	}
+
+	rpc GetNShortestLeases(QueryGetNShortestLeasesRequest) returns (QueryGetNShortestLeasesResponse) {
+		option (google.api.http).get = "/bluzelle/curium/crud/GetNShortestLeases/{uuid}/{num}";
+	}
+
+	rpc GetLease(QueryGetLeaseRequest) returns (QueryGetLeaseResponse) {
+		option (google.api.http).get = "/bluzelle/curium/crud/GetLease/{uuid}/{key}";
+	}
+
+	rpc KeyValues(QueryKeyValuesRequest) returns (QueryKeyValuesResponse) {
+		option (google.api.http).get = "/bluzelle/curium/crud/KeyValues/{uuid}";
+	}
+
+}
+
+// this line is used by starport scaffolding # 3
+
+message QueryKeyValuesRequest {
+	string uuid = 1;
+	PagingRequest pagination = 2;
+}
+
+message QueryKeyValuesResponse {
+	repeated KeyValue keyValues = 1;
+	PagingResponse pagination = 2;
+}
+
+message QueryReadRequest {
+	string uuid = 1;
+	string key = 2;
+}
+
+message QueryReadResponse {
+	bytes value = 1;
+}
+
+message QueryKeysRequest {
+	string uuid = 1;
+	PagingRequest pagination = 2;
+}
+
+message QueryKeysResponse {
+	repeated string keys = 1;
+	PagingResponse pagination = 2;
+}
+
+message QueryMyKeysRequest {
+	string address = 1;
+	string uuid = 2;
+	PagingRequest pagination = 3;
+}
+
+message QueryMyKeysResponse {
+	repeated string keys = 1;
+	PagingResponse pagination = 2;
+}
+
+message QueryCountRequest {
+	string uuid = 1;
+}
+
+message QueryCountResponse {
+	string uuid = 1;
+	uint32 count = 2;
+}
+
+message QueryHasRequest {
+	string uuid = 1;
+	string key = 2;
+}
+
+message QueryHasResponse {
+	bool has = 1;
+}
+
+message QuerySearchRequest {
+	string uuid = 1;
+	string searchString = 2;
+	PagingRequest pagination = 3;
+}
+
+message QuerySearchResponse {
+	repeated KeyValue keyValues = 1;
+	PagingResponse pagination = 2;
+}
+
+message QueryGetLeaseRequest {
+	string uuid = 1;
+	string key = 2;
+}
+
+message QueryGetLeaseResponse {
+	string uuid = 1;
+	string key = 2;
+	uint32 seconds = 3;
+}
+
+message QueryGetNShortestLeasesRequest {
+	string uuid = 1;
+	uint32 num = 2;
+}
+
+message QueryGetNShortestLeasesResponse {
+	string uuid = 1;
+	repeated KeyLease keyLeases = 2;
+
+}
+
+
+
+
+

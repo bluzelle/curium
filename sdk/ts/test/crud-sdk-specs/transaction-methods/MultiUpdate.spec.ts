@@ -178,8 +178,7 @@ describe('tx.MultiUpdate()', function () {
             keyValues: encodeKeyValues([{key: keys[0], value: 'newValue1'}, {key: 'nonExistingKey', value: 'badValue'}, {key: keys[2], value: 'newValue2'}])
         })).to.be.rejectedWith(/key not found/)
 
-        expect(await sdk.db.tx.KeyValues({
-            creator: sdk.db.address,
+        expect(await sdk.db.q.KeyValues({
             uuid
         }).then(resp => resp.keyValues
             .map(({key}) => key))).to.deep.equal(keys)

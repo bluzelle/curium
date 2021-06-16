@@ -1,7 +1,7 @@
 import {localChain} from "../../config"
 import {bluzelle, BluzelleSdk, DbSdk} from "../../../src/bz-sdk/bz-sdk";
 import {range} from "lodash";
-import {Lease} from "../../../src/codec/crud/lease";
+import {Lease} from "../../../src/codec/hackathon-crud/lease";
 import delay from "delay";
 import {passThroughAwait} from "promise-passthrough";
 

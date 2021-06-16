@@ -6,7 +6,7 @@ import {assert} from "./Assert";
 import {entropyToMnemonic, generateMnemonic} from "bip39";
 import {SDKOptions} from '../client-lib/rpc'
 import {bluzelle, BluzelleSdk} from "../bz-sdk/bz-sdk";
-import {Lease} from "../codec/crud/lease";
+import {Lease} from "../codec/hackathon-crud/lease";
 import {AccountResult} from "./types/cosmos/AccountResult";
 
 
@@ -214,18 +214,18 @@ export class API {
     //     return mnemonicToAddress(this.mnemonic);
     // }
     //
-    getLease(key: string): Promise<number> {
-        return this.getClient()
-            .then(client => client.db.tx.GetLease({
-                creator: client.db.address,
-                uuid: this.config.uuid,
-                key
-            }))
-            .then(resp => resp.seconds)
-            // .catch(res => {
-            //     throw res.error === 'Not Found' ? `key "${key}" not found` : res.error
-            // })
-    }
+    // getLease(key: string): Promise<number> {
+    //     return this.getClient()
+    //         .then(client => client.db.tx.GetLease({
+    //             creator: client.db.address,
+    //             uuid: this.config.uuid,
+    //             key
+    //         }))
+    //         .then(resp => resp.seconds)
+    //         // .catch(res => {
+    //         //     throw res.error === 'Not Found' ? `key "${key}" not found` : res.error
+    //         // })
+    // }
     //
     generateBIP39Account = (entropy: string = ''): string => {
         assert(entropy.length === 0 || entropy.length === 64, 'Entropy must be 64 char hex');

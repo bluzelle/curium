@@ -1,8 +1,8 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { PagingRequest, PagingResponse } from "../crud/Paging";
-import { KeyValue, KeyLease } from "../crud/KeyValue";
+import { PagingRequest, PagingResponse } from "../hackathon-crud/Paging";
+import { KeyValue, KeyLease } from "../hackathon-crud/KeyValue";
 
 export const protobufPackage = "bluzelle.curium.crud";
 

@@ -1,0 +1,14 @@
+syntax = "proto3";
+package bluzelle.curium.crud;
+
+// this line is used by starport scaffolding # genesis/proto/import
+import "crud/CrudValue.proto";
+
+option go_package = "github.com/bluzelle/curium/x/crud/types";
+
+// GenesisState defines the crud module's genesis state.
+message GenesisState {
+    // this line is used by starport scaffolding # genesis/proto/state
+		repeated CrudValue CrudValueList = 1; // this line is used by starport scaffolding # genesis/proto/stateField
+    // this line is used by starport scaffolding # ibc/genesis/proto
+}

@@ -72,9 +72,9 @@ protoc \
   --proto_path="../../proto" \
   --proto_path="./proto" \
   --ts_proto_opt="esModuleInterop=true,forceLong=long,useOptionals=true" \
-  "../../proto/crud/CrudValue.proto" \
-  "../../proto/crud/tx.proto" \
-  "../../proto/crud/query.proto" \
+  "../../proto/hackathon-crud/CrudValue.proto" \
+  "../../proto/hackathon-crud/tx.proto" \
+  "../../proto/hackathon-crud/query.proto" \
   "../../proto/nft/tx.proto" \
   "../../proto/nft/query.proto" \
   "./proto/gogoproto/gogo.proto" \

@@ -13,6 +13,34 @@ exports.legacyAdapter = legacyAdapter;
 class API {
     constructor(config) {
         //
+        // deleteAll(gasInfo: GasInfo): Promise<TxResult> {
+        //     return sendMessage<DeleteAllMessage, void>(this.communicationService, {
+        //         type: 'crud/deleteall',
+        //         value: {
+        //             UUID: this.uuid,
+        //             Owner: this.address
+        //         }
+        //     }, gasInfo)
+        //         .then(standardTxResult)
+        // }
+        //
+        // getAddress(): Promise<string> {
+        //     return mnemonicToAddress(this.mnemonic);
+        // }
+        //
+        // getLease(key: string): Promise<number> {
+        //     return this.getClient()
+        //         .then(client => client.db.tx.GetLease({
+        //             creator: client.db.address,
+        //             uuid: this.config.uuid,
+        //             key
+        //         }))
+        //         .then(resp => resp.seconds)
+        //         // .catch(res => {
+        //         //     throw res.error === 'Not Found' ? `key "${key}" not found` : res.error
+        //         // })
+        // }
+        //
         this.generateBIP39Account = (entropy = '') => {
             Assert_1.assert(entropy.length === 0 || entropy.length === 64, 'Entropy must be 64 char hex');
             return entropy ? bip39_1.entropyToMnemonic(entropy) : bip39_1.generateMnemonic(256);
@@ -129,34 +157,6 @@ class API {
             creator: client.db.address,
         }));
         //.then(standardTxResult)
-    }
-    //
-    // deleteAll(gasInfo: GasInfo): Promise<TxResult> {
-    //     return sendMessage<DeleteAllMessage, void>(this.communicationService, {
-    //         type: 'crud/deleteall',
-    //         value: {
-    //             UUID: this.uuid,
-    //             Owner: this.address
-    //         }
-    //     }, gasInfo)
-    //         .then(standardTxResult)
-    // }
-    //
-    // getAddress(): Promise<string> {
-    //     return mnemonicToAddress(this.mnemonic);
-    // }
-    //
-    getLease(key) {
-        return this.getClient()
-            .then(client => client.db.tx.GetLease({
-            creator: client.db.address,
-            uuid: this.config.uuid,
-            key
-        }))
-            .then(resp => resp.seconds);
-        // .catch(res => {
-        //     throw res.error === 'Not Found' ? `key "${key}" not found` : res.error
-        // })
     }
     //
     // async getNShortestLeases(count: number) {

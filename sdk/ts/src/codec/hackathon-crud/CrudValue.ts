@@ -1,7 +1,7 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { Lease } from "../crud/lease";
+import { Lease } from "../hackathon-crud/lease";
 
 export const protobufPackage = "bluzelle.curium.crud";
 

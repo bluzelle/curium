@@ -1,8 +1,8 @@
 import {SDK, sdk, SDKOptions} from "../client-lib/rpc";
 
-import {QueryClientImpl as CrudQueryClientImpl} from "../codec/crud/query";
-import {MsgClientImpl as CrudMsgClientImpl} from "../codec/crud/tx";
-import * as CrudMsgTypes from "../codec/crud/tx";
+import {QueryClientImpl as CrudQueryClientImpl} from "../codec/hackathon-crud/query";
+import {MsgClientImpl as CrudMsgClientImpl} from "../codec/hackathon-crud/tx";
+import * as CrudMsgTypes from "../codec/hackathon-crud/tx";
 
 import {QueryClientImpl as NftQueryClientImpl} from "../codec/nft/query";
 import {MsgClientImpl as NftMsgClientImpl} from "../codec/nft/tx";

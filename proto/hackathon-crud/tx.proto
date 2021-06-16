@@ -1,0 +1,113 @@
+syntax = "proto3";
+package bluzelle.curium.crud;
+
+// this line is used by starport scaffolding # proto/tx/import
+
+option go_package = "github.com/bluzelle/curium/x/crud/types";
+import "hackathon-crud/lease.proto";
+import "hackathon-crud/KeyValue.proto";
+
+// Msg defines the Msg service.
+service Msg {
+    // this line is used by starport scaffolding # proto/tx/rpc
+  rpc RenewLeasesAll(MsgRenewLeasesAll) returns (MsgRenewLeasesAllResponse);
+  rpc RenewLease(MsgRenewLease) returns (MsgRenewLeaseResponse);
+  rpc Rename(MsgRename) returns (MsgRenameResponse);
+  rpc MultiUpdate(MsgMultiUpdate) returns (MsgMultiUpdateResponse);
+  rpc DeleteAll(MsgDeleteAll) returns (MsgDeleteAllResponse);
+  rpc Upsert(MsgUpsert) returns (MsgUpsertResponse);
+  rpc Create(MsgCreate) returns (MsgCreateResponse);
+  rpc Update(MsgUpdate) returns (MsgUpdateResponse);
+  rpc Delete(MsgDelete) returns (MsgDeleteResponse);
+}
+
+// this line is used by starport scaffolding # proto/tx/message
+
+message MsgRenewLeasesAll {
+  string creator = 1;
+  string uuid = 2;
+  Lease lease = 3;
+}
+
+message MsgRenewLeasesAllResponse {
+}
+
+message MsgRenewLease {
+  string creator = 1;
+  string uuid = 2;
+  string key = 3;
+  Lease lease = 4;
+}
+
+message MsgRenewLeaseResponse {
+}
+
+message MsgRename {
+  string creator = 1;
+  string uuid = 2;
+  string key = 3;
+  string newKey = 4;
+}
+
+message MsgRenameResponse {
+}
+
+message MsgMultiUpdate {
+  string creator = 1;
+  string uuid = 2;
+  repeated KeyValueLease keyValues = 3;
+}
+
+message MsgMultiUpdateResponse {
+}
+
+message MsgDeleteAll {
+  string creator = 1;
+  string uuid = 2;
+}
+
+message MsgDeleteAllResponse {
+}
+
+message MsgUpsert {
+  string creator = 1;
+  string uuid = 2;
+  string key = 3;
+  bytes value = 4;
+  Lease lease = 5;
+  bytes metadata = 6;
+}
+
+message MsgUpsertResponse {
+}
+
+message MsgCreate {
+  string creator = 1;
+  string uuid = 2;
+  string key = 3;
+  bytes value = 4;
+  Lease lease = 5;
+  bytes metadata = 6;
+}
+
+message MsgCreateResponse {
+}
+
+message MsgUpdate {
+  string creator = 1;
+  string uuid = 2;
+  string key = 3;
+  bytes value = 4;
+  Lease lease = 5;
+  bytes metadata = 6;
+}
+
+message MsgUpdateResponse { }
+
+message MsgDelete {
+  string creator = 1;
+  string uuid = 2;
+  string key = 3;
+}
+
+message MsgDeleteResponse { }
