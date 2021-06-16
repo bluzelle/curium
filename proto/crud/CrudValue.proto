@@ -2,7 +2,7 @@ syntax = "proto3";
 package bluzelle.curium.crud;
 
 option go_package = "github.com/bluzelle/curium/x/crud/types";
-import "crud/lease.proto";
+import "hackathon-crud/lease.proto";
 
 
 message CrudValue {

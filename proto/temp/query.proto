@@ -2,8 +2,8 @@ syntax = "proto3";
 package bluzelle.curium.crud;
 
 import "google/api/annotations.proto";
-import "hackathon-crud/Paging.proto";
-import "hackathon-crud/KeyValue.proto";
+import "crud/Paging.proto";
+import "crud/KeyValue.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/bluzelle/curium/x/crud/types";

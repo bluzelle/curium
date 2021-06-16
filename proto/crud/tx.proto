@@ -4,24 +4,17 @@ package bluzelle.curium.crud;
 // this line is used by starport scaffolding # proto/tx/import
 
 option go_package = "github.com/bluzelle/curium/x/crud/types";
-import "crud/lease.proto";
-import "crud/KeyValue.proto";
-import "crud/Paging.proto";
+import "hackathon-crud/lease.proto";
+import "hackathon-crud/KeyValue.proto";
+
 // Msg defines the Msg service.
 service Msg {
     // this line is used by starport scaffolding # proto/tx/rpc
-  rpc Count(MsgCount) returns (MsgCountResponse);
   rpc RenewLeasesAll(MsgRenewLeasesAll) returns (MsgRenewLeasesAllResponse);
   rpc RenewLease(MsgRenewLease) returns (MsgRenewLeaseResponse);
-  rpc GetNShortestLeases(MsgGetNShortestLeases) returns (MsgGetNShortestLeasesResponse);
-  rpc Keys(MsgKeys) returns (MsgKeysResponse);
   rpc Rename(MsgRename) returns (MsgRenameResponse);
   rpc MultiUpdate(MsgMultiUpdate) returns (MsgMultiUpdateResponse);
   rpc DeleteAll(MsgDeleteAll) returns (MsgDeleteAllResponse);
-  rpc KeyValues(MsgKeyValues) returns (MsgKeyValuesResponse);
-  rpc Has(MsgHas) returns (MsgHasResponse);
-  rpc GetLease(MsgGetLease) returns (MsgGetLeaseResponse);
-  rpc Read(MsgRead) returns (MsgReadResponse);
   rpc Upsert(MsgUpsert) returns (MsgUpsertResponse);
   rpc Create(MsgCreate) returns (MsgCreateResponse);
   rpc Update(MsgUpdate) returns (MsgUpdateResponse);
@@ -29,14 +22,6 @@ service Msg {
 }
 
 // this line is used by starport scaffolding # proto/tx/message
-message MsgCount {
-  string creator = 1;
-  string uuid = 2;
-}
-
-message MsgCountResponse {
-  uint32 count = 1;
-}
 
 message MsgRenewLeasesAll {
   string creator = 1;
@@ -55,29 +40,6 @@ message MsgRenewLease {
 }
 
 message MsgRenewLeaseResponse {
-}
-
-message MsgGetNShortestLeases {
-  string creator = 1;
-  string uuid = 2;
-  uint32 num = 3;
-}
-
-message MsgGetNShortestLeasesResponse {
-  string uuid = 1;
-  repeated KeyLease keyLeases = 2;
-
-}
-
-message MsgKeys {
-  string creator = 1;
-  string uuid = 2;
-  PagingRequest pagination = 3;
-}
-
-message MsgKeysResponse {
-  repeated string keys = 1;
-  PagingResponse pagination = 2;
 }
 
 message MsgRename {
@@ -105,50 +67,6 @@ message MsgDeleteAll {
 }
 
 message MsgDeleteAllResponse {
-}
-
-message MsgKeyValues {
-  string creator = 1;
-  string uuid = 2;
-  PagingRequest pagination = 3;
-}
-
-message MsgKeyValuesResponse {
-  repeated KeyValue keyValues = 1;
-  PagingResponse pagination = 2;
-}
-
-message MsgHas {
-  string creator = 1;
-  string uuid = 2;
-  string key = 3;
-}
-
-message MsgHasResponse {
-  bool has = 1;
-}
-
-message MsgGetLease {
-  string creator = 1;
-  string uuid = 2;
-  string key = 3;
-}
-
-message MsgGetLeaseResponse {
-  string uuid = 1;
-  string key = 2;
-  uint32 seconds = 3;
-}
-
-message MsgRead {
-  string creator = 1;
-  string uuid = 2;
-  string key = 3;
-}
-
-message MsgReadResponse {
-  bytes value = 1;
-  string key = 2;
 }
 
 message MsgUpsert {
