@@ -3,6 +3,7 @@ import styles from '../styles/Home.module.css'
 import React, {ChangeEvent, useState} from "react";
 import {bluzelle} from '@bluzelle/sdk-js'
 import {passThrough} from "promise-passthrough";
+import {contentType} from "mime-types";
 
 export default function Home() {
     const [state, setState] = useState<string>('ready')
@@ -10,8 +11,14 @@ export default function Home() {
     const onFileSelected = (ev: ChangeEvent<HTMLInputElement>) => {
         setState('uploading')
         ev.target.files?.[0].arrayBuffer()
-            .then(passThrough(x => console.log(bluzelle)))
-             .then(data => bluzelle.helpers.nftHelpers.uploadNft("https://client.sentry.testnet.private.bluzelle.com:1317", data))
+             .then(data => bluzelle.helpers.nftHelpers.uploadNft("https://client.sentry.testnet.private.bluzelle.com:1317", data as Uint8Array))
+            .then(ctx => fetch(`http://localhost:3000/api/createNft`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    hash: ctx.hash,
+                    mime: contentType(ev.target.files?.[0].name || '')
+                })
+            }).then(resp => resp.json()).then(({id}) => ({...ctx, id})))
             .then(ctx => setState(`done:${ctx.hash}`))
    }
 
