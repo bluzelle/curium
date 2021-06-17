@@ -1,13 +1,14 @@
 import {bluzelle, BluzelleSdk} from "@bluzelle/sdk-js";
 
 console.log("STARTING CRUD DEMO")
-sdk.bank.tx.Send({
-    amount: [{
-
-    }], fromAddress: "", toAddress: ""
-
+bluzelle({
+    mnemonic: "mnemonic_from_mint_endpoint",
+    url: "https://client.sentry.testnet.private.bluzelle.com:26657",
+    maxGas: 100000000,
+    gasPrice:  0.002
 })
 const populateUuid = (sdk: BluzelleSdk) =>
+
     sdk.db.withTransaction(() => {
         sdk.db.tx.Create({
             creator: sdk.db.address,

@@ -9,8 +9,9 @@ export const builder = (yargs: Argv) => {
     return yargs
         .usage('create [uuid] [key] [value] [lease]')
         .help()
+        .argv
 }
-export const handler = (argv: {uuid: string, key: string, value: string, lease: string, from: string, gas: string, gas_price: string, node: string}) => {
+export const handler = (argv: {uuid: string, key: string, value: string, lease: string, from: string, gas: number, gas_price: string, node: string}) => {
     return getSdkByName(argv.from, argv.gas_price, argv.gas, argv.node)
         .then(sdk =>
             sdk.db.tx.Create({
@@ -24,4 +25,5 @@ export const handler = (argv: {uuid: string, key: string, value: string, lease: 
         )
         .then(() => console.log(`Key: ${argv.key}, value: ${argv.value} was created in uuid: ${argv.uuid}`))
         .catch(e => console.log(e))
+
 }

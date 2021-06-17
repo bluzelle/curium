@@ -34,6 +34,14 @@ describe('tx.Create()', function () {
 
     it('should just do a create', () => {
         let start = Date.now()
+        sdk.bank.tx.Balance({
+            amount: [{
+                denom: 'ubnt',
+                amount: '300'
+            }],
+            fromAddress: sdk.bank.address,
+            toAddress: [some_bluzelle_address]
+        })
         return sdk.db.tx.Create({
             creator: sdk.db.address,
             uuid,
@@ -51,6 +59,7 @@ describe('tx.Create()', function () {
             }))
             .then(resp => new TextDecoder().decode(resp.value))
             .then(val => expect(val).to.equal('someValue'))
+
     });
 
     it('should do multiple creates in sequence', () => {

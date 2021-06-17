@@ -8,7 +8,8 @@ exports.desc = 'Create a key-value from the database';
 var builder = function (yargs) {
     return yargs
         .usage('create [uuid] [key] [value] [lease]')
-        .help();
+        .help()
+        .argv;
 };
 exports.builder = builder;
 var handler = function (argv) {

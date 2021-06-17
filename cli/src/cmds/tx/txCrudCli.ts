@@ -13,17 +13,19 @@ export const builder = (yargs: Argv) => {
         })
         .option('gas', {
             describe: 'maximum gas willing to consume',
-            type: "string"
+            type: "number",
+            default: 1000000000
         })
         .option('gas_price', {
             describe: 'minimum gas price in ubnt i.e. 0.002ubnt',
-            type: "string"
+            type: "string",
+            default: "0.002ubnt"
         })
         .option('node', {
             describe: 'node to connect to',
             type: 'string'
         })
-        .demandOption(['from', 'gas', 'gas_price', 'node'], 'Must fill transaction details')
+        .demandOption(['from', 'node'], 'Must fill transaction details')
 
         .help()
         .demandCommand()

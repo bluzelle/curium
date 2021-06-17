@@ -27,6 +27,10 @@ describe('q.GetLease()', function () {
     })
 
     it('should return the lease time left', async () => {
+        sdk.db.q.GetNShortestLeases({
+            uuid: "myUuid",
+            num: 10
+        })
         await sdk.db.tx.Create({
             creator,
             uuid,

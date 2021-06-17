@@ -17,11 +17,10 @@ describe('q.MyKeys()', function () {
             .then(newSdk => sdk = newSdk)
             .then(() => uuid = Date.now().toString())
             .then(() => creator = sdk.db.address)
+            .then(() => otherUuid = (Date.now() + 1).toString())
     });
 
     it('should return a list of only keys in all my uuids', async () => {
-
-
         await sdk.db.withTransaction(() => {
             sdk.db.tx.Create({
                 creator,
@@ -62,7 +61,6 @@ describe('q.MyKeys()', function () {
     });
 
     it('should not show keys that have been deleted', async () => {
-
         await sdk.db.withTransaction(() => {
             sdk.db.tx.Create({
                 creator: sdk.db.address,
@@ -120,7 +118,7 @@ describe('q.MyKeys()', function () {
             });
         }, {memo: ''});
 
-        await delay(8000)
+        await delay(20000)
 
         expect(await sdk.db.q.MyKeys({
             uuid: uuidTime,

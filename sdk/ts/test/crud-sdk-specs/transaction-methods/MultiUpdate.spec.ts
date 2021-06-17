@@ -175,7 +175,7 @@ describe('tx.MultiUpdate()', function () {
         await expect(sdk.db.tx.MultiUpdate({
             creator: sdk.db.address,
             uuid,
-            keyValues: encodeKeyValues([{key: keys[0], value: 'newValue1'}, {key: 'nonExistingKey', value: 'badValue'}, {key: keys[2], value: 'newValue2'}])
+            keyValues: encodeKeyValues([{key: keys[0], value: 'newValue1', lease: defaultLease}, {key: 'nonExistingKey', value: 'badValue'}, {key: keys[2], value: 'newValue2'}])
         })).to.be.rejectedWith(/key not found/)
 
         expect(await sdk.db.q.KeyValues({

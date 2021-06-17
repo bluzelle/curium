@@ -11,7 +11,7 @@ var getSdkByName = function (name, gasPrice, gas, url) {
     return exports.readUserMnemonic(name)
         .then(function (mnemonic) { return sdk_js_1.bluzelle({
         gasPrice: parseFloat(gasPrice),
-        maxGas: parseInt(gas),
+        maxGas: gas,
         url: url,
         mnemonic: mnemonic.toString()
     }); });

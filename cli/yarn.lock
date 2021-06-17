@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@bluzelle/sdk-js@^1.0.12":
-  version "1.0.12"
-  resolved "https://registry.yarnpkg.com/@bluzelle/sdk-js/-/sdk-js-1.0.12.tgz#572e5b579ba1aa7f6f060681853ccbdd1952a47f"
-  integrity sha512-f8WVCb3TyXaoaOWOYBOZ7BpBeNsc9vGhbRwBVogjGchvYpHZw+hJbCNaMeyPBXLcPYKyv3HClr8rogWWlUgAPQ==
+"@bluzelle/sdk-js@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@bluzelle/sdk-js/-/sdk-js-1.1.1.tgz#6ea4cb7e00fdb056dae81ef5bbae85b1e6e93eae"
+  integrity sha512-c54aOAFrzn0YVfX/BoHHV4kcTYAnDg+y6vzCtgQjfqaUgpc/z+9ddNjc1BbdcdalzjvIbymfFtceTmJQzI50wA==
   dependencies:
     "@cosmjs/proto-signing" "^0.25.4"
     "@cosmjs/stargate" "^0.25.4"
