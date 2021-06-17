@@ -1,35 +1,23 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.nftHelpers = void 0;
 const promise_passthrough_1 = require("promise-passthrough");
-const crypto_1 = require("crypto");
-const delay_1 = __importDefault(require("delay"));
-// @ts-ignore
-const node_fetch_1 = __importDefault(require("node-fetch"));
-const nftHelpers = (sdk) => ({
-    uploadNft: uploadNft(sdk)
-});
-exports.nftHelpers = nftHelpers;
-const uploadNft = (nft) => (params, data) => {
-    const hash = crypto_1.createHash("sha256")
-        .update(data)
-        .digest("hex");
-    return node_fetch_1.default(`${nft.url.replace('26657', '1317')}/nft/upload/${hash}`, {
-        method: 'POST',
-        body: data,
-    })
-        .then(() => nft.tx.CreateNft({
-        id: hash,
-        creator: nft.address,
-        ...params
-    }))
-        .then(promise_passthrough_1.passThroughAwait(waitForFullReplication(nft)))
-        .then(promise_passthrough_1.passThroughAwait(({ id }) => nft.tx.PublishFile({ id: id, creator: nft.address, hash, metainfo: new Uint8Array() })));
+const lodash_1 = require("lodash");
+const js_sha256_1 = require("js-sha256");
+typeof window === undefined && (global.fetch = require('node-fetch'));
+const splitDataIntoChunks = (data, chunkSize = 500 * 1024) => Promise.all(lodash_1.times(Math.ceil(data.byteLength / chunkSize)).map(chunkNum => new Promise(resolve => setTimeout(() => resolve(data.slice(chunkSize * chunkNum, chunkSize * chunkNum + chunkSize))))));
+const uploadNft = (url, data, cb) => splitDataIntoChunks(data)
+    .then(chunks => ({ data, chunks }))
+    .then(ctx => ({ ...ctx, hash: js_sha256_1.sha256(ctx.data) }))
+    .then(promise_passthrough_1.passThroughAwait(ctx => Promise.all(ctx.chunks.map((chunk, chunkNum) => fetch(`${url}/nft/upload/${ctx.hash}/${chunkNum}`, {
+    method: 'POST',
+    body: chunk
+})
+    .then(promise_passthrough_1.passThrough(() => cb && cb(chunkNum, ctx.chunks.length)))))))
+    .then(({ hash, mimeType }) => ({
+    hash, mimeType
+}));
+exports.nftHelpers = {
+    uploadNft: uploadNft
 };
-const waitForFullReplication = (nft) => ({ id }) => nft.q.IsNftFullyReplicated({ id })
-    .then(response => response.isReplicated ? (true) : (delay_1.default(500)
-    .then(() => waitForFullReplication(nft)({ id }))));
 //# sourceMappingURL=nft-helpers.js.map

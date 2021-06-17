@@ -39,7 +39,7 @@ const DistributionMsgTypes = __importStar(require("../codec/cosmos/distribution/
 const CommunicationService_1 = require("../client-lib/CommunicationService");
 const monet_1 = require("monet");
 const bip39_1 = require("bip39");
-const nft_helpers_1 = require("../helpers/nft-helpers");
+const helpers_1 = require("../helpers/helpers");
 const bluzelle = (options) => Promise.resolve(CommunicationService_1.newCommunicationService(options.url, options.mnemonic || ''))
     .then(cs => Promise.all([
     rpc_1.sdk(options, query_1.QueryClientImpl, tx_1.MsgClientImpl, CrudMsgTypes, cs),
@@ -53,13 +53,11 @@ const bluzelle = (options) => Promise.resolve(CommunicationService_1.newCommunic
     nft,
     bank,
     staking,
-    helpers: {
-        nft: nft_helpers_1.nftHelpers(nft)
-    },
     distribution
 }));
 exports.bluzelle = bluzelle;
 exports.bluzelle.newMnemonic = newMnemonic;
+exports.bluzelle.helpers = helpers_1.sdkHelpers;
 function newMnemonic(entropy = '') {
     return monet_1.Right(entropy)
         .flatMap(entropy => entropy.length === 0 || entropy.length === 64 ? monet_1.Right(entropy) : monet_1.Left(entropy))
@@ -68,26 +66,4 @@ function newMnemonic(entropy = '') {
         .cata(() => 'Invalid entropy', mnemonic => mnemonic);
 }
 exports.newMnemonic = newMnemonic;
-// Promise.resolve(bluzelle({
-//     mnemonic: "focus ill drift swift blood bitter move grace ensure diamond year tongue hint weekend bulb rebel avoid gas dose print remove receive yellow shoot",
-//     url: "http://localhost:26657",
-//     gasPrice: 0.002,
-//     maxGas: 1000000
-// }))
-//     .then(sdk => sdk.staking.q.Pool({}))
-//     .then(x => x)
-// .then(sdk => sdk.bank.q.Balance({address: "bluzelle13cpvky4s7e825ddwme4xh9g7ynxa4yes5uca7e", denom: "ubnt"}))
-//     .then(passThroughAwait(sdk => sdk.db.tx.Create({
-//         uuid: 'uuid2',
-//         key: 'foo',
-//         value: new TextEncoder().encode('bar'),
-//         creator: sdk.db.address,
-//         lease: Long.fromInt(10),
-//         metadata: new Uint8Array()
-//     })))
-//     .then(sdk => sdk.db.q.CrudValue({
-//         uuid: 'uuid2',
-//         key: 'foo'
-//     }))
-//     .then(x => x);
 //# sourceMappingURL=bz-sdk.js.map

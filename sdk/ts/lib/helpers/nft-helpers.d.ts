@@ -1,11 +1,12 @@
-import { MsgCreateNft, MsgCreateNftResponse } from "../codec/nft/tx";
-import { NftSdk } from "../bz-sdk/bz-sdk";
-export declare type UploadNFTParams = Omit<MsgCreateNft, "creator" | "id" | "host">;
 export declare type ChunkCallback = (chunk: number, length: number) => unknown;
 export interface NftHelpers {
-    uploadNft: (params: UploadNFTParams, data: Uint8Array, cb?: ChunkCallback) => Promise<MsgCreateNftResponse>;
+    uploadNft: (url: string, data: Uint8Array, cb?: ChunkCallback) => Promise<UploadNftResult>;
 }
-export declare const nftHelpers: (sdk: NftSdk) => {
-    uploadNft: (params: UploadNFTParams, data: Uint8Array) => Promise<MsgCreateNftResponse>;
+export interface UploadNftResult {
+    hash: string;
+    mimeType: string;
+}
+export declare const nftHelpers: {
+    uploadNft: (url: string, data: Uint8Array, cb?: ChunkCallback | undefined) => Promise<UploadNftResult>;
 };
 //# sourceMappingURL=nft-helpers.d.ts.map

@@ -1,49 +1,62 @@
-import {MsgCreateNft, MsgCreateNftResponse} from "../codec/nft/tx";
-import {NftSdk} from "../bz-sdk/bz-sdk";
-import {passThroughAwait} from "promise-passthrough";
-import {createHash} from "crypto";
-import delay from "delay";
-// @ts-ignore
-import fetch from 'node-fetch'
+import {passThrough, passThroughAwait} from "promise-passthrough";
+import {times} from 'lodash';
+import {sha256} from 'js-sha256'
 
-export type UploadNFTParams = Omit<MsgCreateNft, "creator" | "id" | "host">
+typeof window === undefined && ((global as any).fetch = require('node-fetch'))
+
+
 export type ChunkCallback = (chunk: number, length: number) => unknown
 
 export interface NftHelpers {
-    uploadNft: (params: UploadNFTParams, data: Uint8Array, cb?: ChunkCallback) => Promise<MsgCreateNftResponse>
+    uploadNft: (url: string, data: Uint8Array, cb?: ChunkCallback) => Promise<UploadNftResult>
 }
 
-export const nftHelpers = (sdk: NftSdk) => ({
-    uploadNft: uploadNft(sdk)
-})
+interface Context {
+    hash?: string
+    data: ArrayBuffer
+    chunks: ArrayBuffer[]
+    mimeType?: string
+}
 
-const uploadNft = (nft: NftSdk) => (params: UploadNFTParams, data: Uint8Array): Promise<MsgCreateNftResponse> => {
-    const hash = createHash("sha256")
-        .update(data)
-        .digest("hex")
-    return fetch(`${nft.url.replace('26657', '1317')}/nft/upload/${hash}`, {
-        method: 'POST',
-        body: data,
-    })
-        .then(() => nft.tx.CreateNft({
-            id: hash,
-            creator: nft.address,
-            ...params
-        }))
-        .then(passThroughAwait(waitForFullReplication(nft)))
-        .then(passThroughAwait(({id}: MsgCreateNftResponse) => nft.tx.PublishFile({id: id, creator: nft.address, hash, metainfo: new Uint8Array()})))
+export interface UploadNftResult {
+    hash: string
+    mimeType: string
+}
+
+const splitDataIntoChunks = (data: ArrayBuffer, chunkSize = 500 * 1024): Promise<ArrayBuffer[]> =>
+    Promise.all<ArrayBuffer>(
+        times(Math.ceil(data.byteLength / chunkSize)).map(chunkNum =>
+            new Promise(resolve => setTimeout(() =>
+                resolve(data.slice(chunkSize * chunkNum, chunkSize * chunkNum + chunkSize))
+            ))
+        )
+    )
+
+
+const uploadNft = (url: string, data: Uint8Array, cb?: ChunkCallback): Promise<UploadNftResult> =>
+        splitDataIntoChunks(data)
+            .then(chunks => ({data, chunks} as Context))
+            .then(ctx => ({...ctx, hash: sha256(ctx.data)}))
+            .then(passThroughAwait(ctx =>
+                Promise.all(ctx.chunks.map((chunk, chunkNum) =>
+                    fetch(`${url}/nft/upload/${ctx.hash}/${chunkNum}`, {
+                        method: 'POST',
+                        body: chunk
+                    })
+                        .then(passThrough(() => cb && cb(chunkNum,  ctx.chunks.length)))
+                ))
+            ))
+            .then(({hash, mimeType}) => ({
+                hash, mimeType
+            } as UploadNftResult));
+
+
+
+
+
+export const nftHelpers = {
+    uploadNft: uploadNft
 };
-
-const waitForFullReplication = (nft: NftSdk) => ({id}: MsgCreateNftResponse): Promise<unknown> =>
-       nft.q.IsNftFullyReplicated({id})
-        .then(response => response.isReplicated ? (
-            true
-        ):(
-            delay(500)
-                .then(() => waitForFullReplication(nft)({id}))
-        ))
-
-
 
 
 

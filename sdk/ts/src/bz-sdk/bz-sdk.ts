@@ -25,7 +25,7 @@ import * as DistributionMsgTypes from '../codec/cosmos/distribution/v1beta1/tx'
 import {newCommunicationService} from "../client-lib/CommunicationService";
 import {Left, Right} from "monet";
 import {entropyToMnemonic, generateMnemonic} from "bip39";
-import {nftHelpers, NftHelpers} from "../helpers/nft-helpers";
+import {SdkHelpers, sdkHelpers} from "../helpers/helpers";
 
 
 
@@ -36,13 +36,14 @@ export type BankSdk = SDK<BankQueryClientImpl, BankMsgClientImpl>
 export type StakingSdk = SDK<StakingQueryClientImpl, StakingMsgClientImpl>
 export type DistributionSdk = SDK<DistributionQueryClientImpl, DistributionMsgClientImpl>
 
-export type BluzelleSdk = { db: DbSdk, nft: NftSdk, bank: BankSdk, staking: StakingSdk, helpers: {nft: NftHelpers}, distribution: DistributionSdk }
+export type BluzelleSdk = { db: DbSdk, nft: NftSdk, bank: BankSdk, staking: StakingSdk, distribution: DistributionSdk }
 export interface Bluzelle {
     (options: SDKOptions): Promise<BluzelleSdk>,
-    newMnemonic: (entropy?: string) => string
+    newMnemonic: (entropy?: string) => string,
+    helpers: SdkHelpers
 }
 
-export const bluzelle: Bluzelle = (options: SDKOptions): Promise<BluzelleSdk> =>
+export const bluzelle = (options: SDKOptions): Promise<BluzelleSdk> =>
     Promise.resolve(newCommunicationService(options.url, options.mnemonic || ''))
         .then(cs => Promise.all([
                 sdk<CrudQueryClientImpl, CrudMsgClientImpl>(options, CrudQueryClientImpl, CrudMsgClientImpl, CrudMsgTypes, cs),
@@ -63,13 +64,11 @@ export const bluzelle: Bluzelle = (options: SDKOptions): Promise<BluzelleSdk> =>
             nft,
             bank,
             staking,
-            helpers: {
-                nft: nftHelpers(nft)
-            },
             distribution
                }))
 
 bluzelle.newMnemonic = newMnemonic;
+bluzelle.helpers = sdkHelpers;
 
 
 export function newMnemonic(entropy: string = '' ): string {
@@ -79,26 +78,3 @@ export function newMnemonic(entropy: string = '' ): string {
         .leftMap(() => console.log("Entropy must be 64 char hex"))
         .cata(() => 'Invalid entropy', mnemonic => mnemonic)
 }
-// Promise.resolve(bluzelle({
-//     mnemonic: "focus ill drift swift blood bitter move grace ensure diamond year tongue hint weekend bulb rebel avoid gas dose print remove receive yellow shoot",
-//     url: "http://localhost:26657",
-//     gasPrice: 0.002,
-//     maxGas: 1000000
-// }))
-//     .then(sdk => sdk.staking.q.Pool({}))
-//     .then(x => x)
-
-// .then(sdk => sdk.bank.q.Balance({address: "bluzelle13cpvky4s7e825ddwme4xh9g7ynxa4yes5uca7e", denom: "ubnt"}))
-//     .then(passThroughAwait(sdk => sdk.db.tx.Create({
-//         uuid: 'uuid2',
-//         key: 'foo',
-//         value: new TextEncoder().encode('bar'),
-//         creator: sdk.db.address,
-//         lease: Long.fromInt(10),
-//         metadata: new Uint8Array()
-//     })))
-//     .then(sdk => sdk.db.q.CrudValue({
-//         uuid: 'uuid2',
-//         key: 'foo'
-//     }))
-//     .then(x => x);

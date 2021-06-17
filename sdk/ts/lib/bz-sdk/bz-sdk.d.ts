@@ -9,7 +9,7 @@ import { QueryClientImpl as StakingQueryClientImpl } from '../codec/cosmos/staki
 import { MsgClientImpl as StakingMsgClientImpl } from '../codec/cosmos/staking/v1beta1/tx';
 import { QueryClientImpl as DistributionQueryClientImpl } from '../codec/cosmos/distribution/v1beta1/query';
 import { MsgClientImpl as DistributionMsgClientImpl } from '../codec/cosmos/distribution/v1beta1/tx';
-import { NftHelpers } from "../helpers/nft-helpers";
+import { SdkHelpers } from "../helpers/helpers";
 export declare type DbSdk = SDK<CrudQueryClientImpl, CrudMsgClientImpl>;
 export declare type NftSdk = SDK<NftQueryClientImpl, NftMsgClientImpl>;
 export declare type BankSdk = SDK<BankQueryClientImpl, BankMsgClientImpl>;
@@ -20,15 +20,17 @@ export declare type BluzelleSdk = {
     nft: NftSdk;
     bank: BankSdk;
     staking: StakingSdk;
-    helpers: {
-        nft: NftHelpers;
-    };
     distribution: DistributionSdk;
 };
 export interface Bluzelle {
     (options: SDKOptions): Promise<BluzelleSdk>;
     newMnemonic: (entropy?: string) => string;
+    helpers: SdkHelpers;
 }
-export declare const bluzelle: Bluzelle;
+export declare const bluzelle: {
+    (options: SDKOptions): Promise<BluzelleSdk>;
+    newMnemonic: typeof newMnemonic;
+    helpers: SdkHelpers;
+};
 export declare function newMnemonic(entropy?: string): string;
 //# sourceMappingURL=bz-sdk.d.ts.map

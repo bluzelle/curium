@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="TypeScriptCompiler">
+    <option name="nodeInterpreterTextField" value="$USER_HOME$/.nvm/versions/node/v15.14.0/bin/node" />
+    <option name="typeScriptServiceDirectory" value="$PROJECT_DIR$/sdk/ts/node_modules/typescript" />
+    <option name="versionType" value="SERVICE_DIRECTORY" />
+  </component>
+</project>
