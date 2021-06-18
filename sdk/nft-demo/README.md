@@ -1,4 +1,4 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+This is a demo of the NFT storage protocol using a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
 
@@ -12,23 +12,33 @@ yarn dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+The two main files are:
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+* pages/index.tsx
+* pages/api/createNft.ts
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+index.tsx uses a helper function in the SDK to upload files to a bluzelle sentry node and then sends a call to  /createNFT to your application server which is serviced by createNFT.ts.  The first code uploads the data to the bluzelle node and the second code informs the server that the upload is complete and starts the process to notify all nodes that the file is ready to be replicated.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+             .then(data => bluzelle.helpers.nftHelpers.uploadNft("https://client.sentry.testnet.private.bluzelle.com:1317", data as Uint8Array))
+            .then(ctx => fetch(`http://localhost:3000/api/createNft`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    hash: ctx.hash,
+                    mime: contentType(ev.target.files?.[0].name || '')
+                })
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+```
+    return getSdk()
+        .then((sdk: BluzelleSdk) => sdk.nft.tx.CreateNft({
+            id: Date.now().toString(),
+            hash: body.hash,
+            mime: body.mime,
+            meta: 'whatever metadata you want',
+            creator: sdk.nft.address,
+        }))
+```
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
