@@ -21,8 +21,8 @@ The two main files are:
 
 index.tsx uses a helper function in the SDK to upload files to a bluzelle sentry node and then sends a call to  /createNFT to your application server which is serviced by createNFT.ts.  The first code uploads the data to the bluzelle node and the second code informs the server that the upload is complete and starts the process to notify all nodes that the file is ready to be replicated.
 
-```
-             .then(data => bluzelle.helpers.nftHelpers.uploadNft("https://client.sentry.testnet.private.bluzelle.com:1317", data as Uint8Array))
+```typescript
+.then(data =>   bluzelle.helpers.nftHelpers.uploadNft("https://client.sentry.testnet.private.bluzelle.com:1317", data as Uint8Array))
             .then(ctx => fetch(`http://localhost:3000/api/createNft`, {
                 method: 'POST',
                 body: JSON.stringify({
@@ -31,7 +31,7 @@ index.tsx uses a helper function in the SDK to upload files to a bluzelle sentry
                 })
 ```
 
-```
+```typescript
     return getSdk()
         .then((sdk: BluzelleSdk) => sdk.nft.tx.CreateNft({
             id: Date.now().toString(),

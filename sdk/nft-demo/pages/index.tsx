@@ -19,7 +19,7 @@ export default function Home() {
                     mime: contentType(ev.target.files?.[0].name || '')
                 })
             }).then(resp => resp.json()).then(({id}) => ({...ctx, id})))
-            .then(ctx => setState(`done:${ctx.hash}`))
+            .then(ctx => setState(`done:${ctx.id}`))
    }
 
 
