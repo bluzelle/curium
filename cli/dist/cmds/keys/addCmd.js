@@ -51,3 +51,9 @@ var makeCliDir = function () {
     return fs_1.promises.mkdir(path_1.default.resolve(__dirname, process.env.HOME + "/.curium/cli"))
         .catch(function (e) { return e.stack.match(/already exists/) ? {} : e; });
 };
+var encryptMnemonic = function (mnemonic) {
+    return CryptoJS.AES.encrypt(mnemonic, "cli").toString();
+};
+var decryptMnemonic = function (mnemonic) {
+    return CryptoJS.AES.decrypt(mnemonic, "cli").toString(CryptoJS.enc.Utf8);
+};
