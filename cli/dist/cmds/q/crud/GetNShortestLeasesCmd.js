@@ -2,28 +2,27 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = exports.builder = exports.desc = exports.command = void 0;
 var sdk_helpers_1 = require("../../../helpers/sdk-helpers");
-exports.command = 'has <uuid> <key>';
-exports.desc = 'Check if the specified key exists in given uuid';
+exports.command = 'getNShortestLeases <uuid> <num>';
+exports.desc = 'Query remaining lease time of [num] shortest leases in [uuid]';
 var builder = function (yargs) {
     return yargs
         .positional('uuid', {
         description: 'distinct database identifier',
         type: 'string'
     })
-        .positional('key', {
-        description: 'key to read',
-        type: 'string'
+        .positional('num', {
+        description: 'number of keyLease objects to return',
+        type: "number"
     })
         .help();
 };
 exports.builder = builder;
 var handler = function (argv) {
     return sdk_helpers_1.getQuerySdk(argv.node)
-        .then(function (sdk) { return sdk.db.q.Has({
+        .then(function (sdk) { return sdk.db.q.GetNShortestLeases({
         uuid: argv.uuid,
-        key: argv.key
+        num: argv.num
     }); })
-        .then(function (data) { return data.has; })
         .then(console.log)
         .catch(console.log);
 };

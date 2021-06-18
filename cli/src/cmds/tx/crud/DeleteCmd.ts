@@ -1,15 +1,22 @@
 import {Argv,} from "yargs";
-import {getSdkByName} from "../../../helpers/sdk-helpers";
+import {Flags, getSdkByName} from "../../../helpers/sdk-helpers";
 
 export const command = 'delete <uuid> <key>'
 export const desc = 'remove a key-value from the database'
 export const builder = (yargs: Argv) => {
     return yargs
-        .usage('delete [uuid] [key]')
+        .positional('uuid', {
+            description: 'distinct database identifier',
+            type: 'string'
+        })
+        .positional('key', {
+            description: 'key to delete',
+            type: 'string'
+        })
         .help()
 }
-export const handler = (argv: {uuid: string, key: string, from: string, gas: string, gas_price: string, node: string}) => {
-    return getSdkByName(argv.from, argv.gas_price, argv.gas, argv.node)
+export const handler = (argv: {uuid: string, key: string} & Flags) => {
+    return getSdkByName(argv.from, argv.gasPrice, argv.gas, argv.node)
         .then(x => x)
         .then(sdk =>
             sdk.db.tx.Delete({

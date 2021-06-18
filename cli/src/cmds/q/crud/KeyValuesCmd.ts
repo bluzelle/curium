@@ -9,6 +9,10 @@ export const command = 'keyValues <uuid>'
 export const desc = 'Read all keys-values in uuid from the database'
 export const builder = (yargs: Argv) => {
     return yargs
+        .positional('uuid', {
+            description: 'distinct database identifier',
+            type: 'string'
+        })
         .help()
 }
 export const handler = (argv: QueryKeyValuesRequest & {node: string}) => {

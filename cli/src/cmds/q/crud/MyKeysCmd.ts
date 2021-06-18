@@ -7,6 +7,14 @@ export const command = 'myKeys <address> <uuid>'
 export const desc = 'Read all keys in uuid owned by given address'
 export const builder = (yargs: Argv) => {
     return yargs
+        .positional('uuid', {
+            description: 'distinct database identifier',
+            type: 'string'
+        })
+        .positional('address', {
+            description: 'key-value creator address',
+            type: 'string'
+        })
         .help()
 }
 export const handler = (argv: QueryMyKeysRequest & {node: string}) => {

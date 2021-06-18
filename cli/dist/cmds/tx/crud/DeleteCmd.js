@@ -6,12 +6,19 @@ exports.command = 'delete <uuid> <key>';
 exports.desc = 'remove a key-value from the database';
 var builder = function (yargs) {
     return yargs
-        .usage('delete [uuid] [key]')
+        .positional('uuid', {
+        description: 'distinct database identifier',
+        type: 'string'
+    })
+        .positional('key', {
+        description: 'key to delete',
+        type: 'string'
+    })
         .help();
 };
 exports.builder = builder;
 var handler = function (argv) {
-    return sdk_helpers_1.getSdkByName(argv.from, argv.gas_price, argv.gas, argv.node)
+    return sdk_helpers_1.getSdkByName(argv.from, argv.gasPrice, argv.gas, argv.node)
         .then(function (x) { return x; })
         .then(function (sdk) {
         return sdk.db.tx.Delete({

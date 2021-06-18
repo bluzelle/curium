@@ -17,6 +17,14 @@ exports.command = 'search <uuid> <searchString>';
 exports.desc = 'Search uuid according to given search string';
 var builder = function (yargs) {
     return yargs
+        .positional('uuid', {
+        description: 'distinct database identifier',
+        type: 'string'
+    })
+        .positional('searchString', {
+        description: 'string to search by key in database',
+        type: 'string'
+    })
         .help();
 };
 exports.builder = builder;

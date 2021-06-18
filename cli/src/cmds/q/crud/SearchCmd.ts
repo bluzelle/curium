@@ -7,6 +7,14 @@ export const command = 'search <uuid> <searchString>'
 export const desc = 'Search uuid according to given search string'
 export const builder = (yargs: Argv) => {
     return yargs
+        .positional('uuid', {
+            description: 'distinct database identifier',
+            type: 'string'
+        })
+        .positional('searchString', {
+            description: 'string to search by key in database',
+            type: 'string'
+        })
         .help()
 }
 export const handler = (argv: QuerySearchRequest & {node: string}) => {

@@ -6,6 +6,10 @@ exports.command = 'keys <uuid>';
 exports.desc = 'Read all keys in uuid from the database';
 var builder = function (yargs) {
     return yargs
+        .positional('uuid', {
+        description: 'distinct database identifier',
+        type: 'string'
+    })
         .help();
 };
 exports.builder = builder;

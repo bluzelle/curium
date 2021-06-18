@@ -3,6 +3,8 @@ import {promises} from "fs";
 import path from "path";
 import {bluzelle, BluzelleSdk} from "@bluzelle/sdk-js";
 
+export type Flags = {from: string, gas: number, gasPrice: string, node: string}
+
 export const getSdkByName = (name: string, gasPrice: string, gas: number, url: string): Promise<BluzelleSdk> =>
     readUserMnemonic(name)
         .then(mnemonic => bluzelle({

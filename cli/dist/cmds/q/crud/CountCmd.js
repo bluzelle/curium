@@ -6,6 +6,10 @@ exports.command = 'count <uuid>';
 exports.desc = 'Query total number of key-values in given uuid';
 var builder = function (yargs) {
     return yargs
+        .positional('uuid', {
+        description: 'distinct database identifier',
+        type: 'string'
+    })
         .help();
 };
 exports.builder = builder;

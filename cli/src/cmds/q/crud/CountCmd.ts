@@ -7,6 +7,10 @@ export const command = 'count <uuid>'
 export const desc = 'Query total number of key-values in given uuid'
 export const builder = (yargs: Argv) => {
     return yargs
+        .positional('uuid', {
+            description: 'distinct database identifier',
+            type: 'string'
+        })
         .help()
 }
 export const handler = (argv: QueryCountRequest & {node: string}) => {

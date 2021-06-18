@@ -6,6 +6,14 @@ exports.command = 'myKeys <address> <uuid>';
 exports.desc = 'Read all keys in uuid owned by given address';
 var builder = function (yargs) {
     return yargs
+        .positional('uuid', {
+        description: 'distinct database identifier',
+        type: 'string'
+    })
+        .positional('address', {
+        description: 'key-value creator address',
+        type: 'string'
+    })
         .help();
 };
 exports.builder = builder;

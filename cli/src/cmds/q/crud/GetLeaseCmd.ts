@@ -6,6 +6,14 @@ export const command = 'getLease <uuid> <key>'
 export const desc = 'Query remaining lease time on given key in specified uuid'
 export const builder = (yargs: Argv) => {
     return yargs
+        .positional('uuid', {
+            description: 'distinct database identifier',
+            type: 'string'
+        })
+        .positional('key', {
+            description: 'key to read',
+            type: 'string'
+        })
         .help()
 }
 export const handler = (argv: QueryGetLeaseRequest & {node: string}) => {

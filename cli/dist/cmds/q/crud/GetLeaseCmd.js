@@ -6,6 +6,14 @@ exports.command = 'getLease <uuid> <key>';
 exports.desc = 'Query remaining lease time on given key in specified uuid';
 var builder = function (yargs) {
     return yargs
+        .positional('uuid', {
+        description: 'distinct database identifier',
+        type: 'string'
+    })
+        .positional('key', {
+        description: 'key to read',
+        type: 'string'
+    })
         .help();
 };
 exports.builder = builder;

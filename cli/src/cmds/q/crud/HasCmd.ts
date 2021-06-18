@@ -6,6 +6,14 @@ export const command = 'has <uuid> <key>'
 export const desc = 'Check if the specified key exists in given uuid'
 export const builder = (yargs: Argv) => {
     return yargs
+        .positional('uuid', {
+            description: 'distinct database identifier',
+            type: 'string'
+        })
+        .positional('key', {
+            description: 'key to read',
+            type: 'string'
+        })
         .help()
 }
 export const handler = (argv: QueryHasRequest & {node: string}) => {

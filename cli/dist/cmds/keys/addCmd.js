@@ -21,6 +21,10 @@ var builder = function (yargs) {
         type: 'boolean',
         default: false
     })
+        .positional('user', {
+        describe: 'name of user account to create',
+        type: 'string'
+    })
         .help();
 };
 exports.builder = builder;

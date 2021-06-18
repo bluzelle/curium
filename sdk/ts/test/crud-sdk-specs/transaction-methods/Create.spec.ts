@@ -34,14 +34,7 @@ describe('tx.Create()', function () {
 
     it('should just do a create', () => {
         let start = Date.now()
-        sdk.bank.tx.Balance({
-            amount: [{
-                denom: 'ubnt',
-                amount: '300'
-            }],
-            fromAddress: sdk.bank.address,
-            toAddress: [some_bluzelle_address]
-        })
+        sdk.db.q.KeyValues()
         return sdk.db.tx.Create({
             creator: sdk.db.address,
             uuid,

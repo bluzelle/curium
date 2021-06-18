@@ -612,7 +612,7 @@ const hasResp = await sdk.db.q.Has({
 
 .....
 
-sdk.db.q.GetNShortestLeases({
+sdk.db.q.Has({
   uuid: 'myUuid',
   key: "myKey"
 })
@@ -661,15 +661,15 @@ sdk.db.q.Keys({
 
 Returns: Promise=>QueryKeysResponse 
 
-| QueryKeysRequest | Description                                   | Type          |
-| :--------------- | :-------------------------------------------- | ------------- |
-| uuid             | Database identifier                           | string        |
-| pagination       | PagingRequest {startKey: string, limit: Long} | PagingRequest |
+| QueryKeysRequest      | Description                                   | Type          |
+| :-------------------- | :-------------------------------------------- | ------------- |
+| uuid                  | Database identifier                           | string        |
+| pagination (optional) | PagingRequest {startKey: string, limit: Long} | PagingRequest |
 
-| QueryKeysResponse | Description                                   | Type           |
-| :---------------- | :-------------------------------------------- | -------------- |
-| keys              |                                               | string []      |
-| pagination        | PagingResponse {nextKey: string, total: Long} | PagingResponse |
+| QueryKeysResponse     | Description                                   | Type           |
+| :-------------------- | :-------------------------------------------- | -------------- |
+| keys                  |                                               | string []      |
+| pagination (optional) | PagingResponse {nextKey: string, total: Long} | PagingResponse |
 
 - ### KeyValues\(QueryKeyValuesRequest)<a id="KeyValues"></a>
 
@@ -678,12 +678,20 @@ Read the complete set of key-values in the specified uuid.
 ```typescript
 const keyValuesResp = await sdk.db.q.KeyValues({
   uuid: 'myUuid',
+  pagination: {
+    startKey: 'key-a'
+    limit: Long.fromInt(50)
+  }
 })
 
 .....
 
 sdk.db.q.KeyValues({
-  uuid: 'myUuid'
+  uuid: 'myUuid',
+  pagination: {
+    startKey: 'key-a'
+    limit: Long.fromInt(50)
+  }
 })
 	.then(resp => {...})
 	.catch(err => {...})
@@ -692,13 +700,15 @@ sdk.db.q.KeyValues({
 
 Returns: Promise=>QueryKeyValuesResponse 
 
-| QueryKeyValuesRequest | Description         | Type   |
-| :-------------------- | :------------------ | ------ |
-| uuid                  | Database identifier | string |
+| QueryKeyValuesRequest | Description                                   | Type          |
+| :-------------------- | :-------------------------------------------- | ------------- |
+| uuid                  | Database identifier                           | string        |
+| pagination (optional) | PagingRequest {startKey: string, limit: Long} | PagingRequest |
 
-| QueryKeyValuesResponse | Description                               | Type        |
-| :--------------------- | :---------------------------------------- | ----------- |
-| keyValues              | KeyValue {key: string, value: Uint8Array} | KeyValue [] |
+| QueryKeyValuesResponse | Description                                   | Type           |
+| :--------------------- | :-------------------------------------------- | -------------- |
+| keyValues              | KeyValue {key: string, value: Uint8Array}     | KeyValue []    |
+| pagination (optional)  | PagingResponse {nextKey: string, total: Long} | PagingResponse |
 
 - ### MyKeys\(QueryMyKeysRequest)<a id="MyKeys"></a>
 
@@ -723,16 +733,16 @@ sdk.db.q.Keys({
 
 Returns: Promise=>QueryMyKeysResponse 
 
-| QueryMyKeysRequest | Description                                   | Type          |
-| :----------------- | :-------------------------------------------- | ------------- |
-| uuid               | Database identifier                           | string        |
-| address            | Bluzelle address                              | string        |
-| pagination         | PagingRequest {startKey: string, limit: Long} | PagingRequest |
+| QueryMyKeysRequest    | Description                                   | Type          |
+| :-------------------- | :-------------------------------------------- | ------------- |
+| uuid                  | Database identifier                           | string        |
+| address               | Bluzelle address                              | string        |
+| pagination (optional) | PagingRequest {startKey: string, limit: Long} | PagingRequest |
 
-| QueryMyKeysResponse | Description                                   | Type           |
-| :------------------ | :-------------------------------------------- | -------------- |
-| keys                |                                               | string []      |
-| pagination          | PagingResponse {nextKey: string, total: Long} | PagingResponse |
+| QueryMyKeysResponse   | Description                                   | Type           |
+| :-------------------- | :-------------------------------------------- | -------------- |
+| keys                  |                                               | string []      |
+| pagination (optional) | PagingResponse {nextKey: string, total: Long} | PagingResponse |
 
 - ### Read\(QueryReadRequest)<a id="Read"></a>
 
@@ -772,15 +782,23 @@ Search by key in the specified uuid.
 
 ```typescript
 const searchResp = await sdk.db.q.Search({
-   uuid: "myUuid",
-   searchString: "keyPrefix"
+  uuid: "myUuid",
+  searchString: "keyPrefix",
+  pagination: {
+    startKey: 'keyPrefix-A'
+    limit: Long.fromInt(50)
+  }
 })
 
 .....
 
 sdk.db.q.Search({
   uuid: 'myUuid',
-  searchString: "keyPrefix"
+  searchString: "keyPrefix",
+  pagination: {
+    startKey: 'keyPrefix-A'
+    limit: Long.fromInt(50)
+  }
 })
 	.then(resp => {...})
 	.catch(err => {...})
@@ -789,13 +807,13 @@ sdk.db.q.Search({
 
 Returns: Promise=>QuerySearchResponse 
 
-| QuerySearchRequest | Description                                          | Type          |
-| :----------------- | :--------------------------------------------------- | ------------- |
-| uuid               | Database identifier                                  | string        |
-| searchString       | query for keys that start with or match searchString | string        |
-| pagination         | {startKey: string, limit: Long}                      | PagingRequest |
+| QuerySearchRequest    | Description                                          | Type          |
+| :-------------------- | :--------------------------------------------------- | ------------- |
+| uuid                  | Database identifier                                  | string        |
+| searchString          | query for keys that start with or match searchString | string        |
+| pagination (optional) | {startKey: string, limit: Long}                      | PagingRequest |
 
-| QuerySearchResponse | Description                               | Type           |
-| :------------------ | :---------------------------------------- | -------------- |
-| keyValues           | KeyValue {key: string, value: Uint8Array} | KeyValue []    |
-| pagination          | {nextKey: string, total: Long}            | PagingResponse |
+| QuerySearchResponse   | Description                               | Type           |
+| :-------------------- | :---------------------------------------- | -------------- |
+| keyValues             | KeyValue {key: string, value: Uint8Array} | KeyValue []    |
+| pagination (optional) | {nextKey: string, total: Long}            | PagingResponse |

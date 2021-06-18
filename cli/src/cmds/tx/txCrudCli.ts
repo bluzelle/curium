@@ -16,19 +16,18 @@ export const builder = (yargs: Argv) => {
             type: "number",
             default: 1000000000
         })
-        .option('gas_price', {
-            describe: 'minimum gas price in ubnt i.e. 0.002ubnt',
+        .option('gasPrice', {
+            describe: 'minimum gas price in ubnt',
             type: "string",
             default: "0.002ubnt"
         })
         .option('node', {
             describe: 'node to connect to',
-            type: 'string'
+            type: 'string',
+            default: 'https://client.sentry.testnet.private.bluzelle.com:26657'
         })
-        .demandOption(['from', 'node'], 'Must fill transaction details')
-
+        .demandOption(['from'])
         .help()
-        .demandCommand()
 }
 export const handler = (argv: Arguments) => {
 

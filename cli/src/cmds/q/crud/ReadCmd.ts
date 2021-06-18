@@ -8,6 +8,15 @@ export const command = 'read <uuid> <key>'
 export const desc = 'Read a key-value from the database'
 export const builder = (yargs: Argv) => {
     return yargs
+        .positional('uuid', {
+            description: 'distinct database identifier',
+            type: 'string',
+            default: 'uuid'
+        })
+        .positional('key', {
+            description: 'key to read',
+            type: 'string',
+        })
         .help()
 }
 export const handler = (argv: QueryReadRequest & {node: string}) => {
