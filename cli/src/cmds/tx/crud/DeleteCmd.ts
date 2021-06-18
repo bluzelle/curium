@@ -2,7 +2,7 @@ import {Argv,} from "yargs";
 import {Flags, getSdkByName} from "../../../helpers/sdk-helpers";
 
 export const command = 'delete <uuid> <key>'
-export const desc = 'remove a key-value from the database'
+export const desc = 'Remove a key-value from the database'
 export const builder = (yargs: Argv) => {
     return yargs
         .positional('uuid', {

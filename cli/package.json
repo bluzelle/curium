@@ -19,6 +19,6 @@
     "build": "yarn tsc"
   },
   "bin": {
-    "blzcli": "./dist/cli.js"
+    "sdkcli": "./dist/cli.js"
   }
 }
