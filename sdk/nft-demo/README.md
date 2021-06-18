@@ -32,7 +32,7 @@ index.tsx uses a helper function in the SDK to upload files to a bluzelle sentry
 ```
 
 ```typescript
-    return getSdk()
+    return getSdk()gy
         .then((sdk: BluzelleSdk) => sdk.nft.tx.CreateNft({
             id: Date.now().toString(),
             hash: body.hash,
