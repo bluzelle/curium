@@ -1,12 +1,7 @@
 import {bluzelle, BluzelleSdk} from "@bluzelle/sdk-js";
 
 console.log("STARTING CRUD DEMO")
-bluzelle({
-    mnemonic: "mnemonic_from_mint_endpoint",
-    url: "https://client.sentry.testnet.private.bluzelle.com:26657",
-    maxGas: 100000000,
-    gasPrice:  0.002
-})
+
 const populateUuid = (sdk: BluzelleSdk) =>
 
     sdk.db.withTransaction(() => {
@@ -150,14 +145,12 @@ let sdk: BluzelleSdk
 const main = async () => {
 
     sdk = await bluzelle({
-        gasPrice: 0.002,
-        maxGas: 10000000,
+        mnemonic: "fee blossom summer between addict destroy roast inspire figure behave team beach love donor sausage retreat warfare poverty frost void release cost pond blur",
         url: "https://client.sentry.testnet.private.bluzelle.com:26657",
-        mnemonic: "urge crisp birth cotton rely reflect demise carry donor nut daughter ankle spoil breeze usual name absurd stumble typical early announce before machine street"
+        maxGas: 100000000,
+        gasPrice:  0.002
     })
-    sdk.bank.q.Balance({
 
-    })
     await sdk.db.tx.Create({
         creator: sdk.db.address,
         uuid: uuid,
@@ -196,7 +189,7 @@ const main = async () => {
             uuid: uuid,
             key: 'myKey'
         }))
-        .then(resp => resp.leaseBlocks.toInt() * 5.5)
+        .then(resp => resp.seconds)
         .then(console.log.bind(null, "Remaining lease time (seconds) "))
         .then(() => populateUuid(sdk))
         .then(() => console.log("POPULATED UUID WITH NEW KEY-VALUES"))

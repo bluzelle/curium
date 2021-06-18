@@ -29,7 +29,7 @@ import {bluzelle} from '@bluzelle/sdk-js'
 
 const sdk = await bluzelle({
         mnemonic: mnemonic_from_mint_endpoint, 
-        url: https://client.sentry.testnet.private.bluzelle.com:26657,
+        url: "https://client.sentry.testnet.private.bluzelle.com:26657",
         maxGas: 100000000, 
         gasPrice:  0.002 		 
     });

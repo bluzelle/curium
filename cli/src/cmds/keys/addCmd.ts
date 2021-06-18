@@ -5,7 +5,7 @@ import {
     makeCliDir,
     readUserMnemonic
 } from "../../helpers/sdk-helpers";
-import {newMnemonic} from "@bluzelle/sdk-js";
+import {bluzelle, newMnemonic} from "@bluzelle/sdk-js";
 
 
 
@@ -30,6 +30,7 @@ export const handler = (argv: { user: string, recover: boolean}) => {
         .then(mnemonic => createUserFile(argv.user, mnemonic))
         .then(() => readUserMnemonic(argv.user))
         .then(console.log)
+
 
 }
 
