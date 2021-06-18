@@ -38,7 +38,6 @@ export const handler = (argv: {uuid: string, key: string, value: string, lease: 
                 metadata: new Uint8Array()
             })
         )
-        .then(() => console.log(`Key: ${argv.key}, value: ${argv.value} was created in uuid: ${argv.uuid}`))
-        .catch(e => console.log(e))
+        .then(() => console.log(`Key: ${argv.key}, Value: ${argv.value} was created in uuid: ${argv.uuid}`))
 
 }

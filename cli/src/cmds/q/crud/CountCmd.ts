@@ -20,5 +20,5 @@ export const handler = (argv: QueryCountRequest & {node: string}) => {
         }))
         .then(data => data.count)
         .then(console.log)
-        .catch(console.log)
+
 }

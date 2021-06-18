@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = exports.builder = exports.desc = exports.command = void 0;
-var sdk_helpers_1 = require("../../../helpers/sdk-helpers");
+const sdk_helpers_1 = require("../../../helpers/sdk-helpers");
 exports.command = 'read <uuid> <key>';
 exports.desc = 'Read a key-value from the database';
-var builder = function (yargs) {
+const builder = (yargs) => {
     return yargs
         .positional('uuid', {
         description: 'distinct database identifier',
@@ -17,14 +17,14 @@ var builder = function (yargs) {
         .help();
 };
 exports.builder = builder;
-var handler = function (argv) {
+const handler = (argv) => {
     return sdk_helpers_1.getQuerySdk(argv.node)
-        .then(function (sdk) { return sdk.db.q.Read({
+        .then(sdk => sdk.db.q.Read({
         uuid: argv.uuid.toString(),
         key: argv.key.toString()
-    }); })
-        .then(function (data) { return new TextDecoder().decode(data.value); })
-        .then(console.log)
-        .catch(console.log);
+    }))
+        .then(data => new TextDecoder().decode(data.value))
+        .then(console.log);
 };
 exports.handler = handler;
+//# sourceMappingURL=ReadCmd.js.map

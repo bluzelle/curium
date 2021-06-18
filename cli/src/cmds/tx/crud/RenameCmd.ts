@@ -32,5 +32,4 @@ export const handler = (argv: {uuid: string, key: string, newKey: string} & Flag
             })
         )
         .then(() => console.log(`Key: ${argv.key} was renamed to ${argv.newKey} in uuid: ${argv.uuid}`))
-        .catch(e => console.log(e))
 }

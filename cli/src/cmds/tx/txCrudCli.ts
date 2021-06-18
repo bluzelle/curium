@@ -27,6 +27,7 @@ export const builder = (yargs: Argv) => {
             default: 'https://client.sentry.testnet.private.bluzelle.com:26657'
         })
         .demandOption(['from'])
+        .recommendCommands()
         .help()
 }
 export const handler = (argv: Arguments) => {

@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = exports.builder = exports.desc = exports.command = void 0;
-var sdk_helpers_1 = require("../../../helpers/sdk-helpers");
+const sdk_helpers_1 = require("../../../helpers/sdk-helpers");
 exports.command = 'renewLease <uuid> <key> <lease>';
 exports.desc = 'Renew lease of a key-value in the database';
-var builder = function (yargs) {
+const builder = (yargs) => {
     return yargs
         .positional('uuid', {
         description: 'distinct database identifier',
@@ -21,18 +21,16 @@ var builder = function (yargs) {
         .help();
 };
 exports.builder = builder;
-var handler = function (argv) {
+const handler = (argv) => {
     return sdk_helpers_1.getSdkByName(argv.from, argv.gasPrice, argv.gas, argv.node)
-        .then(function (x) { return x; })
-        .then(function (sdk) {
-        return sdk.db.tx.RenewLease({
-            creator: sdk.db.address,
-            uuid: argv.uuid,
-            key: argv.key,
-            lease: { seconds: argv.lease }
-        });
-    })
-        .then(function () { return console.log("Lease renewed for " + argv.lease + " seconds for Key: " + argv.key + " in uuid: " + argv.uuid); })
-        .catch(function (e) { return console.log(e); });
+        .then(x => x)
+        .then(sdk => sdk.db.tx.RenewLease({
+        creator: sdk.db.address,
+        uuid: argv.uuid,
+        key: argv.key,
+        lease: { seconds: argv.lease }
+    }))
+        .then(() => console.log(`Lease renewed for ${argv.lease} seconds for Key: ${argv.key} in uuid: ${argv.uuid}`));
 };
 exports.handler = handler;
+//# sourceMappingURL=RenewLeaseCmd.js.map

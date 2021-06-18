@@ -3,9 +3,9 @@ import {Argv} from "yargs";
 import {
     createUserFile,
     makeCliDir,
-    promptForMnemonic,
     readUserMnemonic
 } from "../../helpers/sdk-helpers";
+import {newMnemonic} from "@bluzelle/sdk-js";
 
 
 
@@ -30,12 +30,20 @@ export const handler = (argv: { user: string, recover: boolean}) => {
         .then(mnemonic => createUserFile(argv.user, mnemonic))
         .then(() => readUserMnemonic(argv.user))
         .then(console.log)
-        .catch(e => console.log(e))
 
 }
 
 
+const readline = require('readline').createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
 
+export const promptForMnemonic = (recover: boolean): Promise<string> =>
+    recover? new Promise((resolve) => readline.question("Please provide BIP39 mnemonic\n", (mnemonic: string) => {
+        readline.close()
+        return resolve(mnemonic)
+    })) : Promise.resolve(newMnemonic())
 
 
 

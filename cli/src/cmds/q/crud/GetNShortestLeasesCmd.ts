@@ -23,5 +23,5 @@ export const handler = (argv: QueryGetNShortestLeasesRequest & {node: string}) =
             num: argv.num
         }))
         .then(console.log)
-        .catch(console.log)
+
 }

@@ -37,5 +37,4 @@ export const handler = (argv: {uuid: string, key: string, value: string, lease: 
             })
         )
         .then(() => console.log(`Key: ${argv.key}, value: ${argv.value} successfully upserted in uuid: ${argv.uuid}`))
-        .catch(e => console.log(e))
 }

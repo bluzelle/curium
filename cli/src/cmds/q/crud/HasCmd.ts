@@ -24,5 +24,5 @@ export const handler = (argv: QueryHasRequest & {node: string}) => {
         }))
         .then(data => data.has)
         .then(console.log)
-        .catch(console.log)
+
 }

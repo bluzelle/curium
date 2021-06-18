@@ -14,6 +14,7 @@ export const builder = (yargs: Argv) => {
         })
         .help()
         .demandCommand()
+        .recommendCommands()
 }
 export const handler = (argv: Arguments) => {
 

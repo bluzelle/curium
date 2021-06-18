@@ -1,0 +1,1 @@
+{"version":3,"file":"q.d.ts","sourceRoot":"","sources":["../../src/cmds/q.ts"],"names":[],"mappings":"AAAA,OAAO,EAAC,SAAS,EAAE,IAAI,EAAC,MAAM,OAAO,CAAC;AAItC,eAAO,MAAM,OAAO,eAAe,CAAA;AACnC,eAAO,MAAM,IAAI,sCAAsC,CAAA;AACvD,eAAO,MAAM,OAAO,UAAY,CAAA;AAChC,eAAO,MAAM,OAAO,UAAW,IAAI,aAMlC,CAAA;AACD,eAAO,MAAM,OAAO,SAAU,SAAS,SAEtC,CAAA"}

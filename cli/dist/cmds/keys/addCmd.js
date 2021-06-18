@@ -1,10 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handler = exports.builder = exports.desc = exports.command = void 0;
-var sdk_helpers_1 = require("../../helpers/sdk-helpers");
+exports.promptForMnemonic = exports.handler = exports.builder = exports.desc = exports.command = void 0;
+const sdk_helpers_1 = require("../../helpers/sdk-helpers");
+const sdk_js_1 = require("@bluzelle/sdk-js");
 exports.command = 'add <user>';
 exports.desc = 'Add key to local system and generate mnemonic';
-var builder = function (yargs) {
+const builder = (yargs) => {
     return yargs
         .option('recover', {
         describe: 'recover account by providing mnemonic',
@@ -18,12 +19,21 @@ var builder = function (yargs) {
         .help();
 };
 exports.builder = builder;
-var handler = function (argv) {
+const handler = (argv) => {
     return sdk_helpers_1.makeCliDir()
-        .then(function () { return sdk_helpers_1.promptForMnemonic(argv.recover); })
-        .then(function (mnemonic) { return sdk_helpers_1.createUserFile(argv.user, mnemonic); })
-        .then(function () { return sdk_helpers_1.readUserMnemonic(argv.user); })
-        .then(console.log)
-        .catch(function (e) { return console.log(e); });
+        .then(() => exports.promptForMnemonic(argv.recover))
+        .then(mnemonic => sdk_helpers_1.createUserFile(argv.user, mnemonic))
+        .then(() => sdk_helpers_1.readUserMnemonic(argv.user))
+        .then(console.log);
 };
 exports.handler = handler;
+const readline = require('readline').createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+const promptForMnemonic = (recover) => recover ? new Promise((resolve) => readline.question("Please provide BIP39 mnemonic\n", (mnemonic) => {
+    readline.close();
+    return resolve(mnemonic);
+})) : Promise.resolve(sdk_js_1.newMnemonic());
+exports.promptForMnemonic = promptForMnemonic;
+//# sourceMappingURL=addCmd.js.map

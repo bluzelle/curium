@@ -10,6 +10,7 @@ export const builder = (yargs: Argv) => {
         .commandDir(join(__dirname,`q`))
         .help()
         .demandCommand()
+        .recommendCommands()
 }
 export const handler = (argv: Arguments) => {
 

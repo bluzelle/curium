@@ -32,5 +32,4 @@ export const handler = (argv: {uuid: string, key: string, lease: number} & Flags
             })
         )
         .then(() => console.log(`Lease renewed for ${argv.lease} seconds for Key: ${argv.key} in uuid: ${argv.uuid}`))
-        .catch(e => console.log(e))
 }

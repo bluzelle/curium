@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = exports.builder = exports.desc = exports.command = void 0;
-var sdk_helpers_1 = require("../../../helpers/sdk-helpers");
+const sdk_helpers_1 = require("../../../helpers/sdk-helpers");
 exports.command = 'rename <uuid> <key> <newKey>';
 exports.desc = 'Rename a key-value from the database';
-var builder = function (yargs) {
+const builder = (yargs) => {
     return yargs
         .positional('uuid', {
         description: 'distinct database identifier',
@@ -21,18 +21,16 @@ var builder = function (yargs) {
         .help();
 };
 exports.builder = builder;
-var handler = function (argv) {
+const handler = (argv) => {
     return sdk_helpers_1.getSdkByName(argv.from, argv.gasPrice, argv.gas, argv.node)
-        .then(function (x) { return x; })
-        .then(function (sdk) {
-        return sdk.db.tx.Rename({
-            creator: sdk.db.address,
-            uuid: argv.uuid,
-            key: argv.key,
-            newKey: argv.newKey
-        });
-    })
-        .then(function () { return console.log("Key: " + argv.key + " was renamed to " + argv.newKey + " in uuid: " + argv.uuid); })
-        .catch(function (e) { return console.log(e); });
+        .then(x => x)
+        .then(sdk => sdk.db.tx.Rename({
+        creator: sdk.db.address,
+        uuid: argv.uuid,
+        key: argv.key,
+        newKey: argv.newKey
+    }))
+        .then(() => console.log(`Key: ${argv.key} was renamed to ${argv.newKey} in uuid: ${argv.uuid}`));
 };
 exports.handler = handler;
+//# sourceMappingURL=RenameCmd.js.map

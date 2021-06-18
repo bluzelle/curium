@@ -4,10 +4,7 @@ import path from "path";
 import {bluzelle, BluzelleSdk, newMnemonic} from "@bluzelle/sdk-js";
 import * as CryptoJS from 'crypto-js'
 
-const readline = require('readline').createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
+
 
 export type Flags = {from: string, gas: number, gasPrice: string, node: string}
 
@@ -45,11 +42,7 @@ export const decryptMnemonic = (mnemonic: string): Promise<string> =>
     Promise.resolve(CryptoJS.AES.decrypt(mnemonic, "cli").toString(CryptoJS.enc.Utf8))
 
 
-export const promptForMnemonic = (recover: boolean): Promise<string> =>
-    recover? new Promise((resolve) => readline.question("Please provide BIP39 mnemonic\n", (mnemonic: string) => {
-        readline.close()
-        return resolve(mnemonic)
-    })) : Promise.resolve(newMnemonic())
+
 
 
 export const createUserFile = (user: string, mnemonic: string): Promise<void> =>

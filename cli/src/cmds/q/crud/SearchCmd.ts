@@ -25,5 +25,5 @@ export const handler = (argv: QuerySearchRequest & {node: string}) => {
         }))
         .then(data => data.keyValues.map((KV: KeyValue) => ({...KV, value: new TextDecoder().decode(KV.value)})))
         .then(console.log)
-        .catch(console.log)
+
 }

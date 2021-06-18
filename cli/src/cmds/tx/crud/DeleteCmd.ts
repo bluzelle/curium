@@ -26,5 +26,4 @@ export const handler = (argv: {uuid: string, key: string} & Flags) => {
             })
         )
         .then(() => console.log(`Key: ${argv.key} was deleted from uuid: ${argv.uuid}`))
-        .catch(e => console.log(e))
 }

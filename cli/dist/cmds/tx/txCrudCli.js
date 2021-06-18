@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = exports.builder = exports.desc = exports.command = void 0;
-var path_1 = require("path");
+const path_1 = require("path");
 exports.command = 'crud <method>';
 exports.desc = 'transaction crud method';
-var builder = function (yargs) {
+const builder = (yargs) => {
     return yargs
-        .commandDir(path_1.join(__dirname, "crud"))
+        .commandDir(path_1.join(__dirname, `crud`))
         .option('from', {
         describe: 'payer address',
         type: "string"
@@ -27,9 +27,11 @@ var builder = function (yargs) {
         default: 'https://client.sentry.testnet.private.bluzelle.com:26657'
     })
         .demandOption(['from'])
+        .recommendCommands()
         .help();
 };
 exports.builder = builder;
-var handler = function (argv) {
+const handler = (argv) => {
 };
 exports.handler = handler;
+//# sourceMappingURL=txCrudCli.js.map

@@ -8,4 +8,5 @@ yargs(process.argv.slice(2))
     .commandDir(join(__dirname,'cmds'))
     .help()
     .demandCommand()
+    .recommendCommands()
     .argv

@@ -21,5 +21,4 @@ export const handler = (argv: {uuid: string} & Flags) => {
             })
         )
         .then(() => console.log(`Uuid: ${argv.uuid} has been cleared`))
-        .catch(e => console.log(e))
 }
