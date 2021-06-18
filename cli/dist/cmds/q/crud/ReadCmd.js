@@ -9,7 +9,6 @@ var builder = function (yargs) {
         .positional('uuid', {
         description: 'distinct database identifier',
         type: 'string',
-        default: 'uuid'
     })
         .positional('key', {
         description: 'key to read',

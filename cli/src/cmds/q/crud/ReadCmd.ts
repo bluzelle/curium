@@ -11,7 +11,6 @@ export const builder = (yargs: Argv) => {
         .positional('uuid', {
             description: 'distinct database identifier',
             type: 'string',
-            default: 'uuid'
         })
         .positional('key', {
             description: 'key to read',
@@ -19,7 +18,7 @@ export const builder = (yargs: Argv) => {
         })
         .help()
 }
-export const handler = (argv: QueryReadRequest & {node: string}) => {
+export const handler = (argv: QueryReadRequest & {node: string}): Promise<void> => {
     return getQuerySdk(argv.node)
         .then(sdk => sdk.db.q.Read({
             uuid: argv.uuid.toString(),
