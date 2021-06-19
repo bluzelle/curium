@@ -10,7 +10,7 @@ import {
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
 import {expect} from 'chai'
 import {bluzelle, BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
-import {Lease} from "../../../src/codec/hackathon-crud/lease";
+import {Lease} from "../../../src/codec/crud/lease";
 import {getPrintableChars} from "testing/lib/helpers/testHelpers";
 import {localChain} from "../../config";
 import {getSentry, getSwarm, getValidator, SINGLE_SENTRY_SWARM} from "testing/lib/helpers/swarmHelpers";
