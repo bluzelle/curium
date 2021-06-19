@@ -2,6 +2,25 @@
 
 **sdk-js** is a JavaScript library that can be used to access the Bluzelle database service.
 
+# Setup
+
+
+```
+1) sudo apt update
+
+2) curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+
+3) export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+4) exec "$SHELL"
+
+5) nvm install 14 
+
+6) nvm use 14
+```
+
+
 
 # sdk-js Installation
 
