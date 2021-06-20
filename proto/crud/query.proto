@@ -43,9 +43,25 @@ service Query {
 		option (google.api.http).get = "/bluzelle/curium/crud/KeyValues/{uuid}";
 	}
 
+	rpc File(QueryFileRequest) returns (QueryFileResponse) {
+
+			}
+
 }
 
 // this line is used by starport scaffolding # 3
+
+
+message QueryFileRequest {
+	string uuid = 1;
+	string key = 2;
+}
+
+message QueryFileResponse {
+	bytes data = 1;
+	string uuid = 2;
+	string key = 3;
+}
 
 message QueryKeyValuesRequest {
 	string uuid = 1;

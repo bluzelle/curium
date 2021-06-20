@@ -16,7 +16,12 @@ func RegisterRoutes(clientCtx client.Context, r *mux.Router) {
 	// this line is used by starport scaffolding # 2
 	registerQueryRoutes(clientCtx, r)
 	registerTxHandlers(clientCtx, r)
+	registerHttpServerRoutes(clientCtx, r)
 
+}
+
+func registerHttpServerRoutes(clientCtx client.Context, r *mux.Router) {
+	r.HandleFunc("/crud/file/{uuid}/{key}", httpHandler(clientCtx)).Methods("GET")
 }
 
 func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {
