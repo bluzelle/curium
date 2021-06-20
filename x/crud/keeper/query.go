@@ -19,7 +19,7 @@ func NewQuerier(k Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 		)
 
 		switch path[0] {
-		case "file":
+		case "raw":
 			value, err := k.File(sdk.WrapSDKContext(ctx), &types.QueryFileRequest{
 				Uuid: path[1],
 				Key:  path[2],

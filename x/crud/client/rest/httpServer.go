@@ -17,7 +17,7 @@ func httpHandler(clientCtx client.Context) http.HandlerFunc {
 		uuid := mux.Vars(r)["uuid"]
 		key := mux.Vars(r)["key"]
 
-		data, _, err := clientCtx.QueryWithData(fmt.Sprintf("custom/%s/file/%s/%s", types.QuerierRoute, uuid, key), nil)
+		data, _, err := clientCtx.QueryWithData(fmt.Sprintf("custom/%s/raw/%s/%s", types.QuerierRoute, uuid, key), nil)
 
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())

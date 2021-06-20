@@ -21,7 +21,7 @@ func RegisterRoutes(clientCtx client.Context, r *mux.Router) {
 }
 
 func registerHttpServerRoutes(clientCtx client.Context, r *mux.Router) {
-	r.HandleFunc("/crud/file/{uuid}/{key}", httpHandler(clientCtx)).Methods("GET")
+	r.HandleFunc("/crud/raw/{uuid}/{key}", httpHandler(clientCtx)).Methods("GET")
 }
 
 func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {
