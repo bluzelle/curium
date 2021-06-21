@@ -59,7 +59,7 @@ mkdir -p proto/cosmos_proto
 curl https://raw.githubusercontent.com/regen-network/cosmos-proto/master/cosmos.proto > proto/cosmos_proto/cosmos.proto
 
 # Needed to modify the gogoproto file for the Cosmos modules
-sed -i '' '/google.protobuf.FieldOptions/a \
+sed -i.bak '/google.protobuf.FieldOptions/a \
 optional string castrepeated = 65000;' proto/gogoproto/gogo.proto
 
 
