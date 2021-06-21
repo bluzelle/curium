@@ -2,9 +2,20 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { Lease } from "../crud/lease";
-import { KeyValueLease } from "../crud/KeyValue";
+import { PagingRequest, PagingResponse } from "../crud/Paging";
+import { KeyLease, KeyValueLease, KeyValue } from "../crud/KeyValue";
 
 export const protobufPackage = "bluzelle.curium.crud";
+
+/** this line is used by starport scaffolding # proto/tx/message */
+export interface MsgCount {
+  creator: string;
+  uuid: string;
+}
+
+export interface MsgCountResponse {
+  count: number;
+}
 
 export interface MsgRenewLeasesAll {
   creator: string;
@@ -22,6 +33,28 @@ export interface MsgRenewLease {
 }
 
 export interface MsgRenewLeaseResponse {}
+
+export interface MsgGetNShortestLeases {
+  creator: string;
+  uuid: string;
+  num: number;
+}
+
+export interface MsgGetNShortestLeasesResponse {
+  uuid: string;
+  keyLeases: KeyLease[];
+}
+
+export interface MsgKeys {
+  creator: string;
+  uuid: string;
+  pagination?: PagingRequest;
+}
+
+export interface MsgKeysResponse {
+  keys: string[];
+  pagination?: PagingResponse;
+}
 
 export interface MsgRename {
   creator: string;
@@ -46,6 +79,50 @@ export interface MsgDeleteAll {
 }
 
 export interface MsgDeleteAllResponse {}
+
+export interface MsgKeyValues {
+  creator: string;
+  uuid: string;
+  pagination?: PagingRequest;
+}
+
+export interface MsgKeyValuesResponse {
+  keyValues: KeyValue[];
+  pagination?: PagingResponse;
+}
+
+export interface MsgHas {
+  creator: string;
+  uuid: string;
+  key: string;
+}
+
+export interface MsgHasResponse {
+  has: boolean;
+}
+
+export interface MsgGetLease {
+  creator: string;
+  uuid: string;
+  key: string;
+}
+
+export interface MsgGetLeaseResponse {
+  uuid: string;
+  key: string;
+  seconds: number;
+}
+
+export interface MsgRead {
+  creator: string;
+  uuid: string;
+  key: string;
+}
+
+export interface MsgReadResponse {
+  value: Uint8Array;
+  key: string;
+}
 
 export interface MsgUpsert {
   creator: string;
@@ -87,6 +164,139 @@ export interface MsgDelete {
 }
 
 export interface MsgDeleteResponse {}
+
+const baseMsgCount: object = { creator: "", uuid: "" };
+
+export const MsgCount = {
+  encode(
+    message: MsgCount,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.uuid !== "") {
+      writer.uint32(18).string(message.uuid);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgCount {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgCount } as MsgCount;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.uuid = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgCount {
+    const message = { ...baseMsgCount } as MsgCount;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgCount): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgCount>): MsgCount {
+    const message = { ...baseMsgCount } as MsgCount;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    return message;
+  },
+};
+
+const baseMsgCountResponse: object = { count: 0 };
+
+export const MsgCountResponse = {
+  encode(
+    message: MsgCountResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.count !== 0) {
+      writer.uint32(8).uint32(message.count);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgCountResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgCountResponse } as MsgCountResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.count = reader.uint32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgCountResponse {
+    const message = { ...baseMsgCountResponse } as MsgCountResponse;
+    if (object.count !== undefined && object.count !== null) {
+      message.count = Number(object.count);
+    } else {
+      message.count = 0;
+    }
+    return message;
+  },
+
+  toJSON(message: MsgCountResponse): unknown {
+    const obj: any = {};
+    message.count !== undefined && (obj.count = message.count);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgCountResponse>): MsgCountResponse {
+    const message = { ...baseMsgCountResponse } as MsgCountResponse;
+    if (object.count !== undefined && object.count !== null) {
+      message.count = object.count;
+    } else {
+      message.count = 0;
+    }
+    return message;
+  },
+};
 
 const baseMsgRenewLeasesAll: object = { creator: "", uuid: "" };
 
@@ -383,6 +593,384 @@ export const MsgRenewLeaseResponse = {
 
   fromPartial(_: DeepPartial<MsgRenewLeaseResponse>): MsgRenewLeaseResponse {
     const message = { ...baseMsgRenewLeaseResponse } as MsgRenewLeaseResponse;
+    return message;
+  },
+};
+
+const baseMsgGetNShortestLeases: object = { creator: "", uuid: "", num: 0 };
+
+export const MsgGetNShortestLeases = {
+  encode(
+    message: MsgGetNShortestLeases,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.uuid !== "") {
+      writer.uint32(18).string(message.uuid);
+    }
+    if (message.num !== 0) {
+      writer.uint32(24).uint32(message.num);
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): MsgGetNShortestLeases {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgGetNShortestLeases } as MsgGetNShortestLeases;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.uuid = reader.string();
+          break;
+        case 3:
+          message.num = reader.uint32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgGetNShortestLeases {
+    const message = { ...baseMsgGetNShortestLeases } as MsgGetNShortestLeases;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.num !== undefined && object.num !== null) {
+      message.num = Number(object.num);
+    } else {
+      message.num = 0;
+    }
+    return message;
+  },
+
+  toJSON(message: MsgGetNShortestLeases): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    message.num !== undefined && (obj.num = message.num);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<MsgGetNShortestLeases>
+  ): MsgGetNShortestLeases {
+    const message = { ...baseMsgGetNShortestLeases } as MsgGetNShortestLeases;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.num !== undefined && object.num !== null) {
+      message.num = object.num;
+    } else {
+      message.num = 0;
+    }
+    return message;
+  },
+};
+
+const baseMsgGetNShortestLeasesResponse: object = { uuid: "" };
+
+export const MsgGetNShortestLeasesResponse = {
+  encode(
+    message: MsgGetNShortestLeasesResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.uuid !== "") {
+      writer.uint32(10).string(message.uuid);
+    }
+    for (const v of message.keyLeases) {
+      KeyLease.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): MsgGetNShortestLeasesResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseMsgGetNShortestLeasesResponse,
+    } as MsgGetNShortestLeasesResponse;
+    message.keyLeases = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.uuid = reader.string();
+          break;
+        case 2:
+          message.keyLeases.push(KeyLease.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgGetNShortestLeasesResponse {
+    const message = {
+      ...baseMsgGetNShortestLeasesResponse,
+    } as MsgGetNShortestLeasesResponse;
+    message.keyLeases = [];
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.keyLeases !== undefined && object.keyLeases !== null) {
+      for (const e of object.keyLeases) {
+        message.keyLeases.push(KeyLease.fromJSON(e));
+      }
+    }
+    return message;
+  },
+
+  toJSON(message: MsgGetNShortestLeasesResponse): unknown {
+    const obj: any = {};
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    if (message.keyLeases) {
+      obj.keyLeases = message.keyLeases.map((e) =>
+        e ? KeyLease.toJSON(e) : undefined
+      );
+    } else {
+      obj.keyLeases = [];
+    }
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<MsgGetNShortestLeasesResponse>
+  ): MsgGetNShortestLeasesResponse {
+    const message = {
+      ...baseMsgGetNShortestLeasesResponse,
+    } as MsgGetNShortestLeasesResponse;
+    message.keyLeases = [];
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.keyLeases !== undefined && object.keyLeases !== null) {
+      for (const e of object.keyLeases) {
+        message.keyLeases.push(KeyLease.fromPartial(e));
+      }
+    }
+    return message;
+  },
+};
+
+const baseMsgKeys: object = { creator: "", uuid: "" };
+
+export const MsgKeys = {
+  encode(
+    message: MsgKeys,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.uuid !== "") {
+      writer.uint32(18).string(message.uuid);
+    }
+    if (message.pagination !== undefined) {
+      PagingRequest.encode(
+        message.pagination,
+        writer.uint32(26).fork()
+      ).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgKeys {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgKeys } as MsgKeys;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.uuid = reader.string();
+          break;
+        case 3:
+          message.pagination = PagingRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgKeys {
+    const message = { ...baseMsgKeys } as MsgKeys;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PagingRequest.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: MsgKeys): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PagingRequest.toJSON(message.pagination)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgKeys>): MsgKeys {
+    const message = { ...baseMsgKeys } as MsgKeys;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PagingRequest.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+};
+
+const baseMsgKeysResponse: object = { keys: "" };
+
+export const MsgKeysResponse = {
+  encode(
+    message: MsgKeysResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    for (const v of message.keys) {
+      writer.uint32(10).string(v!);
+    }
+    if (message.pagination !== undefined) {
+      PagingResponse.encode(
+        message.pagination,
+        writer.uint32(18).fork()
+      ).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgKeysResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgKeysResponse } as MsgKeysResponse;
+    message.keys = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.keys.push(reader.string());
+          break;
+        case 2:
+          message.pagination = PagingResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgKeysResponse {
+    const message = { ...baseMsgKeysResponse } as MsgKeysResponse;
+    message.keys = [];
+    if (object.keys !== undefined && object.keys !== null) {
+      for (const e of object.keys) {
+        message.keys.push(String(e));
+      }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PagingResponse.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: MsgKeysResponse): unknown {
+    const obj: any = {};
+    if (message.keys) {
+      obj.keys = message.keys.map((e) => e);
+    } else {
+      obj.keys = [];
+    }
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PagingResponse.toJSON(message.pagination)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgKeysResponse>): MsgKeysResponse {
+    const message = { ...baseMsgKeysResponse } as MsgKeysResponse;
+    message.keys = [];
+    if (object.keys !== undefined && object.keys !== null) {
+      for (const e of object.keys) {
+        message.keys.push(e);
+      }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PagingResponse.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
     return message;
   },
 };
@@ -797,6 +1385,701 @@ export const MsgDeleteAllResponse = {
 
   fromPartial(_: DeepPartial<MsgDeleteAllResponse>): MsgDeleteAllResponse {
     const message = { ...baseMsgDeleteAllResponse } as MsgDeleteAllResponse;
+    return message;
+  },
+};
+
+const baseMsgKeyValues: object = { creator: "", uuid: "" };
+
+export const MsgKeyValues = {
+  encode(
+    message: MsgKeyValues,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.uuid !== "") {
+      writer.uint32(18).string(message.uuid);
+    }
+    if (message.pagination !== undefined) {
+      PagingRequest.encode(
+        message.pagination,
+        writer.uint32(26).fork()
+      ).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgKeyValues {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgKeyValues } as MsgKeyValues;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.uuid = reader.string();
+          break;
+        case 3:
+          message.pagination = PagingRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgKeyValues {
+    const message = { ...baseMsgKeyValues } as MsgKeyValues;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PagingRequest.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: MsgKeyValues): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PagingRequest.toJSON(message.pagination)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgKeyValues>): MsgKeyValues {
+    const message = { ...baseMsgKeyValues } as MsgKeyValues;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PagingRequest.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+};
+
+const baseMsgKeyValuesResponse: object = {};
+
+export const MsgKeyValuesResponse = {
+  encode(
+    message: MsgKeyValuesResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    for (const v of message.keyValues) {
+      KeyValue.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PagingResponse.encode(
+        message.pagination,
+        writer.uint32(18).fork()
+      ).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): MsgKeyValuesResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgKeyValuesResponse } as MsgKeyValuesResponse;
+    message.keyValues = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.keyValues.push(KeyValue.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PagingResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgKeyValuesResponse {
+    const message = { ...baseMsgKeyValuesResponse } as MsgKeyValuesResponse;
+    message.keyValues = [];
+    if (object.keyValues !== undefined && object.keyValues !== null) {
+      for (const e of object.keyValues) {
+        message.keyValues.push(KeyValue.fromJSON(e));
+      }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PagingResponse.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: MsgKeyValuesResponse): unknown {
+    const obj: any = {};
+    if (message.keyValues) {
+      obj.keyValues = message.keyValues.map((e) =>
+        e ? KeyValue.toJSON(e) : undefined
+      );
+    } else {
+      obj.keyValues = [];
+    }
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PagingResponse.toJSON(message.pagination)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgKeyValuesResponse>): MsgKeyValuesResponse {
+    const message = { ...baseMsgKeyValuesResponse } as MsgKeyValuesResponse;
+    message.keyValues = [];
+    if (object.keyValues !== undefined && object.keyValues !== null) {
+      for (const e of object.keyValues) {
+        message.keyValues.push(KeyValue.fromPartial(e));
+      }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PagingResponse.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+};
+
+const baseMsgHas: object = { creator: "", uuid: "", key: "" };
+
+export const MsgHas = {
+  encode(
+    message: MsgHas,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.uuid !== "") {
+      writer.uint32(18).string(message.uuid);
+    }
+    if (message.key !== "") {
+      writer.uint32(26).string(message.key);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgHas {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgHas } as MsgHas;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.uuid = reader.string();
+          break;
+        case 3:
+          message.key = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgHas {
+    const message = { ...baseMsgHas } as MsgHas;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = String(object.key);
+    } else {
+      message.key = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgHas): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    message.key !== undefined && (obj.key = message.key);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgHas>): MsgHas {
+    const message = { ...baseMsgHas } as MsgHas;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = object.key;
+    } else {
+      message.key = "";
+    }
+    return message;
+  },
+};
+
+const baseMsgHasResponse: object = { has: false };
+
+export const MsgHasResponse = {
+  encode(
+    message: MsgHasResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.has === true) {
+      writer.uint32(8).bool(message.has);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgHasResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgHasResponse } as MsgHasResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.has = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgHasResponse {
+    const message = { ...baseMsgHasResponse } as MsgHasResponse;
+    if (object.has !== undefined && object.has !== null) {
+      message.has = Boolean(object.has);
+    } else {
+      message.has = false;
+    }
+    return message;
+  },
+
+  toJSON(message: MsgHasResponse): unknown {
+    const obj: any = {};
+    message.has !== undefined && (obj.has = message.has);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgHasResponse>): MsgHasResponse {
+    const message = { ...baseMsgHasResponse } as MsgHasResponse;
+    if (object.has !== undefined && object.has !== null) {
+      message.has = object.has;
+    } else {
+      message.has = false;
+    }
+    return message;
+  },
+};
+
+const baseMsgGetLease: object = { creator: "", uuid: "", key: "" };
+
+export const MsgGetLease = {
+  encode(
+    message: MsgGetLease,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.uuid !== "") {
+      writer.uint32(18).string(message.uuid);
+    }
+    if (message.key !== "") {
+      writer.uint32(26).string(message.key);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgGetLease {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgGetLease } as MsgGetLease;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.uuid = reader.string();
+          break;
+        case 3:
+          message.key = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgGetLease {
+    const message = { ...baseMsgGetLease } as MsgGetLease;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = String(object.key);
+    } else {
+      message.key = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgGetLease): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    message.key !== undefined && (obj.key = message.key);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgGetLease>): MsgGetLease {
+    const message = { ...baseMsgGetLease } as MsgGetLease;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = object.key;
+    } else {
+      message.key = "";
+    }
+    return message;
+  },
+};
+
+const baseMsgGetLeaseResponse: object = { uuid: "", key: "", seconds: 0 };
+
+export const MsgGetLeaseResponse = {
+  encode(
+    message: MsgGetLeaseResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.uuid !== "") {
+      writer.uint32(10).string(message.uuid);
+    }
+    if (message.key !== "") {
+      writer.uint32(18).string(message.key);
+    }
+    if (message.seconds !== 0) {
+      writer.uint32(24).uint32(message.seconds);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgGetLeaseResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgGetLeaseResponse } as MsgGetLeaseResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.uuid = reader.string();
+          break;
+        case 2:
+          message.key = reader.string();
+          break;
+        case 3:
+          message.seconds = reader.uint32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgGetLeaseResponse {
+    const message = { ...baseMsgGetLeaseResponse } as MsgGetLeaseResponse;
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = String(object.key);
+    } else {
+      message.key = "";
+    }
+    if (object.seconds !== undefined && object.seconds !== null) {
+      message.seconds = Number(object.seconds);
+    } else {
+      message.seconds = 0;
+    }
+    return message;
+  },
+
+  toJSON(message: MsgGetLeaseResponse): unknown {
+    const obj: any = {};
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    message.key !== undefined && (obj.key = message.key);
+    message.seconds !== undefined && (obj.seconds = message.seconds);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgGetLeaseResponse>): MsgGetLeaseResponse {
+    const message = { ...baseMsgGetLeaseResponse } as MsgGetLeaseResponse;
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = object.key;
+    } else {
+      message.key = "";
+    }
+    if (object.seconds !== undefined && object.seconds !== null) {
+      message.seconds = object.seconds;
+    } else {
+      message.seconds = 0;
+    }
+    return message;
+  },
+};
+
+const baseMsgRead: object = { creator: "", uuid: "", key: "" };
+
+export const MsgRead = {
+  encode(
+    message: MsgRead,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.uuid !== "") {
+      writer.uint32(18).string(message.uuid);
+    }
+    if (message.key !== "") {
+      writer.uint32(26).string(message.key);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgRead {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgRead } as MsgRead;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.uuid = reader.string();
+          break;
+        case 3:
+          message.key = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgRead {
+    const message = { ...baseMsgRead } as MsgRead;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = String(object.key);
+    } else {
+      message.key = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgRead): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    message.key !== undefined && (obj.key = message.key);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgRead>): MsgRead {
+    const message = { ...baseMsgRead } as MsgRead;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = object.key;
+    } else {
+      message.key = "";
+    }
+    return message;
+  },
+};
+
+const baseMsgReadResponse: object = { key: "" };
+
+export const MsgReadResponse = {
+  encode(
+    message: MsgReadResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.value.length !== 0) {
+      writer.uint32(10).bytes(message.value);
+    }
+    if (message.key !== "") {
+      writer.uint32(18).string(message.key);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgReadResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgReadResponse } as MsgReadResponse;
+    message.value = new Uint8Array();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.value = reader.bytes();
+          break;
+        case 2:
+          message.key = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgReadResponse {
+    const message = { ...baseMsgReadResponse } as MsgReadResponse;
+    message.value = new Uint8Array();
+    if (object.value !== undefined && object.value !== null) {
+      message.value = bytesFromBase64(object.value);
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = String(object.key);
+    } else {
+      message.key = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgReadResponse): unknown {
+    const obj: any = {};
+    message.value !== undefined &&
+      (obj.value = base64FromBytes(
+        message.value !== undefined ? message.value : new Uint8Array()
+      ));
+    message.key !== undefined && (obj.key = message.key);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgReadResponse>): MsgReadResponse {
+    const message = { ...baseMsgReadResponse } as MsgReadResponse;
+    if (object.value !== undefined && object.value !== null) {
+      message.value = object.value;
+    } else {
+      message.value = new Uint8Array();
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = object.key;
+    } else {
+      message.key = "";
+    }
     return message;
   },
 };
@@ -1510,13 +2793,22 @@ export const MsgDeleteResponse = {
 /** Msg defines the Msg service. */
 export interface Msg {
   /** this line is used by starport scaffolding # proto/tx/rpc */
+  Count(request: MsgCount): Promise<MsgCountResponse>;
   RenewLeasesAll(
     request: MsgRenewLeasesAll
   ): Promise<MsgRenewLeasesAllResponse>;
   RenewLease(request: MsgRenewLease): Promise<MsgRenewLeaseResponse>;
+  GetNShortestLeases(
+    request: MsgGetNShortestLeases
+  ): Promise<MsgGetNShortestLeasesResponse>;
+  Keys(request: MsgKeys): Promise<MsgKeysResponse>;
   Rename(request: MsgRename): Promise<MsgRenameResponse>;
   MultiUpdate(request: MsgMultiUpdate): Promise<MsgMultiUpdateResponse>;
   DeleteAll(request: MsgDeleteAll): Promise<MsgDeleteAllResponse>;
+  KeyValues(request: MsgKeyValues): Promise<MsgKeyValuesResponse>;
+  Has(request: MsgHas): Promise<MsgHasResponse>;
+  GetLease(request: MsgGetLease): Promise<MsgGetLeaseResponse>;
+  Read(request: MsgRead): Promise<MsgReadResponse>;
   Upsert(request: MsgUpsert): Promise<MsgUpsertResponse>;
   Create(request: MsgCreate): Promise<MsgCreateResponse>;
   Update(request: MsgUpdate): Promise<MsgUpdateResponse>;
@@ -1528,6 +2820,14 @@ export class MsgClientImpl implements Msg {
   constructor(rpc: Rpc) {
     this.rpc = rpc;
   }
+  Count(request: MsgCount): Promise<MsgCountResponse> {
+    const data = MsgCount.encode(request).finish();
+    const promise = this.rpc.request("bluzelle.curium.crud.Msg", "Count", data);
+    return promise.then((data) =>
+      MsgCountResponse.decode(new _m0.Reader(data))
+    );
+  }
+
   RenewLeasesAll(
     request: MsgRenewLeasesAll
   ): Promise<MsgRenewLeasesAllResponse> {
@@ -1552,6 +2852,26 @@ export class MsgClientImpl implements Msg {
     return promise.then((data) =>
       MsgRenewLeaseResponse.decode(new _m0.Reader(data))
     );
+  }
+
+  GetNShortestLeases(
+    request: MsgGetNShortestLeases
+  ): Promise<MsgGetNShortestLeasesResponse> {
+    const data = MsgGetNShortestLeases.encode(request).finish();
+    const promise = this.rpc.request(
+      "bluzelle.curium.crud.Msg",
+      "GetNShortestLeases",
+      data
+    );
+    return promise.then((data) =>
+      MsgGetNShortestLeasesResponse.decode(new _m0.Reader(data))
+    );
+  }
+
+  Keys(request: MsgKeys): Promise<MsgKeysResponse> {
+    const data = MsgKeys.encode(request).finish();
+    const promise = this.rpc.request("bluzelle.curium.crud.Msg", "Keys", data);
+    return promise.then((data) => MsgKeysResponse.decode(new _m0.Reader(data)));
   }
 
   Rename(request: MsgRename): Promise<MsgRenameResponse> {
@@ -1588,6 +2908,42 @@ export class MsgClientImpl implements Msg {
     return promise.then((data) =>
       MsgDeleteAllResponse.decode(new _m0.Reader(data))
     );
+  }
+
+  KeyValues(request: MsgKeyValues): Promise<MsgKeyValuesResponse> {
+    const data = MsgKeyValues.encode(request).finish();
+    const promise = this.rpc.request(
+      "bluzelle.curium.crud.Msg",
+      "KeyValues",
+      data
+    );
+    return promise.then((data) =>
+      MsgKeyValuesResponse.decode(new _m0.Reader(data))
+    );
+  }
+
+  Has(request: MsgHas): Promise<MsgHasResponse> {
+    const data = MsgHas.encode(request).finish();
+    const promise = this.rpc.request("bluzelle.curium.crud.Msg", "Has", data);
+    return promise.then((data) => MsgHasResponse.decode(new _m0.Reader(data)));
+  }
+
+  GetLease(request: MsgGetLease): Promise<MsgGetLeaseResponse> {
+    const data = MsgGetLease.encode(request).finish();
+    const promise = this.rpc.request(
+      "bluzelle.curium.crud.Msg",
+      "GetLease",
+      data
+    );
+    return promise.then((data) =>
+      MsgGetLeaseResponse.decode(new _m0.Reader(data))
+    );
+  }
+
+  Read(request: MsgRead): Promise<MsgReadResponse> {
+    const data = MsgRead.encode(request).finish();
+    const promise = this.rpc.request("bluzelle.curium.crud.Msg", "Read", data);
+    return promise.then((data) => MsgReadResponse.decode(new _m0.Reader(data)));
   }
 
   Upsert(request: MsgUpsert): Promise<MsgUpsertResponse> {

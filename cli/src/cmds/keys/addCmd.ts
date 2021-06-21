@@ -30,8 +30,7 @@ export const handler = (argv: { user: string, recover: boolean}) => {
         .then(mnemonic => createUserFile(argv.user, mnemonic))
         .then(() => readUserMnemonic(argv.user))
         .then(console.log)
-
-
+        .then(() => process.exit())
 }
 
 

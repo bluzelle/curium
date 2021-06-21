@@ -9,6 +9,6 @@ export declare const builder: (yargs: Argv) => Argv<{
 export declare const handler: (argv: {
     user: string;
     recover: boolean;
-}) => Promise<void>;
+}) => Promise<never>;
 export declare const promptForMnemonic: (recover: boolean) => Promise<string>;
 //# sourceMappingURL=addCmd.d.ts.map

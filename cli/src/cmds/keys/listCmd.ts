@@ -10,9 +10,8 @@ export const builder = (yargs: Argv) => {
 }
 export const handler = () => {
     return readCliDir()
-        .then(x => x)
         .then(console.log)
-        .then(x => x)
+        .then(() => process.exit())
 }
 
 

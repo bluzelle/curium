@@ -11,9 +11,8 @@ const builder = (yargs) => {
 exports.builder = builder;
 const handler = () => {
     return sdk_helpers_1.readCliDir()
-        .then(x => x)
         .then(console.log)
-        .then(x => x);
+        .then(() => process.exit());
 };
 exports.handler = handler;
 //# sourceMappingURL=listCmd.js.map

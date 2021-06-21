@@ -24,7 +24,8 @@ const handler = (argv) => {
         .then(() => exports.promptForMnemonic(argv.recover))
         .then(mnemonic => sdk_helpers_1.createUserFile(argv.user, mnemonic))
         .then(() => sdk_helpers_1.readUserMnemonic(argv.user))
-        .then(console.log);
+        .then(console.log)
+        .then(() => process.exit());
 };
 exports.handler = handler;
 const readline = require('readline').createInterface({
