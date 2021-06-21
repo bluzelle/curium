@@ -5,6 +5,7 @@
   "license": "MIT",
   "dependencies": {
     "@bluzelle/sdk-js": "^1.1.2",
+    "@cosmjs/proto-signing": "^0.25.4",
     "@types/crypto-js": "^4.0.1",
     "@types/node": "^15.12.3",
     "@types/yargs": "^17.0.0",
