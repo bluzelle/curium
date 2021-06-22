@@ -20,10 +20,14 @@ const builder = (yargs) => {
 };
 exports.builder = builder;
 const handler = (argv) => {
+    let yourMnemonic;
     return sdk_helpers_1.makeCliDir()
         .then(() => exports.promptForMnemonic(argv.recover))
         .then(mnemonic => sdk_helpers_1.createUserFile(argv.user, mnemonic, exports.promptToOverrideUser))
         .then(() => sdk_helpers_1.readUserMnemonic(argv.user))
+        .then(mnemonic => yourMnemonic = mnemonic)
+        .then(sdk_helpers_1.getAccountInfoFromMnemonic)
+        .then(info => ({ ...info, mnemonic: yourMnemonic }))
         .then(console.log)
         .then(() => process.exit());
 };

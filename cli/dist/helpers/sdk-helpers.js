@@ -22,7 +22,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.readCliDir = exports.makeCliDir = exports.createUserFile = exports.decryptMnemonic = exports.encryptMnemonic = exports.readUserMnemonic = exports.decodeBufferFromFile = exports.getQuerySdk = exports.getSdkByName = void 0;
+exports.getAccountInfoFromMnemonic = exports.getUserInfo = exports.readCliDir = exports.makeCliDir = exports.createUserFile = exports.decryptMnemonic = exports.encryptMnemonic = exports.readUserMnemonic = exports.decodeBufferFromFile = exports.getQuerySdk = exports.getSdkByName = void 0;
 const fs_1 = require("fs");
 const path_1 = __importDefault(require("path"));
 const sdk_js_1 = require("@bluzelle/sdk-js");
@@ -75,11 +75,10 @@ const readCliDir = () => {
         let user;
         return getUserFromFile(file)
             .then(userFromFile => user = userFromFile)
-            .then(() => fs_1.promises.readFile(path_1.default.resolve(__dirname, `${process.env.HOME}/.curium/cli/${file}`)))
-            .then(exports.decodeBufferFromFile)
+            .then(exports.readUserMnemonic)
             .then(mnemonic => ({ mnemonic, user }));
     })))
-        .then(usersAndMnemonics => Promise.all(usersAndMnemonics.map(({ mnemonic, user }) => getAccountInfoFromMnemonic(mnemonic)
+        .then(usersAndMnemonics => Promise.all(usersAndMnemonics.map(({ mnemonic, user }) => exports.getAccountInfoFromMnemonic(mnemonic)
         .then(info => ({ ...info, user })))))
         .catch(e => e.toString().match(/no such file or directory/) ? function () {
         throw "no keys stored";
@@ -88,9 +87,15 @@ const readCliDir = () => {
     }());
 };
 exports.readCliDir = readCliDir;
+const getUserInfo = (user) => {
+    return exports.readUserMnemonic(user)
+        .then(exports.getAccountInfoFromMnemonic);
+};
+exports.getUserInfo = getUserInfo;
 const getUserFromFile = (filename) => Promise.resolve(filename.split('.info')[0]);
 const getAccountInfoFromMnemonic = (mnemonic) => proto_signing_1.DirectSecp256k1HdWallet.fromMnemonic(mnemonic, { prefix: 'bluzelle' })
     .then(wallet => wallet.getAccounts())
     .then(x => x[0])
     .then(info => ({ ...info, pubkey: bech32_1.Bech32.encode('bluzellepub', info.pubkey) }));
+exports.getAccountInfoFromMnemonic = getAccountInfoFromMnemonic;
 //# sourceMappingURL=sdk-helpers.js.map
