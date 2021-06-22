@@ -45,12 +45,12 @@ export const decryptMnemonic = (mnemonic: string): Promise<string> =>
     Promise.resolve(CryptoJS.AES.decrypt(mnemonic, "cli").toString(CryptoJS.enc.Utf8))
 
 
-export const createUserFile = (user: string, mnemonic: string, flag: string = 'wx'): Promise<void> =>
+export const createUserFile = (user: string, mnemonic: string, prompter: () => Promise<boolean>, flag: string = "wx") : Promise<void> =>
     encryptMnemonic(mnemonic)
         .then(encodedMnemonic => promises.writeFile(path.resolve(__dirname, `${process.env.HOME}/.curium/cli/${user}.info`), encodedMnemonic, {flag}))
         .catch(e => (e.stack as string).match(/already exists/) ?
-            promptToOverrideUser()
-                .then(bool => bool? createUserFile(user, mnemonic, 'w+') : function () {throw `${user} is already taken, aborted keys add`}())
+            prompter()
+                .then(bool => bool? createUserFile(user, mnemonic, prompter, 'w+') : function () {throw `${user} is already taken, aborted keys add`}())
             : e)
 
 
@@ -62,6 +62,7 @@ export const makeCliDir = (): Promise<void> =>
         .catch(e => (e.stack as string).match(/already exists/) ? {} : e)
 
 export const readCliDir = (): Promise<DecodedAccountInfo[]> => {
+
     return promises.readdir(path.resolve(__dirname, `${process.env.HOME}/.curium/cli`))
         .then(files => Promise.all(files.map(file => {
             let user: string
@@ -94,20 +95,3 @@ export const getAccountInfoFromMnemonic = (mnemonic: string): Promise<DecodedAcc
         .then(wallet => wallet.getAccounts())
         .then(x => x[0])
         .then(info => ({...info, pubkey: Bech32.encode('bluzellepub', info.pubkey)}))
-
-const readline = require('readline').createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
-export const promptForMnemonic = (recover: boolean): Promise<string> =>
-    recover? new Promise((resolve) => readline.question("Please provide BIP39 mnemonic\n", (mnemonic: string) => {
-        readline.pause()
-        return resolve(mnemonic)
-    })) : Promise.resolve(newMnemonic())
-
-export const promptToOverrideUser = (): Promise<boolean> =>
-    new Promise((resolve) => readline.question("User already exists, would you like to override? [y/N]\n", (ans: string) => {
-        readline.pause();
-        return resolve(ans.trim().toLowerCase() === 'y')
-    }))
