@@ -10,5 +10,4 @@ export declare const handler: (argv: {
     user: string;
     recover: boolean;
 }) => Promise<never>;
-export declare const promptForMnemonic: (recover: boolean) => Promise<string>;
 //# sourceMappingURL=addCmd.d.ts.map
