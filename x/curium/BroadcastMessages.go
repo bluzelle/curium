@@ -2,7 +2,7 @@ package curium
 
 import (
 	"context"
-	client2 "github.com/cosmos/cosmos-sdk/client"
+	sdkclient "github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/crypto"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
@@ -10,10 +10,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	signing2 "github.com/cosmos/cosmos-sdk/x/auth/signing"
+	types3 "github.com/tendermint/tendermint/abci/types"
+	types2 "github.com/tendermint/tendermint/types"
 	"time"
 )
 
@@ -40,7 +41,7 @@ func (krr KeyRingReader) GetAddress(name string) (sdk.AccAddress, error) {
 type MsgBroadcaster func(ctx sdk.Context, msgs []types.Msg, from string) chan *MsgBroadcasterResponse
 
 type MsgBroadcasterResponse struct {
-	Response *txtypes.BroadcastTxResponse
+	Response *types3.TxResult
 	Error error
 }
 
@@ -148,7 +149,7 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) MsgBr
 
 			txCtx, _ := context.WithDeadline(context.Background(), time.Now().Add(time.Second*20))
 
-			client, err := client2.NewClientFromNode("http://localhost:26657")
+			client, err := sdkclient.NewClientFromNode("http://localhost:26657")
 			if err != nil {
 				returnError(err)
 				return
@@ -162,8 +163,23 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) MsgBr
 
 			_ = res
 
+			client.Start()
+
+			sub, err := client.Subscribe(txCtx, "MsgBroadcaster",   types2.EventQueryTxFor(txBytes).String())
+			if err != nil {
+				returnError(err)
+				return
+			}
+			result := <- sub
+			_ = result
+
+
+			a := result.Data.(types2.EventDataTx)
+
+			_ = a
+
 			resp <- &MsgBroadcasterResponse{
-				Response: &txtypes.BroadcastTxResponse{},
+				Response: &a.TxResult,
 			}
 		    close(resp)
 		}()
