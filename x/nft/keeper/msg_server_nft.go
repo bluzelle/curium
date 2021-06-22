@@ -8,14 +8,6 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func sendFileReceived(ctx sdk.Context, k msgServer, msg *types.MsgFileReceived) {
-	result, err := k.msgBroadcaster(ctx, []sdk.Msg{msg}, "nft")
-	if err != nil {
-		k.Logger(ctx).Error("Error sending msgFileReceived", "err", err)
-	}
-	fmt.Println(result, err)
-
-}
 
 func (k msgServer) UpdateNft(goCtx context.Context, msg *types.MsgUpdateNft) (*types.MsgUpdateNftResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)

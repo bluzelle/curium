@@ -116,11 +116,10 @@ func (k Keeper) BroadcastRegisterBtPeer(ctx sdk.Context) {
 		Address: myIp,
 		Port:    uint64(k.btPort),
 	}
-	result, err := k.msgBroadcaster(ctx, []sdk.Msg{&msg}, "nft")
-	if err != nil {
+
+	result :=  <- k.msgBroadcaster(ctx, []sdk.Msg{&msg}, "nft")
+
+	if result.Error != nil {
 		k.Logger(ctx).Error("unable to broadcast register peer message", err)
-	}
-	if result != nil {
-		fmt.Println(result)
 	}
 }

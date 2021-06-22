@@ -82,9 +82,9 @@ func (k Keeper) broadcastPublishFile(ctx sdk.Context, id, hash string, metainfo 
 		Metainfo: metaBytes,
 	}
 
-	_, err = k.msgBroadcaster(ctx, []sdk.Msg{&publishMsg}, "nft")
-	if err != nil {
-		return err
+	result := <- k.msgBroadcaster(ctx, []sdk.Msg{&publishMsg}, "nft")
+	if result.Error != nil {
+		return result.Error
 	}
 	return nil
 

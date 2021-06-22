@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"fmt"
 	// this line is used by starport scaffolding # 1
 	"github.com/bluzelle/curium/x/faucet/types"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -40,13 +41,10 @@ func mintHandler(k Keeper, ctx sdk.Context, data []byte) ([]byte, error) {
 		Address: string(data),
 	}
 
-	_, err = k.msgBroadcaster(ctx, []sdk.Msg{&msg}, "minter")
-	// Really bad hack for now until I can find out why this timeout is happening
-
-	if err != nil && err.Error() != "rpc error: code = DeadlineExceeded desc = context deadline exceeded" {
-		return nil, sdkerrors.New("faucet", 2, err.Error())
-	}
-
+	go func() {
+		result := <- k.msgBroadcaster(ctx, []sdk.Msg{&msg}, "minter")
+		fmt.Println(result)
+	}()
 
 	return []byte{}, nil
 }
