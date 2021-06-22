@@ -1006,6 +1006,12 @@ export class MsgClientImpl implements Msg {
   private readonly rpc: Rpc;
   constructor(rpc: Rpc) {
     this.rpc = rpc;
+    this.RegisterPeer = this.RegisterPeer.bind(this);
+    this.PublishFile = this.PublishFile.bind(this);
+    this.FileReceived = this.FileReceived.bind(this);
+    this.CreateNft = this.CreateNft.bind(this);
+    this.UpdateNft = this.UpdateNft.bind(this);
+    this.DeleteNft = this.DeleteNft.bind(this);
   }
   RegisterPeer(request: MsgRegisterPeer): Promise<MsgRegisterPeerResponse> {
     const data = MsgRegisterPeer.encode(request).finish();
@@ -1115,8 +1121,8 @@ const btoa: (bin: string) => string =
   ((bin) => globalThis.Buffer.from(bin, "binary").toString("base64"));
 function base64FromBytes(arr: Uint8Array): string {
   const bin: string[] = [];
-  for (let i = 0; i < arr.byteLength; ++i) {
-    bin.push(String.fromCharCode(arr[i]));
+  for (const byte of arr) {
+    bin.push(String.fromCharCode(byte));
   }
   return btoa(bin.join(""));
 }
@@ -1127,6 +1133,7 @@ type Builtin =
   | Uint8Array
   | string
   | number
+  | boolean
   | undefined
   | Long;
 export type DeepPartial<T> = T extends Builtin

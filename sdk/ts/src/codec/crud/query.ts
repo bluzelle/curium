@@ -1781,6 +1781,16 @@ export class QueryClientImpl implements Query {
   private readonly rpc: Rpc;
   constructor(rpc: Rpc) {
     this.rpc = rpc;
+    this.Read = this.Read.bind(this);
+    this.Keys = this.Keys.bind(this);
+    this.MyKeys = this.MyKeys.bind(this);
+    this.Count = this.Count.bind(this);
+    this.Has = this.Has.bind(this);
+    this.Search = this.Search.bind(this);
+    this.GetNShortestLeases = this.GetNShortestLeases.bind(this);
+    this.GetLease = this.GetLease.bind(this);
+    this.KeyValues = this.KeyValues.bind(this);
+    this.File = this.File.bind(this);
   }
   Read(request: QueryReadRequest): Promise<QueryReadResponse> {
     const data = QueryReadRequest.encode(request).finish();
@@ -1936,8 +1946,8 @@ const btoa: (bin: string) => string =
   ((bin) => globalThis.Buffer.from(bin, "binary").toString("base64"));
 function base64FromBytes(arr: Uint8Array): string {
   const bin: string[] = [];
-  for (let i = 0; i < arr.byteLength; ++i) {
-    bin.push(String.fromCharCode(arr[i]));
+  for (const byte of arr) {
+    bin.push(String.fromCharCode(byte));
   }
   return btoa(bin.join(""));
 }
@@ -1948,6 +1958,7 @@ type Builtin =
   | Uint8Array
   | string
   | number
+  | boolean
   | undefined
   | Long;
 export type DeepPartial<T> = T extends Builtin

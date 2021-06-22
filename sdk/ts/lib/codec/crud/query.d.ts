@@ -3,6 +3,15 @@ import _m0 from "protobufjs/minimal";
 import { PagingRequest, PagingResponse } from "../crud/Paging";
 import { KeyValue, KeyLease } from "../crud/KeyValue";
 export declare const protobufPackage = "bluzelle.curium.crud";
+export interface QueryFileRequest {
+    uuid: string;
+    key: string;
+}
+export interface QueryFileResponse {
+    data: Uint8Array;
+    uuid: string;
+    key: string;
+}
 export interface QueryKeyValuesRequest {
     uuid: string;
     pagination?: PagingRequest;
@@ -75,6 +84,20 @@ export interface QueryGetNShortestLeasesResponse {
     uuid: string;
     keyLeases: KeyLease[];
 }
+export declare const QueryFileRequest: {
+    encode(message: QueryFileRequest, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryFileRequest;
+    fromJSON(object: any): QueryFileRequest;
+    toJSON(message: QueryFileRequest): unknown;
+    fromPartial(object: DeepPartial<QueryFileRequest>): QueryFileRequest;
+};
+export declare const QueryFileResponse: {
+    encode(message: QueryFileResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryFileResponse;
+    fromJSON(object: any): QueryFileResponse;
+    toJSON(message: QueryFileResponse): unknown;
+    fromPartial(object: DeepPartial<QueryFileResponse>): QueryFileResponse;
+};
 export declare const QueryKeyValuesRequest: {
     encode(message: QueryKeyValuesRequest, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryKeyValuesRequest;
@@ -213,6 +236,7 @@ export interface Query {
     GetNShortestLeases(request: QueryGetNShortestLeasesRequest): Promise<QueryGetNShortestLeasesResponse>;
     GetLease(request: QueryGetLeaseRequest): Promise<QueryGetLeaseResponse>;
     KeyValues(request: QueryKeyValuesRequest): Promise<QueryKeyValuesResponse>;
+    File(request: QueryFileRequest): Promise<QueryFileResponse>;
 }
 export declare class QueryClientImpl implements Query {
     private readonly rpc;
@@ -226,11 +250,12 @@ export declare class QueryClientImpl implements Query {
     GetNShortestLeases(request: QueryGetNShortestLeasesRequest): Promise<QueryGetNShortestLeasesResponse>;
     GetLease(request: QueryGetLeaseRequest): Promise<QueryGetLeaseResponse>;
     KeyValues(request: QueryKeyValuesRequest): Promise<QueryKeyValuesResponse>;
+    File(request: QueryFileRequest): Promise<QueryFileResponse>;
 }
 interface Rpc {
     request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;
 }
-declare type Builtin = Date | Function | Uint8Array | string | number | undefined | Long;
+declare type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined | Long;
 export declare type DeepPartial<T> = T extends Builtin ? T : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>> : T extends {} ? {
     [K in keyof T]?: DeepPartial<T[K]>;
 } : Partial<T>;

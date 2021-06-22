@@ -1309,6 +1309,15 @@ exports.MsgDeleteResponse = {
 class MsgClientImpl {
     constructor(rpc) {
         this.rpc = rpc;
+        this.RenewLeasesAll = this.RenewLeasesAll.bind(this);
+        this.RenewLease = this.RenewLease.bind(this);
+        this.Rename = this.Rename.bind(this);
+        this.MultiUpdate = this.MultiUpdate.bind(this);
+        this.DeleteAll = this.DeleteAll.bind(this);
+        this.Upsert = this.Upsert.bind(this);
+        this.Create = this.Create.bind(this);
+        this.Update = this.Update.bind(this);
+        this.Delete = this.Delete.bind(this);
     }
     RenewLeasesAll(request) {
         const data = exports.MsgRenewLeasesAll.encode(request).finish();
@@ -1382,8 +1391,8 @@ const btoa = globalThis.btoa ||
     ((bin) => globalThis.Buffer.from(bin, "binary").toString("base64"));
 function base64FromBytes(arr) {
     const bin = [];
-    for (let i = 0; i < arr.byteLength; ++i) {
-        bin.push(String.fromCharCode(arr[i]));
+    for (const byte of arr) {
+        bin.push(String.fromCharCode(byte));
     }
     return btoa(bin.join(""));
 }

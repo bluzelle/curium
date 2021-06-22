@@ -26,8 +26,7 @@ describe('tx.Count()', function () {
     it('should return the number of keys', async () => {
         const {keys} = await createKeys(sdk.db, 5, uuid);
 
-        expect(await sdk.db.tx.Count({
-            creator: sdk.db.address,
+        expect(await sdk.db.q.Count({
             uuid
         }).then(resp => resp.count)).to.equal(5);
 

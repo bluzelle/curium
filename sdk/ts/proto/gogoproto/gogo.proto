@@ -127,7 +127,7 @@ extend google.protobuf.MessageOptions {
 }
 
 extend google.protobuf.FieldOptions {
-optional string castrepeated = 65000;	optional bool nullable = 65001;
+    optional string castrepeated = 65000;	optional bool nullable = 65001;
 	optional bool embed = 65002;
 	optional string customtype = 65003;
 	optional string customname = 65004;

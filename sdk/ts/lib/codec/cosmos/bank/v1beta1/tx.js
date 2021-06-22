@@ -255,6 +255,8 @@ exports.MsgMultiSendResponse = {
 class MsgClientImpl {
     constructor(rpc) {
         this.rpc = rpc;
+        this.Send = this.Send.bind(this);
+        this.MultiSend = this.MultiSend.bind(this);
     }
     Send(request) {
         const data = exports.MsgSend.encode(request).finish();

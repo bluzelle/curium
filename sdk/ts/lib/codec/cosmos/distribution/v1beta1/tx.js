@@ -464,6 +464,11 @@ exports.MsgFundCommunityPoolResponse = {
 class MsgClientImpl {
     constructor(rpc) {
         this.rpc = rpc;
+        this.SetWithdrawAddress = this.SetWithdrawAddress.bind(this);
+        this.WithdrawDelegatorReward = this.WithdrawDelegatorReward.bind(this);
+        this.WithdrawValidatorCommission =
+            this.WithdrawValidatorCommission.bind(this);
+        this.FundCommunityPool = this.FundCommunityPool.bind(this);
     }
     SetWithdrawAddress(request) {
         const data = exports.MsgSetWithdrawAddress.encode(request).finish();

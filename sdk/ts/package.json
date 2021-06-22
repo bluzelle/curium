@@ -22,10 +22,11 @@
     "promise-passthrough": "^1.0.5",
     "ts-node": "^9.1.1",
     "ts-proto": "^1.79.6",
-    "typescript": "^4.2.4"
+    "typescript": "^4.2.4",
+    "zx": "^1.14.2"
   },
   "scripts": {
-    "compile-proto": "./compile-proto.sh",
+    "compile-proto": "zx compile-proto.js",
     "build": "tsc"
   }
 }

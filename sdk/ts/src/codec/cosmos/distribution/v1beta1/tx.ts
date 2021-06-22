@@ -657,6 +657,11 @@ export class MsgClientImpl implements Msg {
   private readonly rpc: Rpc;
   constructor(rpc: Rpc) {
     this.rpc = rpc;
+    this.SetWithdrawAddress = this.SetWithdrawAddress.bind(this);
+    this.WithdrawDelegatorReward = this.WithdrawDelegatorReward.bind(this);
+    this.WithdrawValidatorCommission =
+      this.WithdrawValidatorCommission.bind(this);
+    this.FundCommunityPool = this.FundCommunityPool.bind(this);
   }
   SetWithdrawAddress(
     request: MsgSetWithdrawAddress
@@ -729,6 +734,7 @@ type Builtin =
   | Uint8Array
   | string
   | number
+  | boolean
   | undefined
   | Long;
 export type DeepPartial<T> = T extends Builtin

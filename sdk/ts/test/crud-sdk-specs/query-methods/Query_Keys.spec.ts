@@ -151,7 +151,7 @@ describe('q.Keys()', function () {
         }, {memo: ''});
 
         await delay(40000);
-
+        
         expect(await sdk.db.q.Keys({
             uuid
         }).then(resp => resp.keys)).to.deep.equal(['key1', 'key3']);
