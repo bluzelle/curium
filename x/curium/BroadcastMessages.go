@@ -42,6 +42,7 @@ type MsgBroadcaster func(ctx sdk.Context, msgs []types.Msg, from string) chan *M
 
 type MsgBroadcasterResponse struct {
 	Response *types3.TxResult
+	Data *[]byte
 	Error error
 }
 
@@ -176,12 +177,12 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) MsgBr
 
 			a := result.Data.(types2.EventDataTx)
 
-			_ = a
-
 			resp <- &MsgBroadcasterResponse{
 				Response: &a.TxResult,
+				Data: &a.TxResult.Result.Data,
 			}
 		    close(resp)
+			client.Stop()
 		}()
 
 		return resp
