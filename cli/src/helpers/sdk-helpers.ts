@@ -62,14 +62,12 @@ export const makeCliDir = (): Promise<void> =>
         .catch(e => (e.stack as string).match(/already exists/) ? {} : e)
 
 export const readCliDir = (): Promise<DecodedAccountInfo[]> => {
-
     return promises.readdir(path.resolve(__dirname, `${process.env.HOME}/.curium/cli`))
         .then(files => Promise.all(files.map(file => {
             let user: string
             return getUserFromFile(file)
                 .then(userFromFile => user = userFromFile)
-                .then(() => promises.readFile(path.resolve(__dirname, `${process.env.HOME}/.curium/cli/${file}`)))
-                .then(decodeBufferFromFile)
+                .then(readUserMnemonic)
                 .then(mnemonic => ({mnemonic, user}))
         })))
         .then(usersAndMnemonics => Promise.all(usersAndMnemonics.map(({mnemonic, user}) =>
@@ -80,6 +78,11 @@ export const readCliDir = (): Promise<DecodedAccountInfo[]> => {
         }() : function () {
             throw e
         }())
+}
+
+export const getUserInfo = (user: string): Promise<DecodedAccountInfo> => {
+    return readUserMnemonic(user)
+        .then(getAccountInfoFromMnemonic)
 }
 
 const getUserFromFile = (filename: string): Promise<string> =>

@@ -5,7 +5,7 @@ import {
     makeCliDir, promptForMnemonic,
     readUserMnemonic
 } from "../../helpers/sdk-helpers";
-import {bluzelle, newMnemonic} from "@bluzelle/sdk-js";
+
 
 
 

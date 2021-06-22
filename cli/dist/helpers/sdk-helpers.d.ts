@@ -19,6 +19,7 @@ declare type DecodedAccountInfo = Omit<AccountData, 'pubkey'> & {
 };
 export declare const makeCliDir: () => Promise<void>;
 export declare const readCliDir: () => Promise<DecodedAccountInfo[]>;
+export declare const getUserInfo: (user: string) => Promise<DecodedAccountInfo>;
 export declare const getAccountInfoFromMnemonic: (mnemonic: string) => Promise<DecodedAccountInfo>;
 export declare const promptForMnemonic: (recover: boolean) => Promise<string>;
 export declare const promptToOverrideUser: () => Promise<boolean>;
