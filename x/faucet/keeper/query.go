@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"fmt"
 	// this line is used by starport scaffolding # 1
 	"github.com/bluzelle/curium/x/faucet/types"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -41,10 +40,7 @@ func mintHandler(k Keeper, ctx sdk.Context, data []byte) ([]byte, error) {
 		Address: string(data),
 	}
 
-	go func() {
-		result := <- k.msgBroadcaster(ctx, []sdk.Msg{&msg}, "minter")
-		fmt.Println(result)
-	}()
+	k.msgBroadcaster(ctx, []sdk.Msg{&msg}, "minter")
 
-	return []byte{}, nil
+	return []byte{}, err
 }

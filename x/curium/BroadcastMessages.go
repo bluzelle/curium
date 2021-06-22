@@ -42,8 +42,8 @@ type MsgBroadcaster func(ctx sdk.Context, msgs []types.Msg, from string) chan *M
 
 type MsgBroadcasterResponse struct {
 	Response *types3.TxResult
-	Data *[]byte
-	Error error
+	Data     *[]byte
+	Error    error
 }
 
 func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) MsgBroadcaster {
@@ -127,7 +127,7 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) MsgBr
 				AccountNumber: accnt.GetAccountNumber(),
 				Sequence:      accnt.GetSequence(),
 			}
-			_ = signerData
+
 			sigV2, err = tx.SignWithPrivKey(
 				encCfg.TxConfig.SignModeHandler().DefaultMode(), signerData,
 				txBuilder, privKey, encCfg.TxConfig, accnt.GetSequence())
@@ -166,22 +166,20 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) MsgBr
 
 			client.Start()
 
-			sub, err := client.Subscribe(txCtx, "MsgBroadcaster",   types2.EventQueryTxFor(txBytes).String())
+			sub, err := client.Subscribe(txCtx, "MsgBroadcaster", types2.EventQueryTxFor(txBytes).String())
 			if err != nil {
 				returnError(err)
 				return
 			}
-			result := <- sub
-			_ = result
-
+			result := <-sub
 
 			a := result.Data.(types2.EventDataTx)
 
 			resp <- &MsgBroadcasterResponse{
 				Response: &a.TxResult,
-				Data: &a.TxResult.Result.Data,
+				Data:     &a.TxResult.Result.Data,
 			}
-		    close(resp)
+			close(resp)
 			client.Stop()
 		}()
 
