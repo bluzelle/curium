@@ -79,7 +79,7 @@ const readCliDir = () => {
             .then(mnemonic => ({ mnemonic, user }));
     })))
         .then(usersAndMnemonics => Promise.all(usersAndMnemonics.map(({ mnemonic, user }) => exports.getAccountInfoFromMnemonic(mnemonic)
-        .then(info => ({ ...info, user })))))
+        .then(info => ({ user, ...info })))))
         .catch(e => e.toString().match(/no such file or directory/) ? function () {
         throw "no keys stored";
     }() : function () {

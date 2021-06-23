@@ -26,6 +26,5 @@ export const handler = (argv: QueryReadRequest & {node: string}): Promise<void> 
         }))
         .then(data => new TextDecoder().decode(data.value))
         .then(console.log)
-        //.then(() => process.exit())
 
 }

@@ -25,7 +25,6 @@ const handler = (argv) => {
     }))
         .then(data => new TextDecoder().decode(data.value))
         .then(console.log);
-    //.then(() => process.exit())
 };
 exports.handler = handler;
 //# sourceMappingURL=ReadCmd.js.map

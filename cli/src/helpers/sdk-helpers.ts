@@ -73,7 +73,7 @@ export const readCliDir = (): Promise<DecodedAccountInfo[]> => {
         })))
         .then(usersAndMnemonics => Promise.all(usersAndMnemonics.map(({mnemonic, user}) =>
             getAccountInfoFromMnemonic(mnemonic)
-                .then(info => ({...info, user}) as DecodedAccountInfo))))
+                .then(info => ({user, ...info}) as DecodedAccountInfo))))
         .catch(e => e.toString().match(/no such file or directory/) ? function () {
             throw "no keys stored"
         }() : function () {
