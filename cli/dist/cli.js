@@ -11,5 +11,7 @@ yargs_1.default(process.argv.slice(2))
     .help()
     .demandCommand()
     .recommendCommands()
+    .strict()
+    .wrap(yargs_1.default.terminalWidth() - 180)
     .argv;
 //# sourceMappingURL=cli.js.map

@@ -9,4 +9,6 @@ yargs(process.argv.slice(2))
     .help()
     .demandCommand()
     .recommendCommands()
+    .strict()
+    .wrap(yargs.terminalWidth() - 180)
     .argv
