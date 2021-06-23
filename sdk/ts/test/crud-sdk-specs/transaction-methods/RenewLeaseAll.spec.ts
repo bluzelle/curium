@@ -36,13 +36,11 @@ describe('tx.RenewLeaseAll()', function () {
             lease: {...zeroLease, days: 2},
             metadata: new Uint8Array()
         });
-        expect(await sdk.db.tx.GetLease({
-            creator,
+        expect(await sdk.db.q.GetLease({
             uuid,
             key: 'key1'
         }).then(resp => resp.seconds)).to.be.closeTo(86400, 12);
-        expect(await sdk.db.tx.GetLease({
-            creator,
+        expect(await sdk.db.q.GetLease({
             uuid,
             key: 'key2'
         }).then(resp => resp.seconds)).to.be.closeTo(86400 * 2, 12);
@@ -52,13 +50,11 @@ describe('tx.RenewLeaseAll()', function () {
             uuid,
             lease: {...zeroLease, days: 2}
         });
-        expect(await sdk.db.tx.GetLease({
-            creator,
+        expect(await sdk.db.q.GetLease({
             uuid,
             key: 'key1'
         }).then(resp => resp.seconds)).to.be.closeTo(86400 * 2, 12);
-        expect(await sdk.db.tx.GetLease({
-            creator,
+        expect(await sdk.db.q.GetLease({
             uuid,
             key: 'key2'
         }).then(resp => resp.seconds)).to.be.closeTo(86400 * 2, 12);
@@ -84,14 +80,12 @@ describe('tx.RenewLeaseAll()', function () {
             lease: {...zeroLease, days: 2},
             metadata: new Uint8Array()
         });
-        expect(await sdk.db.tx.GetLease({
-            creator,
+        expect(await sdk.db.q.GetLease({
             uuid,
             key: 'key1'
         }).then(resp => resp.seconds)).to.be.closeTo(86400, 12);
 
-        expect(await sdk.db.tx.GetLease({
-            creator,
+        expect(await sdk.db.q.GetLease({
             uuid,
             key: 'key2'
         }).then(resp => resp.seconds)).to.be.closeTo(86400 * 2, 12);
@@ -102,13 +96,11 @@ describe('tx.RenewLeaseAll()', function () {
             lease: {...zeroLease, days: 2}
         })).to.be.rejectedWith(/Incorrect owner/)
 
-        expect(await sdk.db.tx.GetLease({
-            creator,
+        expect(await sdk.db.q.GetLease({
             uuid,
             key: 'key1'
         }).then(resp => resp.seconds)).to.be.closeTo(86400, 12);
-        expect(await sdk.db.tx.GetLease({
-            creator,
+        expect(await sdk.db.q.GetLease({
             uuid,
             key: 'key2'
         }).then(resp => resp.seconds)).to.be.closeTo(86400 * 2, 12);

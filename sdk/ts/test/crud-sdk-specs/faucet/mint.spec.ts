@@ -2,7 +2,7 @@ import {bluzelle, BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
 import {getMintedAccount, getSdk} from "../../helpers/client-helpers/sdk-helpers";
 import {expect} from "chai";
-import {Lease} from "../../../src/codec/hackathon-crud/lease";
+import {Lease} from "../../../src/codec/crud/lease";
 import {times} from 'lodash'
 describe('mint endpoint', function () {
     //this.timeout(DEFAULT_TIMEOUT);

@@ -1,6 +1,6 @@
 import {expect} from "chai";
-import {BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
-import {createKeys, defaultLease, encodeData, getSdk, newSdkClient} from "../../helpers/client-helpers/sdk-helpers";
+import {BluzelleSdk} from "../../src/bz-sdk/bz-sdk";
+import {createKeys, defaultLease, encodeData, getSdk, newSdkClient} from "../helpers/client-helpers/sdk-helpers";
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
 import Long from 'long'
 import {useChaiAsPromised} from "testing/lib/globalHelpers";

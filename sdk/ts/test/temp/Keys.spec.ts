@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
-import {BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
+import {BluzelleSdk} from "../../src/bz-sdk/bz-sdk";
 import {
     createKeys, decodeData,
     defaultLease,
@@ -8,12 +8,12 @@ import {
     getSdk,
     newSdkClient,
     zeroLease
-} from "../../helpers/client-helpers/sdk-helpers";
+} from "../helpers/client-helpers/sdk-helpers";
 import Long from 'long'
 import delay from "delay";
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
 import {getSwarm} from "testing/lib/helpers/swarmHelpers";
-import {Lease} from "../../../src/codec/crud/lease";
+import {Lease} from "../../src/codec/crud/lease";
 
 describe('tx.Keys()', function () {
 

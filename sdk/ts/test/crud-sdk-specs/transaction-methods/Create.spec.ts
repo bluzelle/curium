@@ -34,7 +34,7 @@ describe('tx.Create()', function () {
 
     it('should just do a create', () => {
         let start = Date.now()
-        sdk.db.q.KeyValues()
+
         return sdk.db.tx.Create({
             creator: sdk.db.address,
             uuid,
