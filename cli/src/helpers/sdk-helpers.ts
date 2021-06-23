@@ -45,24 +45,34 @@ export const decryptMnemonic = (mnemonic: string): Promise<string> =>
     Promise.resolve(CryptoJS.AES.decrypt(mnemonic, "cli").toString(CryptoJS.enc.Utf8))
 
 
-export const createUserFile = (user: string, mnemonic: string, prompter: () => Promise<boolean>, flag: string = "wx") : Promise<void> =>
+export const createUserFile = (user: string, mnemonic: string, prompter: () => Promise<boolean>, flag: string = "wx"): Promise<void> =>
     encryptMnemonic(mnemonic)
         .then(encodedMnemonic => promises.writeFile(path.resolve(__dirname, `${process.env.HOME}/.curium/cli/${user}.info`), encodedMnemonic, {flag}))
         .catch(e => (e.stack as string).match(/already exists/) ?
             prompter()
-                .then(bool => bool? createUserFile(user, mnemonic, prompter, 'w+') : function () {throw `${user} is already taken, aborted keys add`}())
+                .then(bool => bool ? createUserFile(user, mnemonic, prompter, 'w+') : function () {
+                    throw `${user} is already taken, aborted keys add`
+                }())
             : e)
 
+export const removeUserFile = (user: string): Promise<void> =>
+    promises.rm(path.resolve(__dirname, `${process.env.HOME}/.curium/cli/${user}.info`))
+        .catch(e => (e.stack as string).match(/no such file/) ?
+            function () {
+                throw `${user} does not exist in local keyring`
+            }() :
+            function () {
+                throw e
+            }())
 
 
-type DecodedAccountInfo = Omit<AccountData, 'pubkey'> & {pubkey: string}
+type DecodedAccountInfo = Omit<AccountData, 'pubkey'> & { pubkey: string }
 
 export const makeCliDir = (): Promise<void> =>
     promises.mkdir(path.resolve(__dirname, `${process.env.HOME}/.curium/cli`))
         .catch(e => (e.stack as string).match(/already exists/) ? {} : e)
 
 export const readCliDir = (): Promise<DecodedAccountInfo[]> => {
-
     return promises.readdir(path.resolve(__dirname, `${process.env.HOME}/.curium/cli`))
         .then(files => Promise.all(files.map(file => {
             let user: string

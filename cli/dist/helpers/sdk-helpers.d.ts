@@ -14,6 +14,7 @@ export declare const readUserMnemonic: (user: string) => Promise<string>;
 export declare const encryptMnemonic: (mnemonic: string) => Promise<string>;
 export declare const decryptMnemonic: (mnemonic: string) => Promise<string>;
 export declare const createUserFile: (user: string, mnemonic: string, prompter: () => Promise<boolean>, flag?: string) => Promise<void>;
+export declare const removeUserFile: (user: string) => Promise<void>;
 declare type DecodedAccountInfo = Omit<AccountData, 'pubkey'> & {
     pubkey: string;
 };

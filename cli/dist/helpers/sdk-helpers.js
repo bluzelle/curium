@@ -22,7 +22,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAccountInfoFromMnemonic = exports.getUserInfo = exports.readCliDir = exports.makeCliDir = exports.createUserFile = exports.decryptMnemonic = exports.encryptMnemonic = exports.readUserMnemonic = exports.decodeBufferFromFile = exports.getQuerySdk = exports.getSdkByName = void 0;
+exports.getAccountInfoFromMnemonic = exports.getUserInfo = exports.readCliDir = exports.makeCliDir = exports.removeUserFile = exports.createUserFile = exports.decryptMnemonic = exports.encryptMnemonic = exports.readUserMnemonic = exports.decodeBufferFromFile = exports.getQuerySdk = exports.getSdkByName = void 0;
 const fs_1 = require("fs");
 const path_1 = __importDefault(require("path"));
 const sdk_js_1 = require("@bluzelle/sdk-js");
@@ -63,9 +63,20 @@ const createUserFile = (user, mnemonic, prompter, flag = "wx") => exports.encryp
     .then(encodedMnemonic => fs_1.promises.writeFile(path_1.default.resolve(__dirname, `${process.env.HOME}/.curium/cli/${user}.info`), encodedMnemonic, { flag }))
     .catch(e => e.stack.match(/already exists/) ?
     prompter()
-        .then(bool => bool ? exports.createUserFile(user, mnemonic, prompter, 'w+') : function () { throw `${user} is already taken, aborted keys add`; }())
+        .then(bool => bool ? exports.createUserFile(user, mnemonic, prompter, 'w+') : function () {
+        throw `${user} is already taken, aborted keys add`;
+    }())
     : e);
 exports.createUserFile = createUserFile;
+const removeUserFile = (user) => fs_1.promises.rm(path_1.default.resolve(__dirname, `${process.env.HOME}/.curium/cli/${user}.info`))
+    .catch(e => e.stack.match(/no such file/) ?
+    function () {
+        throw `${user} does not exist in local keyring`;
+    }() :
+    function () {
+        throw e;
+    }());
+exports.removeUserFile = removeUserFile;
 const makeCliDir = () => fs_1.promises.mkdir(path_1.default.resolve(__dirname, `${process.env.HOME}/.curium/cli`))
     .catch(e => e.stack.match(/already exists/) ? {} : e);
 exports.makeCliDir = makeCliDir;
