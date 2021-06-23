@@ -10,11 +10,18 @@ const builder = (yargs) => {
         describe: 'name of user or bluzelle address',
         type: 'string'
     })
+        .option('address', {
+        describe: 'return the bluzelle address',
+        alias: 'a',
+        type: 'boolean',
+        default: false
+    })
         .help();
 };
 exports.builder = builder;
 const handler = (argv) => {
     return sdk_helpers_1.getUserInfo(argv.user)
+        .then(info => argv.address ? info.address : info)
         .then(console.log)
         .then(() => process.exit());
 };

@@ -14,10 +14,17 @@ export const builder = (yargs: Argv) => {
             describe: 'name of user or bluzelle address',
             type: 'string'
         })
+        .option('address', {
+            describe: 'return the bluzelle address',
+            alias: 'a',
+            type: 'boolean',
+            default: false
+    })
         .help()
 }
-export const handler = (argv: { user: string }) => {
+export const handler = (argv: { user: string, address: boolean }) => {
     return getUserInfo(argv.user)
+        .then(info => argv.address? info.address : info)
         .then(console.log)
         .then(() => process.exit())
 }
