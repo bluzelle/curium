@@ -1,11 +1,7 @@
 import {Argv} from "yargs";
 
-import {
-    createUserFile, getAccountInfoFromMnemonic,
-    makeCliDir,
-    readUserMnemonic, removeUserFile
-} from "../../helpers/sdk-helpers";
-import {bluzelle, newMnemonic} from "@bluzelle/sdk-js";
+import {removeUserFile} from "../../helpers/sdk-helpers";
+
 
 
 export const command = 'delete <user>'
