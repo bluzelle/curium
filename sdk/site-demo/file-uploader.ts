@@ -1,4 +1,4 @@
-import {bluzelle, BluzelleSdk} from "@bluzelle/sdk-js";
+import {BluzelleSdk} from "@bluzelle/sdk-js";
 import {Lease} from "@bluzelle/sdk-js/lib/codec/crud/lease";
 import {readdir} from 'fs/promises'
 import {readFile} from 'fs/promises'
@@ -15,7 +15,7 @@ function writeSite(bz: BluzelleSdk) {
         .then(files => Promise.all(files.map(file =>
             bz.db.tx.Upsert({
                 creator: bz.db.address,
-                uuid: 'my-site',
+                uuid: 'my-sitex',
                 key: file.filename,
                 value: file.data,
                 lease: {days: 1} as Lease,
@@ -47,14 +47,5 @@ function readFiles(): Promise<File[]> {
             ))
         )
 
-        // filenames.forEach(function(filename) {
-        //     fs.readFile(dirname + filename, 'utf-8', function(err, content) {
-        //         if (err) {
-        //             onError(err);
-        //             return;
-        //         }
-        //         onFileContent(filename, content);
-        //     });
-        // });
 }
 
