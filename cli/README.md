@@ -6,9 +6,9 @@
 
 
 ```
-yarn add @bluzelle/cli
+yarn global add @bluzelle/cli
 or
-npm install @bluzelle/cli
+npm install -g @bluzelle/cli
 ```
 
 # Quick Start
