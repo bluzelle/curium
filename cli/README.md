@@ -25,6 +25,8 @@ blzcli keys add [user] --recover
 
 3) copy and paste your mnemonic when prompted, and press enter
 
+4) send transactions to the Bluzelle chain with the flag --from [user] 
+
 # Usage 
 
 ## blzcli
