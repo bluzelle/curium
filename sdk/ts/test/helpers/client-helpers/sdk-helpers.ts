@@ -15,10 +15,10 @@ process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = '0';
 
 export const getSdk = (mnemonic: string): Promise<BluzelleSdk> => {
     return bluzelle({
-        //mnemonic: "urge crisp birth cotton rely reflect demise carry donor nut daughter ankle spoil breeze usual name absurd stumble typical early announce before machine street",
-        mnemonic,
-        url: 'http://localhost:26667',
-        //url: 'https://client.sentry.testnet.private.bluzelle.com:26657',
+        mnemonic: "noodle swallow lion hill ask catalog outer opera pluck between lend panel rose craft mass behind sad regret easy brother wealth various shop bean",
+        //mnemonic,
+        //url: 'http://localhost:26667',
+        url: 'https://client.sentry.testnet.private.bluzelle.com:26657',
         gasPrice: 0.002,
         maxGas: 1000000000
     })

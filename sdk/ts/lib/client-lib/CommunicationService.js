@@ -73,7 +73,7 @@ const sendMessages = (service, queue, retrans = false) => new Promise((resolve, 
 const getDelayBetweenRequests = (length, url) => monet_1.Right(length)
     .flatMap(length => length < 500 ? monet_1.Left(3000) : monet_1.Right(length))
     .flatMap(length => /localhost/.test(url) ? monet_1.Left(500) : monet_1.Left(500))
-    .cata(t => t, () => 5000);
+    .cata(t => 5000, () => 5000);
 let chainId;
 const transmitTransaction = (service, messages, { memo }) => {
     let cosmos;

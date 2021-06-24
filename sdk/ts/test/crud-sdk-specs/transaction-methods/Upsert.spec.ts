@@ -9,7 +9,8 @@ import {
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
 import {bluzelle, BluzelleSdk, DbSdk} from "../../../src/bz-sdk/bz-sdk";
 import {expect} from "chai";
-
+import {times} from "lodash";
+import {passThrough} from "promise-passthrough";
 
 describe('tx.Upsert()', function () {
     this.timeout(DEFAULT_TIMEOUT);
@@ -223,6 +224,26 @@ describe('tx.Upsert()', function () {
         })).to.be.rejectedWith(/incorrect owner/)
 
 
+    });
+
+    it('should fail parallel without Left 5 second delay', () => {
+
+        return Promise.all(times(5).map(idx => sdk.db.tx.Upsert({
+            creator,
+            uuid,
+            key: `key-${idx}`,
+            value: encodeData(`value-${idx}`.padEnd(500, "0")),
+            lease: defaultLease,
+            metadata: new Uint8Array()
+        })
+            .then(() => console.log(`=============created key-${idx}, value-${idx}, in uuid ${uuid}`))))
+            .then(() => Promise.all(times(5).map(idx => sdk.db.q.Read({
+                uuid,
+                key: `key-${idx}`
+            })
+                .then(passThrough(() => console.log(`//////////// read key ${idx}`)))))
+                .then(arrayValues => arrayValues.map(val => decodeData(val.value)))
+                .then(decodedValues => expect(decodedValues).to.deep.equal(times(5).map(idx => `value-${idx}`.padEnd(500, "0")))))
     })
 
 });

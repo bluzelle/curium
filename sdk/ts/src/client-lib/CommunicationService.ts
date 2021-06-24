@@ -110,7 +110,7 @@ const getDelayBetweenRequests = (length: number, url: string): number =>
     Right<number, number>(length)
         .flatMap(length => length < 500 ? Left(3000) : Right(length))
         .flatMap(length => /localhost/.test(url) ? Left(500) : Left(500))
-        .cata(t => t, () => 5000)
+        .cata(t => 5000, () => 5000)
 
 
 let chainId: string
