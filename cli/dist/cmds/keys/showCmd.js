@@ -3,11 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = exports.builder = exports.desc = exports.command = void 0;
 const sdk_helpers_1 = require("../../helpers/sdk-helpers");
 exports.command = 'show <user>';
-exports.desc = 'Show key info of specified user or bluzelle address';
+exports.desc = 'Show key info of specified user';
 const builder = (yargs) => {
     return yargs
         .positional('user', {
-        describe: 'name of user or bluzelle address',
+        describe: 'name of user',
         type: 'string'
     })
         .option('address', {

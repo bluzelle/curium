@@ -7,11 +7,11 @@ import {
 
 
 export const command = 'show <user>'
-export const desc = 'Show key info of specified user or bluzelle address'
+export const desc = 'Show key info of specified user'
 export const builder = (yargs: Argv) => {
     return yargs
         .positional('user', {
-            describe: 'name of user or bluzelle address',
+            describe: 'name of user',
             type: 'string'
         })
         .option('address', {

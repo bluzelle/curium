@@ -1,6 +1,6 @@
 import { Argv } from "yargs";
 export declare const command = "show <user>";
-export declare const desc = "Show key info of specified user or bluzelle address";
+export declare const desc = "Show key info of specified user";
 export declare const builder: (yargs: Argv) => Argv<{
     user: string | undefined;
 } & {
