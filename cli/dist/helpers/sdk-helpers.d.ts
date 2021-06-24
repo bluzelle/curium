@@ -18,6 +18,7 @@ export declare const removeUserFile: (user: string) => Promise<void>;
 declare type DecodedAccountInfo = Omit<AccountData, 'pubkey'> & {
     pubkey: string;
 };
+export declare const makeCuriumDir: () => Promise<void>;
 export declare const makeCliDir: () => Promise<void>;
 export declare const readCliDir: () => Promise<DecodedAccountInfo[]>;
 export declare const getUserInfo: (user: string) => Promise<DecodedAccountInfo>;

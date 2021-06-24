@@ -68,6 +68,10 @@ export const removeUserFile = (user: string): Promise<void> =>
 
 type DecodedAccountInfo = Omit<AccountData, 'pubkey'> & { pubkey: string }
 
+export const makeCuriumDir = (): Promise<void> =>
+    promises.mkdir(path.resolve(__dirname, `${process.env.HOME}/.curium`))
+        .catch(e => (e.stack as string).match(/already exists/) ? {} : e)
+
 export const makeCliDir = (): Promise<void> =>
     promises.mkdir(path.resolve(__dirname, `${process.env.HOME}/.curium/cli`))
         .catch(e => (e.stack as string).match(/already exists/) ? {} : e)

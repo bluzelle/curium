@@ -2,7 +2,7 @@ import {Argv} from "yargs";
 
 import {
     createUserFile, getAccountInfoFromMnemonic,
-    makeCliDir,
+    makeCliDir, makeCuriumDir,
     readUserMnemonic
 } from "../../helpers/sdk-helpers";
 import {bluzelle, newMnemonic} from "@bluzelle/sdk-js";
@@ -26,7 +26,8 @@ export const builder = (yargs: Argv) => {
 }
 export const handler = (argv: { user: string, recover: boolean}) => {
     let yourMnemonic: string
-    return makeCliDir()
+    return makeCuriumDir()
+        .then(() => makeCliDir())
         .then(() => promptForMnemonic(argv.recover))
         .then(mnemonic => createUserFile(argv.user, mnemonic, promptToOverrideUser))
         .then(() => readUserMnemonic(argv.user))

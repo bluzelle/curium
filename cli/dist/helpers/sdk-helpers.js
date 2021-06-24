@@ -22,7 +22,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAccountInfoFromMnemonic = exports.getUserInfo = exports.readCliDir = exports.makeCliDir = exports.removeUserFile = exports.createUserFile = exports.decryptMnemonic = exports.encryptMnemonic = exports.readUserMnemonic = exports.decodeBufferFromFile = exports.getQuerySdk = exports.getSdkByName = void 0;
+exports.getAccountInfoFromMnemonic = exports.getUserInfo = exports.readCliDir = exports.makeCliDir = exports.makeCuriumDir = exports.removeUserFile = exports.createUserFile = exports.decryptMnemonic = exports.encryptMnemonic = exports.readUserMnemonic = exports.decodeBufferFromFile = exports.getQuerySdk = exports.getSdkByName = void 0;
 const fs_1 = require("fs");
 const path_1 = __importDefault(require("path"));
 const sdk_js_1 = require("@bluzelle/sdk-js");
@@ -77,6 +77,9 @@ const removeUserFile = (user) => fs_1.promises.rm(path_1.default.resolve(__dirna
         throw e;
     }());
 exports.removeUserFile = removeUserFile;
+const makeCuriumDir = () => fs_1.promises.mkdir(path_1.default.resolve(__dirname, `${process.env.HOME}/.curium`))
+    .catch(e => e.stack.match(/already exists/) ? {} : e);
+exports.makeCuriumDir = makeCuriumDir;
 const makeCliDir = () => fs_1.promises.mkdir(path_1.default.resolve(__dirname, `${process.env.HOME}/.curium/cli`))
     .catch(e => e.stack.match(/already exists/) ? {} : e);
 exports.makeCliDir = makeCliDir;
