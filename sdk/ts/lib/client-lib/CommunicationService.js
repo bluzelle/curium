@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.testHook = exports.getClient = exports.sendMessage = exports.withTransaction = exports.newCommunicationService = exports.mnemonicToAddress = void 0;
+exports.getClient = exports.sendMessage = exports.withTransaction = exports.newCommunicationService = exports.mnemonicToAddress = void 0;
 const monet_1 = require("monet");
 const lodash_1 = require("lodash");
 const delay_1 = __importDefault(require("delay"));
@@ -67,13 +67,10 @@ const sendMessages = (service, queue, retrans = false) => new Promise((resolve, 
             .cata(() => reject(e), () => {
         }));
     })
-        // hacky way to make sure that connections arrive at server in order
-        .then(() => delay_1.default(getDelayBetweenRequests(JSON.stringify(queue.items).length, service.url)));
+        // hacky way to make sure that connections arrive at server in order for https connections
+        .then(() => delay_1.default(getDelayHttpDelay(service)));
 });
-const getDelayBetweenRequests = (length, url) => monet_1.Right(length)
-    .flatMap(length => length < 500 ? monet_1.Left(3000) : monet_1.Right(length))
-    .flatMap(length => /localhost/.test(url) ? monet_1.Left(500) : monet_1.Left(500))
-    .cata(t => 5000, () => 5000);
+const getDelayHttpDelay = (cs) => cs.url.match(/ws/) ? 0 : 3000;
 let chainId;
 const transmitTransaction = (service, messages, { memo }) => {
     let cosmos;
@@ -102,7 +99,7 @@ const transmitTransaction = (service, messages, { memo }) => {
 };
 let msgChain = Promise.resolve();
 const getSequence = (service, cosmos) => (service.accountRequested ? (service.accountRequested = service.accountRequested
-    .then(() => service.seq = service.seq + 1)) : (exports.mnemonicToAddress(service.mnemonic)
+    .then(() => service.seq = service.seq + 1)) : (service.accountRequested = exports.mnemonicToAddress(service.mnemonic)
     .then(address => service.accountRequested = cosmos.getAccount(address)
     .then((data) => {
     if (!data) {
@@ -138,14 +135,21 @@ const combineGas = (transactions) => transactions.reduce((gasInfo, transaction) 
 }, {});
 // Inside an async function...
 const getSigner = (mnemonic) => proto_signing_1.DirectSecp256k1HdWallet.fromMnemonic(mnemonic, { prefix: 'bluzelle' });
-const getClient = (service) => getSigner(service.mnemonic)
+const getMemoizedClient = lodash_1.memoize((service) => getSigner(service.mnemonic)
     .then(signer => stargate_1.SigningStargateClient.connectWithSigner(service.url, signer, {
     registry: Registry_1.myRegistry,
     broadcastTimeoutMs: 300000,
-}));
+})));
+const getClient = (service) => {
+    return getMemoizedClient(service)
+        .then(updateRegistry.bind(null, Registry_1.getMyRegistry()));
+    function updateRegistry(registry, client) {
+        // @ts-ignore
+        client.registry = registry;
+        return client;
+    }
+    ;
+};
 exports.getClient = getClient;
 const getChainId = lodash_1.memoize((client) => client.getChainId());
-exports.testHook = {
-    getDelayBetweenRequests
-};
 //# sourceMappingURL=CommunicationService.js.map

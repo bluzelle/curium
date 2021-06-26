@@ -2,7 +2,7 @@ import {
     decodeData,
     DEFAULT_TIMEOUT,
     defaultLease,
-    encodeData,
+    encodeData, getMintedAccount,
     getSdk,
     newSdkClient
 } from "../../helpers/client-helpers/sdk-helpers";
@@ -11,6 +11,8 @@ import {bluzelle, BluzelleSdk, DbSdk} from "../../../src/bz-sdk/bz-sdk";
 import {expect} from "chai";
 import {times} from "lodash";
 import {passThrough} from "promise-passthrough";
+import {getSwarm} from "testing/lib/helpers/swarmHelpers";
+
 
 describe('tx.Upsert()', function () {
     this.timeout(DEFAULT_TIMEOUT);
@@ -20,6 +22,12 @@ describe('tx.Upsert()', function () {
     let creator: string
     beforeEach(() => {
         useChaiAsPromised();
+        // return getSwarm()
+        //     .then(() => getMintedAccount())
+        //     .then(getSdk)
+        //     .then(newSdk => sdk = newSdk)
+        //     .then(() => uuid = Date.now().toString())
+        //     .then(() => creator = sdk.db.address)
         return getSdk("phrase lonely draw rubber either tuna harbor route decline burger inquiry aisle scrub south style chronic trouble biology coil defy fashion warfare blanket shuffle")
             .then(newSdk => sdk = newSdk)
             .then(() => uuid = Date.now().toString())
@@ -228,7 +236,7 @@ describe('tx.Upsert()', function () {
 
     it('should fail parallel without Left 5 second delay', () => {
 
-        return Promise.all(times(5).map(idx => sdk.db.tx.Upsert({
+        return Promise.all(times(200).map(idx => sdk.db.tx.Upsert({
             creator,
             uuid,
             key: `key-${idx}`,
@@ -237,13 +245,39 @@ describe('tx.Upsert()', function () {
             metadata: new Uint8Array()
         })
             .then(() => console.log(`=============created key-${idx}, value-${idx}, in uuid ${uuid}`))))
-            .then(() => Promise.all(times(5).map(idx => sdk.db.q.Read({
+            .then(() => Promise.all(times(200).map(idx => sdk.db.q.Read({
                 uuid,
                 key: `key-${idx}`
             })
                 .then(passThrough(() => console.log(`//////////// read key ${idx}`)))))
                 .then(arrayValues => arrayValues.map(val => decodeData(val.value)))
-                .then(decodedValues => expect(decodedValues).to.deep.equal(times(5).map(idx => `value-${idx}`.padEnd(500, "0")))))
+                .then(decodedValues => expect(decodedValues).to.deep.equal(times(200).map(idx => `value-${idx}`.padEnd(500, "0")))))
+    });
+
+    it('should fail when doing two different parallel tx', () => {
+        return Promise.all([sdk.db.tx.Create({
+            creator,
+            uuid,
+            key: 'myFirstKey',
+            value: encodeData('myFirstValue'),
+            lease: defaultLease,
+            metadata: new Uint8Array()
+        }), sdk.db.tx.Upsert({
+            creator,
+            uuid,
+            key: 'mySecondKey',
+            value: encodeData('mySecondValue'),
+            lease: defaultLease,
+            metadata: new Uint8Array()
+        })])
+            .then(() => Promise.all([sdk.db.q.Read({
+                uuid,
+                key: 'myFirstKey'
+            }).then(resp => decodeData(resp.value)), sdk.db.q.Read({
+                uuid,
+                key:'mySecondKey'
+            }).then(resp => decodeData(resp.value))]))
+            .then(reads => expect(reads).to.deep.equal(['myFirstValue', 'mySecondValue']))
     })
 
 });

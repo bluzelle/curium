@@ -113,6 +113,26 @@ describe('tx.RenewLeaseAll()', function () {
             uuid,
             lease: {...zeroLease, seconds: 100}
         })).to.be.rejectedWith(/Uuid is empty/)
+    });
+
+    it('should renew one lease', () => {
+        return sdk.db.tx.Create({
+            creator,
+            uuid,
+            key: 'key1',
+            value: encodeData('value'),
+            lease: {...zeroLease, seconds: 100},
+            metadata: new Uint8Array()
+        })
+            .then(() => sdk.db.tx.RenewLeasesAll({
+                creator: sdk.db.address,
+                uuid,
+                lease: {...zeroLease, seconds: 100}
+            }))
+            .then(async () => expect(await sdk.db.q.GetLease({
+                uuid,
+                key:'key1'
+            }).then(resp => resp.seconds)).to.be.closeTo(100, 20))
     })
 
 

@@ -1,16 +1,13 @@
 import {GasInfo} from "../legacyAdapter/types/GasInfo";
-import {Left, Right, Some} from "monet";
-import {MessageResponse} from "../legacyAdapter/types/MessageResponse";
+import {Some} from "monet";
 import {Message} from "../legacyAdapter/types/Message";
 import {memoize} from 'lodash'
 import delay from "delay";
-import {DirectSecp256k1HdWallet, EncodeObject} from "@cosmjs/proto-signing";
+import {DirectSecp256k1HdWallet, EncodeObject, Registry} from "@cosmjs/proto-signing";
 
 import {TxRaw} from "@cosmjs/proto-signing/build/codec/cosmos/tx/v1beta1/tx";
-import {myRegistry} from "./Registry";
-import {BroadcastTxFailure, BroadcastTxResponse, isBroadcastTxFailure, SigningStargateClient} from "@cosmjs/stargate";
-import {BroadcastTxCommitResponse, broadcastTxCommitSuccess, Client, Tendermint34Client} from "@cosmjs/tendermint-rpc";
-import {passThroughAwait} from "promise-passthrough";
+import {getMyRegistry, myRegistry} from "./Registry";
+import {BroadcastTxResponse, isBroadcastTxFailure, SigningStargateClient} from "@cosmjs/stargate";
 
 const TOKEN_NAME = 'ubnt';
 
@@ -102,21 +99,17 @@ const sendMessages = (service: CommunicationService, queue: TransactionMessageQu
                         );
                 }
             )
-            // hacky way to make sure that connections arrive at server in order
-            .then(() => delay(getDelayBetweenRequests(JSON.stringify(queue.items).length, service.url)))
+            // hacky way to make sure that connections arrive at server in order for https connections
+            .then(() => delay(getDelayHttpDelay(service)))
     });
 
-const getDelayBetweenRequests = (length: number, url: string): number =>
-    Right<number, number>(length)
-        .flatMap(length => length < 500 ? Left(3000) : Right(length))
-        .flatMap(length => /localhost/.test(url) ? Left(500) : Left(500))
-        .cata(t => 5000, () => 5000)
+const getDelayHttpDelay = (cs: CommunicationService): number =>
+    cs.url.match(/ws/) ? 0 : 3000
 
 
 let chainId: string
 const transmitTransaction = (service: CommunicationService, messages: MessageQueueItem<any>[], {memo}: { memo: string }): Promise<any> => {
     let cosmos: SigningStargateClient;
-
     return getClient(service)
         .then(c => cosmos = c)
         .then(client => getChainId(client).then(cId => chainId = cId))
@@ -160,22 +153,20 @@ const getSequence = (service: CommunicationService, cosmos: SigningStargateClien
                 service.seq = service.seq + 1
             )
     ) : (
-        mnemonicToAddress(service.mnemonic)
-        .then(address =>
-            service.accountRequested = cosmos.getAccount(address)
-            .then((data: any) => {
-                if (!data) {
-                    throw 'Invalid account: check your mnemonic'
-                }
-                service.seq = data.sequence
-                service.account = data.accountNumber
-            }))))
-
+        service.accountRequested = mnemonicToAddress(service.mnemonic)
+            .then(address =>
+                service.accountRequested = cosmos.getAccount(address)
+                    .then((data: any) => {
+                        if (!data) {
+                            throw 'Invalid account: check your mnemonic'
+                        }
+                        service.seq = data.sequence
+                        service.account = data.accountNumber
+                    }))))
         .then(() => ({
             seq: service.seq,
             account: service.account
         }));
-
 
 
 const checkInternalErrors = (res: BroadcastTxResponse): BroadcastTxResponse => {
@@ -208,8 +199,7 @@ const getSigner = (mnemonic: string) => DirectSecp256k1HdWallet.fromMnemonic(
     mnemonic,
     {prefix: 'bluzelle'});
 
-
-export const getClient = (service: CommunicationService) =>
+const getMemoizedClient = memoize((service: CommunicationService) =>
     getSigner(service.mnemonic)
         .then(signer => SigningStargateClient.connectWithSigner(
             service.url,
@@ -218,11 +208,23 @@ export const getClient = (service: CommunicationService) =>
                 registry: myRegistry,
                 broadcastTimeoutMs: 300000,
             }
-        ));
+        ))
+);
+
+
+export const getClient = (service: CommunicationService) => {
+
+    return getMemoizedClient(service)
+        .then(updateRegistry.bind(null, getMyRegistry()));
+
+
+    function updateRegistry(registry: Registry, client: SigningStargateClient) {
+        // @ts-ignore
+        client.registry = registry;
+        return client;
+    };
+};
 
 const getChainId = memoize<(client: SigningStargateClient) => Promise<string>>((client) => client.getChainId())
 
 
-export const testHook = {
-    getDelayBetweenRequests
-}

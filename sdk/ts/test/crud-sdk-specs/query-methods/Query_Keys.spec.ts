@@ -26,7 +26,7 @@ describe('q.Keys()', function () {
     it('should return a empty list if there are no keys', async () => {
         expect(await sdk.db.q.Keys({
             uuid,
-        }).then(resp => resp.pagination?.total)).to.have.length(0);
+        }).then(resp => resp.pagination?.total.toInt())).to.equal(0);
     });
 
     it('should work with an empty value', async () => {

@@ -30,8 +30,5 @@ export declare const newCommunicationService: (url: string, mnemonic: string) =>
 export declare const withTransaction: <T>(service: CommunicationService, fn: () => T, { memo }: WithTransactionsOptions) => Promise<Uint8Array>;
 export declare const sendMessage: <T, R>(ctx: CommunicationService, message: Message<T>, gasInfo: GasInfo) => Promise<Uint8Array>;
 export declare const getClient: (service: CommunicationService) => Promise<SigningStargateClient>;
-export declare const testHook: {
-    getDelayBetweenRequests: (length: number, url: string) => number;
-};
 export {};
 //# sourceMappingURL=CommunicationService.d.ts.map

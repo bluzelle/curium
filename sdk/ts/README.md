@@ -48,7 +48,7 @@ import {bluzelle} from '@bluzelle/sdk-js'
 
 const sdk = await bluzelle({
         mnemonic: mnemonic_from_mint_endpoint, 
-        url: "https://client.sentry.testnet.private.bluzelle.com:26657",
+        url: "wss://client.sentry.testnet.private.bluzelle.com:26657",
         maxGas: 100000000, 
         gasPrice:  0.002 		 
     });
@@ -56,6 +56,12 @@ const sdk = await bluzelle({
 ```
 
 Note: if the specified gasPrice and/or maxGas is too low, any transactions may be rejected by a validator (e.g. a transaction requires more gas than maxGas specified, or the gasPrice is too low to cover validator fees). The default suggestion for these fields above will suffice.
+
+### Websockets vs. HTTPS
+
+- Currently the sdk supports both websocket and https connections to the Bluzelle testnet
+- Use **websockets** (wss://client.sentry.testnet.private.bluzelle.com:26657) for greater performance
+- For **https** pass the url **https://client.sentry.testnet.private.bluzelle.com:26657** to the bluzelle constructor
 
 # Usage
 
