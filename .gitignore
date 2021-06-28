@@ -5,3 +5,4 @@ secret.yml
 .idea/workspace.xml
 sdk/lib
 sdk/proto
+runConfigurations
