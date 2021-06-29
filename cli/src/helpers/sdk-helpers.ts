@@ -3,7 +3,7 @@ import path from "path";
 import {bluzelle, BluzelleSdk, newMnemonic} from "@bluzelle/sdk-js";
 import * as CryptoJS from 'crypto-js'
 import {AccountData, DirectSecp256k1HdWallet} from "@cosmjs/proto-signing";
-import {Bech32} from "@cosmjs/encoding"
+import {bech32} from "bech32"
 
 export type Flags = { from: string, gas: number, gasPrice: string, node: string }
 
@@ -108,4 +108,4 @@ export const getAccountInfoFromMnemonic = (mnemonic: string): Promise<DecodedAcc
     DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {prefix: 'bluzelle'})
         .then(wallet => wallet.getAccounts())
         .then(x => x[0])
-        .then(info => ({...info, pubkey: Bech32.encode('bluzellepub', info.pubkey)}))
+        .then(info => ({...info, pubkey: bech32.encode('bluzellepub', bech32.toWords(info.pubkey))}))
