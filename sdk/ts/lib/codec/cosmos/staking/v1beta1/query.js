@@ -2034,6 +2034,22 @@ exports.QueryParamsResponse = {
 class QueryClientImpl {
     constructor(rpc) {
         this.rpc = rpc;
+        this.Validators = this.Validators.bind(this);
+        this.Validator = this.Validator.bind(this);
+        this.ValidatorDelegations = this.ValidatorDelegations.bind(this);
+        this.ValidatorUnbondingDelegations =
+            this.ValidatorUnbondingDelegations.bind(this);
+        this.Delegation = this.Delegation.bind(this);
+        this.UnbondingDelegation = this.UnbondingDelegation.bind(this);
+        this.DelegatorDelegations = this.DelegatorDelegations.bind(this);
+        this.DelegatorUnbondingDelegations =
+            this.DelegatorUnbondingDelegations.bind(this);
+        this.Redelegations = this.Redelegations.bind(this);
+        this.DelegatorValidators = this.DelegatorValidators.bind(this);
+        this.DelegatorValidator = this.DelegatorValidator.bind(this);
+        this.HistoricalInfo = this.HistoricalInfo.bind(this);
+        this.Pool = this.Pool.bind(this);
+        this.Params = this.Params.bind(this);
     }
     Validators(request) {
         const data = exports.QueryValidatorsRequest.encode(request).finish();

@@ -1527,6 +1527,15 @@ export class MsgClientImpl implements Msg {
   private readonly rpc: Rpc;
   constructor(rpc: Rpc) {
     this.rpc = rpc;
+    this.RenewLeasesAll = this.RenewLeasesAll.bind(this);
+    this.RenewLease = this.RenewLease.bind(this);
+    this.Rename = this.Rename.bind(this);
+    this.MultiUpdate = this.MultiUpdate.bind(this);
+    this.DeleteAll = this.DeleteAll.bind(this);
+    this.Upsert = this.Upsert.bind(this);
+    this.Create = this.Create.bind(this);
+    this.Update = this.Update.bind(this);
+    this.Delete = this.Delete.bind(this);
   }
   RenewLeasesAll(
     request: MsgRenewLeasesAll
@@ -1674,8 +1683,8 @@ const btoa: (bin: string) => string =
   ((bin) => globalThis.Buffer.from(bin, "binary").toString("base64"));
 function base64FromBytes(arr: Uint8Array): string {
   const bin: string[] = [];
-  for (let i = 0; i < arr.byteLength; ++i) {
-    bin.push(String.fromCharCode(arr[i]));
+  for (const byte of arr) {
+    bin.push(String.fromCharCode(byte));
   }
   return btoa(bin.join(""));
 }
@@ -1686,6 +1695,7 @@ type Builtin =
   | Uint8Array
   | string
   | number
+  | boolean
   | undefined
   | Long;
 export type DeepPartial<T> = T extends Builtin

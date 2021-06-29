@@ -5,9 +5,9 @@ import {
     defaultLease,
     encodeData,
     getSdk, newSdkClient
-} from "../../helpers/client-helpers/sdk-helpers";
+} from "../helpers/client-helpers/sdk-helpers";
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
-import {BluzelleSdk, DbSdk} from "../../../src/bz-sdk/bz-sdk";
+import {BluzelleSdk, DbSdk} from "../../src/bz-sdk/bz-sdk";
 import {expect} from "chai";
 
 

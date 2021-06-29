@@ -40,13 +40,7 @@ func mintHandler(k Keeper, ctx sdk.Context, data []byte) ([]byte, error) {
 		Address: string(data),
 	}
 
-	_, err = k.msgBroadcaster(ctx, []sdk.Msg{&msg}, "minter")
-	// Really bad hack for now until I can find out why this timeout is happening
+	k.msgBroadcaster(ctx, []sdk.Msg{&msg}, "minter")
 
-	if err != nil && err.Error() != "rpc error: code = DeadlineExceeded desc = context deadline exceeded" {
-		return nil, sdkerrors.New("faucet", 2, err.Error())
-	}
-
-
-	return []byte{}, nil
+	return []byte{}, err
 }

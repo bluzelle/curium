@@ -3,13 +3,172 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.QueryClientImpl = exports.QueryGetNShortestLeasesResponse = exports.QueryGetNShortestLeasesRequest = exports.QueryGetLeaseResponse = exports.QueryGetLeaseRequest = exports.QuerySearchResponse = exports.QuerySearchRequest = exports.QueryHasResponse = exports.QueryHasRequest = exports.QueryCountResponse = exports.QueryCountRequest = exports.QueryMyKeysResponse = exports.QueryMyKeysRequest = exports.QueryKeysResponse = exports.QueryKeysRequest = exports.QueryReadResponse = exports.QueryReadRequest = exports.QueryKeyValuesResponse = exports.QueryKeyValuesRequest = exports.protobufPackage = void 0;
+exports.QueryClientImpl = exports.QueryGetNShortestLeasesResponse = exports.QueryGetNShortestLeasesRequest = exports.QueryGetLeaseResponse = exports.QueryGetLeaseRequest = exports.QuerySearchResponse = exports.QuerySearchRequest = exports.QueryHasResponse = exports.QueryHasRequest = exports.QueryCountResponse = exports.QueryCountRequest = exports.QueryMyKeysResponse = exports.QueryMyKeysRequest = exports.QueryKeysResponse = exports.QueryKeysRequest = exports.QueryReadResponse = exports.QueryReadRequest = exports.QueryKeyValuesResponse = exports.QueryKeyValuesRequest = exports.QueryFileResponse = exports.QueryFileRequest = exports.protobufPackage = void 0;
 /* eslint-disable */
 const long_1 = __importDefault(require("long"));
 const minimal_1 = __importDefault(require("protobufjs/minimal"));
 const Paging_1 = require("../crud/Paging");
 const KeyValue_1 = require("../crud/KeyValue");
 exports.protobufPackage = "bluzelle.curium.crud";
+const baseQueryFileRequest = { uuid: "", key: "" };
+exports.QueryFileRequest = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        if (message.uuid !== "") {
+            writer.uint32(10).string(message.uuid);
+        }
+        if (message.key !== "") {
+            writer.uint32(18).string(message.key);
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = { ...baseQueryFileRequest };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.uuid = reader.string();
+                    break;
+                case 2:
+                    message.key = reader.string();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = { ...baseQueryFileRequest };
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = String(object.uuid);
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.key !== undefined && object.key !== null) {
+            message.key = String(object.key);
+        }
+        else {
+            message.key = "";
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.uuid !== undefined && (obj.uuid = message.uuid);
+        message.key !== undefined && (obj.key = message.key);
+        return obj;
+    },
+    fromPartial(object) {
+        const message = { ...baseQueryFileRequest };
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = object.uuid;
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.key !== undefined && object.key !== null) {
+            message.key = object.key;
+        }
+        else {
+            message.key = "";
+        }
+        return message;
+    },
+};
+const baseQueryFileResponse = { uuid: "", key: "" };
+exports.QueryFileResponse = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        if (message.data.length !== 0) {
+            writer.uint32(10).bytes(message.data);
+        }
+        if (message.uuid !== "") {
+            writer.uint32(18).string(message.uuid);
+        }
+        if (message.key !== "") {
+            writer.uint32(26).string(message.key);
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = { ...baseQueryFileResponse };
+        message.data = new Uint8Array();
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.data = reader.bytes();
+                    break;
+                case 2:
+                    message.uuid = reader.string();
+                    break;
+                case 3:
+                    message.key = reader.string();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = { ...baseQueryFileResponse };
+        message.data = new Uint8Array();
+        if (object.data !== undefined && object.data !== null) {
+            message.data = bytesFromBase64(object.data);
+        }
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = String(object.uuid);
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.key !== undefined && object.key !== null) {
+            message.key = String(object.key);
+        }
+        else {
+            message.key = "";
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.data !== undefined &&
+            (obj.data = base64FromBytes(message.data !== undefined ? message.data : new Uint8Array()));
+        message.uuid !== undefined && (obj.uuid = message.uuid);
+        message.key !== undefined && (obj.key = message.key);
+        return obj;
+    },
+    fromPartial(object) {
+        const message = { ...baseQueryFileResponse };
+        if (object.data !== undefined && object.data !== null) {
+            message.data = object.data;
+        }
+        else {
+            message.data = new Uint8Array();
+        }
+        if (object.uuid !== undefined && object.uuid !== null) {
+            message.uuid = object.uuid;
+        }
+        else {
+            message.uuid = "";
+        }
+        if (object.key !== undefined && object.key !== null) {
+            message.key = object.key;
+        }
+        else {
+            message.key = "";
+        }
+        return message;
+    },
+};
 const baseQueryKeyValuesRequest = { uuid: "" };
 exports.QueryKeyValuesRequest = {
     encode(message, writer = minimal_1.default.Writer.create()) {
@@ -1340,6 +1499,16 @@ exports.QueryGetNShortestLeasesResponse = {
 class QueryClientImpl {
     constructor(rpc) {
         this.rpc = rpc;
+        this.Read = this.Read.bind(this);
+        this.Keys = this.Keys.bind(this);
+        this.MyKeys = this.MyKeys.bind(this);
+        this.Count = this.Count.bind(this);
+        this.Has = this.Has.bind(this);
+        this.Search = this.Search.bind(this);
+        this.GetNShortestLeases = this.GetNShortestLeases.bind(this);
+        this.GetLease = this.GetLease.bind(this);
+        this.KeyValues = this.KeyValues.bind(this);
+        this.File = this.File.bind(this);
     }
     Read(request) {
         const data = exports.QueryReadRequest.encode(request).finish();
@@ -1386,6 +1555,11 @@ class QueryClientImpl {
         const promise = this.rpc.request("bluzelle.curium.crud.Query", "KeyValues", data);
         return promise.then((data) => exports.QueryKeyValuesResponse.decode(new minimal_1.default.Reader(data)));
     }
+    File(request) {
+        const data = exports.QueryFileRequest.encode(request).finish();
+        const promise = this.rpc.request("bluzelle.curium.crud.Query", "File", data);
+        return promise.then((data) => exports.QueryFileResponse.decode(new minimal_1.default.Reader(data)));
+    }
 }
 exports.QueryClientImpl = QueryClientImpl;
 var globalThis = (() => {
@@ -1413,8 +1587,8 @@ const btoa = globalThis.btoa ||
     ((bin) => globalThis.Buffer.from(bin, "binary").toString("base64"));
 function base64FromBytes(arr) {
     const bin = [];
-    for (let i = 0; i < arr.byteLength; ++i) {
-        bin.push(String.fromCharCode(arr[i]));
+    for (const byte of arr) {
+        bin.push(String.fromCharCode(byte));
     }
     return btoa(bin.join(""));
 }

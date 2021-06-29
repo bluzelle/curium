@@ -62,8 +62,7 @@ describe('tx.DeleteAll()', function () {
             uuid
         });
 
-        expect(await sdk.db.tx.KeyValues({
-            creator: sdk.db.address,
+        expect(await sdk.db.q.KeyValues({
             uuid
         }).then(resp => resp.keyValues)).to.have.length(0)
 

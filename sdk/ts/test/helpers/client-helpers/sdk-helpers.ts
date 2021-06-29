@@ -15,9 +15,10 @@ process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = '0';
 
 export const getSdk = (mnemonic: string): Promise<BluzelleSdk> => {
     return bluzelle({
-        mnemonic: "urge crisp birth cotton rely reflect demise carry donor nut daughter ankle spoil breeze usual name absurd stumble typical early announce before machine street",
-        //url: 'http://localhost:26667',
-        url: 'https://client.sentry.testnet.private.bluzelle.com:26657',
+        mnemonic: "noodle swallow lion hill ask catalog outer opera pluck between lend panel rose craft mass behind sad regret easy brother wealth various shop bean",
+        //mnemonic,
+        url: 'wss://client.sentry.testnet.private.bluzelle.com:26657',
+        //url: 'https://client.sentry.testnet.private.bluzelle.com:26657',
         gasPrice: 0.002,
         maxGas: 1000000000
     })
@@ -25,11 +26,12 @@ export const getSdk = (mnemonic: string): Promise<BluzelleSdk> => {
 
 export const getMintedAccount = (): Promise<any> => {
     return delay(10000)
-        .then(() => fetch('https://client.sentry.testnet.private.bluzelle.com:26657/mint'))
+        .then(() => fetch('http://localhost:1327/mint'))
         .then(resp => resp.json())
-        .then(obj => obj.result)
-        .then(passThroughAwait(() => delay(10000)))
+        .then(obj => obj.result.mnemonic)
+
 }
+
 
 export const checkBalance = (address: string): Promise<boolean> => {
     return fetch(`http://localhost:1327/bank/balances/${address}`)

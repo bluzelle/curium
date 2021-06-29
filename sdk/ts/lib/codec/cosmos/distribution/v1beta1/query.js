@@ -1195,6 +1195,16 @@ exports.QueryCommunityPoolResponse = {
 class QueryClientImpl {
     constructor(rpc) {
         this.rpc = rpc;
+        this.Params = this.Params.bind(this);
+        this.ValidatorOutstandingRewards =
+            this.ValidatorOutstandingRewards.bind(this);
+        this.ValidatorCommission = this.ValidatorCommission.bind(this);
+        this.ValidatorSlashes = this.ValidatorSlashes.bind(this);
+        this.DelegationRewards = this.DelegationRewards.bind(this);
+        this.DelegationTotalRewards = this.DelegationTotalRewards.bind(this);
+        this.DelegatorValidators = this.DelegatorValidators.bind(this);
+        this.DelegatorWithdrawAddress = this.DelegatorWithdrawAddress.bind(this);
+        this.CommunityPool = this.CommunityPool.bind(this);
     }
     Params(request) {
         const data = exports.QueryParamsRequest.encode(request).finish();

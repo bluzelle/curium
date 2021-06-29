@@ -4398,6 +4398,20 @@ exports.Snapshot = {
 class ABCIApplicationClientImpl {
     constructor(rpc) {
         this.rpc = rpc;
+        this.Echo = this.Echo.bind(this);
+        this.Flush = this.Flush.bind(this);
+        this.Info = this.Info.bind(this);
+        this.DeliverTx = this.DeliverTx.bind(this);
+        this.CheckTx = this.CheckTx.bind(this);
+        this.Query = this.Query.bind(this);
+        this.Commit = this.Commit.bind(this);
+        this.InitChain = this.InitChain.bind(this);
+        this.BeginBlock = this.BeginBlock.bind(this);
+        this.EndBlock = this.EndBlock.bind(this);
+        this.ListSnapshots = this.ListSnapshots.bind(this);
+        this.OfferSnapshot = this.OfferSnapshot.bind(this);
+        this.LoadSnapshotChunk = this.LoadSnapshotChunk.bind(this);
+        this.ApplySnapshotChunk = this.ApplySnapshotChunk.bind(this);
     }
     Echo(request) {
         const data = exports.RequestEcho.encode(request).finish();
@@ -4496,8 +4510,8 @@ const btoa = globalThis.btoa ||
     ((bin) => globalThis.Buffer.from(bin, "binary").toString("base64"));
 function base64FromBytes(arr) {
     const bin = [];
-    for (let i = 0; i < arr.byteLength; ++i) {
-        bin.push(String.fromCharCode(arr[i]));
+    for (const byte of arr) {
+        bin.push(String.fromCharCode(byte));
     }
     return btoa(bin.join(""));
 }

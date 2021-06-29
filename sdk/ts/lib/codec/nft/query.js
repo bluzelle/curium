@@ -364,6 +364,9 @@ exports.QueryIsNftFullyReplicatedResponse = {
 class QueryClientImpl {
     constructor(rpc) {
         this.rpc = rpc;
+        this.Nft = this.Nft.bind(this);
+        this.NftAll = this.NftAll.bind(this);
+        this.IsNftFullyReplicated = this.IsNftFullyReplicated.bind(this);
     }
     Nft(request) {
         const data = exports.QueryGetNftRequest.encode(request).finish();

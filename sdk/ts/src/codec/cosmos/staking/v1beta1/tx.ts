@@ -1091,6 +1091,11 @@ export class MsgClientImpl implements Msg {
   private readonly rpc: Rpc;
   constructor(rpc: Rpc) {
     this.rpc = rpc;
+    this.CreateValidator = this.CreateValidator.bind(this);
+    this.EditValidator = this.EditValidator.bind(this);
+    this.Delegate = this.Delegate.bind(this);
+    this.BeginRedelegate = this.BeginRedelegate.bind(this);
+    this.Undelegate = this.Undelegate.bind(this);
   }
   CreateValidator(
     request: MsgCreateValidator
@@ -1171,6 +1176,7 @@ type Builtin =
   | Uint8Array
   | string
   | number
+  | boolean
   | undefined
   | Long;
 export type DeepPartial<T> = T extends Builtin

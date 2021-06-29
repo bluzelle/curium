@@ -454,6 +454,9 @@ export class QueryClientImpl implements Query {
   private readonly rpc: Rpc;
   constructor(rpc: Rpc) {
     this.rpc = rpc;
+    this.Nft = this.Nft.bind(this);
+    this.NftAll = this.NftAll.bind(this);
+    this.IsNftFullyReplicated = this.IsNftFullyReplicated.bind(this);
   }
   Nft(request: QueryGetNftRequest): Promise<QueryGetNftResponse> {
     const data = QueryGetNftRequest.encode(request).finish();
@@ -504,6 +507,7 @@ type Builtin =
   | Uint8Array
   | string
   | number
+  | boolean
   | undefined
   | Long;
 export type DeepPartial<T> = T extends Builtin

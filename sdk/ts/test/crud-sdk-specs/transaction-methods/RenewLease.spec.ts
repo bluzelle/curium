@@ -81,7 +81,7 @@ describe('tx.RenewLease()', function () {
         })).to.be.rejectedWith(/key not found/)
     })
 
-    it('should not charge for renewing a shorter lease', () => {
+    it.skip('should not charge for renewing a shorter lease', () => {
         let balAfterCreate = 0;
 
         return sdk.db.tx.Create({

@@ -36,7 +36,7 @@ const handler = (argv) => {
         lease: { days: 0, years: 0, minutes: 0, seconds: argv.lease, hours: 0 },
         metadata: new Uint8Array()
     }))
-        .then(() => console.log(`Key: ${argv.key}, value: ${argv.value} successfully upserted in uuid: ${argv.uuid}`));
+        .then(() => console.log(`Key: ${argv.key}, Value: ${argv.value} successfully upserted in uuid: ${argv.uuid}`));
 };
 exports.handler = handler;
 //# sourceMappingURL=UpsertCmd.js.map

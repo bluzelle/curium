@@ -1,9 +1,9 @@
 
-import {API} from "../../../src/legacyAdapter/API";
+import {API} from "../../src/legacyAdapter/API";
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
 import {expect} from "chai";
-import {BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
-import {encodeData, getSdk, zeroLease} from "../../helpers/client-helpers/sdk-helpers";
+import {BluzelleSdk} from "../../src/bz-sdk/bz-sdk";
+import {encodeData, getSdk, zeroLease} from "../helpers/client-helpers/sdk-helpers";
 import delay from "delay";
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
 

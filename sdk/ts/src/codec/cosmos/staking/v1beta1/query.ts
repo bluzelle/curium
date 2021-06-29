@@ -2733,6 +2733,22 @@ export class QueryClientImpl implements Query {
   private readonly rpc: Rpc;
   constructor(rpc: Rpc) {
     this.rpc = rpc;
+    this.Validators = this.Validators.bind(this);
+    this.Validator = this.Validator.bind(this);
+    this.ValidatorDelegations = this.ValidatorDelegations.bind(this);
+    this.ValidatorUnbondingDelegations =
+      this.ValidatorUnbondingDelegations.bind(this);
+    this.Delegation = this.Delegation.bind(this);
+    this.UnbondingDelegation = this.UnbondingDelegation.bind(this);
+    this.DelegatorDelegations = this.DelegatorDelegations.bind(this);
+    this.DelegatorUnbondingDelegations =
+      this.DelegatorUnbondingDelegations.bind(this);
+    this.Redelegations = this.Redelegations.bind(this);
+    this.DelegatorValidators = this.DelegatorValidators.bind(this);
+    this.DelegatorValidator = this.DelegatorValidator.bind(this);
+    this.HistoricalInfo = this.HistoricalInfo.bind(this);
+    this.Pool = this.Pool.bind(this);
+    this.Params = this.Params.bind(this);
   }
   Validators(
     request: QueryValidatorsRequest
@@ -2777,9 +2793,8 @@ export class QueryClientImpl implements Query {
   ValidatorUnbondingDelegations(
     request: QueryValidatorUnbondingDelegationsRequest
   ): Promise<QueryValidatorUnbondingDelegationsResponse> {
-    const data = QueryValidatorUnbondingDelegationsRequest.encode(
-      request
-    ).finish();
+    const data =
+      QueryValidatorUnbondingDelegationsRequest.encode(request).finish();
     const promise = this.rpc.request(
       "cosmos.staking.v1beta1.Query",
       "ValidatorUnbondingDelegations",
@@ -2835,9 +2850,8 @@ export class QueryClientImpl implements Query {
   DelegatorUnbondingDelegations(
     request: QueryDelegatorUnbondingDelegationsRequest
   ): Promise<QueryDelegatorUnbondingDelegationsResponse> {
-    const data = QueryDelegatorUnbondingDelegationsRequest.encode(
-      request
-    ).finish();
+    const data =
+      QueryDelegatorUnbondingDelegationsRequest.encode(request).finish();
     const promise = this.rpc.request(
       "cosmos.staking.v1beta1.Query",
       "DelegatorUnbondingDelegations",
@@ -2943,6 +2957,7 @@ type Builtin =
   | Uint8Array
   | string
   | number
+  | boolean
   | undefined
   | Long;
 export type DeepPartial<T> = T extends Builtin

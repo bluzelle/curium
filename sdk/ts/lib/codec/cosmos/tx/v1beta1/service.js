@@ -712,6 +712,10 @@ exports.GetTxResponse = {
 class ServiceClientImpl {
     constructor(rpc) {
         this.rpc = rpc;
+        this.Simulate = this.Simulate.bind(this);
+        this.GetTx = this.GetTx.bind(this);
+        this.BroadcastTx = this.BroadcastTx.bind(this);
+        this.GetTxsEvent = this.GetTxsEvent.bind(this);
     }
     Simulate(request) {
         const data = exports.SimulateRequest.encode(request).finish();
@@ -760,8 +764,8 @@ const btoa = globalThis.btoa ||
     ((bin) => globalThis.Buffer.from(bin, "binary").toString("base64"));
 function base64FromBytes(arr) {
     const bin = [];
-    for (let i = 0; i < arr.byteLength; ++i) {
-        bin.push(String.fromCharCode(arr[i]));
+    for (const byte of arr) {
+        bin.push(String.fromCharCode(byte));
     }
     return btoa(bin.join(""));
 }

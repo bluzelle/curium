@@ -6,7 +6,7 @@ getBz()
         creator: bz.db.address,
         metadata: new Uint8Array,
         lease: {days: 1} as Lease,
-        uuid: 'my-site',
+        uuid: 'my-sitex',
         key: 'dynamic-data.json',
         value: new TextEncoder().encode(JSON.stringify({now: Date.now()}))
     }))

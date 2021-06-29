@@ -1,6 +1,6 @@
 import {expect} from "chai";
-import {BluzelleSdk} from "../../../src/bz-sdk/bz-sdk";
-import {getSdk, createKeys} from "../../helpers/client-helpers/sdk-helpers";
+import {BluzelleSdk} from "../../src/bz-sdk/bz-sdk";
+import {getSdk, createKeys} from "../helpers/client-helpers/sdk-helpers";
 import {DEFAULT_TIMEOUT} from "testing/lib/helpers/testHelpers";
 import {useChaiAsPromised} from "testing/lib/globalHelpers";
 
@@ -26,8 +26,7 @@ describe('tx.Count()', function () {
     it('should return the number of keys', async () => {
         const {keys} = await createKeys(sdk.db, 5, uuid);
 
-        expect(await sdk.db.tx.Count({
-            creator: sdk.db.address,
+        expect(await sdk.db.q.Count({
             uuid
         }).then(resp => resp.count)).to.equal(5);
 

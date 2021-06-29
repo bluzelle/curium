@@ -2,6 +2,7 @@ package curium
 
 import (
 	"context"
+	sdkclient "github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/crypto"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
@@ -9,11 +10,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	signing2 "github.com/cosmos/cosmos-sdk/x/auth/signing"
-	"google.golang.org/grpc"
+	types3 "github.com/tendermint/tendermint/abci/types"
+	types2 "github.com/tendermint/tendermint/types"
 	"time"
 )
 
@@ -37,121 +38,152 @@ func (krr KeyRingReader) GetAddress(name string) (sdk.AccAddress, error) {
 
 }
 
-type MsgBroadcaster func(ctx sdk.Context, msgs []types.Msg, from string) (*txtypes.BroadcastTxResponse, error)
+type MsgBroadcaster func(ctx sdk.Context, msgs []types.Msg, from string) chan *MsgBroadcasterResponse
 
-func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) func(ctx sdk.Context, msgs []types.Msg, from string) (*txtypes.BroadcastTxResponse, error) {
-	return func(ctx sdk.Context, msgs []types.Msg, from string) (*txtypes.BroadcastTxResponse, error) {
-		// Choose your codec: Amino or Protobuf. Here, we use Protobuf, given by the
-		// following function.
-		encCfg := simapp.MakeTestEncodingConfig()
+type MsgBroadcasterResponse struct {
+	Response *types3.TxResult
+	Data     *[]byte
+	Error    error
+}
 
-		// Create a new TxBuilder.
-		txBuilder := encCfg.TxConfig.NewTxBuilder()
+func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) MsgBroadcaster {
+	return func(ctx sdk.Context, msgs []types.Msg, from string) chan *MsgBroadcasterResponse {
+		resp := make(chan *MsgBroadcasterResponse)
 
-		err := txBuilder.SetMsgs(msgs...)
-		if err != nil {
-			return nil, err
-		}
+		go func() {
+			returnError := func(err error) {
+				resp <- &MsgBroadcasterResponse{
+					Error: err,
+				}
+				close(resp)
+			}
+			// Choose your codec: Amino or Protobuf. Here, we use Protobuf, given by the
+			// following function.
+			encCfg := simapp.MakeTestEncodingConfig()
 
-		gas := uint64(40000000)
-		txBuilder.SetGasLimit(gas)
+			// Create a new TxBuilder.
+			txBuilder := encCfg.TxConfig.NewTxBuilder()
 
-		txBuilder.SetFeeAmount(types.NewCoins(types.NewCoin("ubnt", types.NewInt(10000000))))
-		txBuilder.SetMemo("memo")
-		txBuilder.SetTimeoutHeight(uint64(ctx.BlockHeight() + 20))
+			err := txBuilder.SetMsgs(msgs...)
+			if err != nil {
+				returnError(err)
+				return
+			}
 
-		kr, err := keyring.New("curium", keyring.BackendTest, keyringDir, nil)
-		if err != nil {
-			return nil, err
-		}
-		keys, err := kr.Key(from)
-		if err != nil {
-			return nil, err
-		}
+			gas := uint64(40000000)
+			txBuilder.SetGasLimit(gas)
 
-		addr := keys.GetAddress()
-		accnt := accKeeper.GetAccount(ctx, addr)
-		if accnt == nil {
-			return nil, sdkerrors.New("curium", 2, "Cannot broadcast message, accnt does not exist")
-		}
+			txBuilder.SetFeeAmount(types.NewCoins(types.NewCoin("ubnt", types.NewInt(10000000))))
+			txBuilder.SetMemo("memo")
+			txBuilder.SetTimeoutHeight(uint64(ctx.BlockHeight() + 20))
 
-		privArmor, err := kr.ExportPrivKeyArmor(from, "")
-		if err != nil {
-			return nil, err
-		}
+			kr, err := keyring.New("curium", keyring.BackendTest, keyringDir, nil)
+			if err != nil {
+				returnError(err)
+				return
+			}
+			keys, err := kr.Key(from)
+			if err != nil {
+				returnError(err)
+				return
+			}
 
-		privKey, _, err := crypto.UnarmorDecryptPrivKey(privArmor, "")
-		if err != nil {
-			return nil, err
-		}
+			addr := keys.GetAddress()
+			accnt := accKeeper.GetAccount(ctx, addr)
+			if accnt == nil {
+				returnError(sdkerrors.New("curium", 2, "Cannot broadcast message, accnt does not exist"))
+				return
+			}
 
-		sigV2 := signing.SignatureV2{
-			PubKey: keys.GetPubKey(),
-			Data: &signing.SingleSignatureData{
-				SignMode:  encCfg.TxConfig.SignModeHandler().DefaultMode(),
-				Signature: nil,
-			},
-			Sequence: accnt.GetSequence(),
-		}
+			privArmor, err := kr.ExportPrivKeyArmor(from, "")
+			if err != nil {
+				returnError(err)
+				return
+			}
 
-		err = txBuilder.SetSignatures(sigV2)
-		if err != nil {
-			return nil, err
-		}
+			privKey, _, err := crypto.UnarmorDecryptPrivKey(privArmor, "")
+			if err != nil {
+				returnError(err)
+				return
+			}
 
-		signerData := signing2.SignerData{
-			ChainID:       ctx.ChainID(),
-			AccountNumber: accnt.GetAccountNumber(),
-			Sequence:      accnt.GetSequence(),
-		}
-		_ = signerData
-		sigV2, err = tx.SignWithPrivKey(
-			encCfg.TxConfig.SignModeHandler().DefaultMode(), signerData,
-			txBuilder, privKey, encCfg.TxConfig, accnt.GetSequence())
-		if err != nil {
-			return nil, err
-		}
+			sigV2 := signing.SignatureV2{
+				PubKey: keys.GetPubKey(),
+				Data: &signing.SingleSignatureData{
+					SignMode:  encCfg.TxConfig.SignModeHandler().DefaultMode(),
+					Signature: nil,
+				},
+				Sequence: accnt.GetSequence(),
+			}
 
-		err = txBuilder.SetSignatures(sigV2)
-		if err != nil {
-			return nil, err
-		}
+			err = txBuilder.SetSignatures(sigV2)
+			if err != nil {
+				returnError(err)
+				return
+			}
 
-		txBytes, err := encCfg.TxConfig.TxEncoder()(txBuilder.GetTx())
-		if err != nil {
-			return nil, err
-		}
+			signerData := signing2.SignerData{
+				ChainID:       ctx.ChainID(),
+				AccountNumber: accnt.GetAccountNumber(),
+				Sequence:      accnt.GetSequence(),
+			}
 
-		grpcConn, err := grpc.Dial(
-			"127.0.0.1:9090",    // Or your gRPC server address.
-			grpc.WithInsecure(), // The SDK doesn't support any transport security mechanism.
-		)
-		if err != nil {
-			return nil, err
-		}
-		defer grpcConn.Close()
+			sigV2, err = tx.SignWithPrivKey(
+				encCfg.TxConfig.SignModeHandler().DefaultMode(), signerData,
+				txBuilder, privKey, encCfg.TxConfig, accnt.GetSequence())
+			if err != nil {
+				returnError(err)
+				return
+			}
 
-		txCtx, _ := context.WithDeadline(context.Background(), time.Now().Add(time.Second*20))
+			err = txBuilder.SetSignatures(sigV2)
+			if err != nil {
+				returnError(err)
+				return
+			}
 
-		// Broadcast the tx via gRPC. We create a new client for the Protobuf Tx
-		// service.
-		//	var ctx context.Context
-		txClient := txtypes.NewServiceClient(grpcConn)
-		// We then call the BroadcastTx method on this client.
-		res, err := txClient.BroadcastTx(
-			txCtx,
-			&txtypes.BroadcastTxRequest{
-				Mode:    txtypes.BroadcastMode_BROADCAST_MODE_BLOCK,
-				TxBytes: txBytes, // Proto-binary of the signed transaction, see previous step.
-			},
-		)
-		if err != nil {
-			return nil, err
-		}
-		if res.TxResponse.Code != 0 {
-			return nil, sdkerrors.New(res.TxResponse.Codespace, res.TxResponse.Code, res.TxResponse.RawLog)
-		}
-		return res, nil
+			txBytes, err := encCfg.TxConfig.TxEncoder()(txBuilder.GetTx())
+			if err != nil {
+				returnError(err)
+				return
+			}
+
+			txCtx, _ := context.WithDeadline(context.Background(), time.Now().Add(time.Second*20))
+
+			client, err := sdkclient.NewClientFromNode("http://localhost:26657")
+			if err != nil {
+				returnError(err)
+				return
+			}
+
+			res, err := client.BroadcastTxSync(txCtx, txBytes)
+			if err != nil {
+				returnError(err)
+				return
+			}
+
+			_ = res
+
+			client.Start()
+
+			sub, err := client.Subscribe(txCtx, "MsgBroadcaster", types2.EventQueryTxFor(txBytes).String())
+			if err != nil {
+				returnError(err)
+				return
+			}
+			result := <-sub
+
+			a := result.Data.(types2.EventDataTx)
+
+			resp <- &MsgBroadcasterResponse{
+				Response: &a.TxResult,
+				Data:     &a.TxResult.Result.Data,
+			}
+			close(resp)
+			client.Stop()
+		}()
+
+		return resp
 	}
 
 }

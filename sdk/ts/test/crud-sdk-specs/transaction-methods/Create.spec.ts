@@ -19,7 +19,7 @@ import {passThrough, passThroughAwait} from "promise-passthrough";
 import delay from "delay";
 
 describe('tx.Create()', function () {
-    //this.timeout(DEFAULT_TIMEOUT);
+    this.timeout(DEFAULT_TIMEOUT);
 
     let sdk: BluzelleSdk;
     let uuid: string;
@@ -32,9 +32,29 @@ describe('tx.Create()', function () {
             .then(() => creator = sdk.db.address)
     });
 
+    it('should fail for sequential create and delete', () => {
+        return sdk.db.tx.Create({
+            creator,
+            uuid,
+            key: 'myKey',
+            value: encodeData('myValue'),
+            metadata: new Uint8Array(),
+            lease: defaultLease
+        })
+            .then(() => sdk.db.tx.Delete({
+                creator,
+                uuid,
+                key: 'myKey'
+            }))
+            .then(() => expect(sdk.db.q.Read({
+                uuid,
+                key: 'myKey'
+            })).to.be.rejectedWith(/key not found/))
+    })
+
     it('should just do a create', () => {
         let start = Date.now()
-        sdk.db.q.KeyValues()
+
         return sdk.db.tx.Create({
             creator: sdk.db.address,
             uuid,
@@ -105,7 +125,7 @@ describe('tx.Create()', function () {
 
     it('should do multiple creates in parallel', () => {
 
-        return Promise.all(times(15).map(idx => sdk.db.tx.Create({
+        return Promise.all(times(100).map(idx => sdk.db.tx.Create({
             creator,
             uuid,
             key: `key-${idx}`,
@@ -114,13 +134,13 @@ describe('tx.Create()', function () {
             metadata: new Uint8Array()
         })
             .then(() => console.log(`=============created key-${idx}, value-${idx}, in uuid ${uuid}`))))
-            .then(() => Promise.all(times(15).map(idx => sdk.db.q.Read({
+            .then(() => Promise.all(times(100).map(idx => sdk.db.q.Read({
                 uuid,
                 key: `key-${idx}`
             })
                 .then(passThrough(() => console.log(`//////////// read key ${idx}`)))))
                 .then(arrayValues => arrayValues.map(val => decodeData(val.value)))
-                .then(decodedValues => expect(decodedValues).to.deep.equal(times(15).map(idx => `value-${idx}`))))
+                .then(decodedValues => expect(decodedValues).to.deep.equal(times(100).map(idx => `value-${idx}`))))
     });
 
     it('should do multiple creates in withTransaction()', async () => {

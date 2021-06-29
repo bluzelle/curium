@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"github.com/bluzelle/curium/x/curium"
 	"github.com/gorilla/mux"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -13,8 +14,10 @@ const (
 
 // RegisterRoutes registers faucet-related REST handlers to a router
 func RegisterRoutes(clientCtx client.Context, r *mux.Router) {
-	r.HandleFunc("/mint", mintHandler(clientCtx)).Methods("GET")
-	r.HandleFunc("/mint/{address}", mintHandler(clientCtx)).Methods("GET")
+	if curium.IsTestnet() {
+		r.HandleFunc("/mint", mintHandler(clientCtx)).Methods("GET")
+		r.HandleFunc("/mint/{address}", mintHandler(clientCtx)).Methods("GET")
+	}
 	// this line is used by starport scaffolding # 2
 }
 

@@ -6,6 +6,17 @@ import { KeyValue, KeyLease } from "../crud/KeyValue";
 
 export const protobufPackage = "bluzelle.curium.crud";
 
+export interface QueryFileRequest {
+  uuid: string;
+  key: string;
+}
+
+export interface QueryFileResponse {
+  data: Uint8Array;
+  uuid: string;
+  key: string;
+}
+
 export interface QueryKeyValuesRequest {
   uuid: string;
   pagination?: PagingRequest;
@@ -95,6 +106,176 @@ export interface QueryGetNShortestLeasesResponse {
   uuid: string;
   keyLeases: KeyLease[];
 }
+
+const baseQueryFileRequest: object = { uuid: "", key: "" };
+
+export const QueryFileRequest = {
+  encode(
+    message: QueryFileRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.uuid !== "") {
+      writer.uint32(10).string(message.uuid);
+    }
+    if (message.key !== "") {
+      writer.uint32(18).string(message.key);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryFileRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryFileRequest } as QueryFileRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.uuid = reader.string();
+          break;
+        case 2:
+          message.key = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryFileRequest {
+    const message = { ...baseQueryFileRequest } as QueryFileRequest;
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = String(object.key);
+    } else {
+      message.key = "";
+    }
+    return message;
+  },
+
+  toJSON(message: QueryFileRequest): unknown {
+    const obj: any = {};
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    message.key !== undefined && (obj.key = message.key);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<QueryFileRequest>): QueryFileRequest {
+    const message = { ...baseQueryFileRequest } as QueryFileRequest;
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = object.key;
+    } else {
+      message.key = "";
+    }
+    return message;
+  },
+};
+
+const baseQueryFileResponse: object = { uuid: "", key: "" };
+
+export const QueryFileResponse = {
+  encode(
+    message: QueryFileResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.data.length !== 0) {
+      writer.uint32(10).bytes(message.data);
+    }
+    if (message.uuid !== "") {
+      writer.uint32(18).string(message.uuid);
+    }
+    if (message.key !== "") {
+      writer.uint32(26).string(message.key);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryFileResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryFileResponse } as QueryFileResponse;
+    message.data = new Uint8Array();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.data = reader.bytes();
+          break;
+        case 2:
+          message.uuid = reader.string();
+          break;
+        case 3:
+          message.key = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryFileResponse {
+    const message = { ...baseQueryFileResponse } as QueryFileResponse;
+    message.data = new Uint8Array();
+    if (object.data !== undefined && object.data !== null) {
+      message.data = bytesFromBase64(object.data);
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = String(object.key);
+    } else {
+      message.key = "";
+    }
+    return message;
+  },
+
+  toJSON(message: QueryFileResponse): unknown {
+    const obj: any = {};
+    message.data !== undefined &&
+      (obj.data = base64FromBytes(
+        message.data !== undefined ? message.data : new Uint8Array()
+      ));
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    message.key !== undefined && (obj.key = message.key);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<QueryFileResponse>): QueryFileResponse {
+    const message = { ...baseQueryFileResponse } as QueryFileResponse;
+    if (object.data !== undefined && object.data !== null) {
+      message.data = object.data;
+    } else {
+      message.data = new Uint8Array();
+    }
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = object.key;
+    } else {
+      message.key = "";
+    }
+    return message;
+  },
+};
 
 const baseQueryKeyValuesRequest: object = { uuid: "" };
 
@@ -1593,12 +1774,23 @@ export interface Query {
   ): Promise<QueryGetNShortestLeasesResponse>;
   GetLease(request: QueryGetLeaseRequest): Promise<QueryGetLeaseResponse>;
   KeyValues(request: QueryKeyValuesRequest): Promise<QueryKeyValuesResponse>;
+  File(request: QueryFileRequest): Promise<QueryFileResponse>;
 }
 
 export class QueryClientImpl implements Query {
   private readonly rpc: Rpc;
   constructor(rpc: Rpc) {
     this.rpc = rpc;
+    this.Read = this.Read.bind(this);
+    this.Keys = this.Keys.bind(this);
+    this.MyKeys = this.MyKeys.bind(this);
+    this.Count = this.Count.bind(this);
+    this.Has = this.Has.bind(this);
+    this.Search = this.Search.bind(this);
+    this.GetNShortestLeases = this.GetNShortestLeases.bind(this);
+    this.GetLease = this.GetLease.bind(this);
+    this.KeyValues = this.KeyValues.bind(this);
+    this.File = this.File.bind(this);
   }
   Read(request: QueryReadRequest): Promise<QueryReadResponse> {
     const data = QueryReadRequest.encode(request).finish();
@@ -1705,6 +1897,18 @@ export class QueryClientImpl implements Query {
       QueryKeyValuesResponse.decode(new _m0.Reader(data))
     );
   }
+
+  File(request: QueryFileRequest): Promise<QueryFileResponse> {
+    const data = QueryFileRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "bluzelle.curium.crud.Query",
+      "File",
+      data
+    );
+    return promise.then((data) =>
+      QueryFileResponse.decode(new _m0.Reader(data))
+    );
+  }
 }
 
 interface Rpc {
@@ -1742,8 +1946,8 @@ const btoa: (bin: string) => string =
   ((bin) => globalThis.Buffer.from(bin, "binary").toString("base64"));
 function base64FromBytes(arr: Uint8Array): string {
   const bin: string[] = [];
-  for (let i = 0; i < arr.byteLength; ++i) {
-    bin.push(String.fromCharCode(arr[i]));
+  for (const byte of arr) {
+    bin.push(String.fromCharCode(byte));
   }
   return btoa(bin.join(""));
 }
@@ -1754,6 +1958,7 @@ type Builtin =
   | Uint8Array
   | string
   | number
+  | boolean
   | undefined
   | Long;
 export type DeepPartial<T> = T extends Builtin

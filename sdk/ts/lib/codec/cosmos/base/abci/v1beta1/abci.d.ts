@@ -196,7 +196,7 @@ export declare const SearchTxsResult: {
     toJSON(message: SearchTxsResult): unknown;
     fromPartial(object: DeepPartial<SearchTxsResult>): SearchTxsResult;
 };
-declare type Builtin = Date | Function | Uint8Array | string | number | undefined | Long;
+declare type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined | Long;
 export declare type DeepPartial<T> = T extends Builtin ? T : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>> : T extends {} ? {
     [K in keyof T]?: DeepPartial<T[K]>;
 } : Partial<T>;
