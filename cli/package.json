@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "@bluzelle/sdk-js": "^1.1.4",
+    "@bluzelle/sdk-js": "^1.1.5",
     "@cosmjs/proto-signing": "^0.25.4",
     "@types/bech32": "^1.1.4",
     "@types/crypto-js": "^4.0.1",

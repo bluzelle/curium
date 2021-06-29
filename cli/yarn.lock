@@ -23,10 +23,10 @@
     ts-proto "^1.79.6"
     typescript "^4.2.4"
 
-"@bluzelle/sdk-js@^1.1.4":
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/@bluzelle/sdk-js/-/sdk-js-1.1.4.tgz#ed127294d365d19d5659093a8e3466999ab070ea"
-  integrity sha512-lvmn8/X3nQcFuVTqVjaE0/y17worItloMt/RU9JoXDxJ8e+Qljl7uBOFEshTqNA3n8uizTtbToVkYWE9zRgIjQ==
+"@bluzelle/sdk-js@^1.1.5":
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/@bluzelle/sdk-js/-/sdk-js-1.1.5.tgz#1be48af2cde1590b470f7a734dd2e7c8dca1e8f8"
+  integrity sha512-DBsx73pbKVIqouROWP7KL4bXbBOEMDR/Nqlaw/iF2rQw7M67xMVFYhsbZX/oKwWWaxoTocUfvCFV1XFUNnUrZA==
   dependencies:
     "@bluzelle/sdk-js" "^1.1.1"
     "@cosmjs/proto-signing" "^0.25.4"

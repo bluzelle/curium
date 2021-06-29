@@ -24,7 +24,7 @@ export const builder = (yargs: Argv) => {
         .option('node', {
             describe: 'node to connect to',
             type: 'string',
-            default: 'https://client.sentry.testnet.private.bluzelle.com:26657'
+            default: 'http://localhost:26657'
         })
         .demandOption(['from'])
         .recommendCommands()
