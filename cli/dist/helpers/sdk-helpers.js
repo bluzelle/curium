@@ -28,7 +28,7 @@ const path_1 = __importDefault(require("path"));
 const sdk_js_1 = require("@bluzelle/sdk-js");
 const CryptoJS = __importStar(require("crypto-js"));
 const proto_signing_1 = require("@cosmjs/proto-signing");
-const bech32_1 = require("/Users/avendauz/bluzelle/curium/cli/node_modules/@cosmjs/encoding/build/bech32");
+const encoding_1 = require("@cosmjs/encoding");
 const getSdkByName = (name, gasPrice, gas, url) => exports.readUserMnemonic(name)
     .then(mnemonic => sdk_js_1.bluzelle({
     gasPrice: parseFloat(gasPrice),
@@ -110,6 +110,6 @@ const getUserFromFile = (filename) => Promise.resolve(filename.split('.info')[0]
 const getAccountInfoFromMnemonic = (mnemonic) => proto_signing_1.DirectSecp256k1HdWallet.fromMnemonic(mnemonic, { prefix: 'bluzelle' })
     .then(wallet => wallet.getAccounts())
     .then(x => x[0])
-    .then(info => ({ ...info, pubkey: bech32_1.Bech32.encode('bluzellepub', info.pubkey) }));
+    .then(info => ({ ...info, pubkey: encoding_1.Bech32.encode('bluzellepub', info.pubkey) }));
 exports.getAccountInfoFromMnemonic = getAccountInfoFromMnemonic;
 //# sourceMappingURL=sdk-helpers.js.map

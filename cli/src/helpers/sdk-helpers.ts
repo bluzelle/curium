@@ -3,7 +3,7 @@ import path from "path";
 import {bluzelle, BluzelleSdk, newMnemonic} from "@bluzelle/sdk-js";
 import * as CryptoJS from 'crypto-js'
 import {AccountData, DirectSecp256k1HdWallet} from "@cosmjs/proto-signing";
-import {Bech32} from "/Users/avendauz/bluzelle/curium/cli/node_modules/@cosmjs/encoding/build/bech32"
+import {Bech32} from "@cosmjs/encoding"
 
 export type Flags = { from: string, gas: number, gasPrice: string, node: string }
 
