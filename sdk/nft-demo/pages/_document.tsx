@@ -11,7 +11,7 @@ class MyDocument extends Document {
             <Html style={{background: '#0f0921', height: '100%', textAlign: 'center'}}>
                 <Head />
                 <body>
-                <header style={{padding: 50}}>
+                <header style={{paddingTop: 50, paddingBottom: 50}}>
                     <img src="logo.png"/>
                 </header>
                 <Main />

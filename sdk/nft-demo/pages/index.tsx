@@ -30,14 +30,14 @@ export default function Home() {
                 <h2 style={{fontSize: '3em'}}>
                     Bluzelle NFT Reliable Storage
                 </h2>
-                <div style={{padding: 20}}>
+                <div style={{paddingTop: 20, paddingBottom: 20}}>
                     {state === 'ready' ? (
                         <input id="image-file" type="file" onInput={onFileSelected}/>
                     ) : (
                         state
                     )}
                 </div>
-                <div style={{padding: 10}}>
+                <div style={{paddingTop: 10}}>
                     {state.includes('done:') ? (
                         <>
                             <NodeLink id={state.replace('done:', '')}/>
