@@ -29,8 +29,7 @@ https://raw.githubusercontent.com/bluzelle/curium/stargate/docker/docker-compose
 #### Build and run Curium
 
 ```
-docker-compose build
-docker-compose up
+docker-compose run curium
 ```
 
 **NOTE:  There will be a list of users with mnemonics.  Copy the mnemonic for vuser for the section below**
@@ -51,3 +50,6 @@ You will be asked for the mnemonic.  Paste in the mnemonic copied from the step 
 
 `blzcli tx crud create my-uuid foo bar 10000 --from vuser --gas-price 0.002 --gas 10000000`
 `blzcli q crud keyValues my-uuid`
+
+#### Clear the DB
+
