@@ -1,6 +1,6 @@
 import { Argv } from "yargs";
 import { Flags } from "../../../helpers/sdk-helpers";
-export declare const command = "renewLeasesAll <uuid> <lease>";
+export declare const command = "renewleasesall <uuid> <lease>";
 export declare const desc = "Renew leases of all key-values in uuid";
 export declare const builder: (yargs: Argv) => Argv<{
     uuid: string | undefined;

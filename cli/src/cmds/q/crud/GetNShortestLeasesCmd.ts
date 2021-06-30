@@ -2,7 +2,7 @@ import {Argv} from "yargs";
 import {getQuerySdk} from "../../../helpers/sdk-helpers";
 import { QueryGetNShortestLeasesRequest} from "@bluzelle/sdk-js/lib/codec/crud/query";
 
-export const command = 'getNShortestLeases <uuid> <num>'
+export const command = 'getnshortestleases <uuid> <num>'
 export const desc = 'Query remaining lease time of [num] shortest leases in [uuid]'
 export const builder = (yargs: Argv) => {
     return yargs

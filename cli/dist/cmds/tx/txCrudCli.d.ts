@@ -6,7 +6,7 @@ export declare const builder: (yargs: Argv) => Argv<import("yargs").Defined<{
 } & {
     gas: number;
 } & {
-    gasPrice: string;
+    "gas-price": string;
 } & {
     node: string;
 }, "from">>;

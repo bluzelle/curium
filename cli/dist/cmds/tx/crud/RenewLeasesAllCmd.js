@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = exports.builder = exports.desc = exports.command = void 0;
 const sdk_helpers_1 = require("../../../helpers/sdk-helpers");
-exports.command = 'renewLeasesAll <uuid> <lease>';
+exports.command = 'renewleasesall <uuid> <lease>';
 exports.desc = 'Renew leases of all key-values in uuid';
 const builder = (yargs) => {
     return yargs

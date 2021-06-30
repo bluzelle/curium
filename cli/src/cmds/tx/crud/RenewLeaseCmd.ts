@@ -2,7 +2,7 @@ import {Argv,} from "yargs";
 import {Flags, getSdkByName} from "../../../helpers/sdk-helpers";
 import {Lease} from "@bluzelle/sdk-js/lib/codec/hackathon-crud/lease";
 
-export const command = 'renewLease <uuid> <key> <lease>'
+export const command = 'renewlease <uuid> <key> <lease>'
 export const desc = 'Renew lease of a key-value in the database'
 export const builder = (yargs: Argv) => {
     return yargs

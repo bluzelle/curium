@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = exports.builder = exports.desc = exports.command = void 0;
 const sdk_helpers_1 = require("../../../helpers/sdk-helpers");
-exports.command = 'getNShortestLeases <uuid> <num>';
+exports.command = 'getnshortestleases <uuid> <num>';
 exports.desc = 'Query remaining lease time of [num] shortest leases in [uuid]';
 const builder = (yargs) => {
     return yargs

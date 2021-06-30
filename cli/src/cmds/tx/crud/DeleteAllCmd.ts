@@ -1,7 +1,7 @@
 import {Argv,} from "yargs";
 import {Flags, getSdkByName} from "../../../helpers/sdk-helpers";
 
-export const command = 'deleteAll <uuid>'
+export const command = 'deleteall <uuid>'
 export const desc = 'Remove all key-values from specified uuid'
 export const builder = (yargs: Argv) => {
     return yargs

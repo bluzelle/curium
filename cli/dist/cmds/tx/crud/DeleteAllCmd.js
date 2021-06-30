@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = exports.builder = exports.desc = exports.command = void 0;
 const sdk_helpers_1 = require("../../../helpers/sdk-helpers");
-exports.command = 'deleteAll <uuid>';
+exports.command = 'deleteall <uuid>';
 exports.desc = 'Remove all key-values from specified uuid';
 const builder = (yargs) => {
     return yargs

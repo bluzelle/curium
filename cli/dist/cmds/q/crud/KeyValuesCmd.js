@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = exports.builder = exports.desc = exports.command = void 0;
 const sdk_helpers_1 = require("../../../helpers/sdk-helpers");
-exports.command = 'keyValues <uuid>';
+exports.command = 'keyvalues <uuid>';
 exports.desc = 'Read all keys-values in uuid from the database';
 const builder = (yargs) => {
     return yargs

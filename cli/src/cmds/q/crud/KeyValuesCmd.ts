@@ -5,7 +5,7 @@ import {getQuerySdk} from "../../../helpers/sdk-helpers";
 import {KeyValue} from "@bluzelle/sdk-js/lib/codec/crud/KeyValue";
 import {QueryKeyValuesRequest} from "@bluzelle/sdk-js/lib/codec/crud/query";
 
-export const command = 'keyValues <uuid>'
+export const command = 'keyvalues <uuid>'
 export const desc = 'Read all keys-values in uuid from the database'
 export const builder = (yargs: Argv) => {
     return yargs

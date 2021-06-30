@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = exports.builder = exports.desc = exports.command = void 0;
 const util_1 = require("util");
 const sdk_helpers_1 = require("../../../helpers/sdk-helpers");
-exports.command = 'multiUpdate <uuid> <keyValues..>';
+exports.command = 'multiupdate <uuid> <keyvalues..>';
 exports.desc = 'Update multiple key values';
 const builder = (yargs) => {
     return yargs
@@ -11,7 +11,7 @@ const builder = (yargs) => {
         description: 'distinct database identifier',
         type: 'string'
     })
-        .positional('keyValues', {
+        .positional('keyvalues', {
         description: 'sequential triplets [key1] [value1] [lease1] ... [keyN] [valueN] [leaseN]',
     })
         .help();
@@ -19,7 +19,7 @@ const builder = (yargs) => {
 exports.builder = builder;
 const handler = (argv) => {
     return sdk_helpers_1.getSdkByName(argv.from, argv.gasPrice, argv.gas, argv.node)
-        .then(sdk => parseKeyValues(argv.keyValues)
+        .then(sdk => parseKeyValues(argv.keyvalues)
         .then(keyValues => sdk.db.tx.MultiUpdate({
         creator: sdk.db.address,
         uuid: argv.uuid,

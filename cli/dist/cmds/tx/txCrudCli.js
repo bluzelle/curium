@@ -16,7 +16,7 @@ const builder = (yargs) => {
         type: "number",
         default: 1000000000
     })
-        .option('gasPrice', {
+        .option('gas-price', {
         describe: 'minimum gas price in ubnt',
         type: "string",
         default: "0.002ubnt"
@@ -26,6 +26,8 @@ const builder = (yargs) => {
         type: 'string',
         default: 'http://localhost:26657'
     })
+        .strict()
+        .strictOptions()
         .demandOption(['from'])
         .recommendCommands()
         .help();

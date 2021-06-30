@@ -5,7 +5,7 @@ import {KeyValue, KeyValueLease} from "@bluzelle/sdk-js/lib/codec/crud/KeyValue"
 import {Lease} from "@bluzelle/sdk-js/lib/codec/crud/lease";
 
 
-export const command = 'multiUpdate <uuid> <keyValues..>'
+export const command = 'multiupdate <uuid> <keyvalues..>'
 export const desc = 'Update multiple key values'
 export const builder = (yargs: Argv) => {
     return yargs
@@ -13,15 +13,15 @@ export const builder = (yargs: Argv) => {
             description: 'distinct database identifier',
             type: 'string'
         })
-        .positional('keyValues', {
+        .positional('keyvalues', {
             description: 'sequential triplets [key1] [value1] [lease1] ... [keyN] [valueN] [leaseN]',
         })
         .help()
 }
-export const handler = (argv: {uuid: string, keyValues: string[]} & Flags) => {
+export const handler = (argv: {uuid: string, keyvalues: string[]} & Flags) => {
     return getSdkByName(argv.from, argv.gasPrice, argv.gas, argv.node)
         .then(sdk =>
-            parseKeyValues(argv.keyValues)
+            parseKeyValues(argv.keyvalues)
                 .then(keyValues => sdk.db.tx.MultiUpdate({
                     creator: sdk.db.address,
                     uuid: argv.uuid,
