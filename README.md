@@ -49,6 +49,7 @@ You will be asked for the mnemonic.  Paste in the mnemonic copied from the step 
 **Talk to the node**
 
 `blzcli tx crud create my-uuid foo bar 10000 --from vuser --gas-price 0.002 --gas 10000000`
+
 `blzcli q crud keyValues my-uuid`
 
 #### Clear the DB
