@@ -1,0 +1,12 @@
+version: "3.4"
+
+services:
+  nft-demo:
+    container_name: nft-demo
+    build: .
+    ports:
+      - "80:3000"
+    expose:
+      - "80"
+      - "3000"
+

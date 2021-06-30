@@ -16,5 +16,11 @@ func (k msgServer) PublishFile(goCtx context.Context, msg *types.MsgPublishFile)
 	bencode.DecodeBytes(msg.Metainfo, &metainfo)
 	k.btClient.RetrieveFile(&metainfo)
 	os.Symlink(k.homeDir+"/nft/"+msg.Hash, k.homeDir+"/nft/"+msg.Id)
+	info := types.NftInfo{
+		Id:   msg.Id,
+		Mime: msg.Mime,
+	}
+	os.WriteFile(k.homeDir+"/nft/"+msg.Hash+".info", k.cdc.MustMarshalJSON(&info), 0666)
+	os.Symlink(k.homeDir+"/nft/"+msg.Hash+".info", k.homeDir+"/nft/"+msg.Id+".info")
 	return &types.MsgPublishFileResponse{}, nil
 }

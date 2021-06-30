@@ -18,7 +18,7 @@ export declare class API {
     create(key: string, value: string, lease?: Lease): Promise<unknown>;
     delete(key: string): Promise<unknown>;
     generateBIP39Account: (entropy?: string) => string;
-    convertLeaseToSeconds: (lease: Lease) => number;
+    convertLeaseToSeconds: (lease: any) => number;
     read(key: string): Promise<string>;
     update(key: string, value: string, leaseInfo?: Lease): Promise<unknown>;
     upsert(key: string, value: string, leaseInfo?: Lease): Promise<unknown>;

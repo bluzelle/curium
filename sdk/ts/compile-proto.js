@@ -1,3 +1,5 @@
+const {readFile, writeFile} = require('fs/promises');
+
 void async function () {
     await $`mkdir -p proto/google/api`
     await $`mkdir -p proto/google/protobuf`
@@ -60,9 +62,11 @@ void async function () {
         .then(() => $`curl https://raw.githubusercontent.com/regen-network/cosmos-proto/master/cosmos.proto > proto/cosmos_proto/cosmos.proto`)
 
     //Needed to modify the gogoproto file for the Cosmos modules
-    await $`sed -i '' '/google.protobuf.FieldOptions/a \\ 
-    optional string castrepeated = 65000;' proto/gogoproto/gogo.proto`
-
+    await readFile('proto/gogoproto/gogo.proto')
+        .then(file => file.toString().replace(
+            /(google.protobuf.FieldOptions.*\n)/,
+            '$1  optional string castrepeated = 65000;\n'))
+        .then(file => writeFile('proto/gogoproto/gogo.proto', file));
 
     await $`rm -rf src/codec`
     await $`mkdir -p src/codec`

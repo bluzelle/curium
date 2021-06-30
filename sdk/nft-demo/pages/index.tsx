@@ -1,9 +1,8 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
 import React, {ChangeEvent, useState} from "react";
 import {bluzelle} from '@bluzelle/sdk-js'
-import {passThrough} from "promise-passthrough";
 import {contentType} from "mime-types";
+import {getUrl} from "../getSdk";
+import {passThrough} from "promise-passthrough";
 
 export default function Home() {
     const [state, setState] = useState<string>('ready')
@@ -11,8 +10,9 @@ export default function Home() {
     const onFileSelected = (ev: ChangeEvent<HTMLInputElement>) => {
         setState('uploading')
         ev.target.files?.[0].arrayBuffer()
-             .then(data => bluzelle.helpers.nftHelpers.uploadNft("https://client.sentry.testnet.private.bluzelle.com:1317", data as Uint8Array))
-            .then(ctx => fetch(`http://localhost:3000/api/createNft`, {
+            .then(data => bluzelle.helpers.nftHelpers.uploadNft(getUrl(1317, 1317), data as Uint8Array))
+            .then(passThrough(() => setState('notifying network')))
+            .then(ctx => fetch(process.env.NODE_ENV === 'development' ? 'http://localhost:3000/api/createNft' : `http://nft.bluzelle.com/api/createNft`, {
                 method: 'POST',
                 body: JSON.stringify({
                     hash: ctx.hash,
@@ -20,30 +20,29 @@ export default function Home() {
                 })
             }).then(resp => resp.json()).then(({id}) => ({...ctx, id})))
             .then(ctx => setState(`done:${ctx.id}`))
-   }
+    }
 
 
     return (
-        <div className={styles.container}>
-            <Head>
-                <title>Create Next App</title>
-                <meta name="description" content="Bluzelle NFT storage demo"/>
-                <link rel="icon" href="/favicon.ico"/>
-            </Head>
+        <div style={{background: '#0f0921', color: "white"}}>
 
-            <main className={styles.main}>
-                <h2 className={styles.title}>
+            <main>
+                <h2 style={{fontSize: '3em'}}>
                     Bluzelle NFT Reliable Storage
                 </h2>
-                <div style={{padding: 20}}>
-                    <input id="image-file" type="file" onInput={onFileSelected}/>
+                <div style={{paddingTop: 20, paddingBottom: 20}}>
+                    {state === 'ready' ? (
+                        <input id="image-file" type="file" onInput={onFileSelected}/>
+                    ) : (
+                        state
+                    )}
                 </div>
-                <div style={{padding: 10}}>
+                <div style={{paddingTop: 10}}>
                     {state.includes('done:') ? (
                         <>
-                            <NodeLink port={1317} id={state.replace('done:', '')}/>
+                            <NodeLink id={state.replace('done:', '')}/>
                         </>
-                    ) : (state)}
+                    ) : null}
                 </div>
             </main>
 
@@ -51,12 +50,24 @@ export default function Home() {
     )
 }
 
-const NodeLink: React.FC<{ port: number, id: string }> = ({port, id}) => (
-    <div style={{padding: 5}}>
-        <a href={`https://client.sentry.testnet.private.bluzelle.com:${port}/nft/data/${id}`} target="_blank">
-            node:{port}
-        </a>
-    </div>
+const NodeLink: React.FC<{ id: string }> = ({id}) => (
+    <>
+        <div style={{padding: 5}}>
+            <a href={`https://client.sentry.testnet.private.bluzelle.com:1317/nft/data/${id}`} target="_blank">
+                https://client.sentry.testnet.private.bluzelle.com:1317/nft/data/{id}
+            </a>
+        </div>
+        <div style={{padding: 5}}>
+            <a href={`https://a.client.sentry.testnet.private.bluzelle.com:1317/nft/data/${id}`} target="_blank">
+                https://a.client.sentry.testnet.private.bluzelle.com:1317/nft/data/{id}
+            </a>
+        </div>
+        <div style={{padding: 5}}>
+            <a href={`https://b.client.sentry.testnet.private.bluzelle.com:1317/nft/data/${id}`} target="_blank">
+                https://b.client.sentry.testnet.private.bluzelle.com:1317/nft/data/{id}
+            </a>
+        </div>
+    </>
 )
 
 

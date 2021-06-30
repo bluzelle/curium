@@ -84,6 +84,13 @@ export interface Metadata {
    * be the same as the display.
    */
   symbol: string;
+  /** URI to a document (on or off-chain) that contains additional information. Optional. */
+  uri: string;
+  /**
+   * URIHash is a sha256 hash of a document pointed by URI. It's used to verify that
+   * the document didn't change. Optional.
+   */
+  uriHash: string;
 }
 
 const baseParams: object = { defaultSendEnabled: false };
@@ -583,6 +590,8 @@ const baseMetadata: object = {
   display: "",
   name: "",
   symbol: "",
+  uri: "",
+  uriHash: "",
 };
 
 export const Metadata = {
@@ -607,6 +616,12 @@ export const Metadata = {
     }
     if (message.symbol !== "") {
       writer.uint32(50).string(message.symbol);
+    }
+    if (message.uri !== "") {
+      writer.uint32(58).string(message.uri);
+    }
+    if (message.uriHash !== "") {
+      writer.uint32(66).string(message.uriHash);
     }
     return writer;
   },
@@ -636,6 +651,12 @@ export const Metadata = {
           break;
         case 6:
           message.symbol = reader.string();
+          break;
+        case 7:
+          message.uri = reader.string();
+          break;
+        case 8:
+          message.uriHash = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -678,6 +699,16 @@ export const Metadata = {
     } else {
       message.symbol = "";
     }
+    if (object.uri !== undefined && object.uri !== null) {
+      message.uri = String(object.uri);
+    } else {
+      message.uri = "";
+    }
+    if (object.uriHash !== undefined && object.uriHash !== null) {
+      message.uriHash = String(object.uriHash);
+    } else {
+      message.uriHash = "";
+    }
     return message;
   },
 
@@ -696,6 +727,8 @@ export const Metadata = {
     message.display !== undefined && (obj.display = message.display);
     message.name !== undefined && (obj.name = message.name);
     message.symbol !== undefined && (obj.symbol = message.symbol);
+    message.uri !== undefined && (obj.uri = message.uri);
+    message.uriHash !== undefined && (obj.uriHash = message.uriHash);
     return obj;
   },
 
@@ -731,6 +764,16 @@ export const Metadata = {
       message.symbol = object.symbol;
     } else {
       message.symbol = "";
+    }
+    if (object.uri !== undefined && object.uri !== null) {
+      message.uri = object.uri;
+    } else {
+      message.uri = "";
+    }
+    if (object.uriHash !== undefined && object.uriHash !== null) {
+      message.uriHash = object.uriHash;
+    } else {
+      message.uriHash = "";
     }
     return message;
   },
