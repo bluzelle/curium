@@ -12,7 +12,8 @@ export interface SDKOptions {
     mnemonic?: string,
     url: string,
     gasPrice: number,
-    maxGas: number
+    maxGas: number,
+    legacyCoin?: boolean
 }
 
 export interface SDK<Q, M> {

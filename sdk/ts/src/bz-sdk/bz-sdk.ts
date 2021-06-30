@@ -44,7 +44,7 @@ export interface Bluzelle {
 }
 
 export const bluzelle = (options: SDKOptions): Promise<BluzelleSdk> =>
-    Promise.resolve(newCommunicationService(options.url, options.mnemonic || ''))
+    Promise.resolve(newCommunicationService(options.url, options.mnemonic || '', options.legacyCoin ? "m/44'/118'/0'/0/0": "m/44'/483'/0'/0/0"))
         .then(cs => Promise.all([
                 sdk<CrudQueryClientImpl, CrudMsgClientImpl>(options, CrudQueryClientImpl, CrudMsgClientImpl, CrudMsgTypes, cs),
                 sdk<NftQueryClientImpl, NftMsgClientImpl>(options, NftQueryClientImpl, NftMsgClientImpl, NftMsgTypes, cs),
@@ -65,7 +65,7 @@ export const bluzelle = (options: SDKOptions): Promise<BluzelleSdk> =>
             bank,
             staking,
             distribution
-               }))
+               } as BluzelleSdk))
 
 bluzelle.newMnemonic = newMnemonic;
 bluzelle.helpers = sdkHelpers;

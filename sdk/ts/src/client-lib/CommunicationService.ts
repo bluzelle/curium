@@ -3,7 +3,8 @@ import {Some} from "monet";
 import {Message} from "../legacyAdapter/types/Message";
 import {memoize} from 'lodash'
 import delay from "delay";
-import {DirectSecp256k1HdWallet, EncodeObject, Registry} from "@cosmjs/proto-signing";
+import {DirectSecp256k1HdWallet, DirectSecp256k1HdWalletOptions, EncodeObject, Registry} from "@cosmjs/proto-signing";
+import {stringToPath} from "@cosmjs/crypto";
 
 import {TxRaw} from "@cosmjs/proto-signing/build/codec/cosmos/tx/v1beta1/tx";
 import {getMyRegistry, myRegistry} from "./Registry";
@@ -16,7 +17,7 @@ interface MessageQueueItem<T> {
     gasInfo: GasInfo
 }
 
-const dummyMessageResponse = new Uint8Array()
+const dummyMessageResponse = new Uint8Array(0)
 
 export interface CommunicationService {
     mnemonic: string
@@ -25,6 +26,7 @@ export interface CommunicationService {
     account: number
     accountRequested?: Promise<unknown>
     transactionMessageQueue?: TransactionMessageQueue
+    hdPath: string
 }
 
 interface TransactionMessageQueue {
@@ -48,11 +50,12 @@ const newTransactionMessageQueue = (items: MessageQueueItem<unknown>[], memo: st
 })
 
 
-export const newCommunicationService = (url: string, mnemonic: string) => ({
+export const newCommunicationService = (url: string, mnemonic: string, hdPath: string) => ({
     url,
     mnemonic,
+    hdPath,
     seq: 0,
-    account: 0
+    account: 0,
 })
 
 export const withTransaction = <T>(service: CommunicationService, fn: () => T, {memo}: WithTransactionsOptions): Promise<Uint8Array> => {
@@ -125,7 +128,7 @@ const transmitTransaction = (service: CommunicationService, messages: MessageQue
                 .then((txRaw: TxRaw) => Uint8Array.from(TxRaw.encode(txRaw).finish()))
                 .then((signedTx: Uint8Array) => cosmos.broadcastTx(signedTx, 30000, 1000))
                 .then(checkInternalErrors)
-                .then(() => new Uint8Array())
+                .then(() => new Uint8Array(0))
                 .catch((e) => {
                     if (/account sequence mismatch/.test(e)) {
                         (service.accountRequested = undefined)
@@ -195,12 +198,12 @@ const combineGas = (transactions: MessageQueueItem<any>[]): GasInfo =>
 
 
 // Inside an async function...
-const getSigner = (mnemonic: string) => DirectSecp256k1HdWallet.fromMnemonic(
+const getSigner = (mnemonic: string, hdPath:string) => DirectSecp256k1HdWallet.fromMnemonic(
     mnemonic,
-    {prefix: 'bluzelle'});
+    {prefix: 'bluzelle', hdPaths:stringToPath(hdPath)} as DirectSecp256k1HdWalletOptions);
 
 const getMemoizedClient = memoize((service: CommunicationService) =>
-    getSigner(service.mnemonic)
+    getSigner(service.mnemonic, service.hdPath)
         .then(signer => SigningStargateClient.connectWithSigner(
             service.url,
             signer,
