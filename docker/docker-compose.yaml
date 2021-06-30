@@ -4,10 +4,6 @@ services:
   curium:
     container_name: curium
     build: .
-#    expose:
-#      - "1317"
-#      - "9090"
-#      - "26657"
     ports:
       - "1317:1317"
       - "9090:9090"

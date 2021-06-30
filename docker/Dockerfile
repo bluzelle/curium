@@ -1,4 +1,4 @@
-FROM golang:1.16.3
+FROM golang:1.16.5
 SHELL ["/bin/bash", "-c"]
 RUN apt-get update
 RUN apt-get install git unzip -y
