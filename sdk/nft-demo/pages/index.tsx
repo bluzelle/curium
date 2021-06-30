@@ -11,7 +11,7 @@ export default function Home() {
         setState('uploading')
         ev.target.files?.[0].arrayBuffer()
             .then(data => bluzelle.helpers.nftHelpers.uploadNft("https://client.sentry.testnet.private.bluzelle.com:1317", data as Uint8Array))
-            .then(ctx => fetch(`http://localhost:3000/api/createNft`, {
+            .then(ctx => fetch(`http://nft.bluzelle.com/api/createNft`, {
                 method: 'POST',
                 body: JSON.stringify({
                     hash: ctx.hash,

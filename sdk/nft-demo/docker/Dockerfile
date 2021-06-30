@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM node
 SHELL ["/bin/bash", "-c"]
 RUN apt-get update
 RUN apt-get install git unzip -y
@@ -8,6 +8,7 @@ RUN git clone https://github.com/bluzelle/curium.git
 
 WORKDIR /root/curium/sdk/nft-demo
 RUN git checkout nft-demo
+RUN yarn
 ENTRYPOINT yarn dev
 
 
