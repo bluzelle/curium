@@ -50,7 +50,7 @@ export default function Home() {
     )
 }
 
-const NodeLink: React.FC<{ port: number, id: string }> = ({id}) => (
+const NodeLink: React.FC<{ id: string }> = ({id}) => (
     <>
         <div style={{padding: 5}}>
             <a href={`https://client.sentry.testnet.private.bluzelle.com:1317/nft/data/${id}`} target="_blank">

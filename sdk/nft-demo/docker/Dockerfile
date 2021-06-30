@@ -9,7 +9,8 @@ RUN git clone https://github.com/bluzelle/curium.git
 WORKDIR /root/curium/sdk/nft-demo
 RUN git checkout nft-demo
 RUN yarn
-ENTRYPOINT yarn dev
+RUN yarn build
+ENTRYPOINT yarn start
 
 
 
