@@ -1,8 +1,8 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
 import React, {ChangeEvent, useState} from "react";
 import {bluzelle} from '@bluzelle/sdk-js'
 import {contentType} from "mime-types";
+import {getUrl} from "../getSdk";
+import {passThrough} from "promise-passthrough";
 
 export default function Home() {
     const [state, setState] = useState<string>('ready')
@@ -10,8 +10,9 @@ export default function Home() {
     const onFileSelected = (ev: ChangeEvent<HTMLInputElement>) => {
         setState('uploading')
         ev.target.files?.[0].arrayBuffer()
-            .then(data => bluzelle.helpers.nftHelpers.uploadNft("https://client.sentry.testnet.private.bluzelle.com:1317", data as Uint8Array))
-            .then(ctx => fetch(`http://nft.bluzelle.com/api/createNft`, {
+            .then(data => bluzelle.helpers.nftHelpers.uploadNft(getUrl(1317, 1317), data as Uint8Array))
+            .then(passThrough(() => setState('notifying network')))
+            .then(ctx => fetch(process.env.NODE_ENV === 'development' ? 'http://localhost:3000/api/createNft' : `http://nft.bluzelle.com/api/createNft`, {
                 method: 'POST',
                 body: JSON.stringify({
                     hash: ctx.hash,
@@ -23,26 +24,25 @@ export default function Home() {
 
 
     return (
-        <div className={styles.container}>
-            <Head>
-                <title>Create Next App</title>
-                <meta name="description" content="Bluzelle NFT storage demo"/>
-                <link rel="icon" href="/favicon.ico"/>
-            </Head>
+        <div style={{background: '#0f0921', color: "white"}}>
 
-            <main className={styles.main}>
-                <h2 className={styles.title}>
+            <main>
+                <h2 style={{fontSize: '3em'}}>
                     Bluzelle NFT Reliable Storage
                 </h2>
                 <div style={{padding: 20}}>
-                    <input id="image-file" type="file" onInput={onFileSelected}/>
+                    {state === 'ready' ? (
+                        <input id="image-file" type="file" onInput={onFileSelected}/>
+                    ) : (
+                        state
+                    )}
                 </div>
                 <div style={{padding: 10}}>
                     {state.includes('done:') ? (
                         <>
                             <NodeLink id={state.replace('done:', '')}/>
                         </>
-                    ) : (state)}
+                    ) : null}
                 </div>
             </main>
 
