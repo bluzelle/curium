@@ -21,7 +21,7 @@ These will be used to build and start the Curium node.  Install for your OS.
 
 **Copy the docker files**
 
-https://raw.githubusercontent.com/bluzelle/curium/stargate/docker/Dockerfille
+https://raw.githubusercontent.com/bluzelle/curium/stargate/docker/Dockerfile
 https://raw.githubusercontent.com/bluzelle/curium/stargate/docker/docker-compose.yaml
 
 
