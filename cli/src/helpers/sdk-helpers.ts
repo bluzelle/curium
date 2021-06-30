@@ -1,6 +1,6 @@
 import {promises} from "fs";
 import path from "path";
-import {bluzelle, BluzelleSdk, newMnemonic} from "@bluzelle/sdk-js";
+import {bluzelle, BluzelleSdk} from "@bluzelle/sdk-js";
 import * as CryptoJS from 'crypto-js'
 import {AccountData, DirectSecp256k1HdWallet} from "@cosmjs/proto-signing";
 import {bech32} from "bech32"
@@ -36,7 +36,7 @@ export const decodeBufferFromFile = (buf: Buffer): Promise<string> =>
         .then(decryptMnemonic);
 
 export const readUserMnemonic = (user: string): Promise<string> =>
-    promises.readFile(path.resolve(__dirname, `${process.env.HOME}/.curium/cli/${user}.info`))
+    promises.readFile(path.resolve(__dirname, `${require("os").homedir()}/.curium/cli/${user}.info`))
         .then(decodeBufferFromFile)
         .catch(e => e.toString().match(/no such file or directory/) ? function () {
             throw `${user} not in local keyring, please add it`
@@ -53,7 +53,7 @@ export const decryptMnemonic = (mnemonic: string): Promise<string> =>
 
 export const createUserFile = (user: string, mnemonic: string, prompter: () => Promise<boolean>, flag: string = "wx"): Promise<void> =>
     encryptMnemonic(mnemonic)
-        .then(encodedMnemonic => promises.writeFile(path.resolve(__dirname, `${process.env.HOME}/.curium/cli/${user}.info`), encodedMnemonic, {flag}))
+        .then(encodedMnemonic => promises.writeFile(path.resolve(__dirname, `${require("os").homedir()}/.curium/cli/${user}.info`), encodedMnemonic, {flag}))
         .catch(e => (e.stack as string).match(/already exists/) ?
             prompter()
                 .then(bool => bool ? createUserFile(user, mnemonic, prompter, 'w+') : function () {
@@ -62,7 +62,7 @@ export const createUserFile = (user: string, mnemonic: string, prompter: () => P
             : e)
 
 export const removeUserFile = (user: string): Promise<void> =>
-    promises.rm(path.resolve(__dirname, `${process.env.HOME}/.curium/cli/${user}.info`))
+    promises.rm(path.resolve(__dirname, `${require("os").homedir()}/.curium/cli/${user}.info`))
         .catch(e => (e.stack as string).match(/no such file/) ?
             function () {
                 throw `${user} does not exist in local keyring`
@@ -75,15 +75,15 @@ export const removeUserFile = (user: string): Promise<void> =>
 type DecodedAccountInfo = Omit<AccountData, 'pubkey'> & { pubkey: string }
 
 export const makeCuriumDir = (): Promise<void> =>
-    promises.mkdir(path.resolve(__dirname, `${process.env.HOME}/.curium`))
+    promises.mkdir(path.resolve(__dirname, `${require("os").homedir()}/.curium`))
         .catch(e => (e.stack as string).match(/already exists/) ? {} : e)
 
 export const makeCliDir = (): Promise<void> =>
-    promises.mkdir(path.resolve(__dirname, `${process.env.HOME}/.curium/cli`))
+    promises.mkdir(path.resolve(__dirname, `${require("os").homedir()}/.curium/cli`))
         .catch(e => (e.stack as string).match(/already exists/) ? {} : e)
 
 export const readCliDir = (): Promise<DecodedAccountInfo[]> => {
-    return promises.readdir(path.resolve(__dirname, `${process.env.HOME}/.curium/cli`))
+    return promises.readdir(path.resolve(__dirname, `${require("os").homedir()}/.curium/cli`))
         .then(files => Promise.all(files.map(file => {
             let user: string
             return getUserFromFile(file)

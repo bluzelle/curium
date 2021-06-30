@@ -53,7 +53,7 @@ exports.getQuerySdk = getQuerySdk;
 const decodeBufferFromFile = (buf) => Promise.resolve(new TextDecoder().decode(buf))
     .then(exports.decryptMnemonic);
 exports.decodeBufferFromFile = decodeBufferFromFile;
-const readUserMnemonic = (user) => fs_1.promises.readFile(path_1.default.resolve(__dirname, `${process.env.HOME}/.curium/cli/${user}.info`))
+const readUserMnemonic = (user) => fs_1.promises.readFile(path_1.default.resolve(__dirname, `${require("os").homedir()}/.curium/cli/${user}.info`))
     .then(exports.decodeBufferFromFile)
     .catch(e => e.toString().match(/no such file or directory/) ? function () {
     throw `${user} not in local keyring, please add it`;
@@ -66,7 +66,7 @@ exports.encryptMnemonic = encryptMnemonic;
 const decryptMnemonic = (mnemonic) => Promise.resolve(CryptoJS.AES.decrypt(mnemonic, "cli").toString(CryptoJS.enc.Utf8));
 exports.decryptMnemonic = decryptMnemonic;
 const createUserFile = (user, mnemonic, prompter, flag = "wx") => exports.encryptMnemonic(mnemonic)
-    .then(encodedMnemonic => fs_1.promises.writeFile(path_1.default.resolve(__dirname, `${process.env.HOME}/.curium/cli/${user}.info`), encodedMnemonic, { flag }))
+    .then(encodedMnemonic => fs_1.promises.writeFile(path_1.default.resolve(__dirname, `${require("os").homedir()}/.curium/cli/${user}.info`), encodedMnemonic, { flag }))
     .catch(e => e.stack.match(/already exists/) ?
     prompter()
         .then(bool => bool ? exports.createUserFile(user, mnemonic, prompter, 'w+') : function () {
@@ -74,7 +74,7 @@ const createUserFile = (user, mnemonic, prompter, flag = "wx") => exports.encryp
     }())
     : e);
 exports.createUserFile = createUserFile;
-const removeUserFile = (user) => fs_1.promises.rm(path_1.default.resolve(__dirname, `${process.env.HOME}/.curium/cli/${user}.info`))
+const removeUserFile = (user) => fs_1.promises.rm(path_1.default.resolve(__dirname, `${require("os").homedir()}/.curium/cli/${user}.info`))
     .catch(e => e.stack.match(/no such file/) ?
     function () {
         throw `${user} does not exist in local keyring`;
@@ -83,14 +83,14 @@ const removeUserFile = (user) => fs_1.promises.rm(path_1.default.resolve(__dirna
         throw e;
     }());
 exports.removeUserFile = removeUserFile;
-const makeCuriumDir = () => fs_1.promises.mkdir(path_1.default.resolve(__dirname, `${process.env.HOME}/.curium`))
+const makeCuriumDir = () => fs_1.promises.mkdir(path_1.default.resolve(__dirname, `${require("os").homedir()}/.curium`))
     .catch(e => e.stack.match(/already exists/) ? {} : e);
 exports.makeCuriumDir = makeCuriumDir;
-const makeCliDir = () => fs_1.promises.mkdir(path_1.default.resolve(__dirname, `${process.env.HOME}/.curium/cli`))
+const makeCliDir = () => fs_1.promises.mkdir(path_1.default.resolve(__dirname, `${require("os").homedir()}/.curium/cli`))
     .catch(e => e.stack.match(/already exists/) ? {} : e);
 exports.makeCliDir = makeCliDir;
 const readCliDir = () => {
-    return fs_1.promises.readdir(path_1.default.resolve(__dirname, `${process.env.HOME}/.curium/cli`))
+    return fs_1.promises.readdir(path_1.default.resolve(__dirname, `${require("os").homedir()}/.curium/cli`))
         .then(files => Promise.all(files.map(file => {
         let user;
         return getUserFromFile(file)
