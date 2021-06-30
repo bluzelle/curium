@@ -12,7 +12,7 @@ class MyDocument extends Document {
                 <Head />
                 <body>
                 <header style={{padding: 50}}>
-                    <image src="logo.png"/>
+                    <img src="logo.png"/>
                 </header>
                 <Main />
                 <NextScript />
