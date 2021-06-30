@@ -14,7 +14,10 @@ export const getSdkByName = (name: string, gasPrice: string, gas: number, url: s
             maxGas: gas,
             url,
             mnemonic: mnemonic.toString()
-        }));
+        }))
+        .catch(e => function () {
+            throw e.stack
+        }());
 
 
 export const getQuerySdk = (url: string): Promise<BluzelleSdk> =>
@@ -23,7 +26,10 @@ export const getQuerySdk = (url: string): Promise<BluzelleSdk> =>
         maxGas: 0,
         url,
         mnemonic: bluzelle.newMnemonic()
-    });
+    })
+        .catch(e => function () {
+            throw e.stack
+        }());
 
 export const decodeBufferFromFile = (buf: Buffer): Promise<string> =>
     Promise.resolve(new TextDecoder().decode(buf))

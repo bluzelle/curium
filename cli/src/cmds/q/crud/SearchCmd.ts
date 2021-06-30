@@ -18,7 +18,7 @@ export const builder = (yargs: Argv) => {
             alias: 'searchString'
         })
         .positional('startkey', {
-            description: 'start key to begin pagination',
+            description: 'start key to begin pagination (non-inclusive)',
             type: 'string',
             default: ''
         })

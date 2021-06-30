@@ -1,8 +1,12 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = exports.builder = exports.desc = exports.command = void 0;
 const sdk_helpers_1 = require("../../../helpers/sdk-helpers");
-exports.command = 'keys <uuid>';
+const long_1 = __importDefault(require("long"));
+exports.command = 'keys <uuid> [startkey] [limit]';
 exports.desc = 'Read all keys in uuid from the database';
 const builder = (yargs) => {
     return yargs
@@ -10,13 +14,27 @@ const builder = (yargs) => {
         description: 'distinct database identifier',
         type: 'string'
     })
+        .positional('startkey', {
+        description: 'start key to begin pagination (non-inclusive)',
+        type: 'string',
+        default: ''
+    })
+        .positional('limit', {
+        description: 'max number of keys to return',
+        type: 'number',
+        default: 100
+    })
         .help();
 };
 exports.builder = builder;
 const handler = (argv) => {
     return sdk_helpers_1.getQuerySdk(argv.node)
         .then(sdk => sdk.db.q.Keys({
-        uuid: argv.uuid
+        uuid: argv.uuid,
+        pagination: {
+            startKey: argv.startkey,
+            limit: long_1.default.fromInt(argv.limit)
+        }
     }))
         .then(data => data.keys)
         .then(console.log);

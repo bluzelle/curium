@@ -52,7 +52,7 @@ blzcli q crud read uuid myKey
 // will print the string of the value of myKey
 ```
 
-*Note: the --node flag currently defaults to the Bluzelle testnet, https://client.sentry.testnet.private.bluzelle.com:26657
+*Note: the --node flag currently defaults to http://localhost:26657
 
 ## Transactions (tx)
 
@@ -68,8 +68,8 @@ blzcli tx crud create uuid myKey myValue 3600 --from [user]
 *Note: the remaining flags currently default to:
 
 - --gas 1000000000
-- --gasPrice 0.002ubnt
-- --node https://client.sentry.testnet.private.bluzelle.com:26657
+- --gas-price 0.002ubnt
+- --node http://localhost:26657
 
 ## Keys (keys)
 

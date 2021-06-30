@@ -35,14 +35,20 @@ const getSdkByName = (name, gasPrice, gas, url) => exports.readUserMnemonic(name
     maxGas: gas,
     url,
     mnemonic: mnemonic.toString()
-}));
+}))
+    .catch(e => function () {
+    throw e.stack;
+}());
 exports.getSdkByName = getSdkByName;
 const getQuerySdk = (url) => sdk_js_1.bluzelle({
     gasPrice: 0,
     maxGas: 0,
     url,
     mnemonic: sdk_js_1.bluzelle.newMnemonic()
-});
+})
+    .catch(e => function () {
+    throw e.stack;
+}());
 exports.getQuerySdk = getQuerySdk;
 const decodeBufferFromFile = (buf) => Promise.resolve(new TextDecoder().decode(buf))
     .then(exports.decryptMnemonic);
