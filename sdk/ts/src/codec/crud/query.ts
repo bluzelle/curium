@@ -6,6 +6,15 @@ import { KeyValue, KeyLease } from "../crud/KeyValue";
 
 export const protobufPackage = "bluzelle.curium.crud";
 
+export interface QueryOwnerRequest {
+  uuid: string;
+  key: string;
+}
+
+export interface QueryOwnerResponse {
+  owner: string;
+}
+
 export interface QueryFileRequest {
   uuid: string;
   key: string;
@@ -106,6 +115,139 @@ export interface QueryGetNShortestLeasesResponse {
   uuid: string;
   keyLeases: KeyLease[];
 }
+
+const baseQueryOwnerRequest: object = { uuid: "", key: "" };
+
+export const QueryOwnerRequest = {
+  encode(
+    message: QueryOwnerRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.uuid !== "") {
+      writer.uint32(10).string(message.uuid);
+    }
+    if (message.key !== "") {
+      writer.uint32(18).string(message.key);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryOwnerRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryOwnerRequest } as QueryOwnerRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.uuid = reader.string();
+          break;
+        case 2:
+          message.key = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryOwnerRequest {
+    const message = { ...baseQueryOwnerRequest } as QueryOwnerRequest;
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = String(object.uuid);
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = String(object.key);
+    } else {
+      message.key = "";
+    }
+    return message;
+  },
+
+  toJSON(message: QueryOwnerRequest): unknown {
+    const obj: any = {};
+    message.uuid !== undefined && (obj.uuid = message.uuid);
+    message.key !== undefined && (obj.key = message.key);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<QueryOwnerRequest>): QueryOwnerRequest {
+    const message = { ...baseQueryOwnerRequest } as QueryOwnerRequest;
+    if (object.uuid !== undefined && object.uuid !== null) {
+      message.uuid = object.uuid;
+    } else {
+      message.uuid = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = object.key;
+    } else {
+      message.key = "";
+    }
+    return message;
+  },
+};
+
+const baseQueryOwnerResponse: object = { owner: "" };
+
+export const QueryOwnerResponse = {
+  encode(
+    message: QueryOwnerResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.owner !== "") {
+      writer.uint32(10).string(message.owner);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryOwnerResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryOwnerResponse } as QueryOwnerResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.owner = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryOwnerResponse {
+    const message = { ...baseQueryOwnerResponse } as QueryOwnerResponse;
+    if (object.owner !== undefined && object.owner !== null) {
+      message.owner = String(object.owner);
+    } else {
+      message.owner = "";
+    }
+    return message;
+  },
+
+  toJSON(message: QueryOwnerResponse): unknown {
+    const obj: any = {};
+    message.owner !== undefined && (obj.owner = message.owner);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<QueryOwnerResponse>): QueryOwnerResponse {
+    const message = { ...baseQueryOwnerResponse } as QueryOwnerResponse;
+    if (object.owner !== undefined && object.owner !== null) {
+      message.owner = object.owner;
+    } else {
+      message.owner = "";
+    }
+    return message;
+  },
+};
 
 const baseQueryFileRequest: object = { uuid: "", key: "" };
 
@@ -1775,6 +1917,7 @@ export interface Query {
   GetLease(request: QueryGetLeaseRequest): Promise<QueryGetLeaseResponse>;
   KeyValues(request: QueryKeyValuesRequest): Promise<QueryKeyValuesResponse>;
   File(request: QueryFileRequest): Promise<QueryFileResponse>;
+  Owner(request: QueryOwnerRequest): Promise<QueryOwnerResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -1791,6 +1934,7 @@ export class QueryClientImpl implements Query {
     this.GetLease = this.GetLease.bind(this);
     this.KeyValues = this.KeyValues.bind(this);
     this.File = this.File.bind(this);
+    this.Owner = this.Owner.bind(this);
   }
   Read(request: QueryReadRequest): Promise<QueryReadResponse> {
     const data = QueryReadRequest.encode(request).finish();
@@ -1907,6 +2051,18 @@ export class QueryClientImpl implements Query {
     );
     return promise.then((data) =>
       QueryFileResponse.decode(new _m0.Reader(data))
+    );
+  }
+
+  Owner(request: QueryOwnerRequest): Promise<QueryOwnerResponse> {
+    const data = QueryOwnerRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "bluzelle.curium.crud.Query",
+      "Owner",
+      data
+    );
+    return promise.then((data) =>
+      QueryOwnerResponse.decode(new _m0.Reader(data))
     );
   }
 }

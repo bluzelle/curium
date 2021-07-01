@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.QueryClientImpl = exports.QueryDenomMetadataResponse = exports.QueryDenomMetadataRequest = exports.QueryDenomsMetadataResponse = exports.QueryDenomsMetadataRequest = exports.QueryParamsResponse = exports.QueryParamsRequest = exports.QuerySupplyOfResponse = exports.QuerySupplyOfRequest = exports.QueryTotalSupplyResponse = exports.QueryTotalSupplyRequest = exports.QueryAllBalancesResponse = exports.QueryAllBalancesRequest = exports.QueryBalanceResponse = exports.QueryBalanceRequest = exports.protobufPackage = void 0;
+exports.QueryClientImpl = exports.QueryDenomOwnersResponse = exports.DenomOwner = exports.QueryDenomOwnersRequest = exports.QueryDenomMetadataResponse = exports.QueryDenomMetadataRequest = exports.QueryDenomsMetadataResponse = exports.QueryDenomsMetadataRequest = exports.QueryParamsResponse = exports.QueryParamsRequest = exports.QuerySupplyOfResponse = exports.QuerySupplyOfRequest = exports.QueryTotalSupplyResponse = exports.QueryTotalSupplyRequest = exports.QueryAllBalancesResponse = exports.QueryAllBalancesRequest = exports.QueryBalanceResponse = exports.QueryBalanceRequest = exports.protobufPackage = void 0;
 /* eslint-disable */
 const long_1 = __importDefault(require("long"));
 const minimal_1 = __importDefault(require("protobufjs/minimal"));
@@ -893,6 +893,243 @@ exports.QueryDenomMetadataResponse = {
         return message;
     },
 };
+const baseQueryDenomOwnersRequest = { denom: "" };
+exports.QueryDenomOwnersRequest = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        if (message.denom !== "") {
+            writer.uint32(10).string(message.denom);
+        }
+        if (message.pagination !== undefined) {
+            pagination_1.PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = {
+            ...baseQueryDenomOwnersRequest,
+        };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.denom = reader.string();
+                    break;
+                case 2:
+                    message.pagination = pagination_1.PageRequest.decode(reader, reader.uint32());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = {
+            ...baseQueryDenomOwnersRequest,
+        };
+        if (object.denom !== undefined && object.denom !== null) {
+            message.denom = String(object.denom);
+        }
+        else {
+            message.denom = "";
+        }
+        if (object.pagination !== undefined && object.pagination !== null) {
+            message.pagination = pagination_1.PageRequest.fromJSON(object.pagination);
+        }
+        else {
+            message.pagination = undefined;
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.denom !== undefined && (obj.denom = message.denom);
+        message.pagination !== undefined &&
+            (obj.pagination = message.pagination
+                ? pagination_1.PageRequest.toJSON(message.pagination)
+                : undefined);
+        return obj;
+    },
+    fromPartial(object) {
+        const message = {
+            ...baseQueryDenomOwnersRequest,
+        };
+        if (object.denom !== undefined && object.denom !== null) {
+            message.denom = object.denom;
+        }
+        else {
+            message.denom = "";
+        }
+        if (object.pagination !== undefined && object.pagination !== null) {
+            message.pagination = pagination_1.PageRequest.fromPartial(object.pagination);
+        }
+        else {
+            message.pagination = undefined;
+        }
+        return message;
+    },
+};
+const baseDenomOwner = { address: "" };
+exports.DenomOwner = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        if (message.address !== "") {
+            writer.uint32(10).string(message.address);
+        }
+        if (message.balance !== undefined) {
+            coin_1.Coin.encode(message.balance, writer.uint32(18).fork()).ldelim();
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = { ...baseDenomOwner };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.address = reader.string();
+                    break;
+                case 2:
+                    message.balance = coin_1.Coin.decode(reader, reader.uint32());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = { ...baseDenomOwner };
+        if (object.address !== undefined && object.address !== null) {
+            message.address = String(object.address);
+        }
+        else {
+            message.address = "";
+        }
+        if (object.balance !== undefined && object.balance !== null) {
+            message.balance = coin_1.Coin.fromJSON(object.balance);
+        }
+        else {
+            message.balance = undefined;
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.address !== undefined && (obj.address = message.address);
+        message.balance !== undefined &&
+            (obj.balance = message.balance
+                ? coin_1.Coin.toJSON(message.balance)
+                : undefined);
+        return obj;
+    },
+    fromPartial(object) {
+        const message = { ...baseDenomOwner };
+        if (object.address !== undefined && object.address !== null) {
+            message.address = object.address;
+        }
+        else {
+            message.address = "";
+        }
+        if (object.balance !== undefined && object.balance !== null) {
+            message.balance = coin_1.Coin.fromPartial(object.balance);
+        }
+        else {
+            message.balance = undefined;
+        }
+        return message;
+    },
+};
+const baseQueryDenomOwnersResponse = {};
+exports.QueryDenomOwnersResponse = {
+    encode(message, writer = minimal_1.default.Writer.create()) {
+        for (const v of message.denomOwners) {
+            exports.DenomOwner.encode(v, writer.uint32(10).fork()).ldelim();
+        }
+        if (message.pagination !== undefined) {
+            pagination_1.PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof minimal_1.default.Reader ? input : new minimal_1.default.Reader(input);
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = {
+            ...baseQueryDenomOwnersResponse,
+        };
+        message.denomOwners = [];
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.denomOwners.push(exports.DenomOwner.decode(reader, reader.uint32()));
+                    break;
+                case 2:
+                    message.pagination = pagination_1.PageResponse.decode(reader, reader.uint32());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = {
+            ...baseQueryDenomOwnersResponse,
+        };
+        message.denomOwners = [];
+        if (object.denomOwners !== undefined && object.denomOwners !== null) {
+            for (const e of object.denomOwners) {
+                message.denomOwners.push(exports.DenomOwner.fromJSON(e));
+            }
+        }
+        if (object.pagination !== undefined && object.pagination !== null) {
+            message.pagination = pagination_1.PageResponse.fromJSON(object.pagination);
+        }
+        else {
+            message.pagination = undefined;
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        if (message.denomOwners) {
+            obj.denomOwners = message.denomOwners.map((e) => e ? exports.DenomOwner.toJSON(e) : undefined);
+        }
+        else {
+            obj.denomOwners = [];
+        }
+        message.pagination !== undefined &&
+            (obj.pagination = message.pagination
+                ? pagination_1.PageResponse.toJSON(message.pagination)
+                : undefined);
+        return obj;
+    },
+    fromPartial(object) {
+        const message = {
+            ...baseQueryDenomOwnersResponse,
+        };
+        message.denomOwners = [];
+        if (object.denomOwners !== undefined && object.denomOwners !== null) {
+            for (const e of object.denomOwners) {
+                message.denomOwners.push(exports.DenomOwner.fromPartial(e));
+            }
+        }
+        if (object.pagination !== undefined && object.pagination !== null) {
+            message.pagination = pagination_1.PageResponse.fromPartial(object.pagination);
+        }
+        else {
+            message.pagination = undefined;
+        }
+        return message;
+    },
+};
 class QueryClientImpl {
     constructor(rpc) {
         this.rpc = rpc;
@@ -903,6 +1140,7 @@ class QueryClientImpl {
         this.Params = this.Params.bind(this);
         this.DenomMetadata = this.DenomMetadata.bind(this);
         this.DenomsMetadata = this.DenomsMetadata.bind(this);
+        this.DenomOwners = this.DenomOwners.bind(this);
     }
     Balance(request) {
         const data = exports.QueryBalanceRequest.encode(request).finish();
@@ -938,6 +1176,11 @@ class QueryClientImpl {
         const data = exports.QueryDenomsMetadataRequest.encode(request).finish();
         const promise = this.rpc.request("cosmos.bank.v1beta1.Query", "DenomsMetadata", data);
         return promise.then((data) => exports.QueryDenomsMetadataResponse.decode(new minimal_1.default.Reader(data)));
+    }
+    DenomOwners(request) {
+        const data = exports.QueryDenomOwnersRequest.encode(request).finish();
+        const promise = this.rpc.request("cosmos.bank.v1beta1.Query", "DenomOwners", data);
+        return promise.then((data) => exports.QueryDenomOwnersResponse.decode(new minimal_1.default.Reader(data)));
     }
 }
 exports.QueryClientImpl = QueryClientImpl;

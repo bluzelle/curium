@@ -3,6 +3,13 @@ import _m0 from "protobufjs/minimal";
 import { PagingRequest, PagingResponse } from "../crud/Paging";
 import { KeyValue, KeyLease } from "../crud/KeyValue";
 export declare const protobufPackage = "bluzelle.curium.crud";
+export interface QueryOwnerRequest {
+    uuid: string;
+    key: string;
+}
+export interface QueryOwnerResponse {
+    owner: string;
+}
 export interface QueryFileRequest {
     uuid: string;
     key: string;
@@ -84,6 +91,20 @@ export interface QueryGetNShortestLeasesResponse {
     uuid: string;
     keyLeases: KeyLease[];
 }
+export declare const QueryOwnerRequest: {
+    encode(message: QueryOwnerRequest, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryOwnerRequest;
+    fromJSON(object: any): QueryOwnerRequest;
+    toJSON(message: QueryOwnerRequest): unknown;
+    fromPartial(object: DeepPartial<QueryOwnerRequest>): QueryOwnerRequest;
+};
+export declare const QueryOwnerResponse: {
+    encode(message: QueryOwnerResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryOwnerResponse;
+    fromJSON(object: any): QueryOwnerResponse;
+    toJSON(message: QueryOwnerResponse): unknown;
+    fromPartial(object: DeepPartial<QueryOwnerResponse>): QueryOwnerResponse;
+};
 export declare const QueryFileRequest: {
     encode(message: QueryFileRequest, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryFileRequest;
@@ -237,6 +258,7 @@ export interface Query {
     GetLease(request: QueryGetLeaseRequest): Promise<QueryGetLeaseResponse>;
     KeyValues(request: QueryKeyValuesRequest): Promise<QueryKeyValuesResponse>;
     File(request: QueryFileRequest): Promise<QueryFileResponse>;
+    Owner(request: QueryOwnerRequest): Promise<QueryOwnerResponse>;
 }
 export declare class QueryClientImpl implements Query {
     private readonly rpc;
@@ -251,6 +273,7 @@ export declare class QueryClientImpl implements Query {
     GetLease(request: QueryGetLeaseRequest): Promise<QueryGetLeaseResponse>;
     KeyValues(request: QueryKeyValuesRequest): Promise<QueryKeyValuesResponse>;
     File(request: QueryFileRequest): Promise<QueryFileResponse>;
+    Owner(request: QueryOwnerRequest): Promise<QueryOwnerResponse>;
 }
 interface Rpc {
     request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;

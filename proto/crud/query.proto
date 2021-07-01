@@ -45,11 +45,24 @@ service Query {
 
 	rpc File(QueryFileRequest) returns (QueryFileResponse) {
 
-			}
+			};
+
+	rpc Owner(QueryOwnerRequest) returns (QueryOwnerResponse) {
+		option (google.api.http).get = "/bluzelle/curium/crud/Owner/{uuid}";
+	}
 
 }
 
 // this line is used by starport scaffolding # 3
+
+message QueryOwnerRequest {
+	string uuid = 1;
+	string key = 2;
+}
+
+message QueryOwnerResponse {
+	string owner = 1;
+}
 
 
 message QueryFileRequest {

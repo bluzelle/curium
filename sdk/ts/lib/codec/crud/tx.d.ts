@@ -1,8 +1,17 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { Lease } from "../crud/lease";
-import { KeyValueLease } from "../crud/KeyValue";
+import { PagingRequest, PagingResponse } from "../crud/Paging";
+import { KeyLease, KeyValueLease, KeyValue } from "../crud/KeyValue";
 export declare const protobufPackage = "bluzelle.curium.crud";
+/** this line is used by starport scaffolding # proto/tx/message */
+export interface MsgCount {
+    creator: string;
+    uuid: string;
+}
+export interface MsgCountResponse {
+    count: number;
+}
 export interface MsgRenewLeasesAll {
     creator: string;
     uuid: string;
@@ -17,6 +26,24 @@ export interface MsgRenewLease {
     lease?: Lease;
 }
 export interface MsgRenewLeaseResponse {
+}
+export interface MsgGetNShortestLeases {
+    creator: string;
+    uuid: string;
+    num: number;
+}
+export interface MsgGetNShortestLeasesResponse {
+    uuid: string;
+    keyLeases: KeyLease[];
+}
+export interface MsgKeys {
+    creator: string;
+    uuid: string;
+    pagination?: PagingRequest;
+}
+export interface MsgKeysResponse {
+    keys: string[];
+    pagination?: PagingResponse;
 }
 export interface MsgRename {
     creator: string;
@@ -38,6 +65,42 @@ export interface MsgDeleteAll {
     uuid: string;
 }
 export interface MsgDeleteAllResponse {
+}
+export interface MsgKeyValues {
+    creator: string;
+    uuid: string;
+    pagination?: PagingRequest;
+}
+export interface MsgKeyValuesResponse {
+    keyValues: KeyValue[];
+    pagination?: PagingResponse;
+}
+export interface MsgHas {
+    creator: string;
+    uuid: string;
+    key: string;
+}
+export interface MsgHasResponse {
+    has: boolean;
+}
+export interface MsgGetLease {
+    creator: string;
+    uuid: string;
+    key: string;
+}
+export interface MsgGetLeaseResponse {
+    uuid: string;
+    key: string;
+    seconds: number;
+}
+export interface MsgRead {
+    creator: string;
+    uuid: string;
+    key: string;
+}
+export interface MsgReadResponse {
+    value: Uint8Array;
+    key: string;
 }
 export interface MsgUpsert {
     creator: string;
@@ -76,6 +139,20 @@ export interface MsgDelete {
 }
 export interface MsgDeleteResponse {
 }
+export declare const MsgCount: {
+    encode(message: MsgCount, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgCount;
+    fromJSON(object: any): MsgCount;
+    toJSON(message: MsgCount): unknown;
+    fromPartial(object: DeepPartial<MsgCount>): MsgCount;
+};
+export declare const MsgCountResponse: {
+    encode(message: MsgCountResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgCountResponse;
+    fromJSON(object: any): MsgCountResponse;
+    toJSON(message: MsgCountResponse): unknown;
+    fromPartial(object: DeepPartial<MsgCountResponse>): MsgCountResponse;
+};
 export declare const MsgRenewLeasesAll: {
     encode(message: MsgRenewLeasesAll, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgRenewLeasesAll;
@@ -103,6 +180,34 @@ export declare const MsgRenewLeaseResponse: {
     fromJSON(_: any): MsgRenewLeaseResponse;
     toJSON(_: MsgRenewLeaseResponse): unknown;
     fromPartial(_: DeepPartial<MsgRenewLeaseResponse>): MsgRenewLeaseResponse;
+};
+export declare const MsgGetNShortestLeases: {
+    encode(message: MsgGetNShortestLeases, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgGetNShortestLeases;
+    fromJSON(object: any): MsgGetNShortestLeases;
+    toJSON(message: MsgGetNShortestLeases): unknown;
+    fromPartial(object: DeepPartial<MsgGetNShortestLeases>): MsgGetNShortestLeases;
+};
+export declare const MsgGetNShortestLeasesResponse: {
+    encode(message: MsgGetNShortestLeasesResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgGetNShortestLeasesResponse;
+    fromJSON(object: any): MsgGetNShortestLeasesResponse;
+    toJSON(message: MsgGetNShortestLeasesResponse): unknown;
+    fromPartial(object: DeepPartial<MsgGetNShortestLeasesResponse>): MsgGetNShortestLeasesResponse;
+};
+export declare const MsgKeys: {
+    encode(message: MsgKeys, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgKeys;
+    fromJSON(object: any): MsgKeys;
+    toJSON(message: MsgKeys): unknown;
+    fromPartial(object: DeepPartial<MsgKeys>): MsgKeys;
+};
+export declare const MsgKeysResponse: {
+    encode(message: MsgKeysResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgKeysResponse;
+    fromJSON(object: any): MsgKeysResponse;
+    toJSON(message: MsgKeysResponse): unknown;
+    fromPartial(object: DeepPartial<MsgKeysResponse>): MsgKeysResponse;
 };
 export declare const MsgRename: {
     encode(message: MsgRename, writer?: _m0.Writer): _m0.Writer;
@@ -145,6 +250,62 @@ export declare const MsgDeleteAllResponse: {
     fromJSON(_: any): MsgDeleteAllResponse;
     toJSON(_: MsgDeleteAllResponse): unknown;
     fromPartial(_: DeepPartial<MsgDeleteAllResponse>): MsgDeleteAllResponse;
+};
+export declare const MsgKeyValues: {
+    encode(message: MsgKeyValues, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgKeyValues;
+    fromJSON(object: any): MsgKeyValues;
+    toJSON(message: MsgKeyValues): unknown;
+    fromPartial(object: DeepPartial<MsgKeyValues>): MsgKeyValues;
+};
+export declare const MsgKeyValuesResponse: {
+    encode(message: MsgKeyValuesResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgKeyValuesResponse;
+    fromJSON(object: any): MsgKeyValuesResponse;
+    toJSON(message: MsgKeyValuesResponse): unknown;
+    fromPartial(object: DeepPartial<MsgKeyValuesResponse>): MsgKeyValuesResponse;
+};
+export declare const MsgHas: {
+    encode(message: MsgHas, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgHas;
+    fromJSON(object: any): MsgHas;
+    toJSON(message: MsgHas): unknown;
+    fromPartial(object: DeepPartial<MsgHas>): MsgHas;
+};
+export declare const MsgHasResponse: {
+    encode(message: MsgHasResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgHasResponse;
+    fromJSON(object: any): MsgHasResponse;
+    toJSON(message: MsgHasResponse): unknown;
+    fromPartial(object: DeepPartial<MsgHasResponse>): MsgHasResponse;
+};
+export declare const MsgGetLease: {
+    encode(message: MsgGetLease, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgGetLease;
+    fromJSON(object: any): MsgGetLease;
+    toJSON(message: MsgGetLease): unknown;
+    fromPartial(object: DeepPartial<MsgGetLease>): MsgGetLease;
+};
+export declare const MsgGetLeaseResponse: {
+    encode(message: MsgGetLeaseResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgGetLeaseResponse;
+    fromJSON(object: any): MsgGetLeaseResponse;
+    toJSON(message: MsgGetLeaseResponse): unknown;
+    fromPartial(object: DeepPartial<MsgGetLeaseResponse>): MsgGetLeaseResponse;
+};
+export declare const MsgRead: {
+    encode(message: MsgRead, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgRead;
+    fromJSON(object: any): MsgRead;
+    toJSON(message: MsgRead): unknown;
+    fromPartial(object: DeepPartial<MsgRead>): MsgRead;
+};
+export declare const MsgReadResponse: {
+    encode(message: MsgReadResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): MsgReadResponse;
+    fromJSON(object: any): MsgReadResponse;
+    toJSON(message: MsgReadResponse): unknown;
+    fromPartial(object: DeepPartial<MsgReadResponse>): MsgReadResponse;
 };
 export declare const MsgUpsert: {
     encode(message: MsgUpsert, writer?: _m0.Writer): _m0.Writer;
@@ -205,11 +366,18 @@ export declare const MsgDeleteResponse: {
 /** Msg defines the Msg service. */
 export interface Msg {
     /** this line is used by starport scaffolding # proto/tx/rpc */
+    Count(request: MsgCount): Promise<MsgCountResponse>;
     RenewLeasesAll(request: MsgRenewLeasesAll): Promise<MsgRenewLeasesAllResponse>;
     RenewLease(request: MsgRenewLease): Promise<MsgRenewLeaseResponse>;
+    GetNShortestLeases(request: MsgGetNShortestLeases): Promise<MsgGetNShortestLeasesResponse>;
+    Keys(request: MsgKeys): Promise<MsgKeysResponse>;
     Rename(request: MsgRename): Promise<MsgRenameResponse>;
     MultiUpdate(request: MsgMultiUpdate): Promise<MsgMultiUpdateResponse>;
     DeleteAll(request: MsgDeleteAll): Promise<MsgDeleteAllResponse>;
+    KeyValues(request: MsgKeyValues): Promise<MsgKeyValuesResponse>;
+    Has(request: MsgHas): Promise<MsgHasResponse>;
+    GetLease(request: MsgGetLease): Promise<MsgGetLeaseResponse>;
+    Read(request: MsgRead): Promise<MsgReadResponse>;
     Upsert(request: MsgUpsert): Promise<MsgUpsertResponse>;
     Create(request: MsgCreate): Promise<MsgCreateResponse>;
     Update(request: MsgUpdate): Promise<MsgUpdateResponse>;
@@ -218,11 +386,18 @@ export interface Msg {
 export declare class MsgClientImpl implements Msg {
     private readonly rpc;
     constructor(rpc: Rpc);
+    Count(request: MsgCount): Promise<MsgCountResponse>;
     RenewLeasesAll(request: MsgRenewLeasesAll): Promise<MsgRenewLeasesAllResponse>;
     RenewLease(request: MsgRenewLease): Promise<MsgRenewLeaseResponse>;
+    GetNShortestLeases(request: MsgGetNShortestLeases): Promise<MsgGetNShortestLeasesResponse>;
+    Keys(request: MsgKeys): Promise<MsgKeysResponse>;
     Rename(request: MsgRename): Promise<MsgRenameResponse>;
     MultiUpdate(request: MsgMultiUpdate): Promise<MsgMultiUpdateResponse>;
     DeleteAll(request: MsgDeleteAll): Promise<MsgDeleteAllResponse>;
+    KeyValues(request: MsgKeyValues): Promise<MsgKeyValuesResponse>;
+    Has(request: MsgHas): Promise<MsgHasResponse>;
+    GetLease(request: MsgGetLease): Promise<MsgGetLeaseResponse>;
+    Read(request: MsgRead): Promise<MsgReadResponse>;
     Upsert(request: MsgUpsert): Promise<MsgUpsertResponse>;
     Create(request: MsgCreate): Promise<MsgCreateResponse>;
     Update(request: MsgUpdate): Promise<MsgUpdateResponse>;

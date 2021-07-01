@@ -96,6 +96,34 @@ export interface QueryDenomMetadataResponse {
     /** metadata describes and provides all the client information for the requested token. */
     metadata?: Metadata;
 }
+/**
+ * QueryDenomOwnersRequest defines the request type for the DenomOwners RPC query,
+ * which queries for a paginated set of all account holders of a particular
+ * denomination.
+ */
+export interface QueryDenomOwnersRequest {
+    /** denom defines the coin denomination to query all account holders for. */
+    denom: string;
+    /** pagination defines an optional pagination for the request. */
+    pagination?: PageRequest;
+}
+/**
+ * DenomOwner defines structure representing an account that owns or holds a
+ * particular denominated token. It contains the account address and account
+ * balance of the denominated token.
+ */
+export interface DenomOwner {
+    /** address defines the address that owns a particular denomination. */
+    address: string;
+    /** balance is the balance of the denominated coin for an account. */
+    balance?: Coin;
+}
+/** QueryDenomOwnersResponse defines the RPC response of a DenomOwners RPC query. */
+export interface QueryDenomOwnersResponse {
+    denomOwners: DenomOwner[];
+    /** pagination defines the pagination in the response. */
+    pagination?: PageResponse;
+}
 export declare const QueryBalanceRequest: {
     encode(message: QueryBalanceRequest, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryBalanceRequest;
@@ -194,6 +222,27 @@ export declare const QueryDenomMetadataResponse: {
     toJSON(message: QueryDenomMetadataResponse): unknown;
     fromPartial(object: DeepPartial<QueryDenomMetadataResponse>): QueryDenomMetadataResponse;
 };
+export declare const QueryDenomOwnersRequest: {
+    encode(message: QueryDenomOwnersRequest, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryDenomOwnersRequest;
+    fromJSON(object: any): QueryDenomOwnersRequest;
+    toJSON(message: QueryDenomOwnersRequest): unknown;
+    fromPartial(object: DeepPartial<QueryDenomOwnersRequest>): QueryDenomOwnersRequest;
+};
+export declare const DenomOwner: {
+    encode(message: DenomOwner, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): DenomOwner;
+    fromJSON(object: any): DenomOwner;
+    toJSON(message: DenomOwner): unknown;
+    fromPartial(object: DeepPartial<DenomOwner>): DenomOwner;
+};
+export declare const QueryDenomOwnersResponse: {
+    encode(message: QueryDenomOwnersResponse, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number | undefined): QueryDenomOwnersResponse;
+    fromJSON(object: any): QueryDenomOwnersResponse;
+    toJSON(message: QueryDenomOwnersResponse): unknown;
+    fromPartial(object: DeepPartial<QueryDenomOwnersResponse>): QueryDenomOwnersResponse;
+};
 /** Query defines the gRPC querier service. */
 export interface Query {
     /** Balance queries the balance of a single coin for a single account. */
@@ -208,8 +257,16 @@ export interface Query {
     Params(request: QueryParamsRequest): Promise<QueryParamsResponse>;
     /** DenomsMetadata queries the client metadata of a given coin denomination. */
     DenomMetadata(request: QueryDenomMetadataRequest): Promise<QueryDenomMetadataResponse>;
-    /** DenomsMetadata queries the client metadata for all registered coin denominations. */
+    /**
+     * DenomsMetadata queries the client metadata for all registered coin
+     * denominations.
+     */
     DenomsMetadata(request: QueryDenomsMetadataRequest): Promise<QueryDenomsMetadataResponse>;
+    /**
+     * DenomOwners queries for all account addresses that own a particular token
+     * denomination.
+     */
+    DenomOwners(request: QueryDenomOwnersRequest): Promise<QueryDenomOwnersResponse>;
 }
 export declare class QueryClientImpl implements Query {
     private readonly rpc;
@@ -221,6 +278,7 @@ export declare class QueryClientImpl implements Query {
     Params(request: QueryParamsRequest): Promise<QueryParamsResponse>;
     DenomMetadata(request: QueryDenomMetadataRequest): Promise<QueryDenomMetadataResponse>;
     DenomsMetadata(request: QueryDenomsMetadataRequest): Promise<QueryDenomsMetadataResponse>;
+    DenomOwners(request: QueryDenomOwnersRequest): Promise<QueryDenomOwnersResponse>;
 }
 interface Rpc {
     request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;
