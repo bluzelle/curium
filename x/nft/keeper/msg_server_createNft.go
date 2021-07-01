@@ -40,7 +40,7 @@ func (k msgServer) CreateNft(goCtx context.Context, msg *types.MsgCreateNft) (*t
 		}
 
 		go func() {
-			err = k.broadcastPublishFile(ctx, msg.Id, msg.Hash, metainfo)
+			err = k.broadcastPublishFile(ctx, msg.Id, msg.Hash, msg.Mime, metainfo)
 			if err != nil {
 				k.Logger(ctx).Error("error broadcasting publish nft file", "err", err.Error())
 			}
@@ -64,7 +64,7 @@ func (k Keeper) seedFile(ctx sdk.Context, metainfo *metainfo.MetaInfo) error {
 	return nil
 }
 
-func (k Keeper) broadcastPublishFile(ctx sdk.Context, id, hash string, metainfo *metainfo.MetaInfo) error {
+func (k Keeper) broadcastPublishFile(ctx sdk.Context, id, hash string, mime string, metainfo *metainfo.MetaInfo) error {
 	metaBytes, err := bencode.EncodeBytes(metainfo)
 	if err != nil {
 		return err
@@ -79,6 +79,7 @@ func (k Keeper) broadcastPublishFile(ctx sdk.Context, id, hash string, metainfo 
 		Creator:  addr.String(),
 		Id:       id,
 		Hash:     hash,
+		Mime:     mime,
 		Metainfo: metaBytes,
 	}
 

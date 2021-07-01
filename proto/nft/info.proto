@@ -1,0 +1,10 @@
+syntax = "proto3";
+package bluzelle.curium.nft;
+
+option go_package = "github.com/bluzelle/curium/x/nft/types";
+
+message NftInfo {
+  string id = 2;
+  string mime = 4;
+}
+
