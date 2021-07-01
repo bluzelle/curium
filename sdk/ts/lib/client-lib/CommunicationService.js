@@ -8,11 +8,12 @@ const monet_1 = require("monet");
 const lodash_1 = require("lodash");
 const delay_1 = __importDefault(require("delay"));
 const proto_signing_1 = require("@cosmjs/proto-signing");
+const crypto_1 = require("@cosmjs/crypto");
 const tx_1 = require("@cosmjs/proto-signing/build/codec/cosmos/tx/v1beta1/tx");
 const Registry_1 = require("./Registry");
 const stargate_1 = require("@cosmjs/stargate");
 const TOKEN_NAME = 'ubnt';
-const dummyMessageResponse = new Uint8Array();
+const dummyMessageResponse = new Uint8Array(0);
 const mnemonicToAddress = (mnemonic) => proto_signing_1.DirectSecp256k1HdWallet.fromMnemonic(mnemonic, { prefix: 'bluzelle' })
     .then(wallet => wallet.getAccounts())
     .then(x => x[0].address);
@@ -21,11 +22,12 @@ const newTransactionMessageQueue = (items, memo) => ({
     memo,
     items
 });
-const newCommunicationService = (url, mnemonic) => ({
+const newCommunicationService = (url, mnemonic, hdPath) => ({
     url,
     mnemonic,
+    hdPath,
     seq: 0,
-    account: 0
+    account: 0,
 });
 exports.newCommunicationService = newCommunicationService;
 const withTransaction = (service, fn, { memo }) => {
@@ -87,7 +89,7 @@ const transmitTransaction = (service, messages, { memo }) => {
         .then((txRaw) => Uint8Array.from(tx_1.TxRaw.encode(txRaw).finish()))
         .then((signedTx) => cosmos.broadcastTx(signedTx, 30000, 1000))
         .then(checkInternalErrors)
-        .then(() => new Uint8Array())
+        .then(() => new Uint8Array(0))
         .catch((e) => {
         if (/account sequence mismatch/.test(e)) {
             (service.accountRequested = undefined);
@@ -134,8 +136,8 @@ const combineGas = (transactions) => transactions.reduce((gasInfo, transaction) 
     };
 }, {});
 // Inside an async function...
-const getSigner = (mnemonic) => proto_signing_1.DirectSecp256k1HdWallet.fromMnemonic(mnemonic, { prefix: 'bluzelle' });
-const getMemoizedClient = lodash_1.memoize((service) => getSigner(service.mnemonic)
+const getSigner = (mnemonic, hdPath) => proto_signing_1.DirectSecp256k1HdWallet.fromMnemonic(mnemonic, { prefix: 'bluzelle', hdPaths: [crypto_1.stringToPath(hdPath)] });
+const getMemoizedClient = lodash_1.memoize((service) => getSigner(service.mnemonic, service.hdPath)
     .then(signer => stargate_1.SigningStargateClient.connectWithSigner(service.url, signer, {
     registry: Registry_1.myRegistry,
     broadcastTimeoutMs: 300000,

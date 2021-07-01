@@ -5,6 +5,7 @@ export interface SDKOptions {
     url: string;
     gasPrice: number;
     maxGas: number;
+    legacyCoin?: boolean;
 }
 export interface SDK<Q, M> {
     q: Q;

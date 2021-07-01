@@ -40,7 +40,7 @@ const CommunicationService_1 = require("../client-lib/CommunicationService");
 const monet_1 = require("monet");
 const bip39_1 = require("bip39");
 const helpers_1 = require("../helpers/helpers");
-const bluzelle = (options) => Promise.resolve(CommunicationService_1.newCommunicationService(options.url, options.mnemonic || ''))
+const bluzelle = (options) => Promise.resolve(CommunicationService_1.newCommunicationService(options.url, options.mnemonic || '', options.legacyCoin ? "m/44'/118'/0'/0/0" : "m/44'/483'/0'/0/0"))
     .then(cs => Promise.all([
     rpc_1.sdk(options, query_1.QueryClientImpl, tx_1.MsgClientImpl, CrudMsgTypes, cs),
     rpc_1.sdk(options, query_2.QueryClientImpl, tx_2.MsgClientImpl, NftMsgTypes, cs),

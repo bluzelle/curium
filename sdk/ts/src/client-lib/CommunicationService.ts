@@ -200,7 +200,7 @@ const combineGas = (transactions: MessageQueueItem<any>[]): GasInfo =>
 // Inside an async function...
 const getSigner = (mnemonic: string, hdPath:string) => DirectSecp256k1HdWallet.fromMnemonic(
     mnemonic,
-    {prefix: 'bluzelle', hdPaths:stringToPath(hdPath)} as DirectSecp256k1HdWalletOptions);
+    {prefix: 'bluzelle', hdPaths:[stringToPath(hdPath)]} as Partial<DirectSecp256k1HdWalletOptions>);
 
 const getMemoizedClient = memoize((service: CommunicationService) =>
     getSigner(service.mnemonic, service.hdPath)
