@@ -60,7 +60,7 @@ void async function () {
         .then(() => $`curl https://raw.githubusercontent.com/regen-network/cosmos-proto/master/cosmos.proto > proto/cosmos_proto/cosmos.proto`)
 
     //Needed to modify the gogoproto file for the Cosmos modules
-    await $`sed -i '' '/google.protobuf.FieldOptions/a \\ 
+    await $`sed -i '' '/google.protobuf.FieldOptions/a \
     optional string castrepeated = 65000;' proto/gogoproto/gogo.proto`
 
 
