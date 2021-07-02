@@ -18,6 +18,7 @@ export interface MsgPublishFile {
   creator: string;
   id: string;
   hash: string;
+  mime: string;
   metainfo: Uint8Array;
 }
 
@@ -226,7 +227,7 @@ export const MsgRegisterPeerResponse = {
   },
 };
 
-const baseMsgPublishFile: object = { creator: "", id: "", hash: "" };
+const baseMsgPublishFile: object = { creator: "", id: "", hash: "", mime: "" };
 
 export const MsgPublishFile = {
   encode(
@@ -242,8 +243,11 @@ export const MsgPublishFile = {
     if (message.hash !== "") {
       writer.uint32(26).string(message.hash);
     }
+    if (message.mime !== "") {
+      writer.uint32(34).string(message.mime);
+    }
     if (message.metainfo.length !== 0) {
-      writer.uint32(34).bytes(message.metainfo);
+      writer.uint32(42).bytes(message.metainfo);
     }
     return writer;
   },
@@ -266,6 +270,9 @@ export const MsgPublishFile = {
           message.hash = reader.string();
           break;
         case 4:
+          message.mime = reader.string();
+          break;
+        case 5:
           message.metainfo = reader.bytes();
           break;
         default:
@@ -294,6 +301,11 @@ export const MsgPublishFile = {
     } else {
       message.hash = "";
     }
+    if (object.mime !== undefined && object.mime !== null) {
+      message.mime = String(object.mime);
+    } else {
+      message.mime = "";
+    }
     if (object.metainfo !== undefined && object.metainfo !== null) {
       message.metainfo = bytesFromBase64(object.metainfo);
     }
@@ -305,6 +317,7 @@ export const MsgPublishFile = {
     message.creator !== undefined && (obj.creator = message.creator);
     message.id !== undefined && (obj.id = message.id);
     message.hash !== undefined && (obj.hash = message.hash);
+    message.mime !== undefined && (obj.mime = message.mime);
     message.metainfo !== undefined &&
       (obj.metainfo = base64FromBytes(
         message.metainfo !== undefined ? message.metainfo : new Uint8Array()
@@ -328,6 +341,11 @@ export const MsgPublishFile = {
       message.hash = object.hash;
     } else {
       message.hash = "";
+    }
+    if (object.mime !== undefined && object.mime !== null) {
+      message.mime = object.mime;
+    } else {
+      message.mime = "";
     }
     if (object.metainfo !== undefined && object.metainfo !== null) {
       message.metainfo = object.metainfo;
