@@ -27,7 +27,7 @@ export interface CommunicationService {
     account: number
     accountRequested?: Promise<unknown>
     transactionMessageQueue?: TransactionMessageQueue
-    hdPath: string
+    legacyCoin: boolean
 }
 
 interface TransactionMessageQueue {
@@ -39,10 +39,8 @@ export interface WithTransactionsOptions {
     memo: string
 }
 
-export const mnemonicToAddress = (mnemonic: string, path: string): Promise<string> =>
-    Promise.resolve(path)
-        .then(path => /118/.test(path))
-        .then(legacyCoin => getHdPaths(legacyCoin))
+export const mnemonicToAddress = (mnemonic: string, legacyCoin: boolean): Promise<string> =>
+        Promise.resolve(getHdPaths(legacyCoin))
         .then(hdPath =>
             DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {prefix: 'bluzelle', hdPaths: [hdPath]})
                 .then(wallet => wallet.getAccounts())
@@ -124,7 +122,7 @@ const transmitTransaction = (service: CommunicationService, messages: MessageQue
         .then(client => getChainId(client).then(cId => chainId = cId))
         .then(() => getSequence(service, cosmos))
         .then((account) =>
-            mnemonicToAddress(service.mnemonic, service.hdPath)
+            mnemonicToAddress(service.mnemonic, service.legacyCoin)
                 .then(address => cosmos.sign(address, messages.map(x => x.message) as EncodeObject[], getFeeInfo(combineGas(messages)), 'memo', {
                         accountNumber: account.account,
                         chainId: chainId,
@@ -162,7 +160,7 @@ const getSequence = (service: CommunicationService, cosmos: SigningStargateClien
                 service.seq = service.seq + 1
             )
     ) : (
-        service.accountRequested = mnemonicToAddress(service.mnemonic, service.hdPath)
+        service.accountRequested = mnemonicToAddress(service.mnemonic, service.legacyCoin)
             .then(address =>
                 service.accountRequested = cosmos.getAccount(address)
                     .then((data: any) => {
@@ -204,9 +202,9 @@ const combineGas = (transactions: MessageQueueItem<any>[]): GasInfo =>
 
 
 // Inside an async function...
-const getSigner = (mnemonic: string, hdPath: string) =>
-    Promise.resolve(hdPath)
-        .then(stringToPath)
+const getSigner = (mnemonic: string, legacyCoin: boolean) =>
+    Promise.resolve(legacyCoin)
+        .then(getHdPaths)
         .then(hdPath =>
             DirectSecp256k1HdWallet.fromMnemonic(
                 mnemonic, {
@@ -216,7 +214,7 @@ const getSigner = (mnemonic: string, hdPath: string) =>
             ));
 
 const getMemoizedClient = memoize((service: CommunicationService) =>
-    getSigner(service.mnemonic, service.hdPath)
+    getSigner(service.mnemonic, service.legacyCoin)
         .then(signer => SigningStargateClient.connectWithSigner(
             service.url,
             signer,
