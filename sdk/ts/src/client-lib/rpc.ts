@@ -1,12 +1,10 @@
 import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
 import {createProtobufRpcClient, ProtobufRpcClient, QueryClient} from "@cosmjs/stargate";
-import Long from "long";
-import {newCommunicationService, sendMessage, withTransaction, CommunicationService} from "./CommunicationService"
+import {CommunicationService, sendMessage, withTransaction} from "./CommunicationService"
 import {addMessageType} from "./Registry";
-import {DirectSecp256k1HdWallet} from "@cosmjs/proto-signing";
+import {DirectSecp256k1HdWallet, DirectSecp256k1HdWalletOptions} from "@cosmjs/proto-signing";
+import {Slip10RawIndex, HdPath} from "@cosmjs/crypto";
 import {memoize} from 'lodash'
-import {MessageResponse} from "../legacyAdapter/types/MessageResponse";
-import {NftHelpers, nftHelpers} from "../helpers/nft-helpers";
 
 export interface SDKOptions {
     mnemonic?: string,
@@ -29,7 +27,7 @@ export const sdk = <Q, M>(options: SDKOptions, qImpl: any, mImpl: any, msgTypes:
     return Promise.all([
         queryRpc(options),
         txRpc(options, cs, msgTypes),
-        mnemonicToAddress(options.mnemonic || '')
+        mnemonicToAddress(options.mnemonic || '', options.legacyCoin ?? false)
     ])
         .then(([queryRpc, txRpc, address]) => ({
             q: new qImpl(queryRpc),
@@ -60,9 +58,19 @@ const txRpc = (options: SDKOptions, communicationService: CommunicationService, 
     } as ProtobufRpcClient);
 };
 
-export const mnemonicToAddress = memoize<(mnemonic: string) => Promise<string>>((mnemonic: string): Promise<string> =>
-    DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {prefix: 'bluzelle'})
+export const mnemonicToAddress = memoize<(mnemonic: string, legacyCoin: boolean) => Promise<string>>((mnemonic, legacyCoin): Promise<string> =>
+    DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
+        prefix: 'bluzelle',
+        hdPaths: [getHdPaths(legacyCoin)]
+    } as Partial<DirectSecp256k1HdWalletOptions>)
         .then(wallet => wallet.getAccounts())
-        .then(x => x[0].address))
+        .then(x => x[0].address));
 
 
+export const getHdPaths = (legacyCoin: boolean, index: number = 0) : HdPath => [
+    Slip10RawIndex.hardened(44),
+    Slip10RawIndex.hardened(legacyCoin ? 118 : 483),
+    Slip10RawIndex.hardened(0),
+    Slip10RawIndex.normal(0),
+    Slip10RawIndex.normal(index)
+];

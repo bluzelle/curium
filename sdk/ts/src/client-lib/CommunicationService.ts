@@ -9,6 +9,7 @@ import {stringToPath} from "@cosmjs/crypto";
 import {TxRaw} from "@cosmjs/proto-signing/build/codec/cosmos/tx/v1beta1/tx";
 import {getMyRegistry, myRegistry} from "./Registry";
 import {BroadcastTxResponse, isBroadcastTxFailure, SigningStargateClient} from "@cosmjs/stargate";
+import {getHdPaths} from "./rpc";
 
 const TOKEN_NAME = 'ubnt';
 
@@ -38,10 +39,15 @@ export interface WithTransactionsOptions {
     memo: string
 }
 
-export const mnemonicToAddress = (mnemonic: string): Promise<string> =>
-    DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {prefix: 'bluzelle'})
-        .then(wallet => wallet.getAccounts())
-        .then(x => x[0].address)
+export const mnemonicToAddress = (mnemonic: string, path: string): Promise<string> =>
+    Promise.resolve(path)
+        .then(path => /118/.test(path))
+        .then(legacyCoin => getHdPaths(legacyCoin))
+        .then(hdPath =>
+            DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {prefix: 'bluzelle', hdPaths: [hdPath]})
+                .then(wallet => wallet.getAccounts())
+                .then(x => x[0].address)
+        )
 
 
 const newTransactionMessageQueue = (items: MessageQueueItem<unknown>[], memo: string): TransactionMessageQueue => ({
@@ -118,7 +124,7 @@ const transmitTransaction = (service: CommunicationService, messages: MessageQue
         .then(client => getChainId(client).then(cId => chainId = cId))
         .then(() => getSequence(service, cosmos))
         .then((account) =>
-            mnemonicToAddress(service.mnemonic)
+            mnemonicToAddress(service.mnemonic, service.hdPath)
                 .then(address => cosmos.sign(address, messages.map(x => x.message) as EncodeObject[], getFeeInfo(combineGas(messages)), 'memo', {
                         accountNumber: account.account,
                         chainId: chainId,
@@ -156,7 +162,7 @@ const getSequence = (service: CommunicationService, cosmos: SigningStargateClien
                 service.seq = service.seq + 1
             )
     ) : (
-        service.accountRequested = mnemonicToAddress(service.mnemonic)
+        service.accountRequested = mnemonicToAddress(service.mnemonic, service.hdPath)
             .then(address =>
                 service.accountRequested = cosmos.getAccount(address)
                     .then((data: any) => {
@@ -198,9 +204,16 @@ const combineGas = (transactions: MessageQueueItem<any>[]): GasInfo =>
 
 
 // Inside an async function...
-const getSigner = (mnemonic: string, hdPath:string) => DirectSecp256k1HdWallet.fromMnemonic(
-    mnemonic,
-    {prefix: 'bluzelle', hdPaths:[stringToPath(hdPath)]} as Partial<DirectSecp256k1HdWalletOptions>);
+const getSigner = (mnemonic: string, hdPath: string) =>
+    Promise.resolve(hdPath)
+        .then(stringToPath)
+        .then(hdPath =>
+            DirectSecp256k1HdWallet.fromMnemonic(
+                mnemonic, {
+                    prefix: 'bluzelle',
+                    hdPaths: [hdPath]
+                } as Partial<DirectSecp256k1HdWalletOptions>
+            ));
 
 const getMemoizedClient = memoize((service: CommunicationService) =>
     getSigner(service.mnemonic, service.hdPath)

@@ -21,7 +21,7 @@ interface TransactionMessageQueue {
 export interface WithTransactionsOptions {
     memo: string;
 }
-export declare const mnemonicToAddress: (mnemonic: string) => Promise<string>;
+export declare const mnemonicToAddress: (mnemonic: string, path: string) => Promise<string>;
 export declare const newCommunicationService: (url: string, mnemonic: string, hdPath: string) => {
     url: string;
     mnemonic: string;
