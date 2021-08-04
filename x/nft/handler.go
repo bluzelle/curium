@@ -84,9 +84,9 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 	k.Logger(ctx).Debug("Publish file message received", "id", msg.Id)
 	var metainfo metainfo.MetaInfo
 	bencode.DecodeBytes(msg.Metainfo, &metainfo)
-
+	fmt.Println("Publish message recieved, retrieving file")
 	k.BtClient.RetrieveFile(&metainfo)
-
+	fmt.Println("Retrieved file")
 	k.EnsureNftDirExists()
 
 	err := os.Symlink(k.HomeDir+"/nft/"+msg.Hash, k.HomeDir+"/nft/"+msg.Vendor + "-" + msg.Id)
