@@ -53,7 +53,7 @@ func (tc *TorrentClient) RetrieveFile(metaInfo *metainfo.MetaInfo) {
 	}()
 }
 
-func (tc TorrentClient) TorrentFromFile(filePath string, vendor string) (*metainfo.MetaInfo, error) {
+func (tc TorrentClient) TorrentFromFile(filePath string) (*metainfo.MetaInfo, error) {
 	private := true
 	info := metainfo.Info{
 		PieceLength: PIECE_SIZE * 1024,

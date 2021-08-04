@@ -6,8 +6,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
+
 )
 
 func getNftByVendorHandler(clientCtx context.CLIContext) http.HandlerFunc {
@@ -33,7 +35,7 @@ func getNftByVendorHandler(clientCtx context.CLIContext) http.HandlerFunc {
 
 		var info map[string]interface{}
 
-		infoBytes, err := os.ReadFile(infoLocation)
+		infoBytes, err := ioutil.ReadFile(infoLocation)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, "Unable to read info file")
 		}

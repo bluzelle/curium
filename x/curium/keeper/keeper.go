@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/bluzelle/curium/app/ante/gasmeter"
 	devel "github.com/bluzelle/curium/types"
+	"io/ioutil"
 
 	cryptoKeys "github.com/cosmos/cosmos-sdk/crypto/keys"
 
@@ -24,7 +25,6 @@ import (
 	"github.com/tendermint/tendermint/rpc/core"
 	coretypes "github.com/tendermint/tendermint/rpc/core/types"
 	rpctypes "github.com/tendermint/tendermint/rpc/jsonrpc/types"
-	"io"
 	"net/http"
 	"regexp"
 
@@ -342,6 +342,6 @@ func httpGet(url string) ([]byte, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
+	body, err := ioutil.ReadAll(resp.Body)
 	return body, err
 }

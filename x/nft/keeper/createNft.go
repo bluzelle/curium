@@ -6,6 +6,7 @@ import (
 	"github.com/bluzelle/curium/x/nft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/zeebo/bencode"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -82,7 +83,7 @@ func (k Keeper) AssembleNftFile(uploadDir string, nftDir string, msg *types.MsgC
 		if err == nil && uploadRegEx.MatchString(info.Name()) {
 			fmt.Println(path)
 			if path != uploadDir {
-				data, err := os.ReadFile(path)
+				data, err := ioutil.ReadFile(path)
 				if err != nil {
 					return err
 				}

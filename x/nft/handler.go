@@ -9,6 +9,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/zeebo/bencode"
+	"io/ioutil"
 	"os"
 )
 
@@ -47,7 +48,7 @@ func handleMsgCreateNft(goCtx sdk.Context, k keeper.Keeper, msg *types.MsgCreate
 
 
 	if _, err := os.Stat(k.HomeDir+"/nft/"+msg.Hash); err == nil {
-		metainfo, err := k.BtClient.TorrentFromFile(msg.Hash, msg.Vendor)
+		metainfo, err := k.BtClient.TorrentFromFile(msg.Hash)
 		if err != nil {
 			return nil, sdkerrors.New("nft", 2, fmt.Sprintf("unable to create torrent for file", msg.Hash))
 		}
@@ -99,7 +100,7 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 		UserId: msg.UserId,
 		Mime: msg.Mime,
 	}
-	err = os.WriteFile(k.HomeDir+"/nft/"+msg.Hash+".info", k.Cdc.MustMarshalJSON(&info), 0666)
+	err = ioutil.WriteFile(k.HomeDir+"/nft/"+msg.Hash+".info", k.Cdc.MustMarshalJSON(&info), 0666)
 	if err != nil {
 		return nil, err
 	}
