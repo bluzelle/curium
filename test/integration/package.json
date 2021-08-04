@@ -8,7 +8,7 @@
     "@types/node": "^14.14.20",
     "bluzelle": "^3.0.6",
     "chai": "^4.2.0",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "mocha": "^8.2.1",
     "monet": "^0.9.1",
     "promise-passthrough": "^1.0.5",
