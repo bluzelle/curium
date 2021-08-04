@@ -138,16 +138,14 @@ func (am AppModule) BeginBlock(_ sdk.Context, req abci.RequestBeginBlock) {
 // EndBlock returns the end blocker for the nft module. It returns no validator
 // updates.
 func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-	peerRegistered := false
-	if ctx.BlockHeight() > 10 {
-		if !peerRegistered {
-			go func() {
-				err := am.keeper.BroadcastRegisterBtPeer(ctx)
-				if err == nil {
-					peerRegistered = true
-				}
-			}()
-		}
+	if ctx.BlockHeight() == 10 {
+		go func() {
+			err := am.keeper.BroadcastRegisterBtPeer(ctx)
+			if err != nil {
+				am.keeper.Logger(ctx).Error("Registering bt peers failed", "RegisterBtPeer", err)
+			}
+
+		}()
 	}
 	return []abci.ValidatorUpdate{}
 }
