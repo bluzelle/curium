@@ -22,6 +22,7 @@ import (
 var (
 	_ module.AppModule           = AppModule{}
 	_ module.AppModuleBasic      = AppModuleBasic{}
+	peerRegistered = false
 )
 
 // AppModuleBasic defines the basic application module used by the nft module.
@@ -138,14 +139,15 @@ func (am AppModule) BeginBlock(_ sdk.Context, req abci.RequestBeginBlock) {
 // EndBlock returns the end blocker for the nft module. It returns no validator
 // updates.
 func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-	if ctx.BlockHeight() == 10 {
-		go func() {
-			err := am.keeper.BroadcastRegisterBtPeer(ctx)
-			if err != nil {
-				am.keeper.Logger(ctx).Error("Registering bt peers failed", "RegisterBtPeer", err)
-			}
-
-		}()
+	if ctx.BlockHeight() > 10 {
+		if !peerRegistered {
+			go func() {
+				err := am.keeper.BroadcastRegisterBtPeer(ctx)
+				if err == nil {
+					peerRegistered = true
+				}
+			}()
+		}
 	}
 	return []abci.ValidatorUpdate{}
 }
