@@ -88,8 +88,9 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 	k.BtClient.RetrieveFile(&metainfo)
 	fmt.Println("Retrieved file")
 	k.EnsureNftDirExists()
-
+	fmt.Println("Nft directory now exists")
 	err := os.Symlink(k.HomeDir+"/nft/"+msg.Hash, k.HomeDir+"/nft/"+msg.Vendor + "-" + msg.Id)
+	fmt.Println("Symlink has been created")
 
 	if err != nil {
 		return nil, err
@@ -100,11 +101,15 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 		UserId: msg.UserId,
 		Mime: msg.Mime,
 	}
+	fmt.Println("Writing hash .info file")
 	err = ioutil.WriteFile(k.HomeDir+"/nft/"+msg.Hash+".info", k.Cdc.MustMarshalJSON(&info), 0666)
+	fmt.Println("Finished writing hash .info file")
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("Symlinking vendor .info file")
 	err = os.Symlink(k.HomeDir+"/nft/"+msg.Hash+".info", k.HomeDir+"/nft/"+msg.Vendor + "-" + msg.Id+".info")
+	fmt.Println("Finished symlinking vendor .info file")
 	if err != nil {
 		return nil, err
 	}
