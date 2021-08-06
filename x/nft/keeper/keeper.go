@@ -42,12 +42,13 @@ func NewKeeper (
 
 ) *Keeper {
 	btClient, err := torrentClient.NewTorrentClient(btDirectory, btPort)
-	if ensureNftUserExists(keyringReader) == false {
-		panic("nft user does not exist in keyring")
+	if checkNftUserExists(keyringReader) == false {
+		fmt.Println("***** nft user does not exist in keyring")
 	}
 	if err != nil {
-		panic(err)
+		fmt.Println("*****", err)
 	}
+
 	return &Keeper{
 		Cdc:            cdc,
 		storeKey:       storeKey,
@@ -66,7 +67,7 @@ func (k Keeper) GetCdc() *codec.Codec {
 	return k.Cdc
 }
 
-func ensureNftUserExists(reader *curium.KeyringReader) bool {
+func checkNftUserExists(reader *curium.KeyringReader) bool {
 	_, err := reader.GetAddress("nft")
 	return err == nil
 }
