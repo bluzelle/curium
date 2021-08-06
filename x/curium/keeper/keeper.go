@@ -287,7 +287,8 @@ func DoBroadcast (resp chan *MsgBroadcasterResponse, keyringDir string, cdc *cod
 
 		result, err := pollForTransaction(rpcCtx, broadcastResult.Hash)
 
-
+		fmt.Println("Response after polling for transaction", result)
+		fmt.Println("Error from polling for transaction", err)
 
 		if err != nil {
 			returnError(err)
