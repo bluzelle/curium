@@ -165,7 +165,7 @@ func (k Keeper) NewMsgBroadcaster(keyringDir string, cdc *codec.Codec) MsgBroadc
 func DoBroadcast (resp chan *MsgBroadcasterResponse, keyringDir string, cdc *codec.Codec, curiumKeeper Keeper, accKeeper *keeper.AccountKeeper, ctx sdk.Context, msgs []sdk.Msg, from string, state AccountState) {
 
 		returnError := func(err error) {
-
+			curiumKeeper.Logger(ctx).Error("DoBroadcast, returnError()", "error", err)
 			resp <- &MsgBroadcasterResponse{
 				Error: err,
 			}
@@ -230,7 +230,7 @@ func DoBroadcast (resp chan *MsgBroadcasterResponse, keyringDir string, cdc *cod
 			return
 		}
 
-
+		fmt.Println("***** Seq num before update", state.seqNum)
 
 		state, err = updateAccountState(accnt, state)
 
@@ -239,7 +239,7 @@ func DoBroadcast (resp chan *MsgBroadcasterResponse, keyringDir string, cdc *cod
 			return
 		}
 
-
+		fmt.Println("***** Seq num after update", state.seqNum)
 		// Create a new TxBuilder.
 		txBuilder := auth.NewTxBuilder(
 			utils.GetTxEncoder(cdc),
