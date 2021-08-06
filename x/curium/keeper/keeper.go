@@ -165,7 +165,7 @@ func (k Keeper) NewMsgBroadcaster(keyringDir string, cdc *codec.Codec) MsgBroadc
 func DoBroadcast (resp chan *MsgBroadcasterResponse, keyringDir string, cdc *codec.Codec, curiumKeeper Keeper, accKeeper *keeper.AccountKeeper, ctx sdk.Context, msgs []sdk.Msg, from string, state AccountState) {
 
 		returnError := func(err error) {
-			curiumKeeper.Logger(ctx).Error("DoBroadcast, returnError()", "error", err)
+			curiumKeeper.Logger(ctx).Error("DoBroadcast, returnError(), ~~~", "error", err)
 			resp <- &MsgBroadcasterResponse{
 				Error: err,
 			}
@@ -254,10 +254,11 @@ func DoBroadcast (resp chan *MsgBroadcasterResponse, keyringDir string, cdc *cod
 		).WithKeybase(kr)
 
 
+		fmt.Println("Before building and signing")
 
 		signedMsgs, err := txBuilder.BuildAndSign(from, clientkeys.DefaultKeyPass, msgs)
 
-
+		fmt.Println("After building and signing")
 
 		if err != nil {
 			fmt.Println("******** ERROR FROM BUILDING AND SIGNING", err)
@@ -272,8 +273,11 @@ func DoBroadcast (resp chan *MsgBroadcasterResponse, keyringDir string, cdc *cod
 
 		rpcCtx := rpctypes.Context{}
 
+		fmt.Println("Before broadcasting")
+
 		broadcastResult, err := core.BroadcastTxSync(&rpcCtx, signedMsgs)
 
+		fmt.Println("After broadcasting")
 
 
 		if err != nil {
