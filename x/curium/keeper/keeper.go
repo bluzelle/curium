@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/bluzelle/curium/app/ante/gasmeter"
 	devel "github.com/bluzelle/curium/types"
+	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"io/ioutil"
 
 	cryptoKeys "github.com/cosmos/cosmos-sdk/crypto/keys"
@@ -73,6 +74,25 @@ func NewKeeper(cdc *codec.Codec, storeKey, memKey sdk.StoreKey, laddr string, ac
 	}
 }
 
+type AccountState struct {
+	seqNum uint64
+	accntNum uint64
+	requested bool
+}
+
+
+func updateAccountState (accnt exported.Account, state AccountState) (AccountState, error)  {
+	if state.requested {
+		state.seqNum = state.seqNum + 1
+		return state, nil
+	} else {
+		state.accntNum = accnt.GetAccountNumber()
+		state.seqNum = accnt.GetSequence()
+		state.requested = true
+		return state, nil
+	}
+}
+
 func getKeyring (keyringDir string) (cryptoKeys.Keybase, error) {
 	return cryptoKeys.NewKeyring("BluzelleService", cryptoKeys.BackendTest, keyringDir, nil)
 }
@@ -122,6 +142,10 @@ func pollForTransaction (ctx rpctypes.Context, hash []byte) (*coretypes.ResultTx
 func (k Keeper) NewMsgBroadcaster(keyringDir string, cdc *codec.Codec) MsgBroadcaster {
 	accKeeper := k.accKeeper
 
+	accntState := AccountState{
+		requested: false,
+	}
+
 	return func(ctx sdk.Context, msgs []sdk.Msg, from string) chan *MsgBroadcasterResponse {
 		resp := make(chan *MsgBroadcasterResponse)
 
@@ -130,7 +154,7 @@ func (k Keeper) NewMsgBroadcaster(keyringDir string, cdc *codec.Codec) MsgBroadc
 				close(resp)
 			}()
 
-			DoBroadcast(resp, keyringDir, cdc, k, accKeeper, ctx, msgs, from)
+			DoBroadcast(resp, keyringDir, cdc, k, accKeeper, ctx, msgs, from, accntState)
 		}()
 
 		return resp
@@ -138,7 +162,7 @@ func (k Keeper) NewMsgBroadcaster(keyringDir string, cdc *codec.Codec) MsgBroadc
 
 }
 
-func DoBroadcast (resp chan *MsgBroadcasterResponse, keyringDir string, cdc *codec.Codec, curiumKeeper Keeper, accKeeper *keeper.AccountKeeper, ctx sdk.Context, msgs []sdk.Msg, from string) {
+func DoBroadcast (resp chan *MsgBroadcasterResponse, keyringDir string, cdc *codec.Codec, curiumKeeper Keeper, accKeeper *keeper.AccountKeeper, ctx sdk.Context, msgs []sdk.Msg, from string, state AccountState) {
 
 		returnError := func(err error) {
 
@@ -208,13 +232,19 @@ func DoBroadcast (resp chan *MsgBroadcasterResponse, keyringDir string, cdc *cod
 
 
 
+		state, err = updateAccountState(accnt, state)
+
+		if err != nil {
+			returnError(err)
+			return
+		}
 
 
 		// Create a new TxBuilder.
 		txBuilder := auth.NewTxBuilder(
 			utils.GetTxEncoder(cdc),
-			accnt.GetAccountNumber(),
-			accnt.GetSequence(),
+			state.accntNum,
+			state.seqNum,
 			10000000,
 			1,
 			false,
@@ -230,6 +260,7 @@ func DoBroadcast (resp chan *MsgBroadcasterResponse, keyringDir string, cdc *cod
 
 
 		if err != nil {
+			fmt.Println("******** ERROR FROM BUILDING AND SIGNING", err)
 			returnError(err)
 			return
 		}
@@ -345,3 +376,5 @@ func httpGet(url string) ([]byte, error) {
 	body, err := ioutil.ReadAll(resp.Body)
 	return body, err
 }
+
+
