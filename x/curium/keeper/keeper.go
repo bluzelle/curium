@@ -275,7 +275,7 @@ func DoBroadcast (resp chan *MsgBroadcasterResponse, keyringDir string, cdc *cod
 
 		fmt.Println("Before broadcasting")
 
-		broadcastResult, err := core.BroadcastTxAsync(&rpcCtx, signedMsgs)
+		broadcastResult, err := core.BroadcastTxCommit(&rpcCtx, signedMsgs)
 
 		fmt.Println("After broadcasting")
 
