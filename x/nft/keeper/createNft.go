@@ -44,6 +44,7 @@ func (k Keeper) BroadcastPublishFile(ctx sdk.Context, id string, vendor string, 
 	}
 
 	result := <- k.MsgBroadcaster(ctx, []sdk.Msg{&publishMsg}, "nft")
+	fmt.Println("Response from broadcastMsgPublish", result)
 	if result.Error != nil {
 		return result.Error
 	}
