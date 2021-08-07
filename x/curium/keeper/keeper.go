@@ -78,6 +78,7 @@ type AccountState struct {
 	seqNum    uint64
 	accntNum  uint64
 	requested bool
+	reset bool
 }
 
 func updateAccountState(accnt exported.Account, state AccountState) (AccountState, error) {
@@ -96,6 +97,7 @@ func resetAccountState(accnt exported.Account, state AccountState) (AccountState
 	state.accntNum = accnt.GetAccountNumber()
 	state.seqNum = accnt.GetSequence()
 	state.requested = true
+	state.reset = true
 	return state, nil
 }
 
@@ -148,6 +150,7 @@ func (k Keeper) NewMsgBroadcaster(keyringDir string, cdc *codec.Codec) MsgBroadc
 
 	accntState := AccountState{
 		requested: false,
+		reset: false,
 	}
 
 	return func(ctx sdk.Context, msgs []sdk.Msg, from string) chan *MsgBroadcasterResponse {
@@ -169,7 +172,6 @@ func (k Keeper) NewMsgBroadcaster(keyringDir string, cdc *codec.Codec) MsgBroadc
 func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *codec.Codec, curiumKeeper Keeper, accKeeper *keeper.AccountKeeper, ctx sdk.Context, msgs []sdk.Msg, from string, state AccountState) {
 
 	returnError := func(err error) {
-		curiumKeeper.Logger(ctx).Error("DoBroadcast, returnError(), ~~~", "error", err)
 		resp <- &MsgBroadcasterResponse{
 			Error: err,
 		}
@@ -218,7 +220,7 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 		return
 	}
 
-	fmt.Println("***** Seq num before update", state.seqNum)
+
 
 	state, err = updateAccountState(accnt, state)
 
@@ -227,7 +229,7 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 		return
 	}
 
-	fmt.Println("***** Seq num after update", state.seqNum)
+
 	// Create a new TxBuilder.
 	txBuilder := auth.NewTxBuilder(
 		utils.GetTxEncoder(cdc),
@@ -241,14 +243,11 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 		gasPrice,
 	).WithKeybase(kr)
 
-	fmt.Println("Before building and signing")
 
 	signedMsgs, err := txBuilder.BuildAndSign(from, clientkeys.DefaultKeyPass, msgs)
 
-	fmt.Println("After building and signing")
 
 	if err != nil {
-		fmt.Println("******** ERROR FROM BUILDING AND SIGNING", err)
 		returnError(err)
 		return
 	}
@@ -260,11 +259,7 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 
 	rpcCtx := rpctypes.Context{}
 
-	fmt.Println("Before broadcasting")
-
 	broadcastResult, err := core.BroadcastTxSync(&rpcCtx, signedMsgs)
-
-	fmt.Println("After broadcasting", broadcastResult, msgs)
 
 	if err != nil {
 		returnError(err)
@@ -278,7 +273,11 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 		return
 	}
 
-	fmt.Println(accntSeqString.MatchString(broadcastResult.Log))
+
+	if state.reset {
+		returnError(errors.New(broadcastResult.Log))
+		return
+	}
 
 	if accntSeqString.MatchString(broadcastResult.Log) {
 		returnError(errors.New("Sequencing error, retrying broadcast"))
@@ -293,9 +292,6 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 	}
 
 	result, err := pollForTransaction(rpcCtx, broadcastResult.Hash)
-
-	fmt.Println("Response after polling for transaction", result)
-	fmt.Println("Error from polling for transaction", err)
 
 	if err != nil {
 		returnError(err)

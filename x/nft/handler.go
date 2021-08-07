@@ -29,7 +29,6 @@ func NewHandler(keeper keeper.Keeper) sdk.Handler {
 }
 
 func handleMsgCreateNft(goCtx sdk.Context, k keeper.Keeper, msg *types.MsgCreateNft) (*sdk.Result, error) {
-	fmt.Println("Recieved Msg Create")
 	k.AppendNft(
 		goCtx,
 		msg.Creator,
@@ -58,9 +57,7 @@ func handleMsgCreateNft(goCtx sdk.Context, k keeper.Keeper, msg *types.MsgCreate
 		}
 
 		go func() {
-			fmt.Println("Calling broadcaster to publish file")
 			err = k.BroadcastPublishFile(goCtx, msg.Id, msg.Vendor, msg.UserId, msg.Hash, msg.Mime, metainfo)
-			fmt.Println("Broadcaster completed Msg Publish", err)
 			if err != nil {
 				k.Logger(goCtx).Error("error broadcasting publish nft file", "err", err.Error())
 			}
@@ -86,13 +83,9 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 	k.Logger(ctx).Debug("Publish file message received", "id", msg.Id)
 	var metainfo metainfo.MetaInfo
 	bencode.DecodeBytes(msg.Metainfo, &metainfo)
-	fmt.Println("Publish message recieved, retrieving file")
 	k.BtClient.RetrieveFile(&metainfo)
-	fmt.Println("Retrieved file")
 	k.EnsureNftDirExists()
-	fmt.Println("Nft directory now exists")
 	err := os.Symlink(k.HomeDir+"/nft/"+msg.Hash, k.HomeDir+"/nft/"+msg.Vendor + "-" + msg.Id)
-	fmt.Println("Symlink has been created")
 
 	if err != nil {
 		return nil, err
@@ -103,15 +96,11 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 		UserId: msg.UserId,
 		Mime: msg.Mime,
 	}
-	fmt.Println("Writing hash .info file")
 	err = ioutil.WriteFile(k.HomeDir+"/nft/"+msg.Hash+".info", k.Cdc.MustMarshalJSON(&info), 0666)
-	fmt.Println("Finished writing hash .info file")
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("Symlinking vendor .info file")
 	err = os.Symlink(k.HomeDir+"/nft/"+msg.Hash+".info", k.HomeDir+"/nft/"+msg.Vendor + "-" + msg.Id+".info")
-	fmt.Println("Finished symlinking vendor .info file")
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +108,6 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 }
 
 func handleMsgRegisterPeer(ctx sdk.Context, k Keeper, msg *types.MsgRegisterPeer) (*sdk.Result, error) {
-	fmt.Println("Recieved Msg Register Peer")
 	store := k.GetPeerStore(ctx)
 	var peer types.Peer
 	peer.Id = msg.Id
