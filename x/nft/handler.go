@@ -58,7 +58,9 @@ func handleMsgCreateNft(goCtx sdk.Context, k keeper.Keeper, msg *types.MsgCreate
 		}
 
 		go func() {
+			fmt.Println("Calling broadcaster to publish file")
 			err = k.BroadcastPublishFile(goCtx, msg.Id, msg.Vendor, msg.UserId, msg.Hash, msg.Mime, metainfo)
+			fmt.Println("Broadcaster completed Msg Publish", err)
 			if err != nil {
 				k.Logger(goCtx).Error("error broadcasting publish nft file", "err", err.Error())
 			}
