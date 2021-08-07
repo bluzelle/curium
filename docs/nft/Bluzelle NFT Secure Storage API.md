@@ -9,7 +9,7 @@ The second step is necessary so that your identity credentials can be kept secur
 
 The process looks like this:
 
-[Protocol diagram](https://github.com/bluzelle/curium/raw/devel/docs/nft/short%20protocol.png)
+![Protocol diagram](https://github.com/bluzelle/curium/raw/devel/docs/nft/short%20protocol.png)
 
 ### Step 1: Upload
 
