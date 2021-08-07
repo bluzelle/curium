@@ -29,7 +29,7 @@ func NewHandler(keeper keeper.Keeper) sdk.Handler {
 }
 
 func handleMsgCreateNft(goCtx sdk.Context, k keeper.Keeper, msg *types.MsgCreateNft) (*sdk.Result, error) {
-
+	fmt.Println("Recieved Msg Create")
 	k.AppendNft(
 		goCtx,
 		msg.Creator,
@@ -117,6 +117,7 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 }
 
 func handleMsgRegisterPeer(ctx sdk.Context, k Keeper, msg *types.MsgRegisterPeer) (*sdk.Result, error) {
+	fmt.Println("Recieved Msg Register Peer")
 	store := k.GetPeerStore(ctx)
 	var peer types.Peer
 	peer.Id = msg.Id
