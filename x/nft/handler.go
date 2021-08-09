@@ -81,6 +81,7 @@ func handleMsgCreateNft(goCtx sdk.Context, k keeper.Keeper, msg *types.MsgCreate
 
 func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) (*sdk.Result, error) {
 	k.Logger(ctx).Debug("Publish file message received", "id", msg.Id)
+	fmt.Println("Publish file message recieved")
 	var metainfo metainfo.MetaInfo
 	bencode.DecodeBytes(msg.Metainfo, &metainfo)
 	k.BtClient.RetrieveFile(&metainfo)
@@ -96,6 +97,8 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 		UserId: msg.UserId,
 		Mime: msg.Mime,
 	}
+	fmt.Println("writing .info file")
+
 	err = ioutil.WriteFile(k.HomeDir+"/nft/"+msg.Hash+".info", k.Cdc.MustMarshalJSON(&info), 0666)
 	if err != nil {
 		return nil, err
