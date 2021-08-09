@@ -94,6 +94,7 @@ func updateAccountState(accnt exported.Account, state AccountState) (AccountStat
 }
 
 func resetAccountState(accnt exported.Account, state AccountState) (AccountState, error) {
+	time.Sleep(6 * time.Second)
 	state.accntNum = accnt.GetAccountNumber()
 	state.seqNum = accnt.GetSequence()
 	state.requested = true
