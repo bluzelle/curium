@@ -11,6 +11,7 @@ import (
 	"github.com/zeebo/bencode"
 	"io/ioutil"
 	"os"
+	"time"
 )
 
 func NewHandler(keeper keeper.Keeper) sdk.Handler {
@@ -85,6 +86,7 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 	var metainfo metainfo.MetaInfo
 	bencode.DecodeBytes(msg.Metainfo, &metainfo)
 	k.BtClient.RetrieveFile(&metainfo)
+	time.Sleep(time.Second * 20)
 	k.EnsureNftDirExists()
 	fmt.Println("Creating symlink")
 	fmt.Println("Linking new file", `k.HomeDir+"/nft/"+msg.Vendor + "-" + msg.Id`)
