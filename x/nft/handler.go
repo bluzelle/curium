@@ -90,8 +90,10 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 	err := os.Symlink(k.HomeDir+"/nft/"+msg.Hash, k.HomeDir+"/nft/"+msg.Vendor + "-" + msg.Id)
 
 	if err != nil {
+		fmt.Println("First symlink failed")
 		return nil, err
 	}
+	fmt.Println("Filling nft info struct")
 	info := types.NftInfo{
 		Id:   msg.Id,
 		Vendor: msg.Vendor,
