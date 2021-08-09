@@ -171,7 +171,6 @@ func (k Keeper) NewMsgBroadcaster(keyringDir string, cdc *codec.Codec) MsgBroadc
 }
 
 func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *codec.Codec, curiumKeeper Keeper, accKeeper *keeper.AccountKeeper, ctx sdk.Context, msgs []sdk.Msg, from string, state AccountState) {
-	fmt.Println("MESSAGES THAT ARE BEING BROADCASTED", msgs[0], msgs[0].Type())
 	returnError := func(err error) {
 		resp <- &MsgBroadcasterResponse{
 			Error: err,
@@ -221,11 +220,7 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 		return
 	}
 
-
-	fmt.Println("Seq num before", state.seqNum)
 	state, err = updateAccountState(accnt, state)
-	fmt.Println("Seq num after", state.seqNum)
-
 
 	if err != nil {
 		returnError(err)
@@ -263,7 +258,6 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 	rpcCtx := rpctypes.Context{}
 
 	broadcastResult, err := core.BroadcastTxSync(&rpcCtx, signedMsgs)
-	fmt.Println("***BROADCASTRESULT***", broadcastResult.Log)
 	if err != nil {
 		returnError(err)
 		return
@@ -277,11 +271,11 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 	}
 
 
-	//if state.reset {
-	//	fmt.Println("Extended beyond retry limit")
-	//	returnError(errors.New(broadcastResult.Log))
-	//	return
-	//}
+	if state.reset {
+		fmt.Println("Exceeded retry limit")
+		returnError(errors.New(broadcastResult.Log))
+		return
+	}
 
 	if accntSeqString.MatchString(broadcastResult.Log) {
 		returnError(errors.New("Sequencing error, retrying broadcast"))
@@ -299,10 +293,8 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 
 	result, err := pollForTransaction(rpcCtx, broadcastResult.Hash)
 
-	fmt.Println("***POLLRESULT***", result.TxResult, err)
 
 	if err != nil {
-		fmt.Println("Polling error", err)
 		returnError(err)
 		return
 	}
