@@ -290,7 +290,9 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 			return
 		}
 
-		DoBroadcast(resp, keyringDir, cdc, curiumKeeper, accKeeper, ctx, msgs, from, newAccntState)
+		go func () {
+			DoBroadcast(resp, keyringDir, cdc, curiumKeeper, accKeeper, ctx, msgs, from, newAccntState)
+		}()
 		return
 	}
 
