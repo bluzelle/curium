@@ -276,11 +276,11 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 	}
 
 
-	if state.reset {
-		fmt.Println("Extended beyond retry limit")
-		returnError(errors.New(broadcastResult.Log))
-		return
-	}
+	//if state.reset {
+	//	fmt.Println("Extended beyond retry limit")
+	//	returnError(errors.New(broadcastResult.Log))
+	//	return
+	//}
 
 	if accntSeqString.MatchString(broadcastResult.Log) {
 		returnError(errors.New("Sequencing error, retrying broadcast"))
