@@ -87,10 +87,14 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 	k.BtClient.RetrieveFile(&metainfo)
 	k.EnsureNftDirExists()
 	fmt.Println("Creating symlink")
+	fmt.Println("Linking new file", `k.HomeDir+"/nft/"+msg.Vendor + "-" + msg.Id`)
+	fileInfo, fileErr := os.Stat(k.HomeDir+"/nft/"+msg.Hash)
+	fmt.Println(fileInfo, fileErr)
 	err := os.Symlink(k.HomeDir+"/nft/"+msg.Hash, k.HomeDir+"/nft/"+msg.Vendor + "-" + msg.Id)
 
 	if err != nil {
 		fmt.Println("First symlink failed")
+		fmt.Println(err)
 		return nil, err
 	}
 	fmt.Println("Filling nft info struct")
