@@ -171,7 +171,7 @@ func (k Keeper) NewMsgBroadcaster(keyringDir string, cdc *codec.Codec) MsgBroadc
 }
 
 func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *codec.Codec, curiumKeeper Keeper, accKeeper *keeper.AccountKeeper, ctx sdk.Context, msgs []sdk.Msg, from string, state AccountState) {
-
+	fmt.Println("MESSAGES THAT ARE BEING BROADCASTED", msgs[0], msgs[0].Type())
 	returnError := func(err error) {
 		resp <- &MsgBroadcasterResponse{
 			Error: err,
