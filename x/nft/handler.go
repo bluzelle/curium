@@ -86,6 +86,7 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 	bencode.DecodeBytes(msg.Metainfo, &metainfo)
 	k.BtClient.RetrieveFile(&metainfo)
 	k.EnsureNftDirExists()
+	fmt.Println("Creating symlink")
 	err := os.Symlink(k.HomeDir+"/nft/"+msg.Hash, k.HomeDir+"/nft/"+msg.Vendor + "-" + msg.Id)
 
 	if err != nil {
@@ -103,6 +104,7 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("Writing id symlink")
 	err = os.Symlink(k.HomeDir+"/nft/"+msg.Hash+".info", k.HomeDir+"/nft/"+msg.Vendor + "-" + msg.Id+".info")
 	if err != nil {
 		return nil, err

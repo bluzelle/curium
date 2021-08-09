@@ -220,9 +220,11 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 		return
 	}
 
-
-
+	fmt.Println(msgs)
+	fmt.Println("Seq num before", state.seqNum)
 	state, err = updateAccountState(accnt, state)
+	fmt.Println("Seq num after", state.seqNum)
+
 
 	if err != nil {
 		returnError(err)
@@ -260,7 +262,7 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 	rpcCtx := rpctypes.Context{}
 
 	broadcastResult, err := core.BroadcastTxSync(&rpcCtx, signedMsgs)
-
+	fmt.Println(broadcastResult.Log)
 	if err != nil {
 		returnError(err)
 		return
@@ -275,6 +277,7 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 
 
 	if state.reset {
+		fmt.Println("Extended beyond retry limit")
 		returnError(errors.New(broadcastResult.Log))
 		return
 	}
@@ -297,6 +300,8 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 		returnError(err)
 		return
 	}
+
+	fmt.Println(result.TxResult)
 
 	resp <- &MsgBroadcasterResponse{
 		Response: &result.TxResult,
