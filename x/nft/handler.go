@@ -86,33 +86,28 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 	bencode.DecodeBytes(msg.Metainfo, &metainfo)
 	k.BtClient.RetrieveFile(&metainfo)
 	k.EnsureNftDirExists()
-	fmt.Println("Creating symlink")
-	fmt.Println("Linking new file", `k.HomeDir+"/nft/"+msg.Vendor + "-" + msg.Id`)
-	fileInfo, fileErr := os.Stat(k.HomeDir+"/nft/"+msg.Hash)
-	fmt.Println(fileInfo, fileErr)
+
+
+
 	err := os.Symlink(k.HomeDir+"/nft/"+msg.Hash, k.HomeDir+"/nft/"+msg.Vendor + "-" + msg.Id)
 
 	if err != nil {
-		fmt.Println("First symlink failed")
-		fmt.Println("printing error")
-		fmt.Println(err)
-		fmt.Println("finished printing error")
+
 		return nil, err
 	}
-	fmt.Println("Filling nft info struct")
+
 	info := types.NftInfo{
 		Id:   msg.Id,
 		Vendor: msg.Vendor,
 		UserId: msg.UserId,
 		Mime: msg.Mime,
 	}
-	fmt.Println("writing .info file")
+
 
 	err = ioutil.WriteFile(k.HomeDir+"/nft/"+msg.Hash+".info", k.Cdc.MustMarshalJSON(&info), 0666)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("Writing id symlink")
 	err = os.Symlink(k.HomeDir+"/nft/"+msg.Hash+".info", k.HomeDir+"/nft/"+msg.Vendor + "-" + msg.Id+".info")
 	if err != nil {
 		fmt.Println("error writing vendor symlink")

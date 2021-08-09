@@ -220,7 +220,7 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 		return
 	}
 
-	fmt.Println(msgs)
+
 	fmt.Println("Seq num before", state.seqNum)
 	state, err = updateAccountState(accnt, state)
 	fmt.Println("Seq num after", state.seqNum)
@@ -262,7 +262,7 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 	rpcCtx := rpctypes.Context{}
 
 	broadcastResult, err := core.BroadcastTxSync(&rpcCtx, signedMsgs)
-	fmt.Println(broadcastResult.Log)
+	fmt.Println("***BROADCASTRESULT***", broadcastResult.Log)
 	if err != nil {
 		returnError(err)
 		return
@@ -296,12 +296,13 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 
 	result, err := pollForTransaction(rpcCtx, broadcastResult.Hash)
 
+	fmt.Println("***POLLRESULT***", result.TxResult, err)
+
 	if err != nil {
+		fmt.Println("Polling error", err)
 		returnError(err)
 		return
 	}
-
-	fmt.Println(result.TxResult)
 
 	resp <- &MsgBroadcasterResponse{
 		Response: &result.TxResult,
