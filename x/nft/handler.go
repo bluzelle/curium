@@ -11,7 +11,6 @@ import (
 	"github.com/zeebo/bencode"
 	"io/ioutil"
 	"os"
-	"time"
 )
 
 func NewHandler(keeper keeper.Keeper) sdk.Handler {
@@ -86,7 +85,6 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 	var metainfo metainfo.MetaInfo
 	bencode.DecodeBytes(msg.Metainfo, &metainfo)
 	k.BtClient.RetrieveFile(&metainfo)
-	time.Sleep(time.Second * 20)
 	k.EnsureNftDirExists()
 	fmt.Println("Creating symlink")
 	fmt.Println("Linking new file", `k.HomeDir+"/nft/"+msg.Vendor + "-" + msg.Id`)
@@ -96,7 +94,9 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 
 	if err != nil {
 		fmt.Println("First symlink failed")
+		fmt.Println("printing error")
 		fmt.Println(err)
+		fmt.Println("finished printing error")
 		return nil, err
 	}
 	fmt.Println("Filling nft info struct")
@@ -115,6 +115,7 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 	fmt.Println("Writing id symlink")
 	err = os.Symlink(k.HomeDir+"/nft/"+msg.Hash+".info", k.HomeDir+"/nft/"+msg.Vendor + "-" + msg.Id+".info")
 	if err != nil {
+		fmt.Println("error writing vendor symlink")
 		return nil, err
 	}
 	return &sdk.Result{}, nil
