@@ -1,23 +1,16 @@
 package oracle
 
 import (
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"github.com/bluzelle/curium/x/oracle/keeper"
 	"github.com/bluzelle/curium/x/oracle/types"
-	clientKeys "github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/codec"
-	cryptoKeys "github.com/cosmos/cosmos-sdk/crypto/keys"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/robfig/cron/v3"
 	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/libs/log"
-	"github.com/tendermint/tendermint/rpc/core"
-	"github.com/tendermint/tendermint/rpc/core/types"
-	rpctypes "github.com/tendermint/tendermint/rpc/jsonrpc/types"
 	nestedJson "github.com/wenxiang/go-nestedjson"
 	"io/ioutil"
 	"net/http"
@@ -32,7 +25,7 @@ var logger = log.NewTMLogger(log.NewSyncWriter(os.Stdout))
 
 var accountKeeper auth.AccountKeeper
 
-func RunFeeder(oracleKeeper Keeper, accKeeper auth.AccountKeeper, cdc *codec.Codec) {
+func RunFeeder(ctx sdk.Context, oracleKeeper Keeper, accKeeper auth.AccountKeeper, cdc *codec.Codec) {
 	logger.Info("Starting oracle feeder service")
 	accountKeeper = accKeeper
 
@@ -43,7 +36,7 @@ func RunFeeder(oracleKeeper Keeper, accKeeper auth.AccountKeeper, cdc *codec.Cod
 			return
 		}
 		logger.Info("Oracle feeder run", "Valcons", keeper.GetValconsAddress())
-		GetValueAndSendProofAndVote(oracleKeeper, cdc)
+		GetValueAndSendProofAndVote(ctx, oracleKeeper, cdc)
 	})
 	c.Start()
 }
@@ -53,14 +46,14 @@ type SourceAndValue struct {
 	value  float64
 }
 
-func GetValueAndSendProofAndVote(oracleKeeper Keeper, cdc *codec.Codec) {
+func GetValueAndSendProofAndVote(ctx sdk.Context, oracleKeeper Keeper, cdc *codec.Codec) {
 	sources, _ := oracleKeeper.ListSources(*currCtx)
 	logger.Info("Oracle fetching from sources", "count", len(sources))
 	if len(sources) > 0 {
 		values := fetchValues(sources)
-		sendPreflightMsgs(values, cdc)
+		sendPreflightMsgs(ctx, values, cdc, oracleKeeper)
 		time.AfterFunc(time.Second*20, func() {
-			sendVoteMsgs(values, cdc)
+			sendVoteMsgs(ctx, values, cdc, oracleKeeper)
 		})
 	}
 }
@@ -142,28 +135,29 @@ func readValueFromJson(jsonIn []byte, prop string) (float64, error) {
 	return out, nil
 }
 
-func sendPreflightMsgs(values []SourceAndValue, cdc *codec.Codec) string {
+func sendPreflightMsgs(ctx sdk.Context, values []SourceAndValue, cdc *codec.Codec, keeper Keeper) string {
 	var msgs []sdk.Msg
 	for _, value := range values {
 		msg, _ := generateVoteProofMsg(cdc, value)
 		msgs = append(msgs, msg)
 	}
 	logger.Info("Sending oracle proof messages", "count", len(msgs))
-	result, _ := BroadcastOracleMessages(msgs, cdc)
-	logger.Info("Oracle proof messages sent", "hash", result.Hash)
-	return hex.EncodeToString(result.Hash)
+	result := <- keeper.MsgBroadcaster(ctx, msgs, "oracle")
+
+	logger.Info("Oracle proof messages sent", "response", result.Response.Log)
+	return result.Response.Log
 }
 
-func sendVoteMsgs(values []SourceAndValue, cdc *codec.Codec) string {
+func sendVoteMsgs(ctx sdk.Context, values []SourceAndValue, cdc *codec.Codec, keeper Keeper) string {
 	var msgs []sdk.Msg
 	for _, value := range values {
 		msg, _ := generateVoteMsg(cdc, value)
 		msgs = append(msgs, msg)
 	}
 	logger.Info("Sending feeder vote messages", "count", len(msgs))
-	result, _ := BroadcastOracleMessages(msgs, cdc)
-	logger.Info("Feeder vote messages sent", "hash", result.Hash)
-	return hex.EncodeToString(result.Hash)
+	result := <- keeper.MsgBroadcaster(ctx, msgs, "oracle")
+	logger.Info("Feeder vote messages sent", "hash", result.Response.Log)
+	return result.Response.Log
 }
 
 func generateVoteMsg(cdc *codec.Codec, source SourceAndValue) (types.MsgOracleVote, error) {
@@ -215,50 +209,6 @@ func generateVoteProofMsg(cdc *codec.Codec, source SourceAndValue) (types.MsgOra
 	return msg, nil
 }
 
-func BroadcastOracleMessages(msgs []sdk.Msg, cdc *codec.Codec) (*coretypes.ResultBroadcastTxCommit, error) {
-	config, err := readOracleConfig()
-	if err != nil {
-		return nil, err
-	}
-
-	keybase := clientKeys.NewInMemoryKeyBase()
-	account, err := keybase.CreateAccount("oracle", config.UserMnemonic, cryptoKeys.DefaultBIP39Passphrase, clientKeys.DefaultKeyPass, "44'/118'/0'/0/0", cryptoKeys.Secp256k1)
-
-	if err != nil {
-		logger.Info("Error creating keybase account", err)
-	}
-
-	address := account.GetAddress()
-	acc := accountKeeper.GetAccount(*currCtx, address)
-
-	minGasPrice := strings.Replace(viper.GetString("minimum-gas-prices"), "ubnt", "", 1)
-	gasPrice, _ := sdk.NewDecFromStr(minGasPrice)
-	txBldr := auth.NewTxBuilder(
-		utils.GetTxEncoder(cdc),
-		acc.GetAccountNumber(),
-		acc.GetSequence(),
-		10000000,
-		1,
-		false,
-		currCtx.ChainID(),
-		"memo", nil,
-		sdk.NewDecCoins(sdk.NewDecCoinFromDec("ubnt", gasPrice)),
-	).WithKeybase(keybase)
-
-	signedMsg, err := txBldr.BuildAndSign("oracle", clientKeys.DefaultKeyPass, msgs)
-	if err == nil {
-		rpcCtx := rpctypes.Context{}
-		result, err := core.BroadcastTxCommit(&rpcCtx, signedMsg)
-		if err != nil {
-			logger.Info("Error transmitting feeder messages")
-		}
-		return result, nil
-	}
-
-	return nil, err
-
-}
-
 var currCtx *sdk.Context
 
 func StartFeeder(oracleKeeper Keeper, accountKeeper auth.AccountKeeper, cdc *codec.Codec) {
@@ -268,7 +218,7 @@ func StartFeeder(oracleKeeper Keeper, accountKeeper auth.AccountKeeper, cdc *cod
 		}
 	}()
 	waitForCtx()
-	RunFeeder(oracleKeeper, accountKeeper, cdc)
+	RunFeeder(*currCtx, oracleKeeper, accountKeeper, cdc)
 }
 
 func waitForCtx() {

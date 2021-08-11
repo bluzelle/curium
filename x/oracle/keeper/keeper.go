@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+	curium "github.com/bluzelle/curium/x/curium/keeper"
 	"github.com/bluzelle/curium/x/oracle/types"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -22,15 +23,17 @@ var valueUpdateListeners []types.ValueUpdateListener = make([]types.ValueUpdateL
 type Keeper struct {
 	storeKey sdk.StoreKey
 	stakingKeeper  staking.Keeper
+	MsgBroadcaster curium.MsgBroadcaster
 	cdc            *codec.Codec
 	paramspace     types.ParamSubspace
 }
 
 // NewKeeper creates a oracle keeper
-func NewKeeper(cdc *codec.Codec, storeKey sdk.StoreKey, stakingKeeper staking.Keeper, paramspace types.ParamSubspace) Keeper {
+func NewKeeper(cdc *codec.Codec, storeKey sdk.StoreKey, stakingKeeper staking.Keeper, msgBroadcaster curium.MsgBroadcaster, paramspace types.ParamSubspace) Keeper {
 	keeper := Keeper{
 		storeKey: storeKey,
 		stakingKeeper:  stakingKeeper,
+		MsgBroadcaster: msgBroadcaster,
 		cdc:            cdc,
 		//		paramspace: paramspace.WithKeyTable(types.ParamKeyTable()),
 	}

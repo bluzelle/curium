@@ -359,10 +359,13 @@ func NewCRUDApp(
 		crud.MaxKeeperSizes{MaxKeysSize: maxKeysSize, MaxKeyValuesSize: maxKeyValuesSize, MaxDefaultLeaseBlocks: DefaultLeaseBlockHeight},
 	)
 
+	oracleMsgBroadcaster := app.curiumKeeper.NewMsgBroadcaster(DefaultCLIHome, cdc)
+
 	app.oracleKeeper = oracle.NewKeeper(
 		app.cdc,
 		keys[oracle.StoreKey],
 		app.stakingKeeper,
+		oracleMsgBroadcaster,
 		nil,
 	)
 
