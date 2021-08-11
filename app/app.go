@@ -366,6 +366,7 @@ func NewCRUDApp(
 		keys[oracle.StoreKey],
 		app.stakingKeeper,
 		oracleMsgBroadcaster,
+		curium.NewKeyringReader(DefaultCLIHome),
 		nil,
 	)
 

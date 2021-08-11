@@ -1,15 +1,14 @@
 package oracle
 
 import (
-	"errors"
 	"fmt"
+	curium "github.com/bluzelle/curium/x/curium/keeper"
 	"github.com/bluzelle/curium/x/oracle/keeper"
 	"github.com/bluzelle/curium/x/oracle/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/robfig/cron/v3"
-	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/libs/log"
 	nestedJson "github.com/wenxiang/go-nestedjson"
 	"io/ioutil"
@@ -53,7 +52,7 @@ func GetValueAndSendProofAndVote(ctx sdk.Context, oracleKeeper Keeper, cdc *code
 		values := fetchValues(sources)
 		sendPreflightMsgs(ctx, values, cdc, oracleKeeper)
 		time.AfterFunc(time.Second*20, func() {
-			sendVoteMsgs(ctx, values, cdc, oracleKeeper)
+			sendVoteMsgs(ctx, values, oracleKeeper)
 		})
 	}
 }
@@ -138,7 +137,7 @@ func readValueFromJson(jsonIn []byte, prop string) (float64, error) {
 func sendPreflightMsgs(ctx sdk.Context, values []SourceAndValue, cdc *codec.Codec, keeper Keeper) string {
 	var msgs []sdk.Msg
 	for _, value := range values {
-		msg, _ := generateVoteProofMsg(cdc, value)
+		msg, _ := generateVoteProofMsg(value, keeper.KeyringReader)
 		msgs = append(msgs, msg)
 	}
 	logger.Info("Sending oracle proof messages", "count", len(msgs))
@@ -148,10 +147,10 @@ func sendPreflightMsgs(ctx sdk.Context, values []SourceAndValue, cdc *codec.Code
 	return result.Response.Log
 }
 
-func sendVoteMsgs(ctx sdk.Context, values []SourceAndValue, cdc *codec.Codec, keeper Keeper) string {
+func sendVoteMsgs(ctx sdk.Context, values []SourceAndValue, keeper Keeper) string {
 	var msgs []sdk.Msg
 	for _, value := range values {
-		msg, _ := generateVoteMsg(cdc, value)
+		msg, _ := generateVoteMsg(value, keeper.KeyringReader)
 		msgs = append(msgs, msg)
 	}
 	logger.Info("Sending feeder vote messages", "count", len(msgs))
@@ -160,15 +159,15 @@ func sendVoteMsgs(ctx sdk.Context, values []SourceAndValue, cdc *codec.Codec, ke
 	return result.Response.Log
 }
 
-func generateVoteMsg(cdc *codec.Codec, source SourceAndValue) (types.MsgOracleVote, error) {
-	config, err := readOracleConfig()
+func generateVoteMsg(source SourceAndValue, keyringReader *curium.KeyringReader) (types.MsgOracleVote, error) {
+	oracleAddr, err := keyringReader.GetAddress("oracle")
 	if err != nil {
 		return types.MsgOracleVote{}, err
 	}
 	msg := types.NewMsgOracleVote(
 		keeper.GetValconsAddress(),
 		fmt.Sprintf("%.12f", source.value),
-		config.UserAddress,
+		oracleAddr,
 		source.source.Name,
 		getCurrentBatchId(),
 	)
@@ -192,15 +191,15 @@ func getCurrentBatchId() string {
 	return t
 }
 
-func generateVoteProofMsg(cdc *codec.Codec, source SourceAndValue) (types.MsgOracleVoteProof, error) {
-	config, err := readOracleConfig()
+func generateVoteProofMsg(source SourceAndValue, keyringReader *curium.KeyringReader) (types.MsgOracleVoteProof, error) {
+	oracleAddr, err := keyringReader.GetAddress("oracle")
 	if err != nil {
 		return types.MsgOracleVoteProof{}, err
 	}
 
 	proof := keeper.CalculateProofSig(fmt.Sprintf("%.12f", source.value))
 	valcons := keeper.GetValconsAddress()
-	msg := types.NewMsgOracleVoteProof(valcons, proof, config.UserAddress, source.source.Name)
+	msg := types.NewMsgOracleVoteProof(valcons, proof, oracleAddr, source.source.Name)
 	err = msg.ValidateBasic()
 	if err != nil {
 		logger.Info("Error generating vote proof message", source.source.Name)
@@ -228,14 +227,3 @@ func waitForCtx() {
 	}
 }
 
-func readOracleConfig() (types.LocalOracleConfig, error) {
-	address, err := sdk.AccAddressFromBech32(viper.GetString("oracle-user-address"))
-	if err != nil {
-		errors.New("unable to read oracle address from app.toml")
-	}
-
-	return types.LocalOracleConfig{
-		UserAddress:  address,
-		UserMnemonic: viper.GetString("oracle-user-mnemonic"),
-	}, nil
-}

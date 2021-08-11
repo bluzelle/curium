@@ -24,16 +24,18 @@ type Keeper struct {
 	storeKey sdk.StoreKey
 	stakingKeeper  staking.Keeper
 	MsgBroadcaster curium.MsgBroadcaster
+	KeyringReader *curium.KeyringReader
 	cdc            *codec.Codec
 	paramspace     types.ParamSubspace
 }
 
 // NewKeeper creates a oracle keeper
-func NewKeeper(cdc *codec.Codec, storeKey sdk.StoreKey, stakingKeeper staking.Keeper, msgBroadcaster curium.MsgBroadcaster, paramspace types.ParamSubspace) Keeper {
+func NewKeeper(cdc *codec.Codec, storeKey sdk.StoreKey, stakingKeeper staking.Keeper, msgBroadcaster curium.MsgBroadcaster, keyringReader *curium.KeyringReader, paramspace types.ParamSubspace) Keeper {
 	keeper := Keeper{
 		storeKey: storeKey,
 		stakingKeeper:  stakingKeeper,
 		MsgBroadcaster: msgBroadcaster,
+		KeyringReader: keyringReader,
 		cdc:            cdc,
 		//		paramspace: paramspace.WithKeyTable(types.ParamKeyTable()),
 	}
