@@ -118,9 +118,11 @@ func getAccountAddress(keyring cryptoKeys.Keybase, from string) (sdk.AccAddress,
 }
 
 func (reader KeyringReader) GetAddress(from string) (sdk.AccAddress, error) {
+	fmt.Println("getting address of ", from)
 	keyring, err := getKeyring(reader.keyringDir)
 
 	if err != nil {
+		fmt.Println("error getting address of ", from, err)
 		return nil, err
 	}
 
@@ -171,6 +173,7 @@ func (k Keeper) NewMsgBroadcaster(keyringDir string, cdc *codec.Codec) MsgBroadc
 }
 
 func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *codec.Codec, curiumKeeper Keeper, accKeeper *keeper.AccountKeeper, ctx sdk.Context, msgs []sdk.Msg, from string, state AccountState) {
+	fmt.Println("Doing broadcast")
 	returnError := func(err error) {
 		resp <- &MsgBroadcasterResponse{
 			Error: err,

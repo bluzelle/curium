@@ -194,6 +194,7 @@ func getCurrentBatchId() string {
 func generateVoteProofMsg(source SourceAndValue, keyringReader *curium.KeyringReader) (types.MsgOracleVoteProof, error) {
 	oracleAddr, err := keyringReader.GetAddress("oracle")
 	if err != nil {
+		fmt.Println("Error getting address for generating vote proof message")
 		return types.MsgOracleVoteProof{}, err
 	}
 
