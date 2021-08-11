@@ -33,7 +33,8 @@ type SetUpContextDecorator struct{
 	minGasPriceCoins sdk.DecCoins
 }
 
-func NewSetUpContextDecorator(gasMeterKeeper *gasmeter.GasMeterKeeper, supplyKeeper banktypes.SupplyKeeper, accountKeeper acctypes.AccountKeeper, minGasPriceCoins sdk.DecCoins) SetUpContextDecorator {
+
+func NewSetupContextDecorator(gasMeterKeeper *gasmeter.GasMeterKeeper, supplyKeeper banktypes.SupplyKeeper, accountKeeper acctypes.AccountKeeper, minGasPriceCoins sdk.DecCoins) SetUpContextDecorator {
 	return SetUpContextDecorator{
 		gasMeterKeeper:   gasMeterKeeper,
 		supplyKeeper:       supplyKeeper,
@@ -114,6 +115,12 @@ func SetGasMeter(simulate bool, ctx sdk.Context, gasLimit uint64, tx sdk.Tx, gk 
 	if msgModule == "crud" && !simulate && !ctx.IsCheckTx() { //TODO msg module for nft
 		gm := gasmeter.NewChargingGasMeter(supplyKeeper, accountKeeper, gasLimit, feePayer, gasPriceCoins)
 
+		gk.AddGasMeter(&gm)
+		return ctx.WithGasMeter(gm), nil
+	}
+
+	if (msgModule == "oracle" || msgModule == "nft") {
+		gm := gasmeter.NewFreeGasMeter(gasLimit)
 		gk.AddGasMeter(&gm)
 		return ctx.WithGasMeter(gm), nil
 	}

@@ -20,7 +20,7 @@ func NewAnteHandler(
 	minGasPriceCoins sdk.DecCoins,
 ) sdk.AnteHandler {
 	return sdk.ChainAnteDecorators(
-		NewSetUpContextDecorator(gasMeterKeeper, supplyKeeper, accountKeeper, minGasPriceCoins), // outermost AnteDecorator. SetUpContext must be called first
+		NewSetupContextDecorator(gasMeterKeeper, supplyKeeper, accountKeeper, minGasPriceCoins), // outermost AnteDecorator. SetUpContext must be called first
 		NewMempoolFeeDecorator(),
 		ante.NewValidateBasicDecorator(),
 		ante.NewValidateMemoDecorator(accountKeeper),
