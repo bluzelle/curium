@@ -348,6 +348,17 @@ func NewCRUDApp(
 			app.slashingKeeper.Hooks()),
 	)
 
+	laddr, _ := getRpcLadder(DefaultNodeHome)
+
+	app.curiumKeeper = curium.NewKeeper(
+		app.cdc,
+		keys[curium.StoreKey],
+		keys[curium.MemStoreKey],
+		laddr,
+		app.accountKeeper,
+		app.gasMeterKeeper,
+	)
+
 	// The CrudKeeper is the Keeper from the module
 	// It handles interactions with the namestore
 	app.crudKeeper = crud.NewKeeper(
@@ -393,23 +404,13 @@ func NewCRUDApp(
 		app.supplyKeeper,
 	)
 
-	laddr, _ := getRpcLadder(DefaultNodeHome)
 
-	app.curiumKeeper = curium.NewKeeper(
-		app.cdc,
-		keys[curium.StoreKey],
-		keys[curium.MemStoreKey],
-		laddr,
-		app.accountKeeper,
-		app.gasMeterKeeper,
-		)
 
 	nftFileDir, _ := getNftFileDir(DefaultNodeHome)
 	nft2P2pPort, _ := getNftP2PPort(DefaultNodeHome)
 	nftP2PPort, _  := strconv.Atoi(nft2P2pPort)
 
 	msgBroadcaster := app.curiumKeeper.NewMsgBroadcaster(DefaultCLIHome, cdc)
-
 
 	app.nftKeeper = nft.NewKeeper(
 		app.cdc,
