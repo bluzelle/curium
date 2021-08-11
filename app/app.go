@@ -350,6 +350,9 @@ func NewCRUDApp(
 
 	laddr, _ := getRpcLadder(DefaultNodeHome)
 
+	app.gasMeterKeeper = gasmeter.NewGasMeterKeeper()
+
+
 	app.curiumKeeper = curium.NewKeeper(
 		app.cdc,
 		keys[curium.StoreKey],
@@ -396,7 +399,6 @@ func NewCRUDApp(
 		keys[faucet.StoreKey],
 		app.cdc)
 
-	app.gasMeterKeeper = gasmeter.NewGasMeterKeeper()
 
 	app.taxKeeper = tax.NewKeeper(
 		keys[tax.StoreKey],
