@@ -143,7 +143,7 @@ func getNftFileDir (nodeHome string) (string, error) {
 	if viper.ReadInConfig() == nil {
 
 		if viper.IsSet("nft-file-dir") {
-			return viper.GetString("nft-file-dir"), nil
+			return DefaultNodeHome + "/" + viper.GetString("nft-file-dir"), nil
 		}
 
 	}

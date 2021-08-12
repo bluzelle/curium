@@ -156,7 +156,6 @@ func checkBroadcastPeer(ctx sdk.Context, am AppModule) {
 		am.keeper.Logger(ctx).Error("nft user does not exist in keyring", "nft", err)
 	} else {
 		broadcastPeerOnce.Do(func() {
-			startTorrentClient(ctx, am)
 
 			fmt.Println("Doing broadcast register peer")
 
@@ -177,7 +176,7 @@ func checkBroadcastPeer(ctx sdk.Context, am AppModule) {
 func startTorrentClient(ctx sdk.Context, am AppModule) {
 	btClient, err := torrentClient.NewTorrentClient(am.btDirectory, am.btPort)
 	if err != nil {
-		am.keeper.Logger(ctx).Error("Error creating btClient", "btClient", err)
+		am.keeper.Logger(ctx).Error("Error creating btClient", "error", err)
 	}
 
 	fmt.Println("Bt client before setting", am.keeper.GetBtClient())
