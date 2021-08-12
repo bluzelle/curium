@@ -176,10 +176,10 @@ func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.Val
 			defer func() {
 				go func() {
 					time.Sleep(time.Second)
-					err := am.keeper.BroadcastRegisterBtPeer(ctx)
-					if err != nil {
-						am.keeper.Logger(ctx).Error("Broadcast Register Bt Peer failed", "error", err)
-					}
+					//err := am.keeper.BroadcastRegisterBtPeer(ctx)
+					//if err != nil {
+					//	am.keeper.Logger(ctx).Error("Broadcast Register Bt Peer failed", "error", err)
+					//}
 				}()
 			}()
 		})
