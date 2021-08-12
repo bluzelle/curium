@@ -6,6 +6,7 @@ import (
 	nft "github.com/bluzelle/curium/x/nft/keeper"
 	nftTypes "github.com/bluzelle/curium/x/nft/types"
 	"github.com/bluzelle/curium/x/torrentClient"
+	"github.com/cosmos/cosmos-sdk/x/auth"
 	"sync"
 
 	"github.com/gorilla/mux"
@@ -78,16 +79,18 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 type AppModule struct {
 	AppModuleBasic
 	keeper nft.Keeper
+	accKeeper auth.AccountKeeper
 	btDirectory string
 	btPort int
 	// TODO: Add keepers that your application depends on
 }
 
 // NewAppModule creates a new AppModule object
-func NewAppModule(k nft.Keeper, btDirectory string, btPort int /*TODO: Add Keepers that your application depends on*/) AppModule {
+func NewAppModule(k nft.Keeper, accKeeper auth.AccountKeeper, btDirectory string, btPort int /*TODO: Add Keepers that your application depends on*/) AppModule {
 	return AppModule{
 		AppModuleBasic:      AppModuleBasic{},
 		keeper:              k,
+		accKeeper: accKeeper,
 		btDirectory: btDirectory,
 		btPort: btPort,
 		// TODO: Add keepers that your application depends on
@@ -158,7 +161,7 @@ func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.Val
 		am.keeper.SetBtClient(btClient)
 	})
 
-	err := am.keeper.CheckNftUserExists(am.keeper.KeyringReader)
+	err := am.keeper.CheckNftUserExists(ctx, am.keeper.KeyringReader, am.accKeeper)
 	fmt.Println("Checking nft user exists", err)
 	if err != nil {
 		am.keeper.Logger(ctx).Error("nft user does not exist in keyring", "nft", err)

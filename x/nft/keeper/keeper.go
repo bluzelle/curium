@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"errors"
 	"fmt"
 	"github.com/bluzelle/curium/x/curium"
 	"github.com/bluzelle/curium/x/curium/keeper"
@@ -10,6 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/tendermint/tendermint/libs/log"
 	"os"
 )
@@ -67,9 +69,20 @@ func (k Keeper) GetCdc() *codec.Codec {
 	return k.Cdc
 }
 
-func (k Keeper) CheckNftUserExists(reader *curium.KeyringReader) error {
-	_, err := reader.GetAddress("nft")
-	return err
+func (k Keeper) CheckNftUserExists(ctx sdk.Context, reader *curium.KeyringReader, accKeeper auth.AccountKeeper) error {
+	address, err := reader.GetAddress("nft")
+
+	if err != nil {
+		return err
+	}
+
+	account := accKeeper.GetAccount(ctx, address)
+
+	if account == nil {
+		return errors.New("Nft account does not exist yet")
+	}
+
+	return nil
 }
 
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {

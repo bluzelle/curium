@@ -443,7 +443,7 @@ func NewCRUDApp(
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
 		oracle.NewAppModule(app.oracleKeeper),
 		aggregator.NewAppModule(app.aggKeeper),
-		nft.NewAppModule(*app.nftKeeper, nftFileDir, nftP2PPort),
+		nft.NewAppModule(*app.nftKeeper, app.accountKeeper, nftFileDir, nftP2PPort),
 		curium.NewAppModule(*app.curiumKeeper),
 	)
 
