@@ -7,11 +7,9 @@ import (
 	nftTypes "github.com/bluzelle/curium/x/nft/types"
 	"github.com/bluzelle/curium/x/torrentClient"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	"sync"
-	"time"
-
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
+	"sync"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
@@ -161,7 +159,6 @@ func checkBroadcastPeer(ctx sdk.Context, am AppModule) {
 
 			defer func() {
 				go func() {
-					time.Sleep(time.Second * 20000)
 					err := am.keeper.BroadcastRegisterBtPeer(ctx)
 					if err != nil {
 						am.keeper.Logger(ctx).Error("Broadcast Register Bt Peer failed", "error", err)
