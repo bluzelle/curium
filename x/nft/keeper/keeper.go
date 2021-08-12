@@ -15,6 +15,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	"os"
 )
+var btClient *torrentClient.TorrentClient
 
 type (
 	Keeper struct {
@@ -27,7 +28,7 @@ type (
 		MsgBroadcaster curium.MsgBroadcaster
 		curiumKeeper   *curium.Keeper
 		KeyringReader *keeper.KeyringReader
-		btClient      *torrentClient.TorrentClient
+		BtClient      *torrentClient.TorrentClient
 	}
 )
 
@@ -58,11 +59,11 @@ func NewKeeper (
 }
 
 func (k Keeper) GetBtClient() (*torrentClient.TorrentClient) {
-	return k.btClient
+	return btClient
 }
 
-func (k Keeper) SetBtClient(btClient *torrentClient.TorrentClient) {
-	k.btClient = btClient
+func (k Keeper) SetBtClient(newBtClient *torrentClient.TorrentClient) {
+	btClient = newBtClient
 }
 
 func (k Keeper) GetCdc() *codec.Codec {

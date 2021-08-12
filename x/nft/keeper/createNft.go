@@ -15,7 +15,7 @@ import (
 
 
 func (k Keeper) SeedFile(metainfo *metainfo.MetaInfo) error {
-	err := k.btClient.SeedFile(metainfo)
+	err := k.GetBtClient().SeedFile(metainfo)
 	if err != nil {
 		return err
 	}
