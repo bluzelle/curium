@@ -118,7 +118,6 @@ func getAccountAddress(keyring cryptoKeys.Keybase, from string) (sdk.AccAddress,
 }
 
 func (reader KeyringReader) GetAddress(from string) (sdk.AccAddress, error) {
-	fmt.Println("getting address of ", from)
 	keyring, err := getKeyring(reader.keyringDir)
 
 	if err != nil {
