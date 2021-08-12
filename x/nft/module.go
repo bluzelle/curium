@@ -8,6 +8,7 @@ import (
 	"github.com/bluzelle/curium/x/torrentClient"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"sync"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
@@ -174,6 +175,7 @@ func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.Val
 
 			defer func() {
 				go func() {
+					time.Sleep(time.Second)
 					err := am.keeper.BroadcastRegisterBtPeer(ctx)
 					if err != nil {
 						am.keeper.Logger(ctx).Error("Broadcast Register Bt Peer failed", "error", err)
