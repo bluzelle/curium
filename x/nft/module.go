@@ -24,9 +24,9 @@ import (
 
 // Type check to ensure the interface is properly implemented
 var (
-	_ module.AppModule           = AppModule{}
-	_ module.AppModuleBasic      = AppModuleBasic{}
-	peerRegistered = false
+	_              module.AppModule      = AppModule{}
+	_              module.AppModuleBasic = AppModuleBasic{}
+	peerRegistered                       = false
 )
 
 // AppModuleBasic defines the basic application module used by the nft module.
@@ -78,21 +78,21 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 // AppModule implements an application module for the aggregator module.
 type AppModule struct {
 	AppModuleBasic
-	keeper nft.Keeper
-	accKeeper auth.AccountKeeper
+	keeper      nft.Keeper
+	accKeeper   auth.AccountKeeper
 	btDirectory string
-	btPort int
+	btPort      int
 	// TODO: Add keepers that your application depends on
 }
 
 // NewAppModule creates a new AppModule object
 func NewAppModule(k nft.Keeper, accKeeper auth.AccountKeeper, btDirectory string, btPort int /*TODO: Add Keepers that your application depends on*/) AppModule {
 	return AppModule{
-		AppModuleBasic:      AppModuleBasic{},
-		keeper:              k,
-		accKeeper: accKeeper,
-		btDirectory: btDirectory,
-		btPort: btPort,
+		AppModuleBasic: AppModuleBasic{},
+		keeper:         k,
+		accKeeper:      accKeeper,
+		btDirectory:    btDirectory,
+		btPort:         btPort,
 		// TODO: Add keepers that your application depends on
 	}
 }
@@ -146,6 +146,7 @@ func (am AppModule) BeginBlock(_ sdk.Context, req abci.RequestBeginBlock) {
 }
 
 var once sync.Once
+
 // EndBlock returns the end blocker for the nft module. It returns no validator
 // updates.
 func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
@@ -155,7 +156,7 @@ func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.Val
 	if err != nil {
 		am.keeper.Logger(ctx).Error("nft user does not exist in keyring", "nft", err)
 	} else {
-		once.Do(func () {
+		once.Do(func() {
 
 			btClient, err := torrentClient.NewTorrentClient(am.btDirectory, am.btPort)
 			fmt.Println("Torrent client created", *btClient)
@@ -169,14 +170,18 @@ func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.Val
 
 			fmt.Println("Bt client after setting", am.keeper.BtClient, am.keeper.GetBtClient())
 
-
 			fmt.Println("Doing broadcast register peer")
-			go func() {
-				//err := am.keeper.BroadcastRegisterBtPeer(ctx)
-				//if err != nil {
-				//	am.keeper.Logger(ctx).Error("Broadcast Register Bt Peer failed", "error", err)
-				//}
-			}()})
+
+			defer func() {
+				go func() {
+					err := am.keeper.BroadcastRegisterBtPeer(ctx)
+					if err != nil {
+						am.keeper.Logger(ctx).Error("Broadcast Register Bt Peer failed", "error", err)
+					}
+				}()
+			}()
+		})
+
 	}
 
 	return []abci.ValidatorUpdate{}
