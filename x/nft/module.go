@@ -176,7 +176,6 @@ func checkBroadcastPeer(ctx sdk.Context, am AppModule) {
 
 func startTorrentClient(ctx sdk.Context, am AppModule) {
 	btClient, err := torrentClient.NewTorrentClient(am.btDirectory, am.btPort)
-	fmt.Println("Torrent client created", *btClient)
 	if err != nil {
 		am.keeper.Logger(ctx).Error("Error creating btClient", "btClient", err)
 	}
