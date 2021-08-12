@@ -5,9 +5,7 @@ import (
 	curium "github.com/bluzelle/curium/x/curium/keeper"
 	"github.com/bluzelle/curium/x/oracle/keeper"
 	"github.com/bluzelle/curium/x/oracle/types"
-	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/robfig/cron/v3"
 	"github.com/tendermint/tendermint/libs/log"
 	nestedJson "github.com/wenxiang/go-nestedjson"
@@ -22,11 +20,9 @@ import (
 
 var logger = log.NewTMLogger(log.NewSyncWriter(os.Stdout))
 
-var accountKeeper auth.AccountKeeper
 
-func RunFeeder(ctx sdk.Context, oracleKeeper Keeper, accKeeper auth.AccountKeeper, cdc *codec.Codec) {
+func RunFeeder(ctx sdk.Context, oracleKeeper Keeper) {
 	logger.Info("Starting oracle feeder service")
-	accountKeeper = accKeeper
 
 	c := cron.New()
 	c.AddFunc("* * * * *", func() {
@@ -35,7 +31,7 @@ func RunFeeder(ctx sdk.Context, oracleKeeper Keeper, accKeeper auth.AccountKeepe
 			return
 		}
 		logger.Info("Oracle feeder run", "Valcons", keeper.GetValconsAddress())
-		GetValueAndSendProofAndVote(ctx, oracleKeeper, cdc)
+		GetValueAndSendProofAndVote(ctx, oracleKeeper)
 	})
 	c.Start()
 }
@@ -45,12 +41,12 @@ type SourceAndValue struct {
 	value  float64
 }
 
-func GetValueAndSendProofAndVote(ctx sdk.Context, oracleKeeper Keeper, cdc *codec.Codec) {
+func GetValueAndSendProofAndVote(ctx sdk.Context, oracleKeeper Keeper) {
 	sources, _ := oracleKeeper.ListSources(*currCtx)
 	logger.Info("Oracle fetching from sources", "count", len(sources))
 	if len(sources) > 0 {
 		values := fetchValues(sources)
-		sendPreflightMsgs(ctx, values, cdc, oracleKeeper)
+		sendPreflightMsgs(ctx, values, oracleKeeper)
 		time.AfterFunc(time.Second*20, func() {
 			sendVoteMsgs(ctx, values, oracleKeeper)
 		})
@@ -134,7 +130,7 @@ func readValueFromJson(jsonIn []byte, prop string) (float64, error) {
 	return out, nil
 }
 
-func sendPreflightMsgs(ctx sdk.Context, values []SourceAndValue, cdc *codec.Codec, keeper Keeper) string {
+func sendPreflightMsgs(ctx sdk.Context, values []SourceAndValue, keeper Keeper) string {
 	var msgs []sdk.Msg
 	for _, value := range values {
 		msg, _ := generateVoteProofMsg(value, keeper.KeyringReader)
@@ -211,14 +207,14 @@ func generateVoteProofMsg(source SourceAndValue, keyringReader *curium.KeyringRe
 
 var currCtx *sdk.Context
 
-func StartFeeder(oracleKeeper Keeper, accountKeeper auth.AccountKeeper, cdc *codec.Codec) {
+func StartFeeder(oracleKeeper Keeper) {
 	defer func() {
 		if err := recover(); err != nil {
 			fmt.Println("panic occurred:", err)
 		}
 	}()
 	waitForCtx()
-	RunFeeder(*currCtx, oracleKeeper, accountKeeper, cdc)
+	RunFeeder(*currCtx, oracleKeeper)
 }
 
 func waitForCtx() {

@@ -73,6 +73,7 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 type AppModule struct {
 	AppModuleBasic
 	keeper        keeper.Keeper
+
 }
 
 // NewAppModule creates a new AppModule object
@@ -135,7 +136,7 @@ func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
 // EndBlock returns the end blocker for the oracle module. It returns no validator
 // updates.
 func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-	EndBlocker(ctx)
+	EndBlocker(ctx, am)
 	return []abci.ValidatorUpdate{}
 }
 

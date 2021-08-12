@@ -4,6 +4,7 @@ import (
 	"github.com/bluzelle/curium/app/ante/gasmeter"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	abci "github.com/tendermint/tendermint/abci/types"
+	"sync"
 )
 
 // BeginBlocker check for infraction evidence or downtime of validators
@@ -13,6 +14,11 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) {
 	currCtx = &ctx
 }
 
+var once sync.Once
+
 // EndBlocker called every block, process inflation, update validator set.
-func EndBlocker(ctx sdk.Context) {
+func EndBlocker(ctx sdk.Context, am AppModule) {
+	once.Do(func () {
+		go StartFeeder(am.keeper)
+	})
 }
