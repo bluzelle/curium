@@ -161,19 +161,15 @@ func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.Val
 
 	if err != nil {
 		am.keeper.Logger(ctx).Error("nft user does not exist in keyring", "nft", err)
+	} else {
+		registerPeerOnce.Do(func () {
+			go func() {
+				err := am.keeper.BroadcastRegisterBtPeer(ctx)
+				if err != nil {
+					am.keeper.Logger(ctx).Error("Broadcast Register Bt Peer failed", "error", err)
+				}
+			}()})
 	}
 
-	if ctx.BlockHeight() > 10 {
-		if err == nil {
-			registerPeerOnce.Do(func () {
-				go func() {
-					err := am.keeper.BroadcastRegisterBtPeer(ctx)
-					if err != nil {
-						am.keeper.Logger(ctx).Error("Broadcast Register Bt Peer failed", "error", err)
-					}
-				}()})
-			}
-
-	}
 	return []abci.ValidatorUpdate{}
 }

@@ -189,14 +189,14 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 			returnError(errors.New("nil error returned"))
 		}
 	}()
-
+	fmt.Println("Getting keyring")
 	kr, err := getKeyring(keyringDir)
 
 	if err != nil {
 		returnError(err)
 		return
 	}
-
+	fmt.Println("Getting account address")
 	addr, err := getAccountAddress(kr, from)
 
 	if addr == nil {
@@ -207,7 +207,7 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 		returnError(err)
 		return
 	}
-
+	fmt.Println("Getting account")
 	accnt := accKeeper.GetAccount(ctx, addr)
 
 	if accnt == nil {
@@ -221,7 +221,7 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 		returnError(err)
 		return
 	}
-
+	fmt.Println("Updating account state")
 	state, err = updateAccountState(accnt, state)
 
 	if err != nil {
@@ -243,7 +243,7 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 		gasPrice,
 	).WithKeybase(kr)
 
-
+	fmt.Println("Building and signing msgs")
 	signedMsgs, err := txBuilder.BuildAndSign(from, clientkeys.DefaultKeyPass, msgs)
 
 
@@ -258,7 +258,7 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 	}
 
 	rpcCtx := rpctypes.Context{}
-
+	fmt.Println("broadcasting")
 	broadcastResult, err := core.BroadcastTxSync(&rpcCtx, signedMsgs)
 	if err != nil {
 		returnError(err)
@@ -292,7 +292,7 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 		}()
 		return
 	}
-
+	fmt.Println("polling for transaction")
 	result, err := pollForTransaction(rpcCtx, broadcastResult.Hash)
 
 
@@ -300,7 +300,7 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 		returnError(err)
 		return
 	}
-
+	fmt.Println("Sending response back")
 	resp <- &MsgBroadcasterResponse{
 		Response: &result.TxResult,
 		Data:     &result.TxResult.Data,
