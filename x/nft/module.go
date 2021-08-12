@@ -163,11 +163,11 @@ func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.Val
 				am.keeper.Logger(ctx).Error("Error creating btClient", "btClient", err)
 			}
 
-			fmt.Println("Bt client before setting", *am.keeper.GetBtClient(), am.keeper.GetBtClient())
+			fmt.Println("Bt client before setting", am.keeper.GetBtClient())
 
 			am.keeper.SetBtClient(btClient)
 
-			fmt.Println("Bt client after setting", *am.keeper.GetBtClient(), am.keeper.GetBtClient())
+			fmt.Println("Bt client after setting", am.keeper.GetBtClient())
 
 
 			fmt.Println("Doing broadcast register peer")
