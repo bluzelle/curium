@@ -145,21 +145,10 @@ func (am AppModule) ExportGenesis(ctx sdk.Context) json.RawMessage {
 func (am AppModule) BeginBlock(_ sdk.Context, req abci.RequestBeginBlock) {
 }
 
-var once sync.Once
 var registerPeerOnce sync.Once
 // EndBlock returns the end blocker for the nft module. It returns no validator
 // updates.
 func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-
-	once.Do(func () {
-		btClient, err := torrentClient.NewTorrentClient(am.btDirectory, am.btPort)
-
-		if err != nil {
-			am.keeper.Logger(ctx).Error("Error creating btClient", "btClient", err)
-		}
-
-		am.keeper.SetBtClient(btClient)
-	})
 
 	err := am.keeper.CheckNftUserExists(ctx, am.keeper.KeyringReader, am.accKeeper)
 	fmt.Println("Checking nft user exists", err)
@@ -167,6 +156,20 @@ func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.Val
 		am.keeper.Logger(ctx).Error("nft user does not exist in keyring", "nft", err)
 	} else {
 		registerPeerOnce.Do(func () {
+
+			btClient, err := torrentClient.NewTorrentClient(am.btDirectory, am.btPort)
+			fmt.Println("Torrent client created", *btClient)
+			if err != nil {
+				am.keeper.Logger(ctx).Error("Error creating btClient", "btClient", err)
+			}
+
+			fmt.Println("Bt client before setting", *am.keeper.GetBtClient(), am.keeper.GetBtClient())
+
+			am.keeper.SetBtClient(btClient)
+
+			fmt.Println("Bt client after setting", *am.keeper.GetBtClient(), am.keeper.GetBtClient())
+
+
 			fmt.Println("Doing broadcast register peer")
 			go func() {
 				err := am.keeper.BroadcastRegisterBtPeer(ctx)
