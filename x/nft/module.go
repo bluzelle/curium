@@ -2,6 +2,7 @@ package nft
 
 import (
 	"encoding/json"
+	"fmt"
 	nft "github.com/bluzelle/curium/x/nft/keeper"
 	nftTypes "github.com/bluzelle/curium/x/nft/types"
 	"github.com/bluzelle/curium/x/torrentClient"
@@ -158,11 +159,12 @@ func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.Val
 	})
 
 	err := am.keeper.CheckNftUserExists(am.keeper.KeyringReader)
-
+	fmt.Println("Checking nft user exists", err)
 	if err != nil {
 		am.keeper.Logger(ctx).Error("nft user does not exist in keyring", "nft", err)
 	} else {
 		registerPeerOnce.Do(func () {
+			fmt.Println("Doing broadcast register peer")
 			go func() {
 				err := am.keeper.BroadcastRegisterBtPeer(ctx)
 				if err != nil {
