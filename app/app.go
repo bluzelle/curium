@@ -428,7 +428,6 @@ func NewCRUDApp(
 
 	// check flags...
 	bluzelleCrud := IsCrudEnabled(DefaultNodeHome)
-	logger.Info("Module setup", crudModuleEntry, bluzelleCrud)
 
 	app.mm = module.NewManager(
 		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx),
