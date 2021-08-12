@@ -172,10 +172,10 @@ func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.Val
 
 			fmt.Println("Doing broadcast register peer")
 			go func() {
-				err := am.keeper.BroadcastRegisterBtPeer(ctx)
-				if err != nil {
-					am.keeper.Logger(ctx).Error("Broadcast Register Bt Peer failed", "error", err)
-				}
+				//err := am.keeper.BroadcastRegisterBtPeer(ctx)
+				//if err != nil {
+				//	am.keeper.Logger(ctx).Error("Broadcast Register Bt Peer failed", "error", err)
+				//}
 			}()})
 	}
 
