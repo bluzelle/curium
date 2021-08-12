@@ -47,7 +47,7 @@ func handleMsgCreateNft(goCtx sdk.Context, k keeper.Keeper, msg *types.MsgCreate
 
 
 	if _, err := os.Stat(k.HomeDir+"/nft/"+msg.Hash); err == nil {
-		metainfo, err := k.BtClient.TorrentFromFile(msg.Hash)
+		metainfo, err := k.GetBtClient().TorrentFromFile(msg.Hash)
 		if err != nil {
 			return nil, sdkerrors.New("nft", 2, fmt.Sprintf("unable to create torrent for file", msg.Hash))
 		}
@@ -83,7 +83,7 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 	k.Logger(ctx).Debug("Publish file message received", "id", msg.Id)
 	var metainfo metainfo.MetaInfo
 	bencode.DecodeBytes(msg.Metainfo, &metainfo)
-	k.BtClient.RetrieveFile(&metainfo)
+	k.GetBtClient().RetrieveFile(&metainfo)
 	k.EnsureNftDirExists()
 
 
@@ -122,7 +122,7 @@ func handleMsgRegisterPeer(ctx sdk.Context, k Keeper, msg *types.MsgRegisterPeer
 	store.Set([]byte(msg.Id), k.Cdc.MustMarshalBinaryBare(&peer))
 
 	if k.GetMyNodeId(ctx) != msg.Id {
-		k.BtClient.AddPeer(msg.Id, msg.Address, int(msg.Port))
+		k.GetBtClient().AddPeer(msg.Id, msg.Address, int(msg.Port))
 	}
 
 	return &sdk.Result{}, nil

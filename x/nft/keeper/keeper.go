@@ -24,8 +24,8 @@ type (
 		HomeDir        string
 		MsgBroadcaster curium.MsgBroadcaster
 		curiumKeeper   *curium.Keeper
-		KeyringReader  *keeper.KeyringReader
-		BtClient       *torrentClient.TorrentClient
+		KeyringReader *keeper.KeyringReader
+		btClient      *torrentClient.TorrentClient
 	}
 )
 
@@ -41,13 +41,6 @@ func NewKeeper (
 	keyringReader *keeper.KeyringReader,
 
 ) *Keeper {
-	btClient, err := torrentClient.NewTorrentClient(btDirectory, btPort)
-	if checkNftUserExists(keyringReader) == false {
-		fmt.Println("***** nft user does not exist in keyring")
-	}
-	if err != nil {
-		fmt.Println("*****", err)
-	}
 
 	return &Keeper{
 		Cdc:            cdc,
@@ -59,17 +52,24 @@ func NewKeeper (
 		MsgBroadcaster: msgBroadcaster,
 		curiumKeeper:   curiumKeeper,
 		KeyringReader:  keyringReader,
-		BtClient:       btClient,
 	}
+}
+
+func (k Keeper) GetBtClient() (*torrentClient.TorrentClient) {
+	return k.btClient
+}
+
+func (k Keeper) SetBtClient(btClient *torrentClient.TorrentClient) {
+	k.btClient = btClient
 }
 
 func (k Keeper) GetCdc() *codec.Codec {
 	return k.Cdc
 }
 
-func checkNftUserExists(reader *curium.KeyringReader) bool {
+func (k Keeper) CheckNftUserExists(reader *curium.KeyringReader) error {
 	_, err := reader.GetAddress("nft")
-	return err == nil
+	return err
 }
 
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {

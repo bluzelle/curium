@@ -409,8 +409,8 @@ func NewCRUDApp(
 
 
 	nftFileDir, _ := getNftFileDir(DefaultNodeHome)
-	nft2P2pPort, _ := getNftP2PPort(DefaultNodeHome)
-	nftP2PPort, _  := strconv.Atoi(nft2P2pPort)
+	nftP2PPortString, _ := getNftP2PPort(DefaultNodeHome)
+	nftP2PPort, _  := strconv.Atoi(nftP2PPortString)
 
 	msgBroadcaster := app.curiumKeeper.NewMsgBroadcaster(DefaultCLIHome, cdc)
 
@@ -444,7 +444,7 @@ func NewCRUDApp(
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
 		oracle.NewAppModule(app.oracleKeeper),
 		aggregator.NewAppModule(app.aggKeeper),
-		nft.NewAppModule(*app.nftKeeper),
+		nft.NewAppModule(*app.nftKeeper, nftFileDir, nftP2PPort),
 		curium.NewAppModule(*app.curiumKeeper),
 	)
 
