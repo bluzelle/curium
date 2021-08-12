@@ -142,7 +142,7 @@ func (am AppModule) BeginBlock(_ sdk.Context, req abci.RequestBeginBlock) {
 }
 
 var once sync.Once
-
+var registerPeerOnce sync.Once
 // EndBlock returns the end blocker for the nft module. It returns no validator
 // updates.
 func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
@@ -163,15 +163,17 @@ func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.Val
 		am.keeper.Logger(ctx).Error("nft user does not exist in keyring", "nft", err)
 	}
 
-	//if ctx.BlockHeight() > 10 {
-	//	if !peerRegistered {
-	//		go func() {
-	//			err := am.keeper.BroadcastRegisterBtPeer(ctx)
-	//			if err == nil {
-	//				peerRegistered = true
-	//			}
-	//		}()
-	//	}
-	//}
+	if ctx.BlockHeight() > 10 {
+		if err == nil {
+			registerPeerOnce.Do(func () {
+				go func() {
+					err := am.keeper.BroadcastRegisterBtPeer(ctx)
+					if err != nil {
+						am.keeper.Logger(ctx).Error("Broadcast Register Bt Peer failed", "error", err)
+					}
+				}()})
+			}
+
+	}
 	return []abci.ValidatorUpdate{}
 }
