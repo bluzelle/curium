@@ -74,6 +74,10 @@ describe('whitelist', function()  {
 
     });
 
+    it('should charge for creating an nft', () => {
+        return checkGasWasCharged(bz, "myNftId")
+    })
+
 
 
 });

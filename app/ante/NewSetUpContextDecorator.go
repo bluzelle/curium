@@ -143,9 +143,13 @@ func SetGasMeter(simulate bool, ctx sdk.Context, gasLimit uint64, tx sdk.Tx, gk 
 
 func getWhitelist (ctx sdk.Context, crudKeeper crud.Keeper) (string) {
 	store := crudKeeper.GetKVStore(ctx)
-	whiteListBytes := store.Get([]byte("WHITELIST"))
+	whiteListBlzValue := crudKeeper.GetValue(ctx, store, "bluzelle", "bluzelle")
 
-	return string(whiteListBytes)
+	if len(whiteListBlzValue.Value) == 0 {
+		return ""
+	}
+
+	return whiteListBlzValue.Value
 }
 
 func isOnWhiteList (msgModule string, sender string, whiteList string) bool {
