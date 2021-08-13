@@ -128,7 +128,7 @@ func SetGasMeter(simulate bool, ctx sdk.Context, gasLimit uint64, tx sdk.Tx, gk 
 		return ctx.WithGasMeter(gm), nil
 	}
 
-	if msgModule == "crud" && !simulate && !ctx.IsCheckTx() {
+	if (msgModule == "crud" || msgModule == "oracle") && !simulate && !ctx.IsCheckTx() {
 		gm := gasmeter.NewChargingGasMeter(supplyKeeper, accountKeeper, gasLimit, feePayer, gasPriceCoins)
 
 		gk.AddGasMeter(&gm)
@@ -157,3 +157,5 @@ func isOnWhiteList (msgModule string, sender string, whiteList string) bool {
 	return (msgModule == "crud" || msgModule == "oracle" || msgModule == "nft") && onWhiteList
 
 }
+
+
