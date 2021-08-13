@@ -2,7 +2,6 @@ package nft
 
 import (
 	"encoding/json"
-	"fmt"
 	nft "github.com/bluzelle/curium/x/nft/keeper"
 	nftTypes "github.com/bluzelle/curium/x/nft/types"
 	"github.com/bluzelle/curium/x/torrentClient"
@@ -149,13 +148,13 @@ var newBtClientOnce sync.Once
 
 func checkBroadcastPeer(ctx sdk.Context, am AppModule) {
 	err := am.keeper.CheckNftUserExists(ctx, am.keeper.KeyringReader, am.accKeeper)
-	fmt.Println("Checking nft user exists", err)
+
 	if err != nil {
 		am.keeper.Logger(ctx).Error("nft user does not exist in keyring", "nft", err)
 	} else {
 		broadcastPeerOnce.Do(func() {
 
-			fmt.Println("Doing broadcast register peer")
+
 
 			defer func() {
 				go func() {
@@ -176,11 +175,8 @@ func startTorrentClient(ctx sdk.Context, am AppModule) {
 		am.keeper.Logger(ctx).Error("Error creating btClient", "error", err)
 	}
 
-	fmt.Println("Bt client before setting", am.keeper.GetBtClient())
-
 	am.keeper.SetBtClient(btClient)
 
-	fmt.Println("Bt client after setting", am.keeper.BtClient, am.keeper.GetBtClient())
 }
 
 // EndBlock returns the end blocker for the nft module. It returns no validator

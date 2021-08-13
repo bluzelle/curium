@@ -3,12 +3,14 @@ package ante
 import (
 	"fmt"
 	"github.com/bluzelle/curium/app/ante/gasmeter"
+	"github.com/bluzelle/curium/x/crud"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	acctypes "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"strings"
 )
 
 var (
@@ -30,14 +32,16 @@ type SetUpContextDecorator struct{
 	gasMeterKeeper *gasmeter.GasMeterKeeper
 	supplyKeeper banktypes.SupplyKeeper
 	accountKeeper acctypes.AccountKeeper
+	crudKeeper	crud.Keeper
 	minGasPriceCoins sdk.DecCoins
 }
 
-func NewSetUpContextDecorator(gasMeterKeeper *gasmeter.GasMeterKeeper, supplyKeeper banktypes.SupplyKeeper, accountKeeper acctypes.AccountKeeper, minGasPriceCoins sdk.DecCoins) SetUpContextDecorator {
+func NewSetUpContextDecorator(gasMeterKeeper *gasmeter.GasMeterKeeper, supplyKeeper banktypes.SupplyKeeper, accountKeeper acctypes.AccountKeeper, crudKeeper crud.Keeper, minGasPriceCoins sdk.DecCoins) SetUpContextDecorator {
 	return SetUpContextDecorator{
 		gasMeterKeeper:   gasMeterKeeper,
 		supplyKeeper:       supplyKeeper,
 		accountKeeper:    accountKeeper,
+		crudKeeper: crudKeeper,
 		minGasPriceCoins: minGasPriceCoins,
 	}
 }
@@ -51,11 +55,11 @@ func (sud SetUpContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate
 	if !ok {
 		// Set a gas meter with limit 0 as to prevent an infinite gas meter attack
 		// during runTx.
-		newCtx, _ = SetGasMeter(simulate, ctx, 0, tx, sud.gasMeterKeeper, sud.supplyKeeper, sud.accountKeeper, sud.minGasPriceCoins)
+		newCtx, _ = SetGasMeter(simulate, ctx, 0, tx, sud.gasMeterKeeper, sud.supplyKeeper, sud.accountKeeper, sud.crudKeeper, sud.minGasPriceCoins)
 		return newCtx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be GasTx")
 	}
 
-	newCtx, err = SetGasMeter(simulate, ctx, gasTx.GetGas(), tx, sud.gasMeterKeeper, sud.supplyKeeper, sud.accountKeeper, sud.minGasPriceCoins)
+	newCtx, err = SetGasMeter(simulate, ctx, gasTx.GetGas(), tx, sud.gasMeterKeeper, sud.supplyKeeper, sud.accountKeeper, sud.crudKeeper, sud.minGasPriceCoins)
 
 	if err != nil {
 		return ctx, err
@@ -85,7 +89,7 @@ func (sud SetUpContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate
 }
 
 // SetGasMeter returns a new context with a gas meter set from a given context.
-func SetGasMeter(simulate bool, ctx sdk.Context, gasLimit uint64, tx sdk.Tx, gk *gasmeter.GasMeterKeeper, supplyKeeper banktypes.SupplyKeeper, accountKeeper acctypes.AccountKeeper, minGasPriceCoins sdk.DecCoins) (sdk.Context, error) {
+func SetGasMeter(simulate bool, ctx sdk.Context, gasLimit uint64, tx sdk.Tx, gk *gasmeter.GasMeterKeeper, supplyKeeper banktypes.SupplyKeeper, accountKeeper acctypes.AccountKeeper, crudKeeper crud.Keeper, minGasPriceCoins sdk.DecCoins) (sdk.Context, error) {
 	// In various cases such as simulation and during the genesis block, we do not
 	// meter any gas utilization.
 	if simulate || ctx.BlockHeight() == 0 {
@@ -105,13 +109,23 @@ func SetGasMeter(simulate bool, ctx sdk.Context, gasLimit uint64, tx sdk.Tx, gk 
 
 	feePayer := feeTx.FeePayer()
 
+	whiteList := getWhitelist(ctx, crudKeeper)
+
+	msgModule := tx.GetMsgs()[0].Route()
+
+
 	if gasPriceCoins.AmountOf("ubnt").LT(minGasPriceCoins.AmountOf("ubnt")) {
 		return ctx, sdkerrors.New("curium", 2, "Specified gas price too low")
 	}
 
-	msgModule := tx.GetMsgs()[0].Route()
 
-	if msgModule == "crud" && !simulate && !ctx.IsCheckTx() { //TODO msg module for nft
+	if isOnWhiteList(msgModule, feePayer.String(), whiteList) && !simulate && !ctx.IsCheckTx() {
+		gm := gasmeter.NewFreeGasMeter(gasLimit)
+		gk.AddGasMeter(&gm)
+		return ctx.WithGasMeter(gm), nil
+	}
+
+	if isAChargingModule(msgModule) && !simulate && !ctx.IsCheckTx() {
 		gm := gasmeter.NewChargingGasMeter(supplyKeeper, accountKeeper, gasLimit, feePayer, gasPriceCoins)
 
 		gk.AddGasMeter(&gm)
@@ -123,3 +137,25 @@ func SetGasMeter(simulate bool, ctx sdk.Context, gasLimit uint64, tx sdk.Tx, gk 
 
 	return ctx.WithGasMeter(gm), nil
 }
+
+func getWhitelist (ctx sdk.Context, crudKeeper crud.Keeper) (string) {
+	store := crudKeeper.GetKVStore(ctx)
+	whiteListBlzValue := crudKeeper.GetValue(ctx, store, "bluzelle", "bluzelle")
+
+	if len(whiteListBlzValue.Value) == 0 {
+		return ""
+	}
+
+	return whiteListBlzValue.Value
+}
+
+func isOnWhiteList (msgModule string, sender string, whiteList string) bool {
+	onWhiteList := strings.Contains(whiteList, sender)
+	return isAChargingModule(msgModule) && onWhiteList
+}
+
+func isAChargingModule (msgModule string) bool {
+	return msgModule == "crud" || msgModule == "oracle" || msgModule == "nft"
+}
+
+

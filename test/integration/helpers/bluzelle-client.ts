@@ -1,5 +1,6 @@
 import {bluzelle, BluzelleConfig} from "bluzelle";
 import {memoize} from 'lodash'
+import {GasInfo} from "bluzelle";
 
 export const getBzClient = memoize((config: Partial<BluzelleConfig> = {}) =>
     bluzelle({
@@ -9,3 +10,6 @@ export const getBzClient = memoize((config: Partial<BluzelleConfig> = {}) =>
         ...config
     })
 );
+
+export const defaultGasParams = (gasInfo: GasInfo = {}): GasInfo => ({gas_price: 10, max_gas: 100000000, ...gasInfo})
+

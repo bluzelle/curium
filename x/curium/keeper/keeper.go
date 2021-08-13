@@ -121,7 +121,6 @@ func (reader KeyringReader) GetAddress(from string) (sdk.AccAddress, error) {
 	keyring, err := getKeyring(reader.keyringDir)
 
 	if err != nil {
-		fmt.Println("error getting address of ", from, err)
 		return nil, err
 	}
 
@@ -274,7 +273,6 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 
 
 	if state.reset {
-		fmt.Println("Exceeded retry limit")
 		returnError(errors.New(broadcastResult.Log))
 		return
 	}

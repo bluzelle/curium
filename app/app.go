@@ -503,6 +503,7 @@ func addAnteHandler(app *CRUDApp) {
 			app.supplyKeeper,
 			app.taxKeeper,
 			app.bankKeeper,
+			app.crudKeeper,
 			auth.DefaultSigVerificationGasConsumer,
 			app.gasMeterKeeper,
 			minGasPriceCoins,

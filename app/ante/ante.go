@@ -2,6 +2,7 @@ package ante
 
 import (
 	"github.com/bluzelle/curium/app/ante/gasmeter"
+	"github.com/bluzelle/curium/x/crud"
 	"github.com/bluzelle/curium/x/tax"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
@@ -15,12 +16,13 @@ func NewAnteHandler(
 	supplyKeeper types.SupplyKeeper,
 	taxKeeper tax.Keeper,
 	bankKeeper bank.Keeper,
+	crudKeeper crud.Keeper,
 	sigGasConsumer ante.SignatureVerificationGasConsumer,
 	gasMeterKeeper *gasmeter.GasMeterKeeper,
 	minGasPriceCoins sdk.DecCoins,
 ) sdk.AnteHandler {
 	return sdk.ChainAnteDecorators(
-		NewSetUpContextDecorator(gasMeterKeeper, supplyKeeper, accountKeeper, minGasPriceCoins), // outermost AnteDecorator. SetUpContext must be called first
+		NewSetUpContextDecorator(gasMeterKeeper, supplyKeeper, accountKeeper, crudKeeper, minGasPriceCoins), // outermost AnteDecorator. SetUpContext must be called first
 		NewMempoolFeeDecorator(),
 		ante.NewValidateBasicDecorator(),
 		ante.NewValidateMemoDecorator(accountKeeper),

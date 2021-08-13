@@ -111,7 +111,6 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 	}
 	err = os.Symlink(k.HomeDir+"/nft/"+msg.Hash+".info", k.HomeDir+"/nft/"+msg.Vendor + "-" + msg.Id+".info")
 	if err != nil {
-		fmt.Println("error writing vendor symlink")
 		return nil, err
 	}
 	return &sdk.Result{}, nil
