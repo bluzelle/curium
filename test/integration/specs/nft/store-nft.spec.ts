@@ -24,7 +24,7 @@ import {Daemon} from 'daemon-manager/lib/Daemon'
 import waitUntil from 'async-wait-until';
 import {passThrough, passThroughAwait} from "promise-passthrough";
 import {Some} from "monet";
-import {UploadNftResult} from "../../../../blzjs/client";
+import {UploadNftResult} from "bluzelle";
 
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
