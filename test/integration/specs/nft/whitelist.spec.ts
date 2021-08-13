@@ -13,7 +13,6 @@ import {
 } from "../../helpers/nft-helpers";
 
 import {defaultGasParams} from "../../helpers/bluzelle-client"
-import {getSwarm} from "@bluzelle/testing/lib/helpers/swarmHelpers"
 import {times} from 'lodash'
 import {passThroughAwait} from "promise-passthrough";
 
@@ -21,17 +20,17 @@ describe('whitelist', function()  {
     this.timeout(6000000);
     let bz: API
 
-    beforeEach(() => getAPIAndSwarm()
-        .then(apiAndSwarm => bz = apiAndSwarm.bz)
+    beforeEach(() => getAPIAndSwarm(mattnetConfig)
+        .then(({bz: newBz}) => bz = newBz)
     )
-    // beforeEach(() => getSwarm()
-    //     .then(swarm => swarm.getValidators()[0].getAuth())
-    //     .then(auth => bz = bluzelle({
-    //         endpoint: getSentryUrl(),
-    //         mnemonic: auth.mnemonic,
+    // beforeEach(() =>
+    //     bz = bluzelle({
+    //         endpoint: "http://localhost:1327",
+    //         mnemonic: "crater trade start fresh dance else leg other dwarf flavor talk enough interest sleep woman hotel myself diet fetch recycle remove range subject myself",
     //         uuid: "uuid"
-    //     }))
+    //     })
     // )
+
 
 
     it('should not charge for accounts on the whitelist', () => {

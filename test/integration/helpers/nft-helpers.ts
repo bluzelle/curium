@@ -209,7 +209,7 @@ export const mattnetConfig = {
     logDir: 'logs',
     genesisTokenBalance: 50 * 1000 * 1000,
     chainId: 'bluzelle',
-    bluzelleCrud: false,
+    bluzelleCrud: true,
     bluzelleFaucet: true,
     communityTax: 0.0001,
     baseProposerReward: 0.01,
