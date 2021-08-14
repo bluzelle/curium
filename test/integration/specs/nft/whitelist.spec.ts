@@ -20,31 +20,31 @@ describe('whitelist', function()  {
     this.timeout(6000000);
     let bz: API
 
-    // beforeEach(() => getAPIAndSwarm(mattnetConfig)
-    //     .then(({bz: newBz}) => bz = newBz)
-    // )
-    beforeEach(() =>
-        bz = bluzelle({
-            endpoint: "http://localhost:1327",
-            mnemonic: "crater trade start fresh dance else leg other dwarf flavor talk enough interest sleep woman hotel myself diet fetch recycle remove range subject myself",
-            uuid: "uuid"
-        })
+    beforeEach(() => getAPIAndSwarm(mattnetConfig)
+        .then(({bz: newBz}) => bz = newBz)
     )
+    // beforeEach(() =>
+    //     bz = bluzelle({
+    //         endpoint: "http://localhost:1327",
+    //         mnemonic: "crater trade start fresh dance else leg other dwarf flavor talk enough interest sleep woman hotel myself diet fetch recycle remove range subject myself",
+    //         uuid: "uuid"
+    //     })
+    // )
 
 
 
     it('should not charge for accounts on the whitelist', () => {
-        return bz.create("WHITELIST", bz.address, defaultGasParams())
+        return createWhitelist(bz, bz.address)
             .then(() => checkGasChargeIsZero(bz, "myNftId"))
     });
 
     it('should not charge for all accounts on the whitelist', () => {
-        return Promise.all<API>(times(10).map(() =>
+        return Promise.all<API>(times(2).map(() =>
             createMintedBz()
         ))
             .then(passThroughAwait((clients : API[]) =>
                 Promise.all(clients.map(client => client.address))
-                    .then(addresses => bz.create("WHITELIST", addresses.toString(), defaultGasParams())
+                    .then(addresses => createWhitelist(bz, addresses.toString())
             )))
             .then((clients: API[]) => Promise.all(clients.map((client, idx) => checkGasChargeIsZero(client, `nft-id-${idx}`))))
 
@@ -56,19 +56,19 @@ describe('whitelist', function()  {
         ))
             .then(passThroughAwait((clients : API[]) =>
                 Promise.all(clients.map(client => client.address))
-                    .then(addresses => bz.create("WHITELIST", addresses.toString(), defaultGasParams())
+                    .then(addresses => createWhitelist(bz, addresses.toString())
                     )))
             .then(() => createBz(bz))
             .then(newBz => checkGasWasCharged(newBz, "newBzId"))
     });
 
-    it("should everybody if the whitelist is empty", () => {
+    it.skip("should charge not charge for large number of accounts on whitelist", () => {
         return Promise.all<API>(times(10).map(() =>
             createMintedBz()
         ))
             .then(passThroughAwait((clients : API[]) =>
                 Promise.all(clients.map(client => client.address))
-                    .then(addresses => bz.create("WHITELIST", addresses.toString(), defaultGasParams())
+                    .then(addresses => createWhitelist(bz, addresses.toString())
                     )))
             .then((clients: API[]) => Promise.all(clients.map((client, idx) => checkGasChargeIsZero(client, `nft-id-${idx}`))))
 
@@ -82,7 +82,9 @@ describe('whitelist', function()  {
 
 });
 
-
+const createWhitelist = (bz: API, addresses: string): Promise<void> =>
+    bz.create("bluzelle", addresses, defaultGasParams())
+        .then(() => {})
 
 const checkGasChargeIsZero = (bz: API, id: string): Promise<void> => {
     let originalBal: number

@@ -110,25 +110,22 @@ func SetGasMeter(simulate bool, ctx sdk.Context, gasLimit uint64, tx sdk.Tx, gk 
 	feePayer := feeTx.FeePayer()
 
 	whiteList := getWhitelist(ctx, crudKeeper)
-	fmt.Println("WHITELIST", whiteList)
+
 	msgModule := tx.GetMsgs()[0].Route()
-	fmt.Println("MSGMODULE", msgModule)
-	isOnWhiteList := isOnWhiteList(msgModule, feePayer.String(), whiteList)
-	fmt.Println("FEE PAYER", feePayer.String())
-	fmt.Println(isOnWhiteList)
+
+
 	if gasPriceCoins.AmountOf("ubnt").LT(minGasPriceCoins.AmountOf("ubnt")) {
 		return ctx, sdkerrors.New("curium", 2, "Specified gas price too low")
 	}
 
 
-	if isOnWhiteList && !simulate && !ctx.IsCheckTx() {
-		fmt.Println("ON WHITE LIST, ASSIGNING GAS METER")
+	if isOnWhiteList(msgModule, feePayer.String(), whiteList) && !simulate && !ctx.IsCheckTx() {
 		gm := gasmeter.NewFreeGasMeter(gasLimit)
 		gk.AddGasMeter(&gm)
 		return ctx.WithGasMeter(gm), nil
 	}
 
-	if (msgModule == "crud" || msgModule == "oracle" || msgModule == "nft") && !simulate && !ctx.IsCheckTx() {
+	if isAChargingModule(msgModule) && !simulate && !ctx.IsCheckTx() {
 		gm := gasmeter.NewChargingGasMeter(supplyKeeper, accountKeeper, gasLimit, feePayer, gasPriceCoins)
 
 		gk.AddGasMeter(&gm)
@@ -154,8 +151,11 @@ func getWhitelist (ctx sdk.Context, crudKeeper crud.Keeper) (string) {
 
 func isOnWhiteList (msgModule string, sender string, whiteList string) bool {
 	onWhiteList := strings.Contains(whiteList, sender)
-	return (msgModule == "crud" || msgModule == "oracle" || msgModule == "nft") && onWhiteList
+	return isAChargingModule(msgModule) && onWhiteList
+}
 
+func isAChargingModule (msgModule string) bool {
+	return msgModule == "crud" || msgModule == "oracle" || msgModule == "nft"
 }
 
 

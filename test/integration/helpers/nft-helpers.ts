@@ -31,7 +31,7 @@ export const getAPIAndSwarm = (config: SwarmConfig = mattnetConfig, reimage: boo
                 .then(mnemonic => bluzelle({
                     mnemonic,
                     endpoint: getSentryUrl(),
-                    uuid: "uuid",
+                    uuid: "bluzelle",
                 }))
                 .then(bz => ({
                     bz,
