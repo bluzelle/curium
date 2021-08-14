@@ -107,14 +107,12 @@ describe('whitelist', function()  {
 
     });
 
-    it.skip('should not charge for nft users on local keyring', () => {
+    it('should not charge for nft users on local keyring (that have been added to the whitelist)', () => {
         return swarm.exec(`blzcli keys show nft -a`)
             .then((nftAddr: string) => createWhitelist(bz, nftAddr))
-            .then(() => checkNftUserWasCharged(swarm, bz, "someNftId"))
+            .then(() => checkUserWasNotCharged(swarm, bz, "someNftId", "nft"))
 
     });
-
-
 
 });
 
@@ -159,14 +157,14 @@ const checkGasWasCharged = (bz: API, id: string): Promise<void> => {
 };
 
 
-const getNftUserBalance = (swarm: Swarm): Promise<number> =>
-    swarm.exec(`blzcli keys show nft -a`)
+const getUserBalance = (swarm: Swarm, user: string): Promise<number> =>
+    swarm.exec(`blzcli keys show ${user} -a`)
         .then(addr => swarm.exec(`blzcli q account ${addr}`))
         .then((resp: any) => parseInt(resp.value.coins[0].amount));
 
-const checkNftUserWasCharged = (swarm: Swarm, bz: API, id: string): Promise<void> => {
+const checkUserWasNotCharged = (swarm: Swarm, bz: API, id: string, user: string): Promise<void> => {
     let originalBal: number
-    return getNftUserBalance(swarm)
+    return getUserBalance(swarm, user)
         .then(bal => originalBal = bal)
         .then(() => uploadNft(getSentryUrl(), getLargePayload(50), "mintable"))
         .then(passThroughAwait(({hash}) => bz.createNft(
@@ -185,6 +183,6 @@ const checkNftUserWasCharged = (swarm: Swarm, bz: API, id: string): Promise<void
                         .then((daemon: Daemon) => checkFileSize(daemon, hash, getLargePayload(50).byteLength))
                 )
             ))
-        .then(() => getNftUserBalance(swarm))
-        .then(remainingBal => expect(remainingBal).to.be.lessThan(originalBal))
+        .then(() => getUserBalance(swarm, user))
+        .then(remainingBal => expect(remainingBal).to.equal(originalBal))
 }
