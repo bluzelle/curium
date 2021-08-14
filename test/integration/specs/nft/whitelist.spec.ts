@@ -20,16 +20,16 @@ describe('whitelist', function()  {
     this.timeout(6000000);
     let bz: API
 
-    beforeEach(() => getAPIAndSwarm(mattnetConfig)
-        .then(({bz: newBz}) => bz = newBz)
-    )
-    // beforeEach(() =>
-    //     bz = bluzelle({
-    //         endpoint: "http://localhost:1327",
-    //         mnemonic: "crater trade start fresh dance else leg other dwarf flavor talk enough interest sleep woman hotel myself diet fetch recycle remove range subject myself",
-    //         uuid: "uuid"
-    //     })
+    // beforeEach(() => getAPIAndSwarm(mattnetConfig)
+    //     .then(({bz: newBz}) => bz = newBz)
     // )
+    beforeEach(() =>
+        bz = bluzelle({
+            endpoint: "http://localhost:1327",
+            mnemonic: "crater trade start fresh dance else leg other dwarf flavor talk enough interest sleep woman hotel myself diet fetch recycle remove range subject myself",
+            uuid: "uuid"
+        })
+    )
 
 
 
