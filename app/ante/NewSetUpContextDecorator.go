@@ -155,7 +155,7 @@ func isOnWhiteList (msgModule string, sender string, whiteList string) bool {
 }
 
 func isAChargingModule (msgModule string) bool {
-	return msgModule == "crud" || msgModule == "oracle"
+	return msgModule == "crud" || msgModule == "oracle" || msgModule == "nft"
 }
 
 

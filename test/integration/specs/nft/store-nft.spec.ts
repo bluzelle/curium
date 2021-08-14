@@ -311,10 +311,10 @@ describe("Store and retriving a NFT", function () {
                     uploadNft(getSentryUrl(), encodeData('nft 2'), 'mintable')]
             )
                 .then(passThroughAwait((hashResps) =>
-                    bz.withTransaction(() => {
-                        bz.createNft(id1, hashResps[0].hash, "mintable", "myUserId", 'text/plain', "", defaultGasParams())
+                    Promise.all([
+                        bz.createNft(id1, hashResps[0].hash, "mintable", "myUserId", 'text/plain', "", defaultGasParams()),
                         bz.createNft(id2, hashResps[1].hash, "mintable", "myUserId", 'text/plain', "", defaultGasParams())
-                    })
+                    ])
                 ))
                 .then(passThroughAwait((hashResps) =>
                     Promise.all(hashResps.map(hashResp =>
