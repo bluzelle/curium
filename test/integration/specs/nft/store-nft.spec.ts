@@ -38,7 +38,7 @@ describe("Store and retriving a NFT", function () {
     let swarm: Swarm
     beforeEach(() => {
 
-        return getAPIAndSwarm(mattnetConfig, true)
+        return getAPIAndSwarm(mattnetConfig)
             .then(({bz: newBz, swarm: newSwarm}) => {
                 bz = newBz
                 swarm = newSwarm
@@ -567,43 +567,7 @@ describe("Store and retriving a NFT", function () {
         });
 
 
-        it('should allow a single blz client to createNfts in parallel', () => {
-            const id = Date.now().toString()
-            return Promise.all<UploadNftResult>(times(2).map(
-                    idx => uploadNft(getSentryUrl(), encodeData(`nft-${idx}`), "mintable")
-                )
-            )
-                .then(x => x)
-                .then(passThroughAwait((uploadResults) =>
-                    Promise.all(uploadResults.map((result, idx) =>
-                            bz.createNft(id, result.hash, 'mintable', `user-${idx}`, "text/plain", "", defaultGasParams())
-                        )
-                    )
-                ))
-                .then(x => x)
-                .then(passThroughAwait((uploadResults) =>
-                    Promise.all(swarm.getDaemons().map(daemon =>
-                            Promise.all(uploadResults.map((result, idx) =>
-                                checkFileReplication(daemon, result.hash, `nft-${idx}`.length)
-                                    .then(() => checkInfoFileReplication(daemon, result.hash))
-                            ))
-                        )
-                    )
-                ))
-                .then((uploadResults) =>
-                    Promise.all(swarm.getSentries('client').map(sentry =>
-                            Promise.all(uploadResults.map((result, idx) =>
-                                checkHashEndpoint(sentry, result.hash, `nft-${idx}`)
-                                    .then(() => checkVendorIdEndpoint(sentry, id, 'mintable', `nft-${idx}`))
-                            ))
-                        )
-                    )
-                )
-        });
-
-
-
-        it('should handle large number of uploads of large files', () => {
+        it.skip('should handle large number of uploads of large files', () => {
             const id = Date.now().toString();
             return Promise.all<string>(times(200).map(idx =>
                     uploadNft(getSentryUrl(), getLargePayload(idx), "mintable")
