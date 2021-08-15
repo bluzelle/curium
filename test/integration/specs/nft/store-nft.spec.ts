@@ -38,7 +38,7 @@ describe("Store and retriving a NFT", function () {
     let swarm: Swarm
     beforeEach(() => {
 
-        return getAPIAndSwarm(mattnetConfig)
+        return getAPIAndSwarm(mattnetConfig, true)
             .then(({bz: newBz, swarm: newSwarm}) => {
                 bz = newBz
                 swarm = newSwarm

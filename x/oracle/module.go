@@ -130,7 +130,7 @@ func (am AppModule) ExportGenesis(ctx sdk.Context) json.RawMessage {
 
 // BeginBlock returns the begin blocker for the oracle module.
 func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
-	//BeginBlocker(ctx, req)
+	BeginBlocker(ctx, req)
 }
 
 // EndBlock returns the end blocker for the oracle module. It returns no validator
