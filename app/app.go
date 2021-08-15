@@ -448,7 +448,7 @@ func NewCRUDApp(
 	)
 
 	app.mm.SetOrderBeginBlockers(distr.ModuleName, slashing.ModuleName, oracle.ModuleName)
-	app.mm.SetOrderEndBlockers(gov.ModuleName, staking.ModuleName, aggregator.ModuleName, nft.ModuleName, curium.ModuleName, tax.ModuleName)
+	app.mm.SetOrderEndBlockers(gov.ModuleName, staking.ModuleName, aggregator.ModuleName, nft.ModuleName, curium.ModuleName, tax.ModuleName, oracle.ModuleName)
 
 	// Sets the order of Genesis - Order matters, genutil is to always come last
 	// NOTE: The genutils moodule must occur after staking so that pools are
