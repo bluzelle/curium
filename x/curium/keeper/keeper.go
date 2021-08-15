@@ -50,6 +50,7 @@ type MsgBroadcaster func(ctx sdk.Context, msgs []sdk.Msg, from string) chan *Msg
 type MsgBroadcasterResponse struct {
 	Response *abci.ResponseDeliverTx
 	Data     *[]byte
+	Hash     *string
 	Error    error
 }
 
@@ -298,10 +299,12 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 		returnError(err)
 		return
 	}
+	hash := result.Hash.String()
 
 	resp <- &MsgBroadcasterResponse{
 		Response: &result.TxResult,
 		Data:     &result.TxResult.Data,
+		Hash: 	  &hash,
 	}
 
 }

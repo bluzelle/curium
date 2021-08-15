@@ -138,9 +138,12 @@ func sendPreflightMsgs(ctx sdk.Context, values []SourceAndValue, keeper Keeper) 
 	}
 	logger.Info("Sending oracle proof messages", "count", len(msgs))
 	result := <- keeper.MsgBroadcaster(ctx, msgs, "oracle")
-
-	logger.Info("Oracle proof messages sent", "response", result.Response.Log)
-	return result.Response.Log
+	if result.Error != nil {
+		logger.Error("Error sending oracle proof messages", "error", result.Error)
+		return ""
+	}
+	logger.Info("Oracle proof messages sent", "response", result.Hash)
+	return *result.Hash
 }
 
 func sendVoteMsgs(ctx sdk.Context, values []SourceAndValue, keeper Keeper) string {
@@ -151,8 +154,12 @@ func sendVoteMsgs(ctx sdk.Context, values []SourceAndValue, keeper Keeper) strin
 	}
 	logger.Info("Sending feeder vote messages", "count", len(msgs))
 	result := <- keeper.MsgBroadcaster(ctx, msgs, "oracle")
-	logger.Info("Feeder vote messages sent", "hash", result.Response.Log)
-	return result.Response.Log
+	if result.Error != nil {
+		logger.Error("Error sending feeder vote message", "error", result.Error)
+		return ""
+	}
+	logger.Info("Feeder vote messages sent", "hash", result.Hash)
+	return *result.Hash
 }
 
 func generateVoteMsg(source SourceAndValue, keyringReader *curium.KeyringReader) (types.MsgOracleVote, error) {
