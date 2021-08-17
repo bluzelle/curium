@@ -3,7 +3,7 @@ import {API, bluzelle} from "bluzelle";
 import {deleteSources} from "../oracle-utils";
 import {getBzClient} from "../../../helpers/bluzelle-client";
 import {feedSources} from "../sources";
-import {listOracleSources, addOracleSource} from 'oracle-js'
+import {listOracleSources, addOracleSource} from '@bluzelle/oracle-js'
 
 describe('add-source functions', function()  {
     this.timeout(10000);
@@ -13,7 +13,7 @@ describe('add-source functions', function()  {
     beforeEach(() => deleteSources(bz));
 
     it('should add sources', () => {
-        return addOracleSource(bz, {Name: 'my-source', Url: 'my-url', Property: 'my-property'}, {gas_price: 0.002})
+        return addOracleSource(bz, {Name: 'my-source', Url: 'my-url', Property: 'my-property', Weight: "100"}, {gas_price: 0.002})
             .then(() => listOracleSources(bz))
             .then(sources => {
                 expect(sources).to.have.length(1);
@@ -28,6 +28,7 @@ describe('add-source functions', function()  {
                 Name: feedSources[0].name,
                 Url: feedSources[0].url,
                 Property: feedSources[0].property,
+                Weight: '100'
             },
             {gas_price: 0.002}
         )

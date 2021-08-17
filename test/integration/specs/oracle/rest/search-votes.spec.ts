@@ -3,7 +3,7 @@ import {getBzClient} from "../../../helpers/bluzelle-client";
 import {addVote, deleteVotes} from "../oracle-utils";
 import {expect} from "chai";
 import {passThrough} from "promise-passthrough";
-import {searchOracleVotes} from 'oracle-js'
+import {searchOracleVotes} from '@bluzelle/oracle-js'
 
 describe('search-votes functions', function () {
     this.timeout(60000);

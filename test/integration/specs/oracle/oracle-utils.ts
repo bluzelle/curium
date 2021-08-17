@@ -1,6 +1,6 @@
 import {API} from "../../../../../blzjs/client";
 import {passThrough} from "promise-passthrough";
-import {listOracleSources} from 'oracle-js'
+import {listOracleSources} from '@bluzelle/oracle-js'
 
 const VALCONS = 'bluzellevalcons12345'
 
