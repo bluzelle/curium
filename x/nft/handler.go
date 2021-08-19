@@ -124,7 +124,8 @@ func handleMsgRegisterPeer(ctx sdk.Context, k Keeper, msg *types.MsgRegisterPeer
 	peer.Port = msg.Port
 	store.Set([]byte(msg.Id), k.Cdc.MustMarshalBinaryBare(&peer))
 
-	if k.GetMyNodeId(ctx) != msg.Id {
+	myNodeId, _ := k.GetMyNodeId(ctx)
+	if myNodeId != msg.Id {
 		btClient := k.GetBtClient()
 		btClient.AddPeer(msg.Id, msg.Address, int(msg.Port))
 	}

@@ -105,17 +105,21 @@ func (k Keeper) CheckIsNftAdmin(address string) error {
 	return nil
 }
 
-func (k Keeper) GetMyNodeId(ctx sdk.Context) string {
+func (k Keeper) GetMyNodeId(ctx sdk.Context) (string, error) {
 	status, err := k.curiumKeeper.GetStatus()
-	if err != nil {
+	if err != nil || status == nil {
 		logger := k.Logger(ctx)
 		logger.Error("unable to get node id", err)
+		return "", err
 	}
-	return status.NodeInfo.Id
+	return status.NodeInfo.Id, nil
 }
 
 func (k Keeper) BroadcastRegisterBtPeer(ctx sdk.Context) error {
-	nodeId := k.GetMyNodeId(ctx)
+	nodeId, err := k.GetMyNodeId(ctx)
+	if err != nil {
+		return err
+	}
 
 	myIp, err := k.curiumKeeper.MyRemoteIp()
 	if err != nil || myIp == "" {

@@ -8,9 +8,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
-	"sync"
-
 	abci "github.com/tendermint/tendermint/abci/types"
+	"sync"
+	"time"
 
 	"github.com/bluzelle/curium/x/nft/client/cli"
 	"github.com/bluzelle/curium/x/nft/client/rest"
@@ -153,9 +153,6 @@ func checkBroadcastPeer(ctx sdk.Context, am AppModule) {
 		am.keeper.Logger(ctx).Error("nft user does not exist in keyring", "nft", err)
 	} else {
 		broadcastPeerOnce.Do(func() {
-
-
-
 			defer func() {
 				go func() {
 					err := am.keeper.BroadcastRegisterBtPeer(ctx)
@@ -189,7 +186,9 @@ func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.Val
 	newBtClientOnce.Do(func() {
 		startTorrentClient(ctx, am)
 	})
-	checkBroadcastPeer(ctx, am)
+	time.AfterFunc(20 * time.Second, func() {
+		checkBroadcastPeer(ctx, am)
+	})
 
 	return []abci.ValidatorUpdate{}
 }
