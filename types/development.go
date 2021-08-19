@@ -1,8 +1,11 @@
 package types
 
-import "os"
+import (
+	"os"
+	"strings"
+)
 
 func IsDevelopment () (bool) {
-	_, valid := os.LookupEnv("DEVEL")
-	return valid
+	env, valid := os.LookupEnv("ENVIRONMENT")
+	return valid && strings.Contains(env, "DEVEL")
 }
