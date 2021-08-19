@@ -22,12 +22,11 @@ export const getSwarmAndClient = () =>
                 auth,
                 bz: bluzelle({
                     mnemonic: auth.mnemonic,
-                    uuid: '',
+                    uuid: Date.now().toString(),
                     endpoint: `https://localhost:${swarm.getSentries()[0].getRestPort()}`
                 })
             })
         )
-        .then(x => x);
 
 export const defaultGasParams = (gasInfo: GasInfo = {}): GasInfo => ({gas_price: 10, max_gas: 100000000, ...gasInfo})
 

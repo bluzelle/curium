@@ -1,30 +1,26 @@
-
 import {expect} from "chai";
 
 
-import {API, bluzelle, uploadNft} from "bluzelle";
+import {API, bluzelle, mnemonicToAddress, uploadNft} from "bluzelle";
 import {
-    checkFileReplication, checkFileSize, checkInfoFileReplication, checkTextFileContents,
-    createBz,
+    checkFileReplication,
+    checkFileSize,
     createMintedBz,
-    encodeData,
-    getAPIAndSwarm,
     getLargePayload,
-    getSentryUrl, mattnetConfig,
+    getSentryUrl,
 } from "../../helpers/nft-helpers";
 import {Swarm} from "daemon-manager/lib/Swarm"
 import {Daemon} from "daemon-manager/lib/Daemon"
-import {defaultGasParams} from "../../helpers/bluzelle-client"
+import {defaultGasParams, getSwarmAndClient} from "../../helpers/bluzelle-client"
 import {times} from 'lodash'
 import {passThroughAwait} from "promise-passthrough";
 import {Some} from "monet";
-import {mnemonicToAddress} from "../../../../blzjs/client";
 
 describe('whitelist', function()  {
     this.timeout(6000000);
     let bz: API
     let swarm: Swarm
-    beforeEach(() => getAPIAndSwarm(mattnetConfig)
+    beforeEach(() => getSwarmAndClient()
         .then(({bz: newBz, swarm: newSwarm}) => {
             bz = newBz
             swarm = newSwarm
@@ -34,49 +30,49 @@ describe('whitelist', function()  {
 
     it('should not charge for accounts on the whitelist', () => {
         return createWhitelist(bz, bz.address)
-            .then(() => checkGasChargeIsZero(bz, "myNftId"))
+            .then(() => checkGasChargeIsZero(swarm, bz, "myNftId"))
     });
 
     it('should not charge for all accounts on the whitelist', () => {
         return Promise.all<API>(times(2).map(() =>
-            createMintedBz()
+            createMintedBz(bz)
         ))
             .then(passThroughAwait((clients : API[]) =>
                 Promise.all(clients.map(client => client.address))
                     .then(addresses => createWhitelist(bz, addresses.toString())
             )))
-            .then((clients: API[]) => Promise.all(clients.map((client, idx) => checkGasChargeIsZero(client, `nft-id-${idx}`))))
+            .then((clients: API[]) => Promise.all(clients.map((client, idx) => checkGasChargeIsZero(swarm, client, `nft-id-${idx}`))))
 
     });
 
     it('should charge for any other address not on the whitelist', () => {
         return Promise.all<API>(times(2).map(() =>
-            createMintedBz()
+            createMintedBz(bz)
         ))
             .then(passThroughAwait((clients : API[]) =>
                 Promise.all(clients.map(client => client.address))
                     .then(addresses => createWhitelist(bz, addresses.toString())
                     )))
-            .then(() => checkGasWasCharged(bz, "newBzId"))
+            .then(() => checkGasWasCharged(swarm, bz, "newBzId"))
     });
 
     it("should charge not charge for large number of accounts on whitelist", () => {
         return Promise.all<string>(times(50).map(() =>
             Some(bz.generateBIP39Account())
-                .map(mnemonic => mnemonicToAddress(mnemonic, false))
+                .map(mnemonic => mnemonicToAddress(mnemonic))
                 .join()
         ))
             .then((addresses: string[]) => {
                 addresses.push(bz.address)
                 return createWhitelist(bz, addresses.toString())
                 })
-            .then(() => checkGasChargeIsZero(bz, "myNftId"))
-            .then(() => createMintedBz())
-            .then(newBz => checkGasWasCharged(newBz, "non-whitelisted nft"))
+            .then(() => checkGasChargeIsZero(swarm, bz, "myNftId"))
+            .then(() => createMintedBz(bz))
+            .then(newBz => checkGasWasCharged(swarm, newBz, "non-whitelisted nft"))
     });
 
     it('should charge for creating an nft', () => {
-        return checkGasWasCharged(bz, "myNftId")
+        return checkGasWasCharged(swarm, bz, "myNftId")
     });
 
     it('should replicate a file and charge for it', () => {
@@ -84,7 +80,7 @@ describe('whitelist', function()  {
         let nftHash: string
         return bz.getBNT({ubnt: true})
             .then(bal => originalBal = bal)
-            .then(() => uploadNft(getSentryUrl(), getLargePayload(50), "mintable"))
+            .then(() => uploadNft(getSentryUrl(swarm), getLargePayload(50), "mintable"))
             .then(({hash}) => nftHash = hash)
             .then(() => bz.createNft(
                 "myNftId",
@@ -108,7 +104,8 @@ describe('whitelist', function()  {
     });
 
     it('should not charge for nft users on local keyring (that have been added to the whitelist)', () => {
-        return swarm.exec(`blzcli keys show nft -a`)
+        return swarm.exec<string>(`blzcli keys show nft -a`)
+            .then(x => x as string)
             .then((nftAddr: string) => createWhitelist(bz, nftAddr))
             .then(() => checkUserWasNotCharged(swarm, bz, "someNftId", "nft"))
 
@@ -120,11 +117,11 @@ const createWhitelist = (bz: API, addresses: string): Promise<void> =>
     bz.create("bluzelle", addresses, defaultGasParams())
         .then(() => {})
 
-const checkGasChargeIsZero = (bz: API, id: string): Promise<void> => {
+const checkGasChargeIsZero = (swarm: Swarm, bz: API, id: string): Promise<unknown> => {
     let originalBal: number
     return bz.getBNT({ubnt: true})
         .then(bal => originalBal = bal)
-        .then(() => uploadNft(getSentryUrl(), getLargePayload(50), "mintable"))
+        .then(() => uploadNft(getSentryUrl(swarm), getLargePayload(50), "mintable"))
         .then(({hash}) => bz.createNft(
             id,
             hash,
@@ -138,11 +135,11 @@ const checkGasChargeIsZero = (bz: API, id: string): Promise<void> => {
         .then(remainingBal => expect(remainingBal).to.equal(originalBal))
 }
 
-const checkGasWasCharged = (bz: API, id: string): Promise<void> => {
+const checkGasWasCharged = (swarm: Swarm, bz: API, id: string): Promise<unknown> => {
     let originalBal: number
     return bz.getBNT({ubnt: true})
         .then(bal => originalBal = bal)
-        .then(() => uploadNft(getSentryUrl(), getLargePayload(50), "mintable"))
+        .then(() => uploadNft(getSentryUrl(swarm), getLargePayload(50), "mintable"))
         .then(({hash}) => bz.createNft(
             id,
             hash,
@@ -162,11 +159,11 @@ const getUserBalance = (swarm: Swarm, user: string): Promise<number> =>
         .then(addr => swarm.exec(`blzcli q account ${addr}`))
         .then((resp: any) => parseInt(resp.value.coins[0].amount));
 
-const checkUserWasNotCharged = (swarm: Swarm, bz: API, id: string, user: string): Promise<void> => {
+const checkUserWasNotCharged = (swarm: Swarm, bz: API, id: string, user: string): Promise<unknown> => {
     let originalBal: number
     return getUserBalance(swarm, user)
         .then(bal => originalBal = bal)
-        .then(() => uploadNft(getSentryUrl(), getLargePayload(50), "mintable"))
+        .then(() => uploadNft(getSentryUrl(swarm), getLargePayload(50), "mintable"))
         .then(passThroughAwait(({hash}) => bz.createNft(
             id,
             hash,

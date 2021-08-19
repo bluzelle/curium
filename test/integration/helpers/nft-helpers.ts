@@ -11,8 +11,8 @@ import {defaultGasParams} from "./bluzelle-client";
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 
-export const getSentryUrl = (swarm: Swarm): string =>
-    `https://localhost:${swarm.getSentries()[0].getRestPort()}`;
+export const getSentryUrl = (swarm: Swarm, idx: number = 0): string =>
+    `https://localhost:${swarm.getSentries()[idx].getRestPort()}`;
 
 export const encodeData = (data: string): Uint8Array => new TextEncoder().encode(data);
 
@@ -33,8 +33,8 @@ export const createBz = (bz: API): API =>
         })
         .join();
 
-export const createMintedBz = (swarm: Swarm): Promise<API> =>
-    fetch(`${getSentryUrl(swarm)}/mint`)
+export const createMintedBz = (bz: API): Promise<API> =>
+    fetch(`${bz.url}/mint`)
         .then(x => x.arrayBuffer().then(buf => ({x, buf})))
         .then(resp => ({
             body: new Uint8Array(resp.buf),
@@ -45,8 +45,8 @@ export const createMintedBz = (swarm: Swarm): Promise<API> =>
         .then(resp => resp.mnemonic)
         .then(mnemonic => bluzelle({
             mnemonic,
-            endpoint: 'Need to fix this',
-            uuid: Date.now().toString(),
+            endpoint: bz.url,
+            uuid: bz.uuid,
         }));
 
 
@@ -134,12 +134,8 @@ export const checkHashEndpointBytes = (daemon: Daemon, hash: string, contents: U
         })
         .then(() => daemon);
 
-export const checkVendorIdEndpoint = (daemon: Daemon, id: string, vendor: string, contents: string): Promise<Daemon> =>
-    daemon.getIPAddress()
-        .then(ip => {
-            console.log(ip)
-            return fetchDataWithIdAndVendor(daemon.getSwarm(), id, vendor, `https://${ip}:${daemon.getRestPort().toString()}`)
-        })
+export const checkVendorIdEndpoint = (url: string, daemon: Daemon, id: string, vendor: string, contents: string): Promise<Daemon> =>
+    fetchDataWithIdAndVendor(daemon.getSwarm(), id, vendor, url)
         .then(passThrough(() => console.log("Request made to", id, vendor)))
         .then((resp: { body: Uint8Array, contentType: string }) => expect(resp.body).to.deep.equal(encodeData(contents)))
         .then(() => console.log("File contents from endpoint matches on ", daemon.getName()))
@@ -155,7 +151,10 @@ export const getLargePayload = memoize<(length: number) => Uint8Array>((length) 
     return new Uint8Array(length * 1024 * 1024).map((v, idx) => idx % 256)
 });
 
-export const fetchData = (swarm: Swarm, hash: string = '', {id, vendor}: { id?: string, vendor?: string }): Promise<unknown> =>
+export const fetchData = (swarm: Swarm, hash: string = '', {
+    id,
+    vendor
+}: { id?: string, vendor?: string }): Promise<unknown> =>
     (id ? fetch(`${getSentryUrl(swarm)}/nft/${vendor}/${id}`) : fetch(`${getSentryUrl(swarm)}/nft/${hash}`))
         .then(resp => resp);
 

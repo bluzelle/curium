@@ -5,7 +5,7 @@ import {expect} from "chai";
 import {passThrough} from "promise-passthrough";
 import {searchOracleVotes} from '@bluzelle/oracle-js'
 
-describe('search-votes functions', function () {
+describe.skip('search-votes functions', function () {
     this.timeout(60000);
     let bz: API
 

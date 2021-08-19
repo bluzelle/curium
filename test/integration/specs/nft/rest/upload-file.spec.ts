@@ -1,54 +1,44 @@
 import {expect} from 'chai'
-import {API, bluzelle} from "bluzelle";
-import {promises} from "fs"
+import {API} from "bluzelle"
+import {times} from 'lodash'
 
+import {getSwarmAndClient} from "../../../helpers/bluzelle-client";
+import {Swarm} from "daemon-manager/lib/Swarm";
 
-import {getBzClient} from "../../../helpers/bluzelle-client";
-import * as fs from "fs";
-import * as path from "path";
-
+process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
 describe('file upload', function()  {
-    this.timeout(10000);
-    let bz: API
+    this.timeout(200000);
+    let bz: API;
+    let swarm: Swarm;
 
-    beforeEach(() => bz = getBzClient());
+    beforeEach(() =>
+        getSwarmAndClient()
+            .then(result => {
+                bz = result.bz
+                swarm  = result.swarm
+            })
+    );
 
 
     it('should create a directory nft-upload/vendor in .blzd', () => {
-        return fetch(`http://localhost:1317/nft/upload/Mintable/someHash/1`, {
+        return fetch(`${bz.url}/nft/upload/mintable/someHash/1`, {
             method: 'POST',
             body: "1"
         })
-            .then(() => fs.existsSync(path.resolve(__dirname, `${process.env.HOME}/.blzd/nft-upload/Mintable`)))
-            .then(resp => expect(resp).to.be.true)
+            .then(() => swarm.getSentries()[0].readTextFile('.blzd/nft-upload/mintable/someHash-0001'))
+            .then(resp => expect(resp).to.equal("1"))
     });
 
     it('should allow multiple simultaneous uploads to a node', () => {
-        return Promise.all([
-            fetch(`http://localhost:1317/nft/upload/Mintable/mintableHash/1`, {
-            method: 'POST',
-            body: "1"
-        }), fetch(`http://localhost:1317/nft/upload/Crypto/cryptoHash/1`, {
-                method: 'POST',
-                body: "1"
-            }),
-        ])
-            .then(() => fs.existsSync(path.resolve(__dirname, `${process.env.HOME}/.blzd/nft-upload/Mintable`)))
-            .then(resp => expect(resp).to.be.true)
-            .then(() => fs.existsSync(path.resolve(__dirname, `${process.env.HOME}/.blzd/nft-upload/Crypto`)))
-            .then(resp => expect(resp).to.be.true)
+        return Promise.all(
+            times(100).map(n =>
+                fetch(`${bz.url}/nft/upload/vendor-${n}/someHash/1`, {
+                    method: 'POST',
+                    body: "xxx"
+                })
+                    .then(() => swarm.getSentries()[0].readTextFile(`.blzd/nft-upload/vendor-${n}/someHash-0001`))
+                        .then(resp => expect(resp).to.equal('xxx'))
+            )
+        )
     });
-
-    it('should chunk up a large file', () => {
-        let hash = Date.now().toString();
-        return fetch(`http://localhost:1317/nft/upload/${hash}/1`, {
-            method: 'POST',
-            body: "1"
-        })
-            .then(() => fs.existsSync(path.resolve(__dirname, `${process.env.HOME}/.blzd/nft-upload/${hash}-0001`)))
-            .then(resp => expect(resp).to.be.true)
-            .then(() => fs.readFileSync(path.resolve(__dirname, `${process.env.HOME}/.blzd/nft-upload/${hash}-0001`)))
-            .then(resp => expect(new TextDecoder().decode(resp)).to.equal("1"))
-    });
-
 });

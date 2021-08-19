@@ -1,6 +1,6 @@
 import {API} from "../../../../../blzjs/client";
 import {passThrough} from "promise-passthrough";
-import {listOracleSources} from '@bluzelle/oracle-js'
+import {listOracleSources, Source} from '@bluzelle/oracle-js'
 
 const VALCONS = 'bluzellevalcons12345'
 
@@ -13,10 +13,10 @@ export const deleteVotes = (bz: API) =>
         }
     }, {gas_price: 0.002})
 
-export const deleteSources = (bz: API) =>
+export const deleteSources = (bz: API): Promise<unknown> =>
     listOracleSources(bz)
-        .then((sources: any) => sources.length && bz.withTransaction(() =>
-                sources.map(source => deleteSource(bz, source.Name))
+        .then((sources: Source[]): any => sources.length && bz.withTransaction(() =>
+                sources.map((source: Source) => deleteSource(bz, source.Name))
             )
         )
 
@@ -29,9 +29,9 @@ const deleteSource = (bz: API, name: string): Promise<any> =>
         }
     }, {gas_price: 0.002});
 
-const awaitContext = (prop, fn) => (state) =>
+const awaitContext = (prop: string, fn: Function) => (state: Object) =>
     fn(state)
-        .then(val => ({...state, [prop]: val}))
+        .then((val: unknown) => ({...state, [prop]: val}))
 
 const getValcons = (bz: API) => bz.abciQuery('custom/oracle/getValcons', {})
     .then(x => x.result)
@@ -45,9 +45,9 @@ const calculateProofSig = (bz: API, value: string) =>
 
 export const addVote = (bz: API, vote: any) =>
     Promise.resolve({bz: bz, vote: vote})
-        .then(awaitContext('valcons', ctx => getValcons(ctx.bz)))
-        .then(awaitContext('sig', ctx => calculateProofSig(ctx.bz, ctx.vote.Value)))
-        .then(passThrough(ctx =>
+        .then(awaitContext('valcons', (ctx: any) => getValcons(ctx.bz)))
+        .then(awaitContext('sig', (ctx: any) => calculateProofSig(ctx.bz, ctx.vote.Value)))
+        .then(passThrough((ctx: any) =>
                 bz.sendMessage({
                     type: 'oracle/MsgOracleVoteProof',
                     value: {

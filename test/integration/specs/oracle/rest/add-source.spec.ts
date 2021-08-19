@@ -5,7 +5,7 @@ import {getBzClient} from "../../../helpers/bluzelle-client";
 import {feedSources} from "../sources";
 import {listOracleSources, addOracleSource} from '@bluzelle/oracle-js'
 
-describe('add-source functions', function()  {
+describe.skip('add-source functions', function()  {
     this.timeout(10000);
     let bz: API
 
