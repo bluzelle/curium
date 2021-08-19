@@ -119,13 +119,13 @@ func (k Keeper) BroadcastRegisterBtPeer(ctx sdk.Context) error {
 
 	myIp, err := k.curiumKeeper.MyRemoteIp()
 	if err != nil || myIp == "" {
-		k.Logger(ctx).Error("unable to get my ip", err)
+		return err
 	}
 
 
 	creator, err := k.KeyringReader.GetAddress("nft")
 	if err != nil {
-		k.Logger(ctx).Error("unable to get address of nft account")
+		return err
 	}
 	msg := types.MsgRegisterPeer{
 		Creator: creator.String(),

@@ -8,6 +8,7 @@ import (
 	devel "github.com/bluzelle/curium/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"io/ioutil"
+	"net"
 
 	cryptoKeys "github.com/cosmos/cosmos-sdk/crypto/keys"
 
@@ -179,16 +180,16 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 		}
 	}
 
-	defer func() {
-		r := recover()
-		curiumKeeper.Logger(ctx).Error("DoBroadcast", "error", r)
-
-		if r != nil {
-			returnError(r.(error))
-		} else {
-			returnError(errors.New("nil error returned"))
-		}
-	}()
+	//defer func() {
+	//	r := recover()
+	//	curiumKeeper.Logger(ctx).Error("DoBroadcast", "error", r)
+	//
+	//	if r != nil {
+	//		returnError(r.(error))
+	//	} else {
+	//		returnError(errors.New("nil error returned"))
+	//	}
+	//}()
 
 	kr, err := getKeyring(keyringDir)
 
@@ -369,7 +370,15 @@ func (k Keeper) GetNetInfo() (*NetInfo, error) {
 
 func (k Keeper) MyRemoteIp() (string, error) {
 	if devel.IsDevelopment() {
-		return "127.0.0.1", nil
+			conn, err := net.Dial("udp", "8.8.8.8:80")
+			if err != nil {
+			fmt.Println("Unable to determine external ip", err)
+		}
+			defer conn.Close()
+
+			localAddr := conn.LocalAddr().(*net.UDPAddr)
+
+			return localAddr.IP.String(), nil
 	}
 	bz, err := httpGet("https://api.ipify.org?format=json")
 	if err != nil {
@@ -378,7 +387,6 @@ func (k Keeper) MyRemoteIp() (string, error) {
 	var result map[string]string
 	json.Unmarshal(bz, &result)
 	return result["ip"], nil
-
 }
 
 func httpGet(url string) ([]byte, error) {

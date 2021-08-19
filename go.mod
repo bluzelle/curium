@@ -13,6 +13,7 @@ require (
 	github.com/gorilla/mux v1.7.4
 	github.com/magiconair/properties v1.8.1
 	github.com/robfig/cron/v3 v3.0.1
+	github.com/scottburch/monads-golang v1.0.6
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/viper v1.6.3
 	github.com/stretchr/testify v1.7.0
