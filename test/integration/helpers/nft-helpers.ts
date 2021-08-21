@@ -12,7 +12,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 
 export const getSentryUrl = (swarm: Swarm, idx: number = 0): string =>
-    `https://localhost:${swarm.getSentries()[idx].getRestPort()}`;
+    `${swarm.getSwarmConfig().restProtocol}://localhost:${swarm.getSentries()[idx].getRestPort()}`;
 
 export const encodeData = (data: string): Uint8Array => new TextEncoder().encode(data);
 
@@ -143,7 +143,7 @@ export const checkVendorIdEndpoint = (url: string, daemon: Daemon, id: string, v
 
 export const checkVendorIdEndpointBytes = (daemon: Daemon, id: string, vendor: string, contents: Uint8Array): Promise<Daemon> =>
     daemon.getIPAddress()
-        .then(ip => fetchDataWithIdAndVendor(daemon.getSwarm(), id, vendor, `https://${ip}:${daemon.getRestPort().toString()}`))
+        .then(ip => fetchDataWithIdAndVendor(daemon.getSwarm(), id, vendor, `${daemon.getDaemonConfig().restProtocol}://${ip}:${daemon.getRestPort().toString()}`))
         .then((resp: { body: Uint8Array, contentType: string }) => expect(resp.body).to.deep.equal(contents))
         .then(() => daemon);
 

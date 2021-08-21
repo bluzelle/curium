@@ -15,20 +15,20 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	"os"
 )
-var btClient *torrentClient.TorrentClient
+
+var btClient      *torrentClient.TorrentClient
+
 
 type (
 	Keeper struct {
 		Cdc            *codec.Codec
 		storeKey       sdk.StoreKey
-		memKey         sdk.StoreKey
-		BtDirectory    string
-		BtPort         int
-		HomeDir        string
+		memKey     sdk.StoreKey
+		NftBaseDir string
+		BtPort     int
 		MsgBroadcaster curium.MsgBroadcaster
 		curiumKeeper   *curium.Keeper
 		KeyringReader *keeper.KeyringReader
-		BtClient      *torrentClient.TorrentClient
 	}
 )
 
@@ -36,9 +36,8 @@ func NewKeeper (
 	cdc *codec.Codec,
 	storeKey,
 	memKey sdk.StoreKey,
-	btDirectory string,
+	nftBaseDir string,
 	btPort int,
-	homeDir string,
 	msgBroadcaster curium.MsgBroadcaster,
 	curiumKeeper *curium.Keeper,
 	keyringReader *keeper.KeyringReader,
@@ -49,20 +48,31 @@ func NewKeeper (
 		Cdc:            cdc,
 		storeKey:       storeKey,
 		memKey:         memKey,
-		BtDirectory:    btDirectory,
+		NftBaseDir:    nftBaseDir,
 		BtPort:         btPort,
-		HomeDir:        homeDir,
 		MsgBroadcaster: msgBroadcaster,
 		curiumKeeper:   curiumKeeper,
 		KeyringReader:  keyringReader,
 	}
 }
 
-func (k Keeper) GetBtClient() (*torrentClient.TorrentClient) {
+func (k Keeper) GetNftUploadDir() string {
+	return k.NftBaseDir + "/nft-upload"
+}
+
+func (k Keeper) GetNftDir() string {
+	return k.NftBaseDir + "/nft"
+}
+
+func (k Keeper) GetBtPort() int {
+	return k.BtPort
+}
+
+func (k *Keeper) GetBtClient() (*torrentClient.TorrentClient) {
 	return btClient
 }
 
-func (k Keeper) SetBtClient(newBtClient *torrentClient.TorrentClient) {
+func (k *Keeper) SetBtClient(newBtClient *torrentClient.TorrentClient) {
 	btClient = newBtClient
 }
 
@@ -142,13 +152,14 @@ func (k Keeper) BroadcastRegisterBtPeer(ctx sdk.Context) error {
 
 	if result != nil && result.Error != nil {
 		k.Logger(ctx).Error("unable to broadcast register peer message", err)
+		return err
 	}
 
-	return result.Error
+	return nil
 }
 
 func (k Keeper) EnsureNftDirExists () {
-	if _, err := os.Stat(k.HomeDir+"/nft"); err != nil {
-		os.Mkdir(k.HomeDir + "/nft", 0777)
+	if _, err := os.Stat(k.GetNftDir()); err != nil {
+		os.Mkdir(k.GetNftDir(), 0777)
 	}
 }

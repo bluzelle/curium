@@ -10,6 +10,8 @@ interface Node {
     nodeId: string
     valoper: string
     home: string
+    nftBaseDir: string,
+    btPort: number
 }
 
 interface User {
@@ -130,7 +132,11 @@ function updateAppToml(ctx: Context): Promise<unknown> {
         editFile(n, 'app.toml', text =>
             text
                 .replace('minimum-gas-prices = ""', 'minimum-gas-prices = "0.002ubnt"')
-        )
+                .concat(`\nnft-base-dir = "${n.nftBaseDir}"\n`)
+                .concat(`nft-p2p-port = "${n.btPort}"\n`)
+
+
+)
     ))
 }
 
@@ -182,7 +188,9 @@ function initBlzd(count: number): Promise<Context> {
                 exec<any>(() => $`blzd init curium00 --chain-id bluzelle --home ${getHomeDir(n)}`)
                     .then(x => ({
                         nodeId: x.node_id,
-                        home: getHomeDir(n)
+                        home: getHomeDir(n),
+                        btPort: 5500 + n,
+                        nftBaseDir: getHomeDir(n)
                     }))
             )
     ))

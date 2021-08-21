@@ -50,7 +50,7 @@ describe("Store and retriving a NFT", function () {
             })
             .then(() => Promise.all(
                 swarm.getDaemons()
-                    .map(d => d.exec(`rm -rf .blzd/nft*`))
+                    .map(d => d.exec(`rm -rf ${d.getNftBaseDir()}/nft*`))
             ))
     });
 

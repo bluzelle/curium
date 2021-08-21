@@ -5,8 +5,8 @@ import {getSwarm} from "@bluzelle/testing/lib/helpers/swarmHelpers";
 
 export const getBzClient = memoize((config: Partial<BluzelleConfig> = {}) =>
     bluzelle({
-        mnemonic: "crater trade start fresh dance else leg other dwarf flavor talk enough interest sleep woman hotel myself diet fetch recycle remove range subject myself",
-        endpoint: 'https://localhost:1317',
+        mnemonic: "leaf yellow ride arrive garbage sniff park coral brave category resource gauge tired royal flee fall engine smooth couple hole craft unfair august suggest",
+        endpoint: 'https://localhost:1327',
         uuid: 'uuid',
         ...config
     })
@@ -23,7 +23,7 @@ export const getSwarmAndClient = () =>
                 bz: bluzelle({
                     mnemonic: auth.mnemonic,
                     uuid: Date.now().toString(),
-                    endpoint: `https://localhost:${swarm.getSentries()[0].getRestPort()}`
+                    endpoint: `${swarm.getSwarmConfig().restProtocol}://localhost:${swarm.getSentries()[0].getRestPort()}`
                 })
             })
         )

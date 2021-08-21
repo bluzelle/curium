@@ -11,6 +11,7 @@ import (
 	"github.com/zeebo/bencode"
 	"io/ioutil"
 	"os"
+	"sync"
 )
 
 func NewHandler(keeper keeper.Keeper) sdk.Handler {
@@ -39,14 +40,14 @@ func handleMsgCreateNft(goCtx sdk.Context, k keeper.Keeper, msg *types.MsgCreate
 		msg.Meta,
 		msg.Mime,
 	)
-	err := k.AssembleNftFile(k.HomeDir+"/nft-upload", k.HomeDir+"/nft", msg)
+	err := k.AssembleNftFile(k.GetNftUploadDir(), k.GetNftDir(), msg)
 	if err != nil {
 		return nil, sdkerrors.New("nft", 2, fmt.Sprintf("unable to move nft files: %s", msg.Hash))
 	}
 
 
 
-	if _, err := os.Stat(k.HomeDir+"/nft/"+msg.Hash); err == nil {
+	if _, err := os.Stat(k.GetNftDir() + "/" + msg.Hash); err == nil {
 		btClient := k.GetBtClient()
 		metainfo, err := btClient.TorrentFromFile(msg.Hash)
 		if err != nil {
@@ -80,8 +81,17 @@ func handleMsgCreateNft(goCtx sdk.Context, k keeper.Keeper, msg *types.MsgCreate
 	return &sdk.Result{Data: createResp}, nil
 }
 
+var newBtClientOnce sync.Once
+func ensureBtClient(ctx sdk.Context, k Keeper) {
+	newBtClientOnce.Do(func() {
+		startTorrentClient(ctx, k)
+	})
+
+}
+
 func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) (*sdk.Result, error) {
 	k.Logger(ctx).Debug("Publish file message received", "id", msg.Id)
+	ensureBtClient(ctx, k)
 	var metainfo metainfo.MetaInfo
 	bencode.DecodeBytes(msg.Metainfo, &metainfo)
 
@@ -91,7 +101,7 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 	k.EnsureNftDirExists()
 
 
-	err := os.Symlink(k.HomeDir+"/nft/"+msg.Hash, k.HomeDir+"/nft/"+msg.Vendor + "-" + msg.Id)
+	err := os.Symlink(k.GetNftDir() + "/" +msg.Hash, k.GetNftDir() +"/" + msg.Vendor + "-" + msg.Id)
 
 	if err != nil {
 
@@ -105,11 +115,11 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 		Mime: msg.Mime,
 	}
 
-	err = ioutil.WriteFile(k.HomeDir+"/nft/"+msg.Hash+".info", k.Cdc.MustMarshalJSON(&info), 0666)
+	err = ioutil.WriteFile(k.GetNftDir()+"/"+msg.Hash+".info", k.Cdc.MustMarshalJSON(&info), 0666)
 	if err != nil {
 		return nil, err
 	}
-	err = os.Symlink(k.HomeDir+"/nft/"+msg.Hash+".info", k.HomeDir+"/nft/"+msg.Vendor + "-" + msg.Id+".info")
+	err = os.Symlink(k.GetNftDir()+"/"+msg.Hash+".info", k.GetNftDir()+"/"+msg.Vendor + "-" + msg.Id+".info")
 	if err != nil {
 		return nil, err
 	}

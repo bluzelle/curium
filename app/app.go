@@ -74,7 +74,7 @@ func getHomeDir() string {
 	return os.ExpandEnv("$HOME/.blzd")
 }
 
-func getCLIDir () string {
+func getCLIDir() string {
 	if devel.IsDevelopment() && !isFirstNode() {
 		return os.ExpandEnv("$HOME/$BLZCLI")
 	}
@@ -120,52 +120,28 @@ var (
 	}
 )
 
-func IsCrudEnabled(nodeHome string) bool {
-	enabled := true
-
-	viper.SetConfigName("app")
-	viper.SetConfigType("toml")
-	viper.AddConfigPath(nodeHome + "/config/")
-
-	if viper.ReadInConfig() == nil {
-		if viper.IsSet(crudModuleEntry) {
-			enabled = viper.GetBool(crudModuleEntry)
-		}
+func IsCrudEnabled() bool {
+	if viper.IsSet(crudModuleEntry) {
+		return viper.GetBool(crudModuleEntry)
 	}
-	return enabled
+	return true
 }
 
-func getNftFileDir (nodeHome string) (string, error) {
-	viper.SetConfigName("app")
-	viper.SetConfigType("toml")
-	viper.AddConfigPath(nodeHome + "/config/")
-
-	if viper.ReadInConfig() == nil {
-
-		if viper.IsSet("nft-file-dir") {
-			return DefaultNodeHome + "/" + viper.GetString("nft-file-dir"), nil
-		}
-
+func getNftBaseDir() string {
+	if viper.IsSet("nft-base-dir") {
+		return viper.GetString("nft-base-dir")
 	}
-	return "", sdkerrors.New("nft", 1, "No nft file directory specified in app.toml")
+	panic("No nft-base-dir specified in app.toml")
 }
 
-func getNftP2PPort (nodeHome string) (string, error) {
-	viper.SetConfigName("app")
-	viper.SetConfigType("toml")
-	viper.AddConfigPath(nodeHome + "/config/")
-
-	if viper.ReadInConfig() == nil {
-
-		if viper.IsSet("nft-p2p-port") {
-			return viper.GetString("nft-p2p-port"), nil
-		}
-
+func getNftP2PPort() string {
+	if viper.IsSet("nft-p2p-port") {
+		return viper.GetString("nft-p2p-port")
 	}
-	return "", sdkerrors.New("nft", 1, "No nft p2p port specified in app.toml")
+	panic("no nft-p2p-port specified in app.toml")
 }
 
-func getRpcLadder (nodeHome string) (string, error) {
+func getRpcLadder(nodeHome string) (string, error) {
 	viper.SetConfigName("config")
 	viper.SetConfigType("toml")
 	viper.AddConfigPath(nodeHome + "/config/")
@@ -180,20 +156,11 @@ func getRpcLadder (nodeHome string) (string, error) {
 	return "", sdkerrors.New("nft", 1, "No rpc laddr url specified in config.toml")
 }
 
-
-func getMinGasPrices (nodeHome string) (string, error) {
-	viper.SetConfigName("app")
-	viper.SetConfigType("toml")
-	viper.AddConfigPath(nodeHome + "/config/")
-
-	if viper.ReadInConfig() == nil {
-
-		if viper.IsSet("minimum-gas-prices") {
-			return viper.GetString("minimum-gas-prices"), nil
-		}
-
+func getMinGasPrices(nodeHome string) string {
+	if viper.IsSet("minimum-gas-prices") {
+		return viper.GetString("minimum-gas-prices")
 	}
-	return "", sdkerrors.New("crud", 1, "Minimum gas prices not specified in app.toml")
+	panic("minimum-gas-prices not specified in app.toml")
 }
 
 func MakeCodec() *codec.Codec {
@@ -226,7 +193,7 @@ type CRUDApp struct {
 	oracleKeeper   oracle.Keeper
 	faucetKeeper   faucet.Keeper
 	aggKeeper      aggregator.Keeper
-	nftKeeper 	   *nft.Keeper
+	nftKeeper      *nft.Keeper
 	curiumKeeper   *curium.Keeper
 	gasMeterKeeper *gasmeter.GasMeterKeeper
 	// Module Manager
@@ -253,7 +220,7 @@ func NewCRUDApp(
 		gov.StoreKey, params.StoreKey, crud.StoreKey,
 		tax.StoreKey,
 		faucet.StoreKey, crud.LeaseKey, crud.OwnerKey,
-		oracle.StoreKey,aggregator.StoreKey,
+		oracle.StoreKey, aggregator.StoreKey,
 		nft.StoreKey, nft.MemStoreKey,
 		curium.StoreKey, curium.MemStoreKey,
 	)
@@ -348,16 +315,13 @@ func NewCRUDApp(
 			app.slashingKeeper.Hooks()),
 	)
 
-	laddr, _ := getRpcLadder(DefaultNodeHome)
-
 	app.gasMeterKeeper = gasmeter.NewGasMeterKeeper()
-
 
 	app.curiumKeeper = curium.NewKeeper(
 		app.cdc,
 		keys[curium.StoreKey],
 		keys[curium.MemStoreKey],
-		laddr,
+		viper.GetString("rpc.laddr"),
 		app.accountKeeper,
 		app.gasMeterKeeper,
 	)
@@ -399,18 +363,15 @@ func NewCRUDApp(
 		keys[faucet.StoreKey],
 		app.cdc)
 
-
 	app.taxKeeper = tax.NewKeeper(
 		keys[tax.StoreKey],
 		app.cdc,
 		app.supplyKeeper,
 	)
 
-
-
-	nftFileDir, _ := getNftFileDir(DefaultNodeHome)
-	nftP2PPortString, _ := getNftP2PPort(DefaultNodeHome)
-	nftP2PPort, _  := strconv.Atoi(nftP2PPortString)
+	nftBaseDir := getNftBaseDir()
+	nftP2PPortString := getNftP2PPort()
+	nftP2PPort, _ := strconv.Atoi(nftP2PPortString)
 
 	msgBroadcaster := app.curiumKeeper.NewMsgBroadcaster(DefaultCLIHome, cdc)
 
@@ -418,16 +379,15 @@ func NewCRUDApp(
 		app.cdc,
 		keys[nft.StoreKey],
 		keys[nft.MemStoreKey],
-		DefaultNodeHome + "/" + nftFileDir,
+		nftBaseDir,
 		nftP2PPort,
-		DefaultNodeHome,
 		msgBroadcaster,
 		app.curiumKeeper,
 		curium.NewKeyringReader(DefaultCLIHome),
-		)
+	)
 
 	// check flags...
-	bluzelleCrud := IsCrudEnabled(DefaultNodeHome)
+	bluzelleCrud := IsCrudEnabled()
 
 	app.mm = module.NewManager(
 		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx),
@@ -443,7 +403,7 @@ func NewCRUDApp(
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
 		oracle.NewAppModule(app.oracleKeeper),
 		aggregator.NewAppModule(app.aggKeeper),
-		nft.NewAppModule(*app.nftKeeper, app.accountKeeper, nftFileDir, nftP2PPort),
+		nft.NewAppModule(*app.nftKeeper, app.accountKeeper, nftBaseDir + "/nft", nftP2PPort),
 		curium.NewAppModule(*app.curiumKeeper),
 	)
 
@@ -490,10 +450,9 @@ func NewCRUDApp(
 	return app
 }
 
-
 func addAnteHandler(app *CRUDApp) {
 
-	minGasPriceString, _ := getMinGasPrices(DefaultNodeHome)
+	minGasPriceString := getMinGasPrices(DefaultNodeHome)
 	minGasPriceCoins, _ := sdk.ParseDecCoins(minGasPriceString)
 
 	// The AnteHandler handles signature verification and transaction pre-processing
@@ -554,7 +513,7 @@ func (app *CRUDApp) ModuleAccountAddrs() map[string]bool {
 	return modAccAddrs
 }
 
-func (app *CRUDApp) ExportAppStateAndValidators(forZeroHeight bool, jailWhiteList []string, ) (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
+func (app *CRUDApp) ExportAppStateAndValidators(forZeroHeight bool, jailWhiteList []string) (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 
 	// as if they could withdraw from the start of the next block
 	ctx := app.NewContext(true, abci.Header{Height: app.LastBlockHeight()})

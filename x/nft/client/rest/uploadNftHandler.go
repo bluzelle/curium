@@ -1,6 +1,5 @@
 package rest
 
-
 import (
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/client/context"
@@ -10,7 +9,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strings"
 )
 func uploadNftHandler(clientCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -18,7 +16,13 @@ func uploadNftHandler(clientCtx context.CLIContext) http.HandlerFunc {
 		chunkNum := mux.Vars(r)["chunkNum"]
 		vendor := mux.Vars(r)["vendor"]
 
-		uploadPath := strings.TrimSuffix(clientCtx.HomeDir, ".blzcli") + ".blzd" + "/nft-upload" + "/" + vendor
+		// TODO create an endpoint to query the nft upload dir from curium
+		uploadDirRes, _, err := clientCtx.Query("custom/nft/get-nft-upload-dir")
+
+		uploadDir := string(uploadDirRes)
+
+		uploadPath := uploadDir + "/" + vendor
+
 		os.MkdirAll(uploadPath, os.ModePerm)
 
 		chunkInt, ok := math.ParseUint64(chunkNum)
