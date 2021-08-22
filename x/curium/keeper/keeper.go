@@ -180,16 +180,18 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 		}
 	}
 
-	//defer func() {
-	//	r := recover()
-	//	curiumKeeper.Logger(ctx).Error("DoBroadcast", "error", r)
-	//
-	//	if r != nil {
-	//		returnError(r.(error))
-	//	} else {
-	//		returnError(errors.New("nil error returned"))
-	//	}
-	//}()
+	if !devel.IsDevelopment() {
+		defer func() {
+			r := recover()
+			curiumKeeper.Logger(ctx).Error("DoBroadcast", "error", r)
+
+			if r != nil {
+				returnError(r.(error))
+			} else {
+				returnError(errors.New("nil error returned"))
+			}
+		}()
+	}
 
 	kr, err := getKeyring(keyringDir)
 

@@ -16,6 +16,7 @@ package app
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/bluzelle/curium/app/ante/gasmeter"
 	"github.com/bluzelle/curium/x/aggregator"
 	"github.com/bluzelle/curium/x/curium"
@@ -205,6 +206,10 @@ func NewCRUDApp(
 	db dbm.DB,
 	baseAppOptions ...func(*bam.BaseApp),
 ) *CRUDApp {
+
+	if devel.IsDevelopment() {
+		fmt.Println("\n******* RUNNING IN DEVELOPMENT MODE *******\n")
+	}
 
 	// First define the top level codec that will be shared by the different modules
 	cdc := MakeCodec()
