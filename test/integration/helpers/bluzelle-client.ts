@@ -5,7 +5,7 @@ import {getSwarm} from "@bluzelle/testing/lib/helpers/swarmHelpers";
 
 export const getBzClient = memoize((config: Partial<BluzelleConfig> = {}) =>
     bluzelle({
-        mnemonic: "leaf yellow ride arrive garbage sniff park coral brave category resource gauge tired royal flee fall engine smooth couple hole craft unfair august suggest",
+        mnemonic: "vivid rack volume school expect tobacco hello paddle annual tobacco choice evoke consider fluid attract bind error setup depth wedding night shove note jazz",
         endpoint: 'https://localhost:1327',
         uuid: 'uuid',
         ...config

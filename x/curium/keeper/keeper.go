@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	accountFetcherTypes "github.com/bluzelle/curium/app/accountFetcher/types"
 	"github.com/bluzelle/curium/app/ante/gasmeter"
 	devel "github.com/bluzelle/curium/types"
-	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"io/ioutil"
 	"net"
+	"strings"
 
 	cryptoKeys "github.com/cosmos/cosmos-sdk/crypto/keys"
 
@@ -16,7 +17,6 @@ import (
 
 	clientkeys "github.com/cosmos/cosmos-sdk/client/keys"
 
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
@@ -46,7 +46,7 @@ type (
 	}
 )
 
-type MsgBroadcaster func(ctx sdk.Context, msgs []sdk.Msg, from string) chan *MsgBroadcasterResponse
+type MsgBroadcaster func(msgs []sdk.Msg, from string) chan *MsgBroadcasterResponse
 
 type MsgBroadcasterResponse struct {
 	Response *abci.ResponseDeliverTx
@@ -76,33 +76,6 @@ func NewKeeper(cdc *codec.Codec, storeKey, memKey sdk.StoreKey, laddr string, ac
 	}
 }
 
-type AccountState struct {
-	seqNum    uint64
-	accntNum  uint64
-	requested bool
-	reset bool
-}
-
-func updateAccountState(accnt exported.Account, state AccountState) (AccountState, error) {
-	if state.requested {
-		state.seqNum = state.seqNum + 1
-		return state, nil
-	} else {
-		state.accntNum = accnt.GetAccountNumber()
-		state.seqNum = accnt.GetSequence()
-		state.requested = true
-		return state, nil
-	}
-}
-
-func resetAccountState(accnt exported.Account, state AccountState) (AccountState, error) {
-	time.Sleep(6 * time.Second)
-	state.accntNum = accnt.GetAccountNumber()
-	state.seqNum = accnt.GetSequence()
-	state.requested = true
-	state.reset = true
-	return state, nil
-}
 
 func getKeyring(keyringDir string) (cryptoKeys.Keybase, error) {
 	return cryptoKeys.NewKeyring("BluzelleService", cryptoKeys.BackendTest, keyringDir, nil)
@@ -148,100 +121,109 @@ func pollForTransaction(ctx rpctypes.Context, hash []byte) (*coretypes.ResultTx,
 	return result, nil
 }
 
-func (k Keeper) NewMsgBroadcaster(keyringDir string, cdc *codec.Codec) MsgBroadcaster {
-	accKeeper := k.accKeeper
 
-	accntState := AccountState{
-		requested: false,
-		reset: false,
-	}
+func (k Keeper) checkTransmitFromQueueThread(msgBroadcastQueue *MsgBroadcastQueue, keyringDir string, cdc *codec.Codec, accInfo *AccountInfo) {
+	queueTicker := time.NewTicker(1000 * time.Millisecond)
+	var queuePaused = false
 
-	return func(ctx sdk.Context, msgs []sdk.Msg, from string) chan *MsgBroadcasterResponse {
-		resp := make(chan *MsgBroadcasterResponse)
+	go func() {
+		for {
+			<-queueTicker.C
 
-		go func() {
-			defer func() {
-				close(resp)
-			}()
-
-			DoBroadcast(resp, keyringDir, cdc, k, accKeeper, ctx, msgs, from, accntState)
-		}()
-
-		return resp
-	}
+			if !queuePaused && !msgBroadcastQueue.IsEmpty() {
+				item := msgBroadcastQueue.Pop()
+				go func() {
+					result := DoBroadcast(keyringDir, cdc, accInfo, item.Msgs, item.From)
+					if result.Error != nil {
+						if item.RetryCount == 0 {
+							fmt.Println("**** Broadcast error (retrying)", result.Error, "msg", item.Msgs[0].Route() + "/" + item.Msgs[0].Type())
+							queuePaused = true
+							item.IncrementRetry()
+							msgBroadcastQueue.Push(item)
+							time.AfterFunc(6*time.Second, func() { queuePaused = false })
+							return
+						}
+						item.Resp <- &MsgBroadcasterResponse {
+							Error: result.Error,
+						}
+					}
+					item.Resp <- result
+					close(item.Resp)
+				}()
+			}
+		}
+	}()
 
 }
 
-func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *codec.Codec, curiumKeeper Keeper, accKeeper *keeper.AccountKeeper, ctx sdk.Context, msgs []sdk.Msg, from string, state AccountState) {
 
-	returnError := func(err error) {
-		resp <- &MsgBroadcasterResponse{
-			Error: err,
-		}
+func (k Keeper) NewMsgBroadcaster(keyringDir string, cdc *codec.Codec, acctFetcher accountFetcherTypes.AccountFetcherFn) MsgBroadcaster {
+	var accInfo = NewAccountInfo(acctFetcher)
+	var msgBroadcastQueue = NewMsgBroadcastQueue()
+
+	k.checkTransmitFromQueueThread(msgBroadcastQueue, keyringDir, cdc, accInfo)
+
+	return func(msgs []sdk.Msg, from string) chan *MsgBroadcasterResponse {
+		resp := make(chan *MsgBroadcasterResponse)
+
+		msgBroadcastQueue.Push(&MsgBroadcastQueueItem{
+			Msgs:       msgs,
+			From:       from,
+			Resp:       resp,
+		})
+
+		return resp
 	}
+}
+
+func DoBroadcast(keyringDir string, cdc *codec.Codec, accInfo *AccountInfo, msgs []sdk.Msg, from string) *MsgBroadcasterResponse {
 
 	if !devel.IsDevelopment() {
 		defer func() {
 			r := recover()
-			curiumKeeper.Logger(ctx).Error("DoBroadcast", "error", r)
-
-			if r != nil {
-				returnError(r.(error))
-			} else {
-				returnError(errors.New("nil error returned"))
-			}
+			fmt.Println("DoBroadcast", "error", r)
 		}()
 	}
 
 	kr, err := getKeyring(keyringDir)
 
 	if err != nil {
-		returnError(err)
-		return
+		return &MsgBroadcasterResponse{Error: err}
 	}
 
-	addr, err := getAccountAddress(kr, from)
-
-	if addr == nil {
-		returnError(errors.New("Nft address is nil"))
+	accnt, err := accInfo.Next(from)
+	if err != nil {
+		return &MsgBroadcasterResponse{Error: err}
 	}
 
 	if err != nil {
-		returnError(err)
-		return
-	}
-
-	accnt := accKeeper.GetAccount(ctx, addr)
-
-	if accnt == nil {
-		returnError(errors.New("from account does not exist"))
-		return
+		return &MsgBroadcasterResponse{Error: err}
 	}
 
 	gasPrice, err := getGasPriceUbnt()
 
 	if err != nil {
-		returnError(err)
-		return
+		return &MsgBroadcasterResponse{Error: err}
 	}
 
-	state, err = updateAccountState(accnt, state)
 
+
+	chainId, err := readChainId()
 	if err != nil {
-		returnError(err)
-		return
+		return &MsgBroadcasterResponse{Error: err}
 	}
 
+	fmt.Println("*************", accnt.AccNum, "***********", accnt.Seq, "********", chainId)
 
 	// Create a new TxBuilder.
 	txBuilder := auth.NewTxBuilder(
 		utils.GetTxEncoder(cdc),
-		state.accntNum,
-		state.seqNum,
+		accnt.AccNum,
+		accnt.Seq,
 		10000000,
 		1,
 		false,
-		ctx.ChainID(),
+		chainId,
 		"memo", nil,
 		gasPrice,
 	).WithKeybase(kr)
@@ -251,64 +233,32 @@ func DoBroadcast(resp chan *MsgBroadcasterResponse, keyringDir string, cdc *code
 
 
 	if err != nil {
-		returnError(err)
-		return
-	}
-
-	if accnt == nil {
-		returnError(sdkerrors.New("curium", 2, "Cannot broadcast message, accnt does not exist"))
-		return
+		return &MsgBroadcasterResponse{Error: err}
 	}
 
 	rpcCtx := rpctypes.Context{}
 
 	broadcastResult, err := core.BroadcastTxSync(&rpcCtx, signedMsgs)
-	if err != nil {
-		returnError(err)
-		return
-	}
-
-	accntSeqString, err := regexp.Compile("verify correct account sequence")
 
 	if err != nil {
-		returnError(err)
-		return
+		return &MsgBroadcasterResponse{Error: err}
 	}
 
-
-	if state.reset {
-		returnError(errors.New(broadcastResult.Log))
-		return
+	if strings.Contains(broadcastResult.Log, "signature verification failed") {
+		return &MsgBroadcasterResponse{Error: errors.New(broadcastResult.Log)}
 	}
+	fmt.Println("********* BROADCAST RESULT", err, broadcastResult)
 
-	if accntSeqString.MatchString(broadcastResult.Log) {
-		newAccntState, err := resetAccountState(accnt, state)
-		if err != nil {
-			returnError(err)
-			return
-		}
-		fmt.Println("Retrying broadcast")
-		fmt.Println("RESET", newAccntState.reset)
-		go func () {
-			defer func() {
-				close(resp)
-			}()
-			DoBroadcast(resp, keyringDir, cdc, curiumKeeper, accKeeper, ctx, msgs, from, newAccntState)
-		}()
-		fmt.Println("Finished retrying broadcast")
-		return
-	}
 
 	result, err := pollForTransaction(rpcCtx, broadcastResult.Hash)
 
 
 	if err != nil {
-		returnError(err)
-		return
+		return &MsgBroadcasterResponse{Error: err}
 	}
 	hash := result.Hash.String()
 
-	resp <- &MsgBroadcasterResponse{
+	return &MsgBroadcasterResponse{
 		Response: &result.TxResult,
 		Data:     &result.TxResult.Data,
 		Hash: 	  &hash,

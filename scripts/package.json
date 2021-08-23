@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "private": true,
   "dependencies": {
     "@types/lodash": "^4.14.172",
     "@types/node": "^16.6.2",
+    "bip39": "^3.0.4",
     "delay": "^5.0.0",
     "lodash": "^4.17.21",
     "promise-passthrough": "^1.0.5",

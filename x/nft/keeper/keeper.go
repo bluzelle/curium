@@ -25,6 +25,7 @@ type (
 		storeKey       sdk.StoreKey
 		memKey     sdk.StoreKey
 		NftBaseDir string
+		NftUsername string
 		BtPort     int
 		MsgBroadcaster curium.MsgBroadcaster
 		curiumKeeper   *curium.Keeper
@@ -36,6 +37,7 @@ func NewKeeper (
 	cdc *codec.Codec,
 	storeKey,
 	memKey sdk.StoreKey,
+	nftUsername string,
 	nftBaseDir string,
 	btPort int,
 	msgBroadcaster curium.MsgBroadcaster,
@@ -48,6 +50,7 @@ func NewKeeper (
 		Cdc:            cdc,
 		storeKey:       storeKey,
 		memKey:         memKey,
+		NftUsername: nftUsername,
 		NftBaseDir:    nftBaseDir,
 		BtPort:         btPort,
 		MsgBroadcaster: msgBroadcaster,
@@ -81,7 +84,7 @@ func (k Keeper) GetCdc() *codec.Codec {
 }
 
 func (k Keeper) CheckNftUserExists(ctx sdk.Context, reader *curium.KeyringReader, accKeeper auth.AccountKeeper) error {
-	address, err := reader.GetAddress("nft")
+	address, err := reader.GetAddress(k.NftUsername)
 
 	if err != nil {
 		return err
@@ -105,7 +108,7 @@ func (k Keeper) GetPeerStore(ctx sdk.Context) prefix.Store {
 }
 
 func (k Keeper) CheckIsNftAdmin(address string) error {
-	nftAdmin, err := k.KeyringReader.GetAddress("nft")
+	nftAdmin, err := k.KeyringReader.GetAddress(k.NftUsername)
 	if err != nil {
 		return sdkerrors.New("nft", 1, fmt.Sprintf("peer request with invalid admin: %s", err.Error()))
 	}
@@ -137,7 +140,7 @@ func (k Keeper) BroadcastRegisterBtPeer(ctx sdk.Context) error {
 	}
 
 
-	creator, err := k.KeyringReader.GetAddress("nft")
+	creator, err := k.KeyringReader.GetAddress(k.NftUsername)
 	if err != nil {
 		return err
 	}
@@ -148,7 +151,7 @@ func (k Keeper) BroadcastRegisterBtPeer(ctx sdk.Context) error {
 		Port:    uint64(k.BtPort),
 	}
 
-	result :=  <- k.MsgBroadcaster(ctx, []sdk.Msg{&msg}, "nft")
+	result :=  <- k.MsgBroadcaster([]sdk.Msg{&msg}, k.NftUsername)
 
 	if result != nil && result.Error != nil {
 		k.Logger(ctx).Error("unable to broadcast register peer message", err)

@@ -21,7 +21,7 @@ import (
 var logger = log.NewTMLogger(log.NewSyncWriter(os.Stdout))
 
 
-func RunFeeder(ctx sdk.Context, oracleKeeper Keeper) {
+func RunFeeder(oracleKeeper Keeper) {
 	logger.Info("Starting oracle feeder service")
 
 	c := cron.New()
@@ -31,7 +31,7 @@ func RunFeeder(ctx sdk.Context, oracleKeeper Keeper) {
 			return
 		}
 		logger.Info("Oracle feeder run", "Valcons", keeper.GetValconsAddress())
-		GetValueAndSendProofAndVote(ctx, oracleKeeper)
+		GetValueAndSendProofAndVote(oracleKeeper)
 	})
 	c.Start()
 }
@@ -41,14 +41,14 @@ type SourceAndValue struct {
 	value  float64
 }
 
-func GetValueAndSendProofAndVote(ctx sdk.Context, oracleKeeper Keeper) {
+func GetValueAndSendProofAndVote(oracleKeeper Keeper) {
 	sources, _ := oracleKeeper.ListSources(*currCtx)
 	logger.Info("Oracle fetching from sources", "count", len(sources))
 	if len(sources) > 0 {
 		values := fetchValues(sources)
-		sendPreflightMsgs(ctx, values, oracleKeeper)
+		sendPreflightMsgs(values, oracleKeeper)
 		time.AfterFunc(time.Second*20, func() {
-			sendVoteMsgs(ctx, values, oracleKeeper)
+			sendVoteMsgs(values, oracleKeeper)
 		})
 	}
 }
@@ -130,14 +130,14 @@ func readValueFromJson(jsonIn []byte, prop string) (float64, error) {
 	return out, nil
 }
 
-func sendPreflightMsgs(ctx sdk.Context, values []SourceAndValue, keeper Keeper) string {
+func sendPreflightMsgs(values []SourceAndValue, keeper Keeper) string {
 	var msgs []sdk.Msg
 	for _, value := range values {
 		msg, _ := generateVoteProofMsg(value, keeper.KeyringReader)
 		msgs = append(msgs, msg)
 	}
 	logger.Info("Sending oracle proof messages", "count", len(msgs))
-	result := <- keeper.MsgBroadcaster(ctx, msgs, "oracle")
+	result := <- keeper.MsgBroadcaster(msgs, "oracle")
 	if result.Error != nil {
 		logger.Error("Error sending oracle proof messages", "error", result.Error)
 		return ""
@@ -146,14 +146,14 @@ func sendPreflightMsgs(ctx sdk.Context, values []SourceAndValue, keeper Keeper) 
 	return *result.Hash
 }
 
-func sendVoteMsgs(ctx sdk.Context, values []SourceAndValue, keeper Keeper) string {
+func sendVoteMsgs(values []SourceAndValue, keeper Keeper) string {
 	var msgs []sdk.Msg
 	for _, value := range values {
 		msg, _ := generateVoteMsg(value, keeper.KeyringReader)
 		msgs = append(msgs, msg)
 	}
 	logger.Info("Sending feeder vote messages", "count", len(msgs))
-	result := <- keeper.MsgBroadcaster(ctx, msgs, "oracle")
+	result := <- keeper.MsgBroadcaster(msgs, "oracle")
 	if result.Error != nil {
 		logger.Error("Error sending feeder vote message", "error", result.Error)
 		return ""
@@ -220,14 +220,7 @@ func StartFeeder(oracleKeeper Keeper) {
 			fmt.Println("panic occurred:", err)
 		}
 	}()
-	waitForCtx()
-	RunFeeder(*currCtx, oracleKeeper)
+	RunFeeder(oracleKeeper)
 }
 
-func waitForCtx() {
-	for currCtx == nil {
-		logger.Info("Feeder waiting for context")
-		time.Sleep(5 * time.Second)
-	}
-}
 

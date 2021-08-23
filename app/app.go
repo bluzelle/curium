@@ -17,6 +17,7 @@ package app
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/bluzelle/curium/app/accountFetcher"
 	"github.com/bluzelle/curium/app/ante/gasmeter"
 	"github.com/bluzelle/curium/x/aggregator"
 	"github.com/bluzelle/curium/x/curium"
@@ -342,13 +343,13 @@ func NewCRUDApp(
 		crud.MaxKeeperSizes{MaxKeysSize: maxKeysSize, MaxKeyValuesSize: maxKeyValuesSize, MaxDefaultLeaseBlocks: DefaultLeaseBlockHeight},
 	)
 
-	oracleMsgBroadcaster := app.curiumKeeper.NewMsgBroadcaster(DefaultCLIHome, cdc)
+	msgBroadcaster := app.curiumKeeper.NewMsgBroadcaster(DefaultCLIHome, cdc, accountFetcher.AccountFetcher(app, cdc, DefaultCLIHome))
 
 	app.oracleKeeper = oracle.NewKeeper(
 		app.cdc,
 		keys[oracle.StoreKey],
 		app.stakingKeeper,
-		oracleMsgBroadcaster,
+		msgBroadcaster,
 		curium.NewKeyringReader(DefaultCLIHome),
 		nil,
 	)
@@ -378,12 +379,12 @@ func NewCRUDApp(
 	nftP2PPortString := getNftP2PPort()
 	nftP2PPort, _ := strconv.Atoi(nftP2PPortString)
 
-	msgBroadcaster := app.curiumKeeper.NewMsgBroadcaster(DefaultCLIHome, cdc)
 
 	app.nftKeeper = nft.NewKeeper(
 		app.cdc,
 		keys[nft.StoreKey],
 		keys[nft.MemStoreKey],
+		viper.GetString("nft-user-name"),
 		nftBaseDir,
 		nftP2PPort,
 		msgBroadcaster,

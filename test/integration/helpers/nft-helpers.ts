@@ -52,7 +52,7 @@ export const createMintedBz = (bz: API): Promise<API> =>
 
 export const checkFileReplication = (daemon: Daemon, hash: string, fileSize: number): Promise<Daemon> =>
     waitUntil(() =>
-            daemon.exec(`stat -c "%s" .blzd/nft/${hash}`)
+            daemon.exec(`stat -f "%s" ${daemon.getNftBaseDir()}/nft/${hash}`)
                 .then(resp => /^[0-9]*$/.test(resp) ? resp : '0')
                 .then(parseInt)
                 .then(size => size === fileSize)
@@ -94,7 +94,7 @@ export const checkMimeType = (daemon: Daemon, hash: string, mimeType: string): P
         .then(() => daemon)
 
 export const checkFileSize = (daemon: Daemon, hash: string, size: number): Promise<Daemon> =>
-    daemon.exec(`stat -c "%s" .blzd/nft/${hash}`)
+    daemon.exec(`stat -f "%s" ${daemon.getNftBaseDir()}/nft/${hash}`)
         .then(parseInt)
         .then(fileSize => expect(fileSize).to.equal(size))
         .then(() => console.log("File size matches on ", daemon.getName()))

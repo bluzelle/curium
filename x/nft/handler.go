@@ -29,9 +29,9 @@ func NewHandler(keeper keeper.Keeper) sdk.Handler {
 	}
 }
 
-func handleMsgCreateNft(goCtx sdk.Context, k keeper.Keeper, msg *types.MsgCreateNft) (*sdk.Result, error) {
+func handleMsgCreateNft(ctx sdk.Context, k keeper.Keeper, msg *types.MsgCreateNft) (*sdk.Result, error) {
 	k.AppendNft(
-		goCtx,
+		ctx,
 		msg.Creator,
 		msg.Id,
 		msg.Hash,
@@ -46,8 +46,8 @@ func handleMsgCreateNft(goCtx sdk.Context, k keeper.Keeper, msg *types.MsgCreate
 	}
 
 
-
 	if _, err := os.Stat(k.GetNftDir() + "/" + msg.Hash); err == nil {
+		ensureBtClient(ctx, k)
 		btClient := k.GetBtClient()
 		metainfo, err := btClient.TorrentFromFile(msg.Hash)
 		if err != nil {
@@ -59,9 +59,9 @@ func handleMsgCreateNft(goCtx sdk.Context, k keeper.Keeper, msg *types.MsgCreate
 		}
 
 		go func() {
-			err = k.BroadcastPublishFile(goCtx, msg.Id, msg.Vendor, msg.UserId, msg.Hash, msg.Mime, metainfo)
+			err = k.BroadcastPublishFile(ctx, msg.Id, msg.Vendor, msg.UserId, msg.Hash, msg.Mime, metainfo)
 			if err != nil {
-				k.Logger(goCtx).Error("error broadcasting publish nft file", "err", err.Error())
+				k.Logger(ctx).Error("error broadcasting publish nft file", "err", err.Error())
 			}
 		}()
 	}
@@ -90,6 +90,7 @@ func ensureBtClient(ctx sdk.Context, k Keeper) {
 }
 
 func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) (*sdk.Result, error) {
+	fmt.Println("******** HANDLE PUBLISH FILE *********")
 	k.Logger(ctx).Debug("Publish file message received", "id", msg.Id)
 	ensureBtClient(ctx, k)
 	var metainfo metainfo.MetaInfo
@@ -100,8 +101,7 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 	btClient.RetrieveFile(&metainfo)
 	k.EnsureNftDirExists()
 
-
-	err := os.Symlink(k.GetNftDir() + "/" +msg.Hash, k.GetNftDir() +"/" + msg.Vendor + "-" + msg.Id)
+	err := os.Symlink(k.GetNftDir()+"/"+msg.Hash, k.GetNftDir()+"/"+msg.Vendor+"-"+msg.Id)
 
 	if err != nil {
 
@@ -109,17 +109,17 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 	}
 
 	info := types.NftInfo{
-		Id:   msg.Id,
+		Id:     msg.Id,
 		Vendor: msg.Vendor,
 		UserId: msg.UserId,
-		Mime: msg.Mime,
+		Mime:   msg.Mime,
 	}
 
 	err = ioutil.WriteFile(k.GetNftDir()+"/"+msg.Hash+".info", k.Cdc.MustMarshalJSON(&info), 0666)
 	if err != nil {
 		return nil, err
 	}
-	err = os.Symlink(k.GetNftDir()+"/"+msg.Hash+".info", k.GetNftDir()+"/"+msg.Vendor + "-" + msg.Id+".info")
+	err = os.Symlink(k.GetNftDir()+"/"+msg.Hash+".info", k.GetNftDir()+"/"+msg.Vendor+"-"+msg.Id+".info")
 	if err != nil {
 		return nil, err
 	}

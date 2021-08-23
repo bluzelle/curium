@@ -28,7 +28,7 @@ func (k Keeper) BroadcastPublishFile(ctx sdk.Context, id string, vendor string, 
 		return err
 	}
 
-	addr, err := k.KeyringReader.GetAddress("nft")
+	addr, err := k.KeyringReader.GetAddress(k.NftUsername)
 	if err != nil {
 		return err
 	}
@@ -42,7 +42,8 @@ func (k Keeper) BroadcastPublishFile(ctx sdk.Context, id string, vendor string, 
 		Mime:     mime,
 		Metainfo: metaBytes,
 	}
-	result := <- k.MsgBroadcaster(ctx, []sdk.Msg{&publishMsg}, "nft")
+
+	result := <- k.MsgBroadcaster([]sdk.Msg{&publishMsg}, k.NftUsername)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -58,6 +59,7 @@ func (k Keeper) AssembleNftFile(uploadDir string, nftDir string, msg *types.MsgC
 		return err
 	}
 
+	// Delete upload file if already exists in nft dir and stop
 	_, err = os.Stat(nftDir + "/" + msg.Hash)
 
 	if err == nil {

@@ -26,11 +26,11 @@ import {uploadNft} from "bluzelle/lib/bluzelle-node";
 
 import {Swarm} from 'daemon-manager/lib/Swarm'
 import {Daemon} from 'daemon-manager/lib/Daemon'
-import {passThroughAwait} from "promise-passthrough";
+import {passThrough, passThroughAwait} from "promise-passthrough";
 import {Some} from "monet";
 import {UploadNftResult} from "bluzelle";
 import {getSwarmAndClient} from "../../helpers/bluzelle-client";
-import delay from 'delay'
+import delay from "delay";
 
 global.fetch = require('node-fetch')
 
@@ -48,31 +48,56 @@ describe("Store and retriving a NFT", function () {
                 bz = newBz
                 swarm = newSwarm
             })
-            .then(() => Promise.all(
-                swarm.getDaemons()
-                    .map(d => d.exec(`rm -rf ${d.getNftBaseDir()}/nft*`))
-            ))
     });
 
 
     describe('file replication', () => {
         this.timeout(300000)
         it('should replicate a file', () => {
+            const text = `new nft - ${Date.now()}`;
             const id = Date.now().toString()
-            return uploadNft(getSentryUrl(swarm), new TextEncoder().encode('new nft'), 'binance')
-                .then(passThroughAwait(({hash}) => bz.createNft(id, hash, "binance", "myUserId", 'text/txt', "", defaultGasParams())))
+            return uploadNft(getSentryUrl(swarm), new TextEncoder().encode(text), 'mintable')
+                .then(passThroughAwait(({hash}) => bz.createNft(id, hash, "mintable", "myUserId", 'text/txt', "", defaultGasParams())))
+                .then(passThrough(({hash}) => console.log('HASH:', hash)))
                 .then(({hash}) =>
                     Promise.all(swarm.getDaemons()
                         .map(daemon =>
                             checkFileReplication(daemon, hash, 7)
                                 .then(() => checkInfoFileReplication(daemon, hash))
                                 .then(daemon => checkFileSize(daemon, hash, 7))
-                                .then(daemon => checkTextFileContents(daemon, hash, 'new nft'))
+                                .then(daemon => checkTextFileContents(daemon, hash, text))
                         )
                     ))
         });
 
-        it('should replicate a file using a minted user',  () => {
+        it('should allow one client to send 3 createNft() in parallel to the same sentry',  () => {
+            const COUNT = 3
+            const id = Date.now().toString()
+            return Promise.all(
+                times(COUNT).map(n =>
+                    uploadNft(getSentryUrl(swarm), encodeData(`nft ${n}`), 'mintable')
+                )
+            )
+                .then(passThroughAwait(responses =>
+                    Promise.all(times(COUNT).map(n =>
+                        bz.createNft(id + n, responses[n].hash, "mintable", "myUserId", 'text/plain', '', defaultGasParams())
+                    ))
+                ))
+            // .then(([binanceResp, mintableResp, cryptoResp]) =>
+            //     Promise.all(swarm.getSentries('client').map(sentry =>
+            //             checkHashEndpoint(sentry, binanceResp.hash, 'binance nft')
+            //                 .then(sentry => checkVendorIdEndpoint(bz.url, sentry, id, 'binance', 'binance nft'))
+            //                 .then(() => checkHashEndpoint(sentry, mintableResp.hash, 'mintable nft'))
+            //                 .then(sentry => checkVendorIdEndpoint(bz.url, sentry, id, 'mintable', 'mintable nft'))
+            //                 .then(() => checkHashEndpoint(sentry, cryptoResp.hash, 'crypto nft'))
+            //                 .then(sentry => checkVendorIdEndpoint(bz.url, sentry, id, 'crypto', 'crypto nft'))
+            //         )
+            //     )
+            // )
+        });
+
+
+        it('should replicate a file using a minted user', () => {
             const id = Date.now().toString()
             return Promise.resolve(getSentryUrl(swarm))
                 .then(url => uploadNft(url, new TextEncoder().encode('new nft'), 'binance'))
@@ -156,9 +181,9 @@ describe("Store and retriving a NFT", function () {
                 .then(({hash}) =>
                     Promise.all(swarm.getSentries('client')
                         .map(daemon =>
-                                checkFileReplication(daemon, hash, getLargePayload(100).byteLength)
-                                    .then(daemon => checkInfoFileReplication(daemon, hash))
-                                    .then(daemon => checkFileSizeFromEndpoint(daemon, hash, getLargePayload(100).byteLength))
+                            checkFileReplication(daemon, hash, getLargePayload(100).byteLength)
+                                .then(daemon => checkInfoFileReplication(daemon, hash))
+                                .then(daemon => checkFileSizeFromEndpoint(daemon, hash, getLargePayload(100).byteLength))
                         )
                     ))
         });
@@ -237,7 +262,7 @@ describe("Store and retriving a NFT", function () {
                 )
         });
 
-        it.skip('should allow two clients (vendors) to facilitate createNft() in parallel to the same sentry', async () => {
+        it('should allow two clients (vendors) to facilitate createNft() in parallel to the same sentry', async () => {
             const newBz = await createMintedBz(bz);
             const id = Date.now().toString()
             await Promise.all([
@@ -270,51 +295,13 @@ describe("Store and retriving a NFT", function () {
                 )
         });
 
-        it.skip('should allow one client to send 3 createNft() in parallel to the same sentry', async () => {
-            const id = Date.now().toString()
-            await Promise.all([
-                uploadNft(getSentryUrl(swarm), encodeData('binance nft'), 'binance'),
-                uploadNft(getSentryUrl(swarm), encodeData('mintable nft'), 'mintable'),
-                uploadNft(getSentryUrl(swarm), encodeData('crypto nft'), 'crypto')]
-            )
-                .then(passThroughAwait(([binanceResp, mintableResp, cryptoResp]) =>
-                    bz.withTransaction(() => {
-                        bz.createNft(id, binanceResp.hash, "binance", "myUserId", 'text/plain', "", defaultGasParams()),
-                            bz.createNft(id, mintableResp.hash, "mintable", "myUserId", 'text/plain', "", defaultGasParams())
-                            bz.createNft(id, cryptoResp.hash, "crypto", "myUserId", 'text/plain', "", defaultGasParams())
-                    })
-
-                ))
-                .then(passThroughAwait(([binanceResp, mintableResp, cryptoResp]) =>
-                    Promise.all(swarm.getDaemons().map(daemon =>
-                            checkFileReplication(daemon, binanceResp.hash, 'binance nft'.length)
-                                .then(() => checkFileReplication(daemon, mintableResp.hash, 'mintable nft'.length))
-                                .then(() => checkFileReplication(daemon, cryptoResp.hash, 'crypto nft'.length))
-                                .then(() => checkInfoFileReplication(daemon, cryptoResp.hash))
-                                .then(() => checkInfoFileReplication(daemon, binanceResp.hash))
-                                .then(() => checkInfoFileReplication(daemon, mintableResp.hash))
-                        )
-                    )
-                ))
-                .then(([binanceResp, mintableResp, cryptoResp]) =>
-                    Promise.all(swarm.getSentries('client').map(sentry =>
-                            checkHashEndpoint(sentry, binanceResp.hash, 'binance nft')
-                                .then(sentry => checkVendorIdEndpoint(bz.url, sentry, id, 'binance', 'binance nft'))
-                                .then(() => checkHashEndpoint(sentry, mintableResp.hash, 'mintable nft'))
-                                .then(sentry => checkVendorIdEndpoint(bz.url, sentry, id, 'mintable', 'mintable nft'))
-                                .then(() => checkHashEndpoint(sentry, cryptoResp.hash, 'crypto nft'))
-                                .then(sentry => checkVendorIdEndpoint(bz.url, sentry, id, 'crypto', 'crypto nft'))
-                        )
-                    )
-                )
-        });
 
         it.skip('should allow one client to send 2 in parallel to the same sentry', async () => {
             const id1 = "id1"
             const id2 = "id2"
             await Promise.all([
-                    uploadNft(getSentryUrl(swarm), encodeData('nft 1'), 'mintable'),
-                    uploadNft(getSentryUrl(swarm), encodeData('nft 2'), 'mintable')]
+                uploadNft(getSentryUrl(swarm), encodeData('nft 1'), 'mintable'),
+                uploadNft(getSentryUrl(swarm), encodeData('nft 2'), 'mintable')]
             )
                 .then(passThroughAwait((hashResps) =>
                     Promise.all([
@@ -327,10 +314,8 @@ describe("Store and retriving a NFT", function () {
                         Promise.all(swarm.getDaemons().map(daemon =>
                                 checkFileReplication(daemon, hashResp.hash, 5)
                                     .then(() => checkInfoFileReplication(daemon, hashResp.hash))
-
                             )
                         )
-
                     ))
                 ))
                 .then((hashResps) =>
@@ -341,7 +326,6 @@ describe("Store and retriving a NFT", function () {
                             )
                         )
                     ))
-
                 )
         });
 
@@ -367,7 +351,6 @@ describe("Store and retriving a NFT", function () {
                             )
                         )
                     ))
-
                 ))
                 .then(hashResps =>
                     Promise.all(hashResps.map((hashResp, idx) =>
@@ -387,11 +370,10 @@ describe("Store and retriving a NFT", function () {
                 )
             )
                 .then(passThroughAwait((hashResps) =>
-                        Promise.all(hashResps.map((hashResp, idx) =>
-                            createMintedBz(bz)
-                                .then(newBz => newBz.createNft(`ID-${idx}`, hashResp.hash, `vendor-${idx}`, "myUserId", 'text/plain', "", defaultGasParams()))
-                        ))
-
+                    Promise.all(hashResps.map((hashResp, idx) =>
+                        createMintedBz(bz)
+                            .then(newBz => newBz.createNft(`ID-${idx}`, hashResp.hash, `vendor-${idx}`, "myUserId", 'text/plain', "", defaultGasParams()))
+                    ))
                 ))
                 .then(passThroughAwait((hashResps) =>
                     Promise.all(hashResps.map((hashResp, idx) =>
@@ -402,7 +384,6 @@ describe("Store and retriving a NFT", function () {
                             )
                         )
                     ))
-
                 ))
                 .then(hashResps =>
                     Promise.all(hashResps.map((hashResp, idx) =>
@@ -424,12 +405,12 @@ describe("Store and retriving a NFT", function () {
                 )
             )
                 .then(passThroughAwait((hashResps) =>
-                       Promise.all(hashResps.map((hashResp, idx) => {
-                               queue = queue
-                                   .then(() => bz.createNft(`ID-${idx}`, hashResp.hash, "mintable", "myUserId", 'text/plain', "", defaultGasParams()))
-                                return queueHead
-                       }
-                        ))
+                    Promise.all(hashResps.map((hashResp, idx) => {
+                            queue = queue
+                                .then(() => bz.createNft(`ID-${idx}`, hashResp.hash, "mintable", "myUserId", 'text/plain', "", defaultGasParams()))
+                            return queueHead
+                        }
+                    ))
                 ))
                 .then(passThroughAwait((hashResps) =>
                     Promise.all(hashResps.map((hashResp, idx) =>
@@ -440,7 +421,6 @@ describe("Store and retriving a NFT", function () {
                             )
                         )
                     ))
-
                 ))
                 .then(hashResps =>
                     Promise.all(hashResps.map((hashResp, idx) =>
@@ -452,7 +432,6 @@ describe("Store and retriving a NFT", function () {
                     ))
                 )
         });
-
 
 
         it('should allow two clients (vendors) to facilitate createNft() in parallel to different sentries', async () => {
