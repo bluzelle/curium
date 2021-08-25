@@ -28,20 +28,20 @@ type GasTx interface {
 // on gas provided and gas used.
 // CONTRACT: Must be first decorator in the chain
 // CONTRACT: Tx must implement GasTx interface
-type SetUpContextDecorator struct{
-	gasMeterKeeper *gasmeter.GasMeterKeeper
-	supplyKeeper banktypes.SupplyKeeper
-	accountKeeper acctypes.AccountKeeper
-	crudKeeper	crud.Keeper
+type SetUpContextDecorator struct {
+	gasMeterKeeper   *gasmeter.GasMeterKeeper
+	supplyKeeper     banktypes.SupplyKeeper
+	accountKeeper    acctypes.AccountKeeper
+	crudKeeper       crud.Keeper
 	minGasPriceCoins sdk.DecCoins
 }
 
 func NewSetUpContextDecorator(gasMeterKeeper *gasmeter.GasMeterKeeper, supplyKeeper banktypes.SupplyKeeper, accountKeeper acctypes.AccountKeeper, crudKeeper crud.Keeper, minGasPriceCoins sdk.DecCoins) SetUpContextDecorator {
 	return SetUpContextDecorator{
 		gasMeterKeeper:   gasMeterKeeper,
-		supplyKeeper:       supplyKeeper,
+		supplyKeeper:     supplyKeeper,
 		accountKeeper:    accountKeeper,
-		crudKeeper: crudKeeper,
+		crudKeeper:       crudKeeper,
 		minGasPriceCoins: minGasPriceCoins,
 	}
 }
@@ -50,7 +50,6 @@ func (sud SetUpContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate
 	// all transactions must implement GasTx
 
 	gasTx, ok := tx.(GasTx)
-
 
 	if !ok {
 		// Set a gas meter with limit 0 as to prevent an infinite gas meter attack
@@ -102,60 +101,46 @@ func SetGasMeter(simulate bool, ctx sdk.Context, gasLimit uint64, tx sdk.Tx, gk 
 	maxGasInt := sdk.NewIntFromUint64(maxGas).ToDec()
 	feeInt := feeTx.GetFee().AmountOf("ubnt").ToDec()
 
-
 	gasPrice := feeInt.Quo(maxGasInt)
 	gasPriceCoin := sdk.NewDecCoinFromDec("ubnt", gasPrice)
 	gasPriceCoins := sdk.NewDecCoins(gasPriceCoin)
 
 	feePayer := feeTx.FeePayer()
 
-	whiteList := getWhitelist(ctx, crudKeeper)
-
 	msgModule := tx.GetMsgs()[0].Route()
-
 
 	if gasPriceCoins.AmountOf("ubnt").LT(minGasPriceCoins.AmountOf("ubnt")) {
 		return ctx, sdkerrors.New("curium", 2, "Specified gas price too low")
 	}
 
 
-	if isOnWhiteList(msgModule, feePayer.String(), whiteList) && !simulate && !ctx.IsCheckTx() {
+	if !ctx.IsCheckTx() && isOnWhitelist(ctx, crudKeeper, feePayer.String()) && isFreeModule(msgModule) {
 		gm := gasmeter.NewFreeGasMeter(gasLimit)
 		gk.AddGasMeter(&gm)
 		return ctx.WithGasMeter(gm), nil
 	}
 
-	if isAChargingModule(msgModule) && !simulate && !ctx.IsCheckTx() {
-		gm := gasmeter.NewChargingGasMeter(supplyKeeper, accountKeeper, gasLimit, feePayer, gasPriceCoins)
-
+	gm := gasmeter.NewChargingGasMeter(supplyKeeper, accountKeeper, gasLimit, feePayer, gasPriceCoins)
+	if !ctx.IsCheckTx() {
 		gk.AddGasMeter(&gm)
-		return ctx.WithGasMeter(gm), nil
 	}
-
-	gm := gasmeter.NewFreeGasMeter(gasLimit)
-	gk.AddGasMeter(&gm)
-
 	return ctx.WithGasMeter(gm), nil
 }
 
-func getWhitelist (ctx sdk.Context, crudKeeper crud.Keeper) (string) {
+func isOnWhitelist(ctx sdk.Context, k crud.Keeper, sender string) bool {
+	return strings.Contains(getWhitelist(ctx, k), sender)
+}
+
+func getWhitelist(ctx sdk.Context, crudKeeper crud.Keeper) string {
 	store := crudKeeper.GetKVStore(ctx)
-	whiteListBlzValue := crudKeeper.GetValue(ctx, store, "bluzelle", "bluzelle")
+	whitelistBlzValue := crudKeeper.GetValue(ctx, store, "bluzelle", "whitelist")
 
-	if len(whiteListBlzValue.Value) == 0 {
-		return ""
+	if len(whitelistBlzValue.Value) > 0 {
+		return whitelistBlzValue.Value
 	}
-
-	return whiteListBlzValue.Value
+	return ""
 }
 
-func isOnWhiteList (msgModule string, sender string, whiteList string) bool {
-	onWhiteList := strings.Contains(whiteList, sender)
-	return isAChargingModule(msgModule) && onWhiteList
+func isFreeModule(msgModule string) bool {
+	return msgModule == "oracle" || msgModule == "nft"
 }
-
-func isAChargingModule (msgModule string) bool {
-	return msgModule == "crud" || msgModule == "oracle" || msgModule == "nft"
-}
-
-

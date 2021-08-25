@@ -76,9 +76,7 @@ func (g *ChargingGasMeter) Charge(ctx sdk.Context) error {
 	acc := g.accountKeeper.GetAccount(ctx, g.PayerAccount)
 
 	addr := acc.GetAddress()
-
 	err := deductFees(&ctx, g.supplyKeeper, addr, gasFee)
-
 	if err != nil {
 		return err
 	}

@@ -109,8 +109,15 @@ function getBlzcli() {
 function startValidator(ctx: Context): Promise<unknown> {
     return $`killall blzd`
         .catch(e => e)
+        .then(() => fs.rm('blzd.log'))
+        .catch(e => e)
         .then(() => cd(ctx.nodes[0].home))
         .then(() => ctx.blzd = spawn(getBlzd(), ['start', '--home', ctx.nodes[0].home]))
+        .then(cp => {
+            const logStream = fs.createWriteStream('blzd.log', {flags: 'a'});
+            cp.stdout.pipe(logStream);
+            cp.stderr.pipe(logStream);
+        })
 }
 
 function collectGenTx(ctx: Context): Promise<unknown> {

@@ -213,8 +213,6 @@ func DoBroadcast(keyringDir string, cdc *codec.Codec, accInfo *AccountInfo, msgs
 		return &MsgBroadcasterResponse{Error: err}
 	}
 
-	fmt.Println("*************", accnt.AccNum, "***********", accnt.Seq, "********", chainId)
-
 	// Create a new TxBuilder.
 	txBuilder := auth.NewTxBuilder(
 		utils.GetTxEncoder(cdc),
@@ -247,7 +245,6 @@ func DoBroadcast(keyringDir string, cdc *codec.Codec, accInfo *AccountInfo, msgs
 	if strings.Contains(broadcastResult.Log, "signature verification failed") {
 		return &MsgBroadcasterResponse{Error: errors.New(broadcastResult.Log)}
 	}
-	fmt.Println("********* BROADCAST RESULT", err, broadcastResult)
 
 
 	result, err := pollForTransaction(rpcCtx, broadcastResult.Hash)

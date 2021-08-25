@@ -90,7 +90,6 @@ func ensureBtClient(ctx sdk.Context, k Keeper) {
 }
 
 func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) (*sdk.Result, error) {
-	fmt.Println("******** HANDLE PUBLISH FILE *********")
 	k.Logger(ctx).Debug("Publish file message received", "id", msg.Id)
 	ensureBtClient(ctx, k)
 	var metainfo metainfo.MetaInfo
