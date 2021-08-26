@@ -5,7 +5,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "build": "make testnet"
+    "build": "make testnet",
+    "setup": "./scripts/setup.ts"
   }
 }
 

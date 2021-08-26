@@ -100,7 +100,7 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 	btClient.RetrieveFile(&metainfo)
 	k.EnsureNftDirExists()
 
-	err := os.Symlink(k.GetNftDir()+"/"+msg.Hash, k.GetNftDir()+"/"+msg.Vendor+"-"+msg.Id)
+	err := os.Symlink("./"+msg.Hash, k.GetNftDir()+"/"+msg.Vendor+"-"+msg.Id)
 
 	if err != nil {
 
@@ -118,7 +118,7 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 	if err != nil {
 		return nil, err
 	}
-	err = os.Symlink(k.GetNftDir()+"/"+msg.Hash+".info", k.GetNftDir()+"/"+msg.Vendor+"-"+msg.Id+".info")
+	err = os.Symlink("./"+msg.Hash+".info", k.GetNftDir()+"/"+msg.Vendor+"-"+msg.Id+".info")
 	if err != nil {
 		return nil, err
 	}

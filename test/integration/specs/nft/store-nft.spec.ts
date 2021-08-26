@@ -30,6 +30,7 @@ import {passThrough, passThroughAwait} from "promise-passthrough";
 import {Some} from "monet";
 import {UploadNftResult} from "bluzelle";
 import {getSwarmAndClient} from "../../helpers/bluzelle-client";
+import delay from "delay";
 
 global.fetch = require('node-fetch')
 
@@ -52,6 +53,47 @@ describe("Store and retriving a NFT", function () {
 
     describe('file replication', () => {
         this.timeout(300000)
+
+
+        const waitUntilHttpAvailable = (url: string): Promise<Response> =>
+            fetch(url)
+                .then(resp => resp.status !== 200 ? delay(500).then(() => waitUntilHttpAvailable(url)) : resp)
+
+        const waitUntilFileAvailable = (daemon: Daemon, filepath: string): Promise<ArrayBuffer> =>
+            daemon.exec(`stat ${daemon.getNftBaseDir()}/nft/${filepath}`)
+                .then(() => daemon.exec(`base64  ${daemon.getNftBaseDir()}/nft/${filepath}`))
+                .then(base64 => Buffer.from(base64, 'base64'))
+                .catch(() => waitUntilFileAvailable(daemon, filepath))
+
+
+        const checkMimeType2 = (mime: string) => (resp: Response) =>
+            expect(resp.headers.get('content-type')).to.equal(mime);
+
+        const checkHttpContent = (content: Uint8Array) => (resp: Response) =>
+            resp.arrayBuffer()
+                .then(buf => Buffer.from(buf).compare(content))
+                .then(compare => expect(compare).to.equal(0));
+
+        const checkFileContent = (content: Uint8Array) => (file: ArrayBuffer) =>
+            Promise.resolve(Buffer.from(file).compare(content))
+                .then(compare => expect(compare).to.equal(0))
+
+        const checkReplication = (swarm: Swarm, hash: string, id: string, mime: string, vendor: string, content: Uint8Array): Promise<unknown> =>
+            Promise.all(swarm.getSentries().map(daemon =>
+                waitUntilHttpAvailable(`${getSentryUrl(swarm)}/nft/${hash}`)
+                    .then(passThroughAwait(checkMimeType2(mime)))
+                    .then(passThroughAwait(checkHttpContent(content)))
+                    .then(() => waitUntilHttpAvailable(`${getSentryUrl(swarm)}/nft/${vendor}/${id}`))
+                    .then(passThroughAwait(checkMimeType2(mime)))
+                    .then(passThroughAwait(checkHttpContent(content)))
+            ))
+                .then(() => Promise.all(swarm.getValidators().map(daemon =>
+                    waitUntilFileAvailable(daemon, hash)
+                        .then(passThroughAwait(checkFileContent(content)))
+                    // TODO: FINISH HERE
+                )))
+
+
         it('should replicate a file', () => {
             const text = `new nft - ${Date.now()}`;
             const id = Date.now().toString()
@@ -59,17 +101,11 @@ describe("Store and retriving a NFT", function () {
                 .then(passThroughAwait(({hash}) => bz.createNft(id, hash, "mintable", "myUserId", 'text/txt', "", defaultGasParams())))
                 .then(passThrough(({hash}) => console.log('HASH:', hash)))
                 .then(({hash}) =>
-                    Promise.all(swarm.getDaemons()
-                        .map(daemon =>
-                            checkFileReplication(daemon, hash, 7)
-                                .then(() => checkInfoFileReplication(daemon, hash))
-                                .then(daemon => checkFileSize(daemon, hash, 7))
-                                .then(daemon => checkTextFileContents(daemon, hash, text))
-                        )
-                    ))
+                    checkReplication(swarm, hash, id, 'text/txt', 'mintable', new TextEncoder().encode(text))
+                )
         });
 
-        it('should allow one client to send 3 createNft() in parallel to the same sentry',  () => {
+        it('should allow one client to send 3 createNft() in parallel to the same sentry', () => {
             const COUNT = 3
             const id = Date.now().toString()
             return Promise.all(

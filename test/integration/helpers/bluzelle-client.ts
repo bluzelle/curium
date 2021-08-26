@@ -6,6 +6,7 @@ import {SwarmConfig} from "daemon-manager/lib/SwarmConfig";
 import {entropyToMnemonic} from "bip39";
 import {Some} from "monet";
 import {passThrough} from "promise-passthrough";
+import {getSentryUrl} from "./nft-helpers";
 
 export const getBzClient = memoize((config: Partial<BluzelleConfig> = {}) =>
     bluzelle({
@@ -27,7 +28,7 @@ export const getSwarmAndClient = () =>
                 bz: bluzelle({
                     mnemonic: auth.mnemonic,
                     uuid: Date.now().toString(),
-                    endpoint: `${swarm.getSwarmConfig().restProtocol}://localhost:${swarm.getSentries()[0].getRestPort()}`
+                    endpoint: getSentryUrl(swarm)
                 })
             })
         )
