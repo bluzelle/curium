@@ -13,6 +13,7 @@ import (
 const (
 	QueryGetNft               = "get-nft"
 	QueryGetNftUploadDir      = "get-nft-upload-dir"
+	QueryGetNftDir            = "get-nft-dir"
 )
 
 // NewQuerier creates a new querier for nft clients.
@@ -23,6 +24,8 @@ func NewQuerier(k Keeper) sdk.Querier {
 			return queryGetNft(ctx, path[1:], req, k, k.GetCdc())
 		case QueryGetNftUploadDir:
 			return queryGetNftUploadDir(ctx, k)
+		case QueryGetNftDir:
+			return queryGetNftDir(ctx, k)
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown nft query endpoint")
 		}
@@ -32,6 +35,10 @@ func NewQuerier(k Keeper) sdk.Querier {
 
 func queryGetNftUploadDir(ctx sdk.Context, keeper Keeper) ([]byte, error) {
 	return []byte(keeper.GetNftUploadDir()), nil
+}
+
+func queryGetNftDir(ctx sdk.Context, keeper Keeper) ([]byte, error) {
+	return []byte(keeper.GetNftDir()), nil
 }
 
 func queryGetNft(ctx sdk.Context, path []string, _ abci.RequestQuery, keeper Keeper, cdc *codec.Codec) ([]byte, error) {

@@ -13,12 +13,15 @@ import (
 func getNftHandler(clientCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		hash := mux.Vars(r)["hash"]
-		clientCtx.HomeDir = ".blzd"
 
-		location := clientCtx.HomeDir + "/nft/" + hash
-		infoLocation := clientCtx.HomeDir + "/nft/" + hash + ".info"
+		nftDirRes, _, err := clientCtx.Query("custom/nft/get-nft-dir")
+
+		nftDir := string(nftDirRes)
+
+		location := nftDir + "/" + hash
+		infoLocation := nftDir + "/" + hash + ".info"
 		if _, err := os.Stat(location); os.IsNotExist(err) {
-			rest.WriteErrorResponse(w, http.StatusNotFound, location)
+			rest.WriteErrorResponse(w, http.StatusNotFound, hash)
 			rest.WriteErrorResponse(w, http.StatusNotFound, "File does not exist")
 			return
 		}

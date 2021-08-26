@@ -30,7 +30,6 @@ import {passThrough, passThroughAwait} from "promise-passthrough";
 import {Some} from "monet";
 import {UploadNftResult} from "bluzelle";
 import {getSwarmAndClient} from "../../helpers/bluzelle-client";
-import delay from "delay";
 
 global.fetch = require('node-fetch')
 

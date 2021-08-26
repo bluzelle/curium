@@ -16,12 +16,13 @@ func getNftByVendorHandler(clientCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := mux.Vars(r)["id"]
 		vendor := mux.Vars(r)["vendor"]
-		clientCtx.HomeDir = ".blzd"
+		nftDirRes, _, err := clientCtx.Query("custom/nft/get-nft-dir")
 
+		nftDir := string(nftDirRes)
 		filename := vendor + "-" + id
 
-		location := clientCtx.HomeDir + "/nft/" + filename
-		infoLocation := clientCtx.HomeDir + "/nft/" + filename + ".info"
+		location := nftDir + "/" + filename
+		infoLocation := nftDir + "/" + filename + ".info"
 		if _, err := os.Stat(location); os.IsNotExist(err) {
 			rest.WriteErrorResponse(w, http.StatusNotFound, "File does not exist")
 			return
