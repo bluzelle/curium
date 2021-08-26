@@ -1,7 +1,11 @@
 import {bluzelle, BluzelleConfig} from "bluzelle";
-import {memoize} from 'lodash'
+import {memoize, times} from 'lodash'
 import {GasInfo} from "bluzelle";
 import {getSwarm} from "@bluzelle/testing/lib/helpers/swarmHelpers";
+import {SwarmConfig} from "daemon-manager/lib/SwarmConfig";
+import {entropyToMnemonic} from "bip39";
+import {Some} from "monet";
+import {passThrough} from "promise-passthrough";
 
 export const getBzClient = memoize((config: Partial<BluzelleConfig> = {}) =>
     bluzelle({
@@ -13,7 +17,7 @@ export const getBzClient = memoize((config: Partial<BluzelleConfig> = {}) =>
 );
 
 export const getSwarmAndClient = () =>
-    getSwarm()
+    getSwarm([withTestUsers])
         .then(swarm => ({swarm}))
         .then(({swarm}) => swarm.getValidators()[0].getAuth().then(auth => ({swarm, auth})))
         .then(({swarm, auth}) =>
@@ -30,3 +34,14 @@ export const getSwarmAndClient = () =>
 
 export const defaultGasParams = (gasInfo: GasInfo = {}): GasInfo => ({gas_price: 10, max_gas: 100000000, ...gasInfo})
 
+function withTestUsers (config: SwarmConfig): SwarmConfig {
+    return Some({
+        ...config,
+        additionalUsers: times(4).map(n =>({
+            name: `test-${n}`,
+            mnemonic: entropyToMnemonic((n + 1).toString().repeat(30) + 'aa')
+        }))
+    } as SwarmConfig)
+        .map(passThrough((config: SwarmConfig) => console.log("******** test users ******\n", config.additionalUsers)))
+        .join()
+}
