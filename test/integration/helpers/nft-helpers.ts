@@ -33,21 +33,12 @@ export const createBz = (bz: API): API =>
         })
         .join();
 
-export const createMintedBz = (bz: API): Promise<API> =>
-    fetch(`${bz.url}/mint`)
-        .then(x => x.arrayBuffer().then(buf => ({x, buf})))
-        .then(resp => ({
-            body: new Uint8Array(resp.buf),
-            contentType: resp.x.headers.get('content-type') || ''
-        }))
-        .then(({body}) => new TextDecoder().decode(body))
-        .then(x => JSON.parse(x))
-        .then(resp => resp.mnemonic)
-        .then(mnemonic => bluzelle({
-            mnemonic,
-            endpoint: bz.url,
-            uuid: bz.uuid,
-        }));
+export const getMintedBz = (bz: API, idx: number = 0): Promise<API> =>
+    Promise.resolve(bluzelle({
+        endpoint: bz.url,
+        uuid: bz.uuid,
+        mnemonic: testUsers[idx].mnemonic
+    }));
 
 
 export const checkFileReplication = (daemon: Daemon, hash: string, fileSize: number): Promise<Daemon> =>
@@ -262,3 +253,37 @@ export const fetchDataWithHash = (swarm: Swarm, hash: string) =>
 //         '6CVD47YwZBQFtKuHuQ4j51Ufg3WonVJ4mjSTB1tBxdla0CY9F2So\n' +
 //         '-----END RSA PRIVATE KEY-----\n'
 // }
+
+
+
+const testUsers = [
+    {
+        "name": "test-0",
+        "type": "local",
+        "address": "bluzelle1ry63jxrslmqc5fxw2rhf2rzkm72rjmv977u3n6",
+        "pubkey": "bluzellepub1addwnpepqt39sphhg6g6dxufwq08ds7g8423hyyc2cyl6l78m0avhfmfd4ylxk6qp69",
+        "mnemonic": "baby mass dust captain baby mass dust captain baby mass dutch field"
+    },
+    {
+        "name": "test-1",
+        "type": "local",
+        "address": "bluzelle18q2m6qdkqnndjahcjrvjjrld6qaeng54jsf3k3",
+        "pubkey": "bluzellepub1addwnpepqvhxsjvrqx7tn3a286gfqs6g9ferasc9whfe7379a2r2dyrh332zcfd6rsv",
+        "mnemonic": "captain baby mass dust captain baby mass dust captain baby master fetch"
+    },
+    {
+        "name": "test-2",
+        "type": "local",
+        "address": "bluzelle1n39t4hcnr2800tj3znf4udp9vt0g84hd0ufuve",
+        "pubkey": "bluzellepub1addwnpepqgg55jg90mjljzvwn3tqwvwyhf76dsrtaen426rgw7t6fx9wxu8rzxmvh2z",
+        "mnemonic": "creek office smoke grid creek office smoke grid creek office smooth field"
+    },
+    {
+        "name": "test-3",
+        "type": "local",
+        "address": "bluzelle1s7h2wtfslyu7nqglellvjrtssz3ycrt4ykyhfc",
+        "pubkey": "bluzellepub1addwnpepq2kz0nl9762sf7sweznv3sqdce4ywv3z6g3e7y8dyse3999dgkmruncyyv8",
+        "mnemonic": "dust captain baby mass dust captain baby mass dust captain bachelor fiber"
+    }
+]
+
