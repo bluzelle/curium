@@ -114,7 +114,7 @@ func SetGasMeter(simulate bool, ctx sdk.Context, gasLimit uint64, tx sdk.Tx, gk 
 	}
 
 
-	if !ctx.IsCheckTx() && isOnWhitelist(ctx, crudKeeper, feePayer.String()) && isFreeModule(msgModule) {
+	if !ctx.IsCheckTx() && isFreeModule(msgModule) && isOnWhitelist(ctx, crudKeeper, feePayer.String())  {
 		gm := gasmeter.NewFreeGasMeter(gasLimit)
 		gk.AddGasMeter(&gm)
 		return ctx.WithGasMeter(gm), nil
@@ -128,7 +128,8 @@ func SetGasMeter(simulate bool, ctx sdk.Context, gasLimit uint64, tx sdk.Tx, gk 
 }
 
 func isOnWhitelist(ctx sdk.Context, k crud.Keeper, sender string) bool {
-	return strings.Contains(getWhitelist(ctx, k), sender)
+	whitelist := getWhitelist(ctx, k)
+	return strings.Contains(whitelist, sender)
 }
 
 func getWhitelist(ctx sdk.Context, crudKeeper crud.Keeper) string {

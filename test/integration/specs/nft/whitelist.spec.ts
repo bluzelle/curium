@@ -23,6 +23,7 @@ describe('whitelist', function()  {
     beforeEach(() => getSwarmAndClient()
         .then(({bz: newBz, swarm: newSwarm}) => {
             bz = newBz
+            bz.uuid = 'bluzelle'
             swarm = newSwarm
         })
     )
@@ -115,7 +116,6 @@ describe('whitelist', function()  {
 
 const createWhitelist = (bz: API, addresses: string[]): Promise<void> =>
     bz.upsert("whitelist", JSON.stringify(addresses), defaultGasParams())
-        .then(x => x)
         .then(() => {})
 
 const checkGasChargeIsZero = (swarm: Swarm, bz: API, id: string): Promise<unknown> => {
