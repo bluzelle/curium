@@ -61,15 +61,6 @@ export const checkInfoFileReplication = (daemon: Daemon, hash: string): Promise<
         .then(() => console.log("Metadata file replicated on ", daemon.getName()))
         .then(() => daemon);
 
-export const checkUpload = (daemon: Daemon, hash: string, vendor: string): Promise<Daemon> =>
-    waitUntil(() =>
-            daemon.exec(`ls .blzd/nft-upload/${vendor}/${hash}*`)
-                .then(x => /No such file/.test(x) === false)
-        , {timeout: 50000}
-    )
-        .then(() => console.log("Files were uploaded", daemon.getName()))
-        .then(() => daemon);
-
 export const checkVendorInfoFileReplication = (daemon: Daemon, vendor: string, id: string): Promise<Daemon> =>
     waitUntil(() =>
             daemon.exec(`ls .blzd/nft/${vendor}-${id}.info`)
@@ -138,9 +129,16 @@ export const checkVendorIdEndpointBytes = (daemon: Daemon, id: string, vendor: s
         .then((resp: { body: Uint8Array, contentType: string }) => expect(resp.body).to.deep.equal(contents))
         .then(() => daemon);
 
-export const getLargePayload = memoize<(length: number) => Uint8Array>((length) => {
-    return new Uint8Array(length * 1024 * 1024).map((v, idx) => idx % 256)
-});
+export const getLargePayload = (length: number) =>
+    Some({insert: Math.floor(Math.random() * 1_000_000)})
+        .map(ctx => ({...ctx, start: ctx.insert + Math.floor(Math.random() * 1_000_000)}))
+        .map(ctx => ({...ctx, end: ctx.start + Math.floor(Math.random() * 1_000_000)}))
+        .map(ctx =>
+            new Uint8Array(length * 1024 * 1024).map((v, idx) => idx % 256)
+                .copyWithin(ctx.insert, ctx.start, ctx.end)
+        )
+        .join();
+
 
 export const fetchData = (swarm: Swarm, hash: string = '', {
     id,
@@ -253,7 +251,6 @@ export const fetchDataWithHash = (swarm: Swarm, hash: string) =>
 //         '6CVD47YwZBQFtKuHuQ4j51Ufg3WonVJ4mjSTB1tBxdla0CY9F2So\n' +
 //         '-----END RSA PRIVATE KEY-----\n'
 // }
-
 
 
 const testUsers = [
