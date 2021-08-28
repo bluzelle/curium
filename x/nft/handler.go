@@ -11,8 +11,9 @@ import (
 	"github.com/zeebo/bencode"
 	"io/ioutil"
 	"os"
-	"sync"
 )
+
+var UPLOAD_TOKEN_EXPIRE_BLOCKS = int64(720)
 
 func NewHandler(keeper keeper.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
@@ -39,39 +40,22 @@ func handleMsgCreateNft(ctx sdk.Context, k keeper.Keeper, msg *types.MsgCreateNf
 		msg.UserId,
 		msg.Meta,
 		msg.Mime,
+		msg.Size,
 	)
-	err := k.AssembleNftFile(k.GetNftUploadDir(), k.GetNftDir(), msg)
+
+	owner, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
-		return nil, sdkerrors.New("nft", 2, fmt.Sprintf("unable to move nft files: %s", msg.Hash))
+		return nil, sdkerrors.New("nft", 1, "Invalid creator address")
 	}
 
-
-	if _, err := os.Stat(k.GetNftDir() + "/" + msg.Hash); err == nil {
-		ensureBtClient(ctx, k)
-		btClient := k.GetBtClient()
-		metainfo, err := btClient.TorrentFromFile(msg.Hash)
-		if err != nil {
-			return nil, sdkerrors.New("nft", 2, fmt.Sprintf("unable to create torrent for file", msg.Hash))
-		}
-		err = k.SeedFile(metainfo)
-		if err != nil {
-			return nil, sdkerrors.New("nft", 2, fmt.Sprintf("unable to seed file: %s", msg.Hash))
-		}
-
-		go func() {
-			err = k.BroadcastPublishFile(ctx, msg.Id, msg.Vendor, msg.UserId, msg.Hash, msg.Mime, metainfo)
-			if err != nil {
-				k.Logger(ctx).Error("error broadcasting publish nft file", "err", err.Error())
-			}
-		}()
+	if k.UploadTokenManager.IsTokenValid(msg.Hash) {
+		sdkerrors.New("nft", 1, "create message already sent for this hash")
 	}
+	token := k.UploadTokenManager.NewUploadToken(msg.Hash, msg.Size, owner, ctx.BlockHeight() + UPLOAD_TOKEN_EXPIRE_BLOCKS)
 
-	if err != nil {
-		return nil, sdkerrors.New("nft", 2, fmt.Sprintf("unable to create torrent:  %s", msg.Hash))
-	}
-
-	createResp, err := json.Marshal(types.MsgCreateNftResponse{
+	createResp, err := json.Marshal(types.MsgCreateNftResponse {
 		Id: msg.Id,
+		Token: token.Value,
 	})
 
 	if err != nil {
@@ -81,17 +65,9 @@ func handleMsgCreateNft(ctx sdk.Context, k keeper.Keeper, msg *types.MsgCreateNf
 	return &sdk.Result{Data: createResp}, nil
 }
 
-var newBtClientOnce sync.Once
-func ensureBtClient(ctx sdk.Context, k Keeper) {
-	newBtClientOnce.Do(func() {
-		startTorrentClient(ctx, k)
-	})
-
-}
-
 func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) (*sdk.Result, error) {
 	k.Logger(ctx).Debug("Publish file message received", "id", msg.Id)
-	ensureBtClient(ctx, k)
+	keeper.EnsureBtClient(ctx, k)
 	var metainfo metainfo.MetaInfo
 	bencode.DecodeBytes(msg.Metainfo, &metainfo)
 

@@ -14,6 +14,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/tendermint/tendermint/libs/log"
 	"os"
+	"sync"
 )
 
 var btClient      *torrentClient.TorrentClient
@@ -30,6 +31,7 @@ type (
 		MsgBroadcaster curium.MsgBroadcaster
 		curiumKeeper   *curium.Keeper
 		KeyringReader *keeper.KeyringReader
+		UploadTokenManager *types.UploadTokenManager
 	}
 )
 
@@ -43,7 +45,7 @@ func NewKeeper (
 	msgBroadcaster curium.MsgBroadcaster,
 	curiumKeeper *curium.Keeper,
 	keyringReader *keeper.KeyringReader,
-
+	uploadTokenManager *types.UploadTokenManager,
 ) *Keeper {
 
 	return &Keeper{
@@ -56,6 +58,7 @@ func NewKeeper (
 		MsgBroadcaster: msgBroadcaster,
 		curiumKeeper:   curiumKeeper,
 		KeyringReader:  keyringReader,
+		UploadTokenManager: uploadTokenManager,
 	}
 }
 
@@ -166,3 +169,23 @@ func (k Keeper) EnsureNftDirExists () {
 		os.Mkdir(k.GetNftDir(), 0777)
 	}
 }
+
+var newBtClientOnce sync.Once
+
+func EnsureBtClient(ctx sdk.Context, k Keeper) {
+	newBtClientOnce.Do(func() {
+		startTorrentClient(ctx, k)
+	})
+}
+
+func startTorrentClient(ctx sdk.Context, k Keeper) {
+	k.EnsureNftDirExists()
+	btClient, err := torrentClient.NewTorrentClient(k.GetNftDir(), k.GetBtPort())
+	if err != nil {
+		k.Logger(ctx).Error("Error creating btClient", "error", err)
+	}
+
+	k.SetBtClient(btClient)
+}
+
+

@@ -52,15 +52,15 @@ func (k Keeper) BroadcastPublishFile(ctx sdk.Context, id string, vendor string, 
 }
 
 
-func (k Keeper) AssembleNftFile(uploadDir string, nftDir string, msg *types.MsgCreateNft) error {
+func (k Keeper) AssembleNftFile(uploadDir string, nftDir string, hash string) error {
 
-	uploadRegEx, err := regexp.Compile(fmt.Sprintf("^%s-", msg.Hash))
+	uploadRegEx, err := regexp.Compile(fmt.Sprintf("^%s-", hash))
 	if err != nil {
 		return err
 	}
 
 	// Delete upload file if already exists in nft dir and stop
-	_, err = os.Stat(nftDir + "/" + msg.Hash)
+	_, err = os.Stat(nftDir + "/" + hash)
 
 	if err == nil {
 		walkError := filepath.Walk(uploadDir, func(path string, info os.FileInfo, err error) error {
@@ -92,7 +92,7 @@ func (k Keeper) AssembleNftFile(uploadDir string, nftDir string, msg *types.MsgC
 				if err != nil {
 					return err
 				}
-				f, err := os.OpenFile(nftDir+"/"+msg.Hash, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0744)
+				f, err := os.OpenFile(nftDir+"/"+hash, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0744)
 				if err != nil {
 					return err
 				}

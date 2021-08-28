@@ -22,6 +22,7 @@ import (
 	"github.com/bluzelle/curium/x/aggregator"
 	"github.com/bluzelle/curium/x/curium"
 	"github.com/bluzelle/curium/x/nft"
+	"github.com/bluzelle/curium/x/nft/types"
 	"github.com/bluzelle/curium/x/oracle"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"math"
@@ -390,6 +391,7 @@ func NewCRUDApp(
 		msgBroadcaster,
 		app.curiumKeeper,
 		curium.NewKeyringReader(DefaultCLIHome),
+		types.NewUploadTokenManager(),
 	)
 
 	// check flags...

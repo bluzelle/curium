@@ -8,6 +8,7 @@ type Nft struct {
 	Hash string
 	Mime string
 	Meta string
+	Size uint64
 }
 
 type NftInfo struct {
@@ -15,4 +16,5 @@ type NftInfo struct {
 	Vendor string
 	UserId string
 	Mime string
+	Size uint64
 }

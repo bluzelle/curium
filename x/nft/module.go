@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	nft "github.com/bluzelle/curium/x/nft/keeper"
 	nftTypes "github.com/bluzelle/curium/x/nft/types"
-	"github.com/bluzelle/curium/x/torrentClient"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
@@ -165,15 +164,6 @@ func checkBroadcastPeer(ctx sdk.Context, am AppModule) {
 	}
 }
 
-func startTorrentClient(ctx sdk.Context, k Keeper) {
-	k.EnsureNftDirExists()
-	btClient, err := torrentClient.NewTorrentClient(k.GetNftDir(), k.GetBtPort())
-	if err != nil {
-		k.Logger(ctx).Error("Error creating btClient", "error", err)
-	}
-
-	k.SetBtClient(btClient)
-}
 
 // EndBlock returns the end blocker for the nft module. It returns no validator
 // updates.
@@ -183,7 +173,7 @@ func startTorrentClient(ctx sdk.Context, k Keeper) {
 
 func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
 
-	ensureBtClient(ctx, am.keeper)
+	nft.EnsureBtClient(ctx, am.keeper)
 
 	time.AfterFunc(20 * time.Second, func() {
 		checkBroadcastPeer(ctx, am)

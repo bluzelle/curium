@@ -13,10 +13,12 @@ type MsgCreateNft struct {
 	Creator string
 	Mime    string
 	Meta    string
+	Size    uint64
 }
 
 type MsgCreateNftResponse struct {
-	Id      string
+	Id      string    `json:"id"`
+	Token   string	  `json:"token"`
 }
 
 
