@@ -1,0 +1,13 @@
+{
+  "name": "demo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^16.7.6",
+    "bluzelle": "^3.0.9",
+    "js-sha256": "^0.9.0",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.2"
+  }
+}

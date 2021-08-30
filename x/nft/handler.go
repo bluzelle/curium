@@ -102,6 +102,7 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 }
 
 func handleMsgRegisterPeer(ctx sdk.Context, k Keeper, msg *types.MsgRegisterPeer) (*sdk.Result, error) {
+	keeper.EnsureBtClient(ctx, k)
 	store := k.GetPeerStore(ctx)
 	var peer types.Peer
 	peer.Id = msg.Id

@@ -17,7 +17,7 @@ import (
 	"sync"
 )
 
-var btClient      *torrentClient.TorrentClient
+var btClient     *torrentClient.TorrentClient
 
 
 type (
@@ -183,6 +183,7 @@ func startTorrentClient(ctx sdk.Context, k Keeper) {
 	btClient, err := torrentClient.NewTorrentClient(k.GetNftDir(), k.GetBtPort())
 	if err != nil {
 		k.Logger(ctx).Error("Error creating btClient", "error", err)
+		return
 	}
 
 	k.SetBtClient(btClient)
