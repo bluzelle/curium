@@ -31,6 +31,11 @@ func NewHandler(keeper keeper.Keeper) sdk.Handler {
 }
 
 func handleMsgCreateNft(ctx sdk.Context, k keeper.Keeper, msg *types.MsgCreateNft) (*sdk.Result, error) {
+
+	if msg.Size > 150 * 1024 * 1024 {
+		return nil, sdkerrors.New("nft", 2, "nft too large")
+	}
+
 	k.AppendNft(
 		ctx,
 		msg.Creator,

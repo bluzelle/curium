@@ -1,7 +1,10 @@
 import {defaultGasParams, getSwarmAndClient} from "../../helpers/bluzelle-client";
 import {Swarm} from "daemon-manager/lib/Swarm";
 import {API} from "bluzelle";
-import {expect} from 'chai'
+import chai, {expect} from 'chai'
+import asPromised from 'chai-as-promised'
+
+chai.use(asPromised);
 
 describe('MsgCreateNft', function()  {
     this.timeout(100000);
@@ -28,5 +31,22 @@ describe('MsgCreateNft', function()  {
         })
             .then(resp => resp.token)
             .then(token => expect(token).to.equal('hash'))
+    })
+
+    it('should reject a transaction with a size larger than 150MB', (done) => {
+        bz.createNft({
+                id: 'my-id',
+                hash: 'hash',
+                vendor: 'mintable',
+                userId: 'user-id',
+                mime: 'mime',
+                meta: 'meta',
+                size: 151 * 1024 * 1024,
+                gasInfo: defaultGasParams()
+            })
+                .catch(e => {
+                    expect(e.error).to.match(/nft too large/)
+                    done();
+                })
     })
 })
