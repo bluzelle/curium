@@ -89,7 +89,7 @@ function createTestUsers(ctx: Context): Promise<unknown> {
 }
 
 function fundUser(user: User): Promise<unknown> {
-    return $`${getBlzcli()} tx send vuser ${user.address} 10000000000ubnt --from vuser --gas auto --gas-adjustment 3 --gas-prices 0.002ubnt --broadcast-mode block -y`
+    return $`${getBlzcli()} tx send vuser ${user.address} ${10_000_000_000_000}ubnt --from vuser --gas auto --gas-adjustment 3 --gas-prices 0.002ubnt --broadcast-mode block -y`
 }
 
 function copyGenesisJson(ctx: Context): Promise<unknown> {
@@ -125,7 +125,7 @@ function collectGenTx(ctx: Context): Promise<unknown> {
 }
 
 function genTx(ctx: Context): Promise<unknown> {
-    return exec<string>(() => $`${getBlzd()} gentx --name vuser --amount 10000000000000ubnt --keyring-backend test --home ${ctx.nodes[0].home}`)
+    return exec<string>(() => $`${getBlzd()} gentx --name vuser --amount ${100_000_000_000_000_000}ubnt --keyring-backend test --home ${ctx.nodes[0].home}`)
         .then(x => x.replace(/.*"(.*)"/, '$1').trim())
         .then(filename => fs.readFile(filename))
         .then(buf => buf.toString())
@@ -134,7 +134,7 @@ function genTx(ctx: Context): Promise<unknown> {
 }
 
 function addGenesisAccount(ctx: Context): Promise<unknown> {
-    return $`${getBlzd()} add-genesis-account ${ctx.vuser.address} 500000000000000ubnt --home ${ctx.nodes[0].home}`
+    return $`${getBlzd()} add-genesis-account ${ctx.vuser.address} ${5_000_000_000_000_000_000}ubnt --home ${ctx.nodes[0].home}`
 }
 
 function addVuser(ctx: Context): Promise<User> {
