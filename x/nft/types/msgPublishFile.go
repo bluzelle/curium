@@ -24,7 +24,7 @@ func (msg *MsgPublishFile) Route() string {
 }
 
 func (msg *MsgPublishFile) Type() string {
-	return "CreateNft"
+	return "PublishFile"
 }
 
 func (msg *MsgPublishFile) GetSigners() []sdk.AccAddress {

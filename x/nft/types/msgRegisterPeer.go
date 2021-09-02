@@ -21,7 +21,7 @@ func (msg *MsgRegisterPeer) Route() string {
 }
 
 func (msg *MsgRegisterPeer) Type() string {
-	return "CreateNft"
+	return "RegisterPeer"
 }
 
 func (msg *MsgRegisterPeer) GetSigners() []sdk.AccAddress {

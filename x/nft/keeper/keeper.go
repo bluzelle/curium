@@ -3,6 +3,7 @@ package keeper
 import (
 	"errors"
 	"fmt"
+	"github.com/bluzelle/curium/x/crud"
 	"github.com/bluzelle/curium/x/curium"
 	"github.com/bluzelle/curium/x/curium/keeper"
 	"github.com/bluzelle/curium/x/nft/types"
@@ -14,6 +15,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/tendermint/tendermint/libs/log"
 	"os"
+	"strings"
 	"sync"
 )
 
@@ -30,6 +32,7 @@ type (
 		BtPort     int
 		MsgBroadcaster curium.MsgBroadcaster
 		curiumKeeper   *curium.Keeper
+		crudKeeper     *crud.Keeper
 		KeyringReader *keeper.KeyringReader
 		UploadTokenManager *types.UploadTokenManager
 	}
@@ -44,6 +47,7 @@ func NewKeeper (
 	btPort int,
 	msgBroadcaster curium.MsgBroadcaster,
 	curiumKeeper *curium.Keeper,
+	crudKeeper *crud.Keeper,
 	keyringReader *keeper.KeyringReader,
 	uploadTokenManager *types.UploadTokenManager,
 ) *Keeper {
@@ -57,9 +61,15 @@ func NewKeeper (
 		BtPort:         btPort,
 		MsgBroadcaster: msgBroadcaster,
 		curiumKeeper:   curiumKeeper,
+		crudKeeper: crudKeeper,
 		KeyringReader:  keyringReader,
 		UploadTokenManager: uploadTokenManager,
 	}
+}
+
+func (k Keeper) IsAuthorized(ctx sdk.Context, addr sdk.AccAddress) bool {
+	whitelist := k.crudKeeper.GetValue(ctx, k.crudKeeper.GetKVStore(ctx), "bluzelle", "nft-whitelist").Value
+	return strings.Contains(whitelist, addr.String())
 }
 
 func (k Keeper) GetNftUploadDir() string {
@@ -70,7 +80,7 @@ func (k Keeper) GetNftDir() string {
 	return k.NftBaseDir + "/nft"
 }
 
-func (k Keeper) GetBtPort() int {
+func (k *Keeper) GetBtPort() int {
 	return k.BtPort
 }
 

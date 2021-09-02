@@ -5,11 +5,13 @@ import (
 	"github.com/anacrolix/torrent"
 	"github.com/anacrolix/torrent/metainfo"
 	"github.com/zeebo/bencode"
+	"golang.org/x/time/rate"
 	"strings"
 	"time"
 )
 
-const PIECE_SIZE = 128
+const PIECE_SIZE = 256
+const RATE_LIMIT = 1000
 
 type TorrentClient struct {
 	Id       string
@@ -30,6 +32,8 @@ func NewTorrentClient(dataDir string, port int) (*TorrentClient, error) {
 	config.Seed = true
 	config.DropDuplicatePeerIds = true
 	config.DropMutuallyCompletePeers = true
+	config.DownloadRateLimiter = rate.NewLimiter(RATE_LIMIT * 1024 * 1024, PIECE_SIZE * 1024)
+	config.UploadRateLimiter = rate.NewLimiter(RATE_LIMIT * 1024 * 1024, PIECE_SIZE * 1024)
 	cl, err := torrent.NewClient(config)
 	if err != nil {
 		return nil, err

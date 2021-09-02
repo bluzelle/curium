@@ -21,4 +21,5 @@ require (
 	github.com/tendermint/tm-db v0.5.1
 	github.com/wenxiang/go-nestedjson v0.0.0-20150910062500-11a6c4340577
 	github.com/zeebo/bencode v1.0.0
+	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba
 )

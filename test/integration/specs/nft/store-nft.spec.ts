@@ -29,9 +29,11 @@ describe("Store and retrieve a NFT", function () {
     beforeEach(() => {
         return getSwarmAndClient()
             .then(({bz: newBz, swarm: newSwarm}) => {
-                bz = newBz
-                swarm = newSwarm
+                bz = newBz;
+                swarm = newSwarm;
+                bz.uuid = 'bluzelle';
             })
+            .then(() => bz.upsert("nft-whitelist", JSON.stringify([bz.address]), defaultGasParams()))
     });
 
 
@@ -39,7 +41,7 @@ describe("Store and retrieve a NFT", function () {
 
         it('should replicate a large file', () => {
             const id = Date.now().toString()
-            const data = getLargePayload(150)
+            const data = getLargePayload(140)
             const hash = sha256(data);
             return bz.createNft({
                 id,
@@ -62,7 +64,7 @@ describe("Store and retrieve a NFT", function () {
             const COUNT = 3
             return Promise.all(
                 times(COUNT).map(n =>
-                    Promise.resolve(getLargePayload(100))
+                    Promise.resolve(getLargePayload(70))
                         .then(data => ({
                             id: Date.now().toString(),
                             data,
@@ -108,7 +110,7 @@ describe("Store and retrieve a NFT", function () {
 
 
 const waitUntilHttpAvailable = (url: string): Promise<Response> =>
-    Promise.resolve(console.log('waitUntilHttpAvailable'))
+    Promise.resolve(console.log('waitUntilHttpAvailable', url))
         .then(() => fetch(url))
         .then(resp => resp.status !== 200 ? delay(500).then(() => waitUntilHttpAvailable(url)) : resp)
 

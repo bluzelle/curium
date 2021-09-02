@@ -19,7 +19,5 @@ describe('nft upload', function() {
         uploadNft(getSentryUrl(swarm), new TextEncoder().encode('data'), '1111', 'mintable')
             .then(x => x)
             .catch(e => e)
-
-
     })
 })

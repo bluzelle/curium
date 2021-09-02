@@ -3,6 +3,7 @@ package ante
 import (
 	"github.com/bluzelle/curium/app/ante/gasmeter"
 	"github.com/bluzelle/curium/x/crud"
+	nft "github.com/bluzelle/curium/x/nft/keeper"
 	"github.com/bluzelle/curium/x/tax"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
@@ -17,6 +18,7 @@ func NewAnteHandler(
 	taxKeeper tax.Keeper,
 	bankKeeper bank.Keeper,
 	crudKeeper crud.Keeper,
+	nftKeeper  *nft.Keeper,
 	sigGasConsumer ante.SignatureVerificationGasConsumer,
 	gasMeterKeeper *gasmeter.GasMeterKeeper,
 	minGasPriceCoins sdk.DecCoins,
@@ -38,5 +40,6 @@ func NewAnteHandler(
 				bankKeeper,
 			),
 		ante.NewIncrementSequenceDecorator(accountKeeper), // innermost AnteDecorator
+		NewNftChecksAnteHandler(*nftKeeper),
 	)
 }

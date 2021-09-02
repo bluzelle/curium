@@ -10,7 +10,6 @@ import (
 	acctypes "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"strings"
 )
 
 var (
@@ -114,7 +113,7 @@ func SetGasMeter(simulate bool, ctx sdk.Context, gasLimit uint64, tx sdk.Tx, gk 
 	}
 
 
-	if !ctx.IsCheckTx() && isFreeModule(msgModule) && isOnWhitelist(ctx, crudKeeper, feePayer.String())  {
+	if !ctx.IsCheckTx() && isFreeModule(msgModule) {
 		gm := gasmeter.NewFreeGasMeter(gasLimit)
 		gk.AddGasMeter(&gm)
 		return ctx.WithGasMeter(gm), nil
@@ -127,20 +126,6 @@ func SetGasMeter(simulate bool, ctx sdk.Context, gasLimit uint64, tx sdk.Tx, gk 
 	return ctx.WithGasMeter(gm), nil
 }
 
-func isOnWhitelist(ctx sdk.Context, k crud.Keeper, sender string) bool {
-	whitelist := getWhitelist(ctx, k)
-	return strings.Contains(whitelist, sender)
-}
-
-func getWhitelist(ctx sdk.Context, crudKeeper crud.Keeper) string {
-	store := crudKeeper.GetKVStore(ctx)
-	whitelistBlzValue := crudKeeper.GetValue(ctx, store, "bluzelle", "whitelist")
-
-	if len(whitelistBlzValue.Value) > 0 {
-		return whitelistBlzValue.Value
-	}
-	return ""
-}
 
 func isFreeModule(msgModule string) bool {
 	return msgModule == "oracle" || msgModule == "nft"

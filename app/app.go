@@ -390,6 +390,7 @@ func NewCRUDApp(
 		nftP2PPort,
 		msgBroadcaster,
 		app.curiumKeeper,
+		&app.crudKeeper,
 		curium.NewKeyringReader(DefaultCLIHome),
 		types.NewUploadTokenManager(),
 	)
@@ -471,6 +472,7 @@ func addAnteHandler(app *CRUDApp) {
 			app.taxKeeper,
 			app.bankKeeper,
 			app.crudKeeper,
+			app.nftKeeper,
 			auth.DefaultSigVerificationGasConsumer,
 			app.gasMeterKeeper,
 			minGasPriceCoins,
