@@ -23,7 +23,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const defaultGasParams = (gasInfo: GasInfo = {}): GasInfo => ({gas_price: 10, max_gas: 100000000, ...gasInfo})
 
 describe("Store and retrieve a NFT", function () {
-    this.timeout(100000);
+    this.timeout(400_000);
     let bz: API
     let swarm: Swarm
     beforeEach(() => {

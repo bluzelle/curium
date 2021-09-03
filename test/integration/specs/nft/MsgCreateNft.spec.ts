@@ -9,7 +9,7 @@ import {passThroughAwait} from "promise-passthrough";
 chai.use(asPromised);
 
 describe('MsgCreateNft', function () {
-    this.timeout(100000);
+    this.timeout(400_000);
     let bz: API
     let swarm: Swarm
     beforeEach(() => {
