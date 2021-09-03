@@ -11,7 +11,7 @@ import (
 )
 
 const PIECE_SIZE = 256
-const RATE_LIMIT = 1000
+const RATE_LIMIT = 200
 
 type TorrentClient struct {
 	Id       string
