@@ -37,9 +37,6 @@ func (k Keeper) BroadcastPublishFile(ctx sdk.Context, id string, vendor string, 
 		Creator:  addr.String(),
 		Id:       id,
 		Vendor: vendor,
-		UserId: userId,
-		Hash:     hash,
-		Mime:     mime,
 		Metainfo: metaBytes,
 	}
 

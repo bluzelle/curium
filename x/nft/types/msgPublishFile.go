@@ -9,9 +9,6 @@ type MsgPublishFile struct {
 	Creator  string `json:"creator,omitempty"`
 	Id       string `json:"id,omitempty"`
 	Vendor	 string `json:"vendor,omitempty"`
-	UserId	 string `json:"UserId,omitempty"`
-	Hash     string `json:"hash,omitempty"`
-	Mime     string `json:"mime,omitempty"`
 	Metainfo []byte `json:"metainfo,omitempty"`
 }
 
