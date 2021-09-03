@@ -12,6 +12,7 @@ describe('MsgCreateNft', function () {
     this.timeout(400_000);
     let bz: API
     let swarm: Swarm
+
     beforeEach(() => {
         return getSwarmAndClient()
             .then(({bz: newBz, swarm: newSwarm}) => {
@@ -20,6 +21,9 @@ describe('MsgCreateNft', function () {
                 bz.uuid = 'bluzelle'
             })
             .then(() => bz.upsert("nft-whitelist", JSON.stringify([bz.address]), defaultGasParams()))
+            .then(() => Promise.all(swarm.getDaemons().map(daemon =>
+                daemon.exec(`rm -rf ${daemon.getNftBaseDir()}/nft*`)
+            )))
     });
 
     it('should require the account be on a whitelist to allow create', () => {
@@ -86,8 +90,7 @@ describe('MsgCreateNft', function () {
             gasInfo: defaultGasParams()
         })
             .catch(e => {
-                expect(e.error).to.match(/nft too large/)
-                done();
+                /upload too large/.test(e.error) ? done() : done(new Error('should have returned an error'))
             })
     })
 

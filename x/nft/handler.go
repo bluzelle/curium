@@ -32,9 +32,6 @@ func NewHandler(keeper keeper.Keeper) sdk.Handler {
 
 func handleMsgCreateNft(ctx sdk.Context, k keeper.Keeper, msg *types.MsgCreateNft) (*sdk.Result, error) {
 
-	if msg.Size > 150 * 1024 * 1024 {
-		return nil, sdkerrors.New("nft", 2, "nft too large")
-	}
 
 	k.AppendNft(
 		ctx,
@@ -67,25 +64,21 @@ func handleMsgCreateNft(ctx sdk.Context, k keeper.Keeper, msg *types.MsgCreateNf
 		return nil, sdkerrors.New("nft", 2, "Failed to marshal MsgCreateNftResponse")
 	}
 
+	k.EnsureNftDirExists()
+	err = writeSupportFiles(msg, k)
+	if err != nil {
+		return nil, err
+	}
+
 	return &sdk.Result{Data: createResp}, nil
 }
 
-func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) (*sdk.Result, error) {
-	k.Logger(ctx).Debug("Publish file message received", "id", msg.Id)
-	keeper.EnsureBtClient(ctx, k)
-	var metainfo metainfo.MetaInfo
-	bencode.DecodeBytes(msg.Metainfo, &metainfo)
-
-	btClient := k.GetBtClient()
-
-	btClient.RetrieveFile(&metainfo)
-	k.EnsureNftDirExists()
+func writeSupportFiles(msg *types.MsgCreateNft, k keeper.Keeper) error {
 
 	err := os.Symlink("./"+msg.Hash, k.GetNftDir()+"/"+msg.Vendor+"-"+msg.Id)
 
 	if err != nil {
-
-		return nil, err
+		return err
 	}
 
 	info := types.NftInfo{
@@ -97,12 +90,24 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 
 	err = ioutil.WriteFile(k.GetNftDir()+"/"+msg.Hash+".info", k.Cdc.MustMarshalJSON(&info), 0666)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	err = os.Symlink("./"+msg.Hash+".info", k.GetNftDir()+"/"+msg.Vendor+"-"+msg.Id+".info")
 	if err != nil {
-		return nil, err
+		return err
 	}
+	return nil
+}
+
+func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) (*sdk.Result, error) {
+	k.Logger(ctx).Debug("Publish file message received", "id", msg.Id)
+	keeper.EnsureBtClient(ctx, k)
+	var metainfo metainfo.MetaInfo
+	bencode.DecodeBytes(msg.Metainfo, &metainfo)
+
+	btClient := k.GetBtClient()
+
+	btClient.RetrieveFile(&metainfo)
 	return &sdk.Result{}, nil
 }
 

@@ -5,6 +5,9 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
+var UPLOAD_MAX_SIZE = uint64(150)
+
+
 type MsgCreateNft struct {
 	Id      string
 	Hash    string
@@ -48,5 +51,10 @@ func (msg *MsgCreateNft) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
+
+	if msg.Size > UPLOAD_MAX_SIZE * 1024 * 1024 {
+		return sdkerrors.New("nft", 2, "upload too large")
+	}
+
 	return nil
 }

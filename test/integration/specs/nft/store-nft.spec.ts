@@ -34,6 +34,9 @@ describe("Store and retrieve a NFT", function () {
                 bz.uuid = 'bluzelle';
             })
             .then(() => bz.upsert("nft-whitelist", JSON.stringify([bz.address]), defaultGasParams()))
+            .then(() => Promise.all(swarm.getDaemons().map(daemon =>
+                daemon.exec(`rm -rf ${daemon.getNftBaseDir()}/nft*`)
+            )))
     });
 
 
@@ -64,7 +67,7 @@ describe("Store and retrieve a NFT", function () {
             const COUNT = 3
             return Promise.all(
                 times(COUNT).map(n =>
-                    Promise.resolve(getLargePayload(70))
+                    Promise.resolve(getLargePayload(50))
                         .then(data => ({
                             id: Date.now().toString(),
                             data,
