@@ -128,5 +128,5 @@ func SetGasMeter(simulate bool, ctx sdk.Context, gasLimit uint64, tx sdk.Tx, gk 
 
 
 func isFreeModule(msgModule string) bool {
-	return msgModule == "oracle" || msgModule == "nft"
+	return msgModule == "oracle"
 }

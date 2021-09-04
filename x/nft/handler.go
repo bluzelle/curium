@@ -32,7 +32,6 @@ func NewHandler(keeper keeper.Keeper) sdk.Handler {
 
 func handleMsgCreateNft(ctx sdk.Context, k keeper.Keeper, msg *types.MsgCreateNft) (*sdk.Result, error) {
 
-
 	k.AppendNft(
 		ctx,
 		msg.Creator,

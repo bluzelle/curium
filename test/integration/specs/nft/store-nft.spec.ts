@@ -144,6 +144,7 @@ const checkReplication = (swarm: Swarm, hash: string, id: string, mime: string, 
             .then(passThroughAwait(checkMimeType2(mime)))
             .then(passThroughAwait(checkHttpContent(content)))
     ))
+        .then(() => delay(5000))
         .then(() => Promise.all(swarm.getValidators().map(daemon =>
             waitUntilFileAvailable(daemon, hash)
                 .then(passThroughAwait(checkFileContent(content)))
