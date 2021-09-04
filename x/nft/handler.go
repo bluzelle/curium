@@ -86,6 +86,7 @@ func writeSupportFiles(msg *types.MsgCreateNft, k keeper.Keeper) error {
 		Vendor: msg.Vendor,
 		UserId: msg.UserId,
 		Mime:   msg.Mime,
+		Size:   msg.Size,
 	}
 
 	err = ioutil.WriteFile(k.GetNftDir()+"/"+msg.Hash+".info", k.Cdc.MustMarshalJSON(&info), 0666)
@@ -107,24 +108,17 @@ func handleMsgPublishFile(ctx sdk.Context, k Keeper, msg *types.MsgPublishFile) 
 
 	btClient := k.GetBtClient()
 
-	btClient.RetrieveFile(&metainfo)
+	btClient.RetrieveFile(ctx, k, &metainfo)
 	return &sdk.Result{}, nil
 }
 
 func handleMsgRegisterPeer(ctx sdk.Context, k Keeper, msg *types.MsgRegisterPeer) (*sdk.Result, error) {
 	keeper.EnsureBtClient(ctx, k)
-	store := k.GetPeerStore(ctx)
-	var peer types.Peer
-	peer.Id = msg.Id
-	peer.Address = msg.Address
-	peer.Port = msg.Port
-	store.Set([]byte(msg.Id), k.Cdc.MustMarshalBinaryBare(&peer))
-
-	myNodeId, _ := k.GetMyNodeId(ctx)
-	if myNodeId != msg.Id {
-		btClient := k.GetBtClient()
-		btClient.AddPeer(msg.Id, msg.Address, int(msg.Port))
-	}
+	k.AddPeer(ctx, &types.Peer {
+		Id: msg.Id,
+		Address: msg.Address,
+		Port: msg.Port,
+	})
 
 	return &sdk.Result{}, nil
 }

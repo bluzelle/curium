@@ -7,7 +7,6 @@ import (
 	"github.com/bluzelle/curium/x/curium"
 	"github.com/bluzelle/curium/x/curium/keeper"
 	"github.com/bluzelle/curium/x/nft/types"
-	"github.com/bluzelle/curium/x/torrentClient"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -19,7 +18,7 @@ import (
 	"sync"
 )
 
-var btClient     *torrentClient.TorrentClient
+var btClient     *TorrentClient
 
 
 type (
@@ -84,11 +83,11 @@ func (k *Keeper) GetBtPort() int {
 	return k.BtPort
 }
 
-func (k *Keeper) GetBtClient() (*torrentClient.TorrentClient) {
+func (k *Keeper) GetBtClient() (*TorrentClient) {
 	return btClient
 }
 
-func (k *Keeper) SetBtClient(newBtClient *torrentClient.TorrentClient) {
+func (k *Keeper) SetBtClient(newBtClient *TorrentClient) {
 	btClient = newBtClient
 }
 
@@ -116,8 +115,25 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
-func (k Keeper) GetPeerStore(ctx sdk.Context) prefix.Store {
+func (k Keeper) getPeerStore(ctx sdk.Context) prefix.Store {
 	return prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.PeerKey))
+}
+
+func (k Keeper) AddPeer(ctx sdk.Context, peer *types.Peer) {
+	store := k.getPeerStore(ctx)
+	store.Set([]byte(peer.Id), k.Cdc.MustMarshalBinaryBare(peer))
+}
+
+func (k Keeper) GetPeers(ctx sdk.Context) []types.Peer {
+	store := k.getPeerStore(ctx)
+	iterator := store.Iterator(nil, nil)
+	var peers[]types.Peer
+	for ;iterator.Valid(); iterator.Next() {
+		var peer types.Peer
+		k.Cdc.MustUnmarshalBinaryBare(iterator.Value(), &peer)
+		peers = append(peers, peer)
+	}
+	return peers
 }
 
 func (k Keeper) CheckIsNftAdmin(address string) error {
@@ -190,7 +206,7 @@ func EnsureBtClient(ctx sdk.Context, k Keeper) {
 
 func startTorrentClient(ctx sdk.Context, k Keeper) {
 	k.EnsureNftDirExists()
-	btClient, err := torrentClient.NewTorrentClient(k.GetNftDir(), k.GetBtPort())
+	btClient, err := NewTorrentClient(k.GetNftDir(), k.GetBtPort())
 	if err != nil {
 		k.Logger(ctx).Error("Error creating btClient", "error", err)
 		return

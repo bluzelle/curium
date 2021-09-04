@@ -1,9 +1,11 @@
-package torrentClient
+package keeper
 
 import (
 	"fmt"
 	"github.com/anacrolix/torrent"
 	"github.com/anacrolix/torrent/metainfo"
+	"github.com/bluzelle/curium/x/nft/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/zeebo/bencode"
 	"golang.org/x/time/rate"
 	"strings"
@@ -18,7 +20,6 @@ type TorrentClient struct {
 	DataDir  string
 	Client   *torrent.Client
 	Torrents []*torrent.Torrent
-	Peers    []torrent.PeerInfo
 }
 
 func NewTorrentClient(dataDir string, port int) (*TorrentClient, error) {
@@ -32,8 +33,8 @@ func NewTorrentClient(dataDir string, port int) (*TorrentClient, error) {
 	config.Seed = true
 	config.DropDuplicatePeerIds = true
 	config.DropMutuallyCompletePeers = true
-	config.DownloadRateLimiter = rate.NewLimiter(RATE_LIMIT * 1024 * 1024, PIECE_SIZE * 1024)
-	config.UploadRateLimiter = rate.NewLimiter(RATE_LIMIT * 1024 * 1024, PIECE_SIZE * 1024)
+	config.DownloadRateLimiter = rate.NewLimiter(RATE_LIMIT* 1024 * 1024, PIECE_SIZE* 1024)
+	config.UploadRateLimiter = rate.NewLimiter(RATE_LIMIT* 1024 * 1024, PIECE_SIZE* 1024)
 	cl, err := torrent.NewClient(config)
 	if err != nil {
 		return nil, err
@@ -42,19 +43,27 @@ func NewTorrentClient(dataDir string, port int) (*TorrentClient, error) {
 	tc := TorrentClient{
 		DataDir: dataDir,
 		Client:  cl,
-		Peers:   []torrent.PeerInfo{},
 	}
 	return &tc, nil
 }
 
-func (tc *TorrentClient) RetrieveFile(metaInfo *metainfo.MetaInfo) {
+func (tc *TorrentClient) RetrieveFile(ctx sdk.Context, k Keeper,  metaInfo *metainfo.MetaInfo) {
 	tor, _ := tc.Client.AddTorrent(metaInfo)
 	tc.Torrents = append(tc.Torrents, tor)
-	tor.AddPeers(tc.Peers)
+	tor.AddPeers(getTcPeers(ctx, k))
 	go func() {
 		<-tor.GotInfo()
 		tor.DownloadAll()
 	}()
+}
+
+func getTcPeers(ctx sdk.Context, k Keeper) []torrent.PeerInfo {
+	nftPeers := k.GetPeers(ctx)
+	var tcPeers []torrent.PeerInfo
+	for _, p := range(nftPeers) {
+		tcPeers = append(tcPeers, nftPeerToTCPeer(p))
+	}
+	return tcPeers
 }
 
 func (tc TorrentClient) TorrentFromFile(filePath string) (*metainfo.MetaInfo, error) {
@@ -87,17 +96,16 @@ func (tc TorrentClient) TorrentFromFile(filePath string) (*metainfo.MetaInfo, er
 func (tc *TorrentClient) SeedFile(meta *metainfo.MetaInfo) error {
 	tor, _ := tc.Client.AddTorrent(meta)
 	tc.Torrents = append(tc.Torrents, tor)
-	tor.AddPeers(tc.Peers)
 	return nil
 }
 
-func (tc *TorrentClient) AddPeer(id string, ip string, port int) {
+func nftPeerToTCPeer(peer types.Peer) torrent.PeerInfo {
 	b := &strings.Builder{}
-	b.WriteString(fmt.Sprintf("%s:%d", ip, port))
+	b.WriteString(fmt.Sprintf("%s:%d", peer.Address, peer.Port))
 
 	var arr [20]byte
-	copy(arr[:], id)
-	peerInfo := torrent.PeerInfo{
+	copy(arr[:], peer.Id)
+	return torrent.PeerInfo{
 		Id:                 arr,
 		Addr:               b,
 		Source:             torrent.PeerSourceDirect,
@@ -106,5 +114,4 @@ func (tc *TorrentClient) AddPeer(id string, ip string, port int) {
 		Trusted:            true,
 	}
 
-	tc.Peers = append(tc.Peers, peerInfo)
 }
