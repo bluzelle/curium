@@ -1,10 +1,9 @@
 import {defaultGasParams, getSwarmAndClient} from "../../helpers/bluzelle-client";
 import {Swarm} from "daemon-manager/lib/Swarm";
-import {API, uploadNft} from "bluzelle";
+import {API} from "bluzelle";
 import chai, {expect} from 'chai'
 import asPromised from 'chai-as-promised'
-import {getLargePayload, getSentryUrl} from "../../helpers/nft-helpers";
-import {passThroughAwait} from "promise-passthrough";
+import {getLargePayload} from "../../helpers/nft-helpers";
 
 chai.use(asPromised);
 
@@ -94,7 +93,7 @@ describe('MsgCreateNft', function () {
             })
     })
 
-    it('should not charge the user for a create', () => {
+    it('should charge the user for a create', () => {
         return bz.getBNT({ubnt: true})
             .then(bal => ({balBefore: bal}))
             .then(ctx => ({...ctx, data: getLargePayload(50)}))
@@ -110,12 +109,11 @@ describe('MsgCreateNft', function () {
                 })
                     .then(resp => ({...ctx, token: resp.token}))
             )
-            .then(passThroughAwait(ctx => uploadNft(getSentryUrl(swarm), getLargePayload(50), ctx.token, "mintable")))
             .then(ctx =>
                 bz.getBNT({ubnt: true})
                     .then(bal => ({...ctx, balAfter: bal}))
             )
-            .then(ctx => expect(ctx.balBefore - ctx.balAfter).to.equal(0))
+            .then(ctx => expect(ctx.balBefore).to.be.greaterThan(ctx.balAfter))
 
     })
 })

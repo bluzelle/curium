@@ -1,8 +1,10 @@
 package types
 
 import (
+	"github.com/anacrolix/torrent/metainfo"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/zeebo/bencode"
 )
 
 type MsgPublishFile struct {
@@ -42,5 +44,19 @@ func (msg *MsgPublishFile) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
+
+	var metaInfo metainfo.MetaInfo
+	err = bencode.DecodeBytes(msg.Metainfo, &metaInfo)
+	if err != nil {
+		return err
+	}
+
+	if len(metaInfo.Announce) > 0 ||
+		metaInfo.AnnounceList != nil ||
+		metaInfo.Nodes != nil ||
+		metaInfo.UrlList != nil {
+		return sdkerrors.New("nft", 2, "Invalid torrent metainfo in publish")
+	}
+
 	return nil
 }

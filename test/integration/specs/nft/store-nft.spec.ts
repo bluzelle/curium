@@ -44,7 +44,7 @@ describe("Store and retrieve a NFT", function () {
 
         it('should replicate a large file', () => {
             const id = Date.now().toString()
-            const data = getLargePayload(10)
+            const data = getLargePayload(100)
             const hash = sha256(data);
             return bz.createNft({
                 id,
@@ -67,7 +67,7 @@ describe("Store and retrieve a NFT", function () {
             const COUNT = 3
             return Promise.all(
                 times(COUNT).map(n =>
-                    Promise.resolve(getLargePayload(50))
+                    Promise.resolve(getLargePayload(60))
                         .then(data => ({
                             id: Date.now().toString(),
                             data,
