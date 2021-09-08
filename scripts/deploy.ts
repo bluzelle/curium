@@ -6,20 +6,17 @@ const deployCurium = () => {
     .then(() => $`git remote add temporary-remote-curium git@github.com-bluzelle:bluzelle/test-deploy-repo.git`)
     .then(() => $`git checkout -b deploy-curium`)
     .then(() => cd('../../'))
-    .then(() => $`git add curium`)
-    .then(() => $`git restore --staged curium/scripts/deploy.ts`) //exclude deployment script from public repo
-    .then(() => $`git commit -m "Curium Update"`)
-    .then(() => cd('../../'))
-    .then(() => $`ls && git filter-branch -f \
+    .then(() => $`git filter-branch -f \
     --subdirectory-filter curium/ \
     --prune-empty \
     --tag-name-filter cat -- --all`)
+    .then(() => $`ls && git filter-branch -f --tree-filter 'rm -rf scripts/deploy.ts' HEAD`)
     .then(() => $`git push -f temporary-remote-curium devel`)
     .then(() => $`git fetch`)
     .then(() => $`git checkout origin/devel`)
     .then(() => $`git branch -f devel`)
     .then(() => $`git checkout devel`)
-    .then(() => $`git branch -D  deploy-curium`)
+    .then(() => $`git branch -D deploy-curium`)
     .then(() => $`git remote remove temporary-remote-curium`)
     .catch(error => {
         console.log(`SOMETHING WENT WRONG: ${error.message}`)
