@@ -6,6 +6,7 @@
   "private": true,
   "scripts": {
     "build": "make testnet",
+    "deploy": "yarn --cwd=scripts zx deploy.ts",
     "setup": "./scripts/setup.ts"
   }
 }
