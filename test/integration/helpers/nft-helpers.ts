@@ -12,7 +12,13 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 
 export const getSentryUrl = (swarm: Swarm, idx: number = 0): string =>
-    `http://localhost:${swarm.getSentries()[idx].getRestPort() + (swarm.getSwarmConfig().restProtocol === 'https' ? 1 : 0)}`
+    Some(swarm)
+        .map(swarm => swarm.getSentries()[idx].getDaemonConfig().host || '127.0.0.1')
+        .map(ip =>
+            `${swarm.getSentries()[idx].getRestProtocol()}://${ip}:${swarm.getSentries()[idx].getRestPort()}`
+        )
+        .map(x => x)
+        .join()
 
 export const encodeData = (data: string): Uint8Array => new TextEncoder().encode(data);
 

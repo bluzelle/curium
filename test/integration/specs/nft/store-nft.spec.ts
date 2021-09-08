@@ -39,8 +39,27 @@ describe("Store and retrieve a NFT", function () {
             )))
     });
 
-
     describe('file replication', () => {
+        it('should replicate a file', () => {
+            const id = Date.now().toString()
+            const data = getLargePayload(1)
+            const hash = sha256(data);
+            return bz.createNft({
+                id,
+                hash,
+                vendor: 'mintable',
+                userId: 'user-id',
+                mime: 'text/txt',
+                meta: 'meta',
+                size: data.byteLength,
+                gasInfo: defaultGasParams()
+            })
+                .then(({token}) => uploadNft(getSentryUrl(swarm), data, token, 'mintable'))
+                .then(() => console.log('HASH:', hash))
+                .then(() =>
+                    checkReplication(swarm, hash, id, 'text/txt', 'mintable', data)
+                )
+        });
 
         it('should replicate a large file', () => {
             const id = Date.now().toString()
@@ -119,7 +138,13 @@ const waitUntilHttpAvailable = (url: string): Promise<Response> =>
 
 const waitUntilFileAvailable = (daemon: Daemon, filepath: string): Promise<number> =>
     Promise.resolve(console.log('looking for file', `${daemon.getNftBaseDir()}/nft/${filepath}`))
-        .then(() => daemon.exec(`cksum  ${daemon.getNftBaseDir()}/nft/${filepath}`))
+        .then(() => daemon.exec<string>(`cksum  ${daemon.getNftBaseDir()}/nft/${filepath}`))
+        .then(csum => {
+            if (!csum || csum.includes("can't open")) {
+                throw csum
+            }
+            return csum
+        })
         .then(csum => parseInt(csum.split(' ')[0]))
         .catch(() => waitUntilFileAvailable(daemon, filepath))
 
