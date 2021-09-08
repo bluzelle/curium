@@ -15,9 +15,9 @@ describe('nft upload', function() {
             })
     });
 
-    it('should send a 403 if upload has not been authorized', () => {
+    it('should send a 403 if upload has not been authorized', (done) => {
         uploadNft(getSentryUrl(swarm), new TextEncoder().encode('data'), '1111', 'mintable')
-            .then(x => x)
-            .catch(e => e)
+            .then(x => done('should have thrown an error'))
+            .catch(e => done(e.includes('auth invalid') ? undefined : `wrong error: ${e}`))
     })
 })
