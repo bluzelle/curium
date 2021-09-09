@@ -4,6 +4,7 @@ import {passThrough, passThroughAwait} from "promise-passthrough";
 import {ChildProcess, spawn} from "child_process";
 import delay from "delay";
 import {entropyToMnemonic} from 'bip39'
+import path from "path";
 const {toPairs, reduce} = require("lodash/fp");
 
 const {times} = require('lodash');
@@ -109,12 +110,12 @@ function getBlzcli() {
 function startValidator(ctx: Context): Promise<unknown> {
     return $`killall blzd`
         .catch(e => e)
-        .then(() => fs.rm('blzd.log'))
+        .then(() => fs.rm('../test-swarm/blzd.log'))
         .catch(e => e)
         .then(() => cd(ctx.nodes[0].home))
         .then(() => ctx.blzd = spawn(getBlzd(), ['start', '--home', ctx.nodes[0].home]))
         .then(cp => {
-            const logStream = fs.createWriteStream('blzd.log', {flags: 'a'});
+            const logStream = fs.createWriteStream('../test-swarm/blzd.log', {flags: 'a'});
             cp.stdout.pipe(logStream);
             cp.stderr.pipe(logStream);
         })
@@ -237,7 +238,7 @@ function initBlzd(count: number): Promise<Context> {
         .then(nodes => ({nodes} as Context))
 
     function getHomeDir(idx: number): string {
-        return `${os.homedir()}/.blzd-${idx}`
+        return path.join(__dirname, `../test-swarm/blzd-${idx}`)
     }
 
 }

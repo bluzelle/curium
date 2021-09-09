@@ -136,9 +136,9 @@ export const checkVendorIdEndpointBytes = (daemon: Daemon, id: string, vendor: s
         .then(() => daemon);
 
 export const getLargePayload = (length: number): Uint8Array =>
-    Some({insert: Math.floor(Math.random() * 1_000_000)})
-        .map(ctx => ({...ctx, start: ctx.insert + Math.floor(Math.random() * 1_000_000)}))
-        .map(ctx => ({...ctx, end: ctx.start + Math.floor(Math.random() * 1_000_000)}))
+    Some({insert: Math.floor(Math.random() * 200_000)})
+        .map(ctx => ({...ctx, start: ctx.insert + Math.floor(Math.random() * 200_000)}))
+        .map(ctx => ({...ctx, end: ctx.start + Math.floor(Math.random() * 200_000)}))
         .map(ctx =>
             new Uint8Array(length * 1024 * 1024).map((v, idx) => idx % 256)
                 .copyWithin(ctx.insert, ctx.start, ctx.end)
