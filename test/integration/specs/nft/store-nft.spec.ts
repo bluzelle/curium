@@ -34,9 +34,6 @@ describe("Store and retrieve a NFT", function () {
                 bz.uuid = 'bluzelle';
             })
             .then(() => bz.upsert("nft-whitelist", JSON.stringify([bz.address]), defaultGasParams()))
-            .then(() => Promise.all(swarm.getDaemons().map(daemon =>
-                daemon.exec(`rm -rf ${daemon.getNftBaseDir()}/nft*`)
-            )))
     });
 
     describe('file replication', () => {
