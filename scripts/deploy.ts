@@ -3,7 +3,7 @@ import {$, cd} from 'zx';
 
 const deployCurium = () => {
     Promise.resolve()
-    .then(() => $`git remote add temporary-remote-curium git@github.com-bluzelle:bluzelle/test-deploy-repo.git`)
+    .then(() => $`git remote add temporary-remote-curium git@github.com-bluzelle:bluzelle/curium.git`)
     .then(() => $`git checkout -b deploy-curium`)
     .then(() => cd('../../'))
     .then(() => $`git filter-branch -f --tree-filter 'rm -rf curium/scripts/deploy.ts' HEAD`)
