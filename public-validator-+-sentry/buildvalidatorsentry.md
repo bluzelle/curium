@@ -20,18 +20,18 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
       
    These are steps involved in setting up the OS, development environment, and building the nodes that intend to run in one of our Curium zones. Please go through this process for your validator and each of your sentries. **ONLY** follow the three specific links listed below, please. **DO NOT** click through the "next" button at the bottom of the third link, as you only need to execute the steps on these three links specifically.
 
-    i. [OS Setup for Curium](/setup/os.md)
+    i. [OS Setup for Curium](../docs/../docs/setup/os.md)
     
-    ii. [Development Environment Setup](/setup/devenv.md)
+    ii. [Development Environment Setup](/../docs/setup/devenv.md)
     
-    iii. [Build the Curium Project](/setup/build.md)
+    iii. [Build the Curium Project](/../docs/setup/build.md)
 
-2. Open incoming TCP port 26656 \(P2P\). Optionally, if you have sufficient firewall and packet filtering security \(to protect against DoS and DDoS attacks\), you may opt to also open up 26657 \(RPC\), and 1317 \(RESTful\). These two ports are only for the purposes of serving clients. If you have no such interest and do not want to deal with the security considerations, keep them closed. There are many DoS and DDoS vectors possible if these ports are open, to open them with caution and only if necessary.
+2. Open incoming TCP port 26656 \(P2P\) and TCP/UDP 5500 \(NFT\). Optionally, if you have sufficient firewall and packet filtering security \(to protect against DoS and DDoS attacks\), you may opt to also open up 26657 \(RPC\), and 1317 \(RESTful\). These two ports are only for the purposes of serving clients. If you have no such interest and do not want to deal with the security considerations, keep them closed. There are many DoS and DDoS vectors possible if these ports are open, to open them with caution and only if necessary.
 
    If you are running both a sentry and a validator, follow these directives:
 
-   * Sentry: P2P, RPC \(optional\), RESTful \(optional\)
-   * Validator: Only P2P
+   * Sentry: P2P, NFT, RPC \(optional\), RESTful \(optional\)
+   * Validator: Only P2P and NFT
 
    Furthermore, if you are running both, be sure to set your validator to ONLY allow incoming 26656 from your sentry's IP.
 
@@ -155,7 +155,19 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     addr_book_strict = false
     ```
 
-16. In config.toml, set a suitable maximum \# of allowed inbound and outbound peers in the \[p2p\] section. For example, with a node that might be very busy \(such as a sentry to a secure zone for validators\), you might want to increase from the defaults, to avoid a situation where peers start to get dropped. Following are the values we have used:
+16. In config.toml, set the following in the \[p2p\] section for port forwarding:
+
+    ```text
+    upnp = false
+    ```
+
+17. In config.toml, set the following in the \[p2p\] section for peer-exchange reactor (set to true for sentries and false for validators):
+
+    ```text
+    pex = false
+    ```
+
+18. In config.toml, set a suitable maximum \# of allowed inbound and outbound peers in the \[p2p\] section. For example, with a node that might be very busy \(such as a sentry to a secure zone for validators\), you might want to increase from the defaults, to avoid a situation where peers start to get dropped. Following are the values we have used:
 
     ```text
     # Maximum number of inbound peers
@@ -165,7 +177,8 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     max_num_outbound_peers = 100
     ```
 
-17. Edit ".blzd/config/app.toml" to set the minimum-gas-prices to “0.002ubnt”
+
+19. Edit ".blzd/config/app.toml" to set the minimum-gas-prices to “0.002ubnt”
 
     ```text
     # The minimum gas prices a validator is willing to accept for processing a
@@ -176,13 +189,21 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
 
     Remember that _every_ node should have _at least_ this minimum. Feel free to set it higher if you wish.
 
-18. Edit ".blzd/config/app.toml", to add the following:
+20. Edit ".blzd/config/app.toml", to add the following:
 
     ```text
     bluzelle_crud = true
     ```
+
+21. Edit ".blzd/config/app.toml" to include the nft user, the nft directory (the directory you created in the [devenv docs step #6](../docs/setup/devenv.md)), and nft p2p port (tcp and udp port that was opened in [step #1 of os docs](../docs/setup/os.md) ):
+
+    ```text
+    nft-user-name = "nft"
+    nft-base-dir = "/nft"
+    nft-p2p-port = "5500"
+    ```
     
-19. Copy into your "~/.blzd/config/" directory the network's existing genesis.json file. You can interactively view it as follows, from our sentry nodes:
+22. Copy into your "~/.blzd/config/" directory the network's existing genesis.json file. You can interactively view it as follows, from our sentry nodes:
 
     **MAIN NET** (including **FORK** path):
     ```text
@@ -208,13 +229,13 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
 
     Ensure to copy over and replace the existing genesis.json file in your `~/.blzd/config/` folder with the downloaded one from the existing network.
 
-20. ONLY do this step if you are following the **FORK** PATH. 
+23. ONLY do this step if you are following the **FORK** PATH. 
 
     Migrate your validator's consensus signing key from the old machine (the validator on the Soft MainNet) to the new machine (the validator on the Final TestNet). 
     
     To do this, copy your `~/.blzd/config/priv_validator_key.json` from the old machine to the new machine at the same location, overwriting the existing file on the new machine. 
 
-21. Start the Bluzelle daemon
+24. Start the Bluzelle daemon
 
     ```text
     blzd start
@@ -254,27 +275,31 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     
     https://staking.bluzelle.com/ 
    
-    iii) Create a new BNT mnemonic for our MAIN NET, and store and secure this BNT mnemonic securely. **If you lose this mnemonic, you will lose ALL your funds.** Bluzelle is not responsible and there is no policy to "refund" anything. Note that this web wallet is **100% client side**. Your BNT mnemonic is generated on the local browser only and is never transmitted over the network. You are 100% responsible for storing and securing this mnemonic. 
+    iii) Create 3 separate new BNT mnemonics for our MAIN NET, and store and secure these BNT mnemonics securely. **If you lose these mnemonics, you will lose ALL your funds.** Bluzelle is not responsible and there is no policy to "refund" anything. Note that this web wallet is **100% client side**. Your BNT mnemonics are generated on the local browser only and is never transmitted over the network. You are 100% responsible for storing and securing these mnemonics. 
     
-    iv) Add a new local keypair for the account that will be the operator for the validator on this node:
+    iv) Add new local keypairs for the account that will be the operator for the validator on this node:
 
     ```text
     blzcli keys add vuser --recover
+    blzcli keys add oracle --recover (only on a validator node, do not add on a sentry)
+    blzcli keys add nft --recover
     ```
 
-    Provide the menemonic generated above from the web staking wallet, when asked for the BIP39 mnemonic. 
+    Provide the menemonics generated above from the web staking wallet, when asked for the BIP39 mnemonic. 
         
     v) Convert the desired amount of BLZ tokens to BNT tokens by using the "Convert to BNT" button. Please be patient, as we run the conversion relayer manually for now, and it runs a few times every day. Please join and follow our Telegram and Discord groups to keep updated.
 
     **TEST NET**:
    
-    i) Add a new local keypair for the account that will be the operator for the validator on this node:
+    i) Add new local keypairs for the account that will be the operator for the validator on this node:
 
     ```text
     blzcli keys add vuser
+    blzcli keys add oracle (only on a validator node, do not add on a sentry)
+    blzcli keys add nft
     ```
 
-    which will produce the following output:
+    which will produce the following output for vuser, oracle, and nft (vuser as an example):
 
     * name: vuser type: local address: bluzelle1z&lt;...&gt; pubkey: bluzellepub1&lt;...&gt; mnemonic: "" threshold: 0 pubkeys: \[\]
 
@@ -285,7 +310,7 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     CRITICAL: Note the Bluzelle address (starting with "bluzelle") and mnemonic phrase values. You will need these on a long term basis.
 
     ii) Get some tokens to stake your validator from our FAUCET endpoint. Note that you can only use the faucet once every FIVE minutes. 
-    Goto the following URL, replacing in your account's Bluzelle address:
+    Goto the following URL, replacing in your account's Bluzelle address.  Do thise for the vuser, oracle, and nft addresses:
     
     https://client.sentry.testnet.public.bluzelle.com:1317/mint/<address>
     
@@ -299,42 +324,54 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
 
     Export your existing validator's operator wallet from the existing validator machine and import it to the new validator machine. We will assume that the existing wallet account is called `vuser` and will call the new imported wallet account the same name. 
 
+    **Important** if you do not have nft and oracle user on your existing validator, you must create and fund them before you export them out.  See step #23 on how to do that.
+
     i. On the existing validator machine: 
     
     ```
-    blzcli keys export vuser 
+    blzcli keys export vuser
+    blzcli keys export oracle
+    blzcli keys export nft 
     ```
     
-    Note that the `passphrase to encrypt the exported key` that you provide is required when you import the key in the next step. Copy the output of the above command (it will display the output to your screen) and store it into a file. We will assume this file is called `export.txt`.
+    Note that the `passphrase to encrypt the exported key` that you provide is required when you import the key in the next step. Copy the outputs of the above commands (it will display the output to your screen) and store it into files. We will assume these files are named `export.txt, export2.txt, export3.txt`.
     
     ii. On the new validator machine (provide the second password entered when doing the export):
     
     ```
     blzcli keys import vuser export.txt
+    blzcli keys import oracle export2.txt
+    blzcli keys import nft export3.txt
     ```
     
     Notes:
     
-    i. If you have the mnemonic handy for your original vuser, you can just add the vuser to the new validator with the following:
+    i. If you have the mnemonic handy for your original vuser, oracle, and nft users, you can just add them to the new validator with the following:
     
     ```
     blzcli keys add vuser --recover
+    blzcli keys add oracle --recover
+    blzcli keys add nft --recover
     ```
     
     Paste in the mnemonic, when asked.
     
-    ii. If your vuser for your original vuser is secured with a Ledger device, add it to the new validator machine as follows (ensure your Ledger device is plugged in and running the COSMOS app):
+    ii. If your vuser for your original vuser is secured with a Ledger device, add it to the new validator machine as follows (ensure your Ledger device is plugged in and running the COSMOS app).  Do these for nft and oracle users as well.:
     
     ```
     blzcli keys add vuser --ledger --account <i>
+    blzcli keys add oracle --ledger --account <i+1>
+    blzcli keys add nft --ledger --account <i+2>
     ```
     
     Typically, the value of i will be 0, unless you have multiple HD-derived accounts. 
 
-25. Verify your vuser account has the tokens you expect, by asking the local node:
+25. Verify your accounts have the tokens you expect, by asking the local node:
 
     ```text
     blzcli q account $(blzcli keys show vuser -a) | jq ".value.coins"
+    blzcli q account $(blzcli keys show oracle -a) | jq ".value.coins"
+    blzcli q account $(blzcli keys show nft -a) | jq ".value.coins"
     ```  
 
 26. If you are following the **FORK** PATH, SKIP this step. 
