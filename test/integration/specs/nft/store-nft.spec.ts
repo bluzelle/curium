@@ -12,6 +12,7 @@ import {passThroughAwait} from "promise-passthrough";
 import {getSwarmAndClient} from "../../helpers/bluzelle-client";
 import delay from "delay";
 import {sha256} from "js-sha256";
+import {TruthyValue, waitUntil} from 'async-wait-until'
 
 const cksum = require('cksum');
 
@@ -37,6 +38,7 @@ describe("Store and retrieve a NFT", function () {
     });
 
     describe('file replication', () => {
+
         it('should replicate a file', () => {
             const id = Date.now().toString()
             const data = getLargePayload(1)
@@ -80,10 +82,10 @@ describe("Store and retrieve a NFT", function () {
         });
 
         it('should allow one client to send multiple createNft() in parallel to the same sentry', () => {
-            const COUNT = 3
+            const COUNT = 4
             return Promise.all(
                 times(COUNT).map(n =>
-                    Promise.resolve(getLargePayload(60))
+                    Promise.resolve(getLargePayload(100))
                         .then(data => ({
                             id: Date.now().toString(),
                             data,
@@ -128,22 +130,28 @@ describe("Store and retrieve a NFT", function () {
 });
 
 
-const waitUntilHttpAvailable = (url: string): Promise<Response> =>
-    Promise.resolve(console.log('waitUntilHttpAvailable', url))
-        .then(() => fetch(url))
-        .then(resp => resp.status !== 200 ? delay(500).then(() => waitUntilHttpAvailable(url)) : resp)
-
-const waitUntilFileAvailable = (daemon: Daemon, filepath: string): Promise<number> =>
-    Promise.resolve(console.log('looking for file', `${daemon.getNftBaseDir()}/nft/${filepath}`))
-        .then(() => daemon.exec<string>(`cksum  ${daemon.getNftBaseDir()}/nft/${filepath}`))
-        .then(csum => {
-            if (!csum || csum.includes("can't open")) {
-                throw csum
-            }
-            return csum
+const waitUntilHttpAvailable = (url: string, timeout: number): Promise<Response> =>
+    waitUntil(() =>
+            Promise.resolve(console.log('waitUntilHttpAvailable', url))
+                .then(() => fetch(url))
+                .then(resp => resp.status === 200 ? resp as unknown as TruthyValue : false)
+        , {
+            timeout,
+            intervalBetweenAttempts: 1000
         })
-        .then(csum => parseInt(csum.split(' ')[0]))
-        .catch(() => waitUntilFileAvailable(daemon, filepath))
+        .then(x => x as unknown as Response)
+
+
+const waitUntilFileAvailable = (daemon: Daemon, filepath: string, timeout: number): Promise<number> =>
+    waitUntil(() =>
+            Promise.resolve(console.log('looking for file', `${daemon.getNftBaseDir()}/nft/${filepath}`))
+                .then(() => daemon.exec<string>(`cksum  ${daemon.getNftBaseDir()}/nft/${filepath}`))
+                .then(csum => !csum || csum.includes("can't open") ? 0 : parseInt(csum.split(' ')[0]))
+        , {
+            timeout,
+            intervalBetweenAttempts: 1000
+        }
+    )
 
 
 const checkMimeType2 = (mime: string) => (resp: Response) =>
@@ -159,18 +167,18 @@ const checkFileContent = (content: Uint8Array) => (csum: number) =>
 
 const checkReplication = (swarm: Swarm, hash: string, id: string, mime: string, vendor: string, content: Uint8Array): Promise<unknown> =>
     Promise.all(swarm.getSentries().map(daemon =>
-        waitUntilHttpAvailable(`${getSentryUrl(swarm)}/nft/${hash}`)
+        waitUntilHttpAvailable(`${getSentryUrl(swarm)}/nft/${hash}`, 10000)
             .then(passThroughAwait(checkMimeType2(mime)))
             .then(passThroughAwait(checkHttpContent(content)))
-            .then(() => waitUntilHttpAvailable(`${getSentryUrl(swarm)}/nft/${vendor}/${id}`))
+            .then(() => waitUntilHttpAvailable(`${getSentryUrl(swarm)}/nft/${vendor}/${id}`, 10000))
             .then(passThroughAwait(checkMimeType2(mime)))
             .then(passThroughAwait(checkHttpContent(content)))
     ))
         .then(() => delay(5000))
         .then(() => Promise.all(swarm.getValidators().map(daemon =>
-            waitUntilFileAvailable(daemon, hash)
+            waitUntilFileAvailable(daemon, hash, 10000)
                 .then(passThroughAwait(checkFileContent(content)))
-                .then(() => waitUntilFileAvailable(daemon, `${hash}.info`))
-                .then(() => waitUntilFileAvailable(daemon, `${vendor}-${id}`))
-                .then(() => waitUntilFileAvailable(daemon, `${vendor}-${id}.info`))
+                .then(() => waitUntilFileAvailable(daemon, `${hash}.info`, 10000))
+                .then(() => waitUntilFileAvailable(daemon, `${vendor}-${id}`, 10000))
+                .then(() => waitUntilFileAvailable(daemon, `${vendor}-${id}.info`, 10000))
         )))
