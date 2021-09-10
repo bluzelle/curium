@@ -22,6 +22,7 @@ global.fetch = require('node-fetch')
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 const defaultGasParams = (gasInfo: GasInfo = {}): GasInfo => ({gas_price: 10, max_gas: 100000000, ...gasInfo})
+const LOOP_TIMEOUT = 10_000;
 
 describe("Store and retrieve a NFT", function () {
     this.timeout(400_000);
@@ -85,7 +86,8 @@ describe("Store and retrieve a NFT", function () {
             const COUNT = 4
             return Promise.all(
                 times(COUNT).map(n =>
-                    Promise.resolve(getLargePayload(100))
+                    delay(n * 100)
+                        .then(() => getLargePayload(100))
                         .then(data => ({
                             id: Date.now().toString(),
                             data,
@@ -140,6 +142,10 @@ const waitUntilHttpAvailable = (url: string, timeout: number): Promise<Response>
             intervalBetweenAttempts: 1000
         })
         .then(x => x as unknown as Response)
+        .catch(e => {
+            console.log('ERROR:', e)
+            throw e
+        })
 
 
 const waitUntilFileAvailable = (daemon: Daemon, filepath: string, timeout: number): Promise<number> =>
@@ -167,18 +173,18 @@ const checkFileContent = (content: Uint8Array) => (csum: number) =>
 
 const checkReplication = (swarm: Swarm, hash: string, id: string, mime: string, vendor: string, content: Uint8Array): Promise<unknown> =>
     Promise.all(swarm.getSentries().map(daemon =>
-        waitUntilHttpAvailable(`${getSentryUrl(swarm)}/nft/${hash}`, 10000)
+        waitUntilHttpAvailable(`${getSentryUrl(swarm)}/nft/${hash}`, LOOP_TIMEOUT)
             .then(passThroughAwait(checkMimeType2(mime)))
             .then(passThroughAwait(checkHttpContent(content)))
-            .then(() => waitUntilHttpAvailable(`${getSentryUrl(swarm)}/nft/${vendor}/${id}`, 10000))
+            .then(() => waitUntilHttpAvailable(`${getSentryUrl(swarm)}/nft/${vendor}/${id}`, LOOP_TIMEOUT))
             .then(passThroughAwait(checkMimeType2(mime)))
             .then(passThroughAwait(checkHttpContent(content)))
     ))
         .then(() => delay(5000))
         .then(() => Promise.all(swarm.getValidators().map(daemon =>
-            waitUntilFileAvailable(daemon, hash, 10000)
+            waitUntilFileAvailable(daemon, hash, LOOP_TIMEOUT)
                 .then(passThroughAwait(checkFileContent(content)))
-                .then(() => waitUntilFileAvailable(daemon, `${hash}.info`, 10000))
-                .then(() => waitUntilFileAvailable(daemon, `${vendor}-${id}`, 10000))
-                .then(() => waitUntilFileAvailable(daemon, `${vendor}-${id}.info`, 10000))
+                .then(() => waitUntilFileAvailable(daemon, `${hash}.info`, LOOP_TIMEOUT))
+                .then(() => waitUntilFileAvailable(daemon, `${vendor}-${id}`, LOOP_TIMEOUT))
+                .then(() => waitUntilFileAvailable(daemon, `${vendor}-${id}.info`, LOOP_TIMEOUT))
         )))

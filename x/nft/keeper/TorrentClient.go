@@ -12,8 +12,8 @@ import (
 	"time"
 )
 
-const PIECE_SIZE = 256
-const RATE_LIMIT = 200
+const PIECE_SIZE = 1024
+const RATE_LIMIT = 2000
 
 type TorrentClient struct {
 	Id       string
@@ -25,8 +25,10 @@ type TorrentClient struct {
 func NewTorrentClient(dataDir string, port int) (*TorrentClient, error) {
 	config := torrent.NewDefaultClientConfig()
 	config.DataDir = dataDir
+	config.ConnTracker.SetNoMaxEntries()
 	config.Debug = true
 	config.NoDHT = true
+	config.DisableTrackers = true
 	config.DisablePEX = true
 	config.ListenPort = port
 	config.DisableIPv6 = true
