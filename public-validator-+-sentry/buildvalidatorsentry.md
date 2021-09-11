@@ -22,9 +22,9 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
 
     i. [OS Setup for Curium](../docs/../docs/setup/os.md)
     
-    ii. [Development Environment Setup](/../docs/setup/devenv.md)
+    ii. [Development Environment Setup](../docs/../docs/setup/devenv.md)
     
-    iii. [Build the Curium Project](/../docs/setup/build.md)
+    iii. [Build the Curium Project](../docs/../docs/setup/build.md)
 
 2. Open incoming TCP port 26656 \(P2P\) and TCP/UDP 5500 \(NFT\). Optionally, if you have sufficient firewall and packet filtering security \(to protect against DoS and DDoS attacks\), you may opt to also open up 26657 \(RPC\), and 1317 \(RESTful\). These two ports are only for the purposes of serving clients. If you have no such interest and do not want to deal with the security considerations, keep them closed. There are many DoS and DDoS vectors possible if these ports are open, to open them with caution and only if necessary.
 
