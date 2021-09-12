@@ -8,11 +8,11 @@ import {uploadNft} from "bluzelle/lib/bluzelle-node";
 
 import {Swarm} from 'daemon-manager/lib/Swarm'
 import {Daemon} from 'daemon-manager/lib/Daemon'
-import {passThroughAwait} from "promise-passthrough";
+import {passThrough, passThroughAwait} from "promise-passthrough";
 import {getSwarmAndClient} from "../../helpers/bluzelle-client";
-import delay from "delay";
 import {sha256} from "js-sha256";
 import {TruthyValue, waitUntil} from 'async-wait-until'
+import {Some} from "monet";
 
 const cksum = require('cksum');
 
@@ -83,10 +83,11 @@ describe("Store and retrieve a NFT", function () {
         });
 
         it('should allow one client to send multiple createNft() in parallel to the same sentry', () => {
-            const COUNT = 4
+            const COUNT = 6
             return Promise.all(
                 times(COUNT).map(n =>
-                    delay(n * 100)
+//                    delay(n * 100)
+                    Promise.resolve()
                         .then(() => getLargePayload(100))
                         .then(data => ({
                             id: Date.now().toString(),
@@ -132,6 +133,24 @@ describe("Store and retrieve a NFT", function () {
 });
 
 
+const checkReplication = (swarm: Swarm, hash: string, id: string, mime: string, vendor: string, content: Uint8Array): Promise<unknown> =>
+    Promise.all(swarm.getSentries().map((daemon, idx) =>
+        waitUntilHttpAvailable(`${getSentryUrl(swarm, idx)}/nft/${hash}`, LOOP_TIMEOUT)
+            .then(passThroughAwait(checkMimeType2(mime, daemon.getName(), hash)))
+            .then(passThroughAwait(checkHttpContent(content, daemon.getName(), hash)))
+            .then(() => waitUntilHttpAvailable(`${getSentryUrl(swarm)}/nft/${vendor}/${id}`, LOOP_TIMEOUT))
+            .then(passThroughAwait(checkMimeType2(mime, daemon.getName(), id)))
+            .then(passThroughAwait(checkHttpContent(content, daemon.getName(), id)))
+    ))
+        .then(() => Promise.all(swarm.getValidators().map(daemon =>
+            waitUntilFileAvailable(daemon, hash, LOOP_TIMEOUT)
+                .then(passThroughAwait(checkFileContent(content)))
+                .then(() => waitUntilFileAvailable(daemon, `${hash}.info`, LOOP_TIMEOUT))
+                .then(() => waitUntilFileAvailable(daemon, `${vendor}-${id}`, LOOP_TIMEOUT))
+                .then(() => waitUntilFileAvailable(daemon, `${vendor}-${id}.info`, LOOP_TIMEOUT))
+        )))
+
+
 const waitUntilHttpAvailable = (url: string, timeout: number): Promise<Response> =>
     waitUntil(() =>
             Promise.resolve(console.log('waitUntilHttpAvailable', url))
@@ -160,31 +179,17 @@ const waitUntilFileAvailable = (daemon: Daemon, filepath: string, timeout: numbe
     )
 
 
-const checkMimeType2 = (mime: string) => (resp: Response) =>
-    expect(resp.headers.get('content-type')).to.equal(mime);
+const checkMimeType2 = (mime: string, name: string, hash: string) => (resp: Response) =>
+    Some(resp.headers.get('content-type') as string)
+        .map(passThrough(mimeType => console.log('checkMimeType:', name, hash, mimeType, mime)))
+        .map(mimeType => expect(mimeType).to.equal(mime))
 
-const checkHttpContent = (content: Uint8Array) => (resp: Response) =>
+const checkHttpContent = (content: Uint8Array, name:string, hash: string) => (resp: Response) =>
     resp.arrayBuffer()
         .then(buf => Buffer.from(buf).compare(content))
+        .then(passThrough(() => console.log('checkHttpContent:', name, hash)))
         .then(compare => expect(compare).to.equal(0));
 
 const checkFileContent = (content: Uint8Array) => (csum: number) =>
     expect(csum).to.equal(parseInt(cksum(content).toString('hex'), 16))
 
-const checkReplication = (swarm: Swarm, hash: string, id: string, mime: string, vendor: string, content: Uint8Array): Promise<unknown> =>
-    Promise.all(swarm.getSentries().map(daemon =>
-        waitUntilHttpAvailable(`${getSentryUrl(swarm)}/nft/${hash}`, LOOP_TIMEOUT)
-            .then(passThroughAwait(checkMimeType2(mime)))
-            .then(passThroughAwait(checkHttpContent(content)))
-            .then(() => waitUntilHttpAvailable(`${getSentryUrl(swarm)}/nft/${vendor}/${id}`, LOOP_TIMEOUT))
-            .then(passThroughAwait(checkMimeType2(mime)))
-            .then(passThroughAwait(checkHttpContent(content)))
-    ))
-        .then(() => delay(5000))
-        .then(() => Promise.all(swarm.getValidators().map(daemon =>
-            waitUntilFileAvailable(daemon, hash, LOOP_TIMEOUT)
-                .then(passThroughAwait(checkFileContent(content)))
-                .then(() => waitUntilFileAvailable(daemon, `${hash}.info`, LOOP_TIMEOUT))
-                .then(() => waitUntilFileAvailable(daemon, `${vendor}-${id}`, LOOP_TIMEOUT))
-                .then(() => waitUntilFileAvailable(daemon, `${vendor}-${id}.info`, LOOP_TIMEOUT))
-        )))
