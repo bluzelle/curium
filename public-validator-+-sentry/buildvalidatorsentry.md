@@ -195,11 +195,11 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     bluzelle_crud = true
     ```
 
-21. Edit ".blzd/config/app.toml" to include the nft user, the nft directory (the directory you created in the [devenv docs step #6](../docs/setup/devenv.md)), and nft p2p port (tcp and udp port that was opened in [step #1 of os docs](../docs/setup/os.md) ):
+21. Edit ".blzd/config/app.toml" to include the nft user, the nft directory (the directory you created in the [devenv docs step #6](../docs/setup/devenv.md)), and nft p2p port (tcp and udp port that was opened in [step #1 of os docs](../docs/setup/os.md)). It is vital to specify these values accurately -- for example, if the nft-base-dir is not writable by the blzd daemon and/or the nft-user-name is not funded when the blzd daemon is started, your chain sync will likely fail:
 
     ```text
     nft-user-name = "nft"
-    nft-base-dir = "/nft"
+    nft-base-dir = "/home/ubuntu/nft"
     nft-p2p-port = "5500"
     ```
     
