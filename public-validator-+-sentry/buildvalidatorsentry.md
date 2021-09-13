@@ -100,13 +100,13 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
    **MAIN NET** (including **FORK** path):
    
    ```text
-   curl -s http://sandbox.sentry.net.bluzelle.com:26657/net_info | jq -C '[.result.peers[] | select(.node_info.moniker | startswith("daemon-sentry-gateway")) | {moniker: .node_info.moniker, id: .node_info.id, ip_address: .remote_ip}] | sort_by(.moniker)'
+   curl -s http://sandbox.sentry.net.bluzelle.com:26657/net_info | jq -C '[.result.peers[] | select(.node_info.moniker) | {moniker: .node_info.moniker, id: .node_info.id, ip_address: .remote_ip}] | sort_by(.moniker)'
    ```
 
    **TEST NET**:
    
    ```text
-   curl -s http://sandbox.sentry.testnet.public.bluzelle.com:26657/net_info | jq -C '[.result.peers[] | select(.node_info.moniker | startswith("daemon-sentry-gateway")) | {moniker: .node_info.moniker, id: .node_info.id, ip_address: .remote_ip}] | sort_by(.moniker)'
+   curl -s http://sandbox.sentry.testnet.public.bluzelle.com:26657/net_info | jq -C '[.result.peers[] | select(.node_info.moniker) | {moniker: .node_info.moniker, id: .node_info.id, ip_address: .remote_ip}] | sort_by(.moniker)'
    ```
 
    Note down the sentry IP address and respective id, for each such gateway sentry. You will need this information next.
