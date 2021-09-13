@@ -235,35 +235,7 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     
     To do this, copy your `~/.blzd/config/priv_validator_key.json` from the old machine to the new machine at the same location, overwriting the existing file on the new machine. 
 
-24. Start the Bluzelle daemon
-
-    ```text
-    blzd start
-    ```
-
-    The node will start and catch up to the rest of the zone. Occasionally, this command will fail, in that case run the following command first
-
-    ```text
-    blzd unsafe-reset-all
-    ```
-
-    and then retry the start command.
-
-    Notes.
-    
-    i. If you want extra info for logging or analysis or debugging purposes, you can alternatively add the `--log_level info` flag to `blzd start`. 
-    
-    ii. Don't get alarmed if you are following the **FORK** PATH and your validator starts up stating it is not a validator. This is NORMAL. Your validator is currently in jail, so it does not yet appear in the active validator set. That's all this message means. We will unjail you later.
-
-22. If you are creating a validator, wait till your new node catches up to the rest of the zone. It will be obvious as the node will slow down output and be getting blocks every 4-5 seconds. 
-
-    To be sure, run the following command in another terminal on the validator and look for the output of `true`:
-
-    ```
-    watch 'blzcli status | jq ".sync_info.catching_up == false"'
-    ```
-
-23. If you are following the **FORK** PATH, SKIP this step. 
+24. If you are following the **FORK** PATH, SKIP this step. 
 
     If you are creating a validator, you will now need to acquire BNT tokens. Following are instructions depending on if you are targeting the MAIN NET or TEST NET.
 
@@ -319,19 +291,72 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     ```
     blzcli q account $(blzcli keys show vuser -a) --node http://sandbox.sentry.testnet.public.bluzelle.com:26657
     ```
+
+25. ONLY do this step if you are following the **FORK** PATH. 
+  
+    If you are creating a validator, you will now need to acquire BNT tokens. Following are instructions depending on if you are targeting the MAIN NET or TEST NET.
+
+    **MAIN NET**:
+   
+    i) Be sure you have Metamask installed. It needs to be installed properly and connected to your ETH MainNet account that has access to the BLZ tokens you wish to use for your validator. You can use Metamask with Ledger and Trezor hardware wallets as well.
+   
+    ii) Goto the following URL to sign into the staking application:
     
-24. ONLY do this step if you are following the **FORK** PATH. 
+    https://staking.bluzelle.com/ 
+   
+    iii) Create 2 separate new BNT mnemonics for our MAIN NET, and store and secure these BNT mnemonics securely. **If you lose these mnemonics, you will lose ALL your funds.** Bluzelle is not responsible and there is no policy to "refund" anything. Note that this web wallet is **100% client side**. Your BNT mnemonics are generated on the local browser only and is never transmitted over the network. You are 100% responsible for storing and securing these mnemonics. 
+    
+    iv) Add new local keypairs for the account that will be the operator for the validator on this node:
+
+    ```text
+    blzcli keys add oracle --recover (only on a validator node, do not add on a sentry)
+    blzcli keys add nft --recover
+    ```
+
+    Provide the menemonics generated above from the web staking wallet, when asked for the BIP39 mnemonic. 
+        
+    v) Convert the desired amount of BLZ tokens to BNT tokens by using the "Convert to BNT" button. Please be patient, as we run the conversion relayer manually for now, and it runs a few times every day. Please join and follow our Telegram and Discord groups to keep updated.
+
+    **TEST NET**:
+   
+    i) Add new local keypairs for the account that will be the operator for the validator on this node:
+
+    ```text
+    blzcli keys add oracle (only on a validator node, do not add on a sentry)
+    blzcli keys add nft
+    ```
+
+    which will produce the following output for oracle, and nft (nft as an example):
+
+    * name: nft type: local address: bluzelle1z&lt;...&gt; pubkey: bluzellepub1&lt;...&gt; mnemonic: "" threshold: 0 pubkeys: \[\]
+
+      **Important** write this mnemonic phrase in a safe place. It is the only way to recover your account if you ever forget your password.
+
+      poem reason &lt;...&gt; palace
+
+    CRITICAL: Note the Bluzelle address (starting with "bluzelle") and mnemonic phrase values. You will need these on a long term basis.
+
+    ii) Get some tokens to stake your validator from our FAUCET endpoint. Note that you can only use the faucet once every FIVE minutes. 
+    Goto the following URL, replacing in your account's Bluzelle address.  Do thise for the vuser, oracle, and nft addresses:
+    
+    https://client.sentry.testnet.public.bluzelle.com:1317/mint/<address>
+    
+    iii) Verify you have tokens. If the above URL gives an error that the account it not found or something else, it likely means the faucet 
+    has not yet completed (takes a few seconds) or has failed for some reason. Use the following command to check your balance: 
+    ```
+    blzcli q account $(blzcli keys show nft -a) --node http://sandbox.sentry.testnet.public.bluzelle.com:26657
+    ```
+    
+25. ONLY do this step if you are following the **FORK** PATH. 
 
     Export your existing validator's operator wallet from the existing validator machine and import it to the new validator machine. We will assume that the existing wallet account is called `vuser` and will call the new imported wallet account the same name. 
 
-    **Important** if you do not have nft and oracle user on your existing validator, you must create and fund them before you export them out.  See step #23 on how to do that.
+    **Important** if you do not have nft and oracle user on your existing validator, you must create and fund them before you export them out.  See step #24 on how to do that.
 
     i. On the existing validator machine: 
     
     ```
     blzcli keys export vuser
-    blzcli keys export oracle
-    blzcli keys export nft 
     ```
     
     Note that the `passphrase to encrypt the exported key` that you provide is required when you import the key in the next step. Copy the outputs of the above commands (it will display the output to your screen) and store it into files. We will assume these files are named `export.txt, export2.txt, export3.txt`.
@@ -340,18 +365,14 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     
     ```
     blzcli keys import vuser export.txt
-    blzcli keys import oracle export2.txt
-    blzcli keys import nft export3.txt
     ```
     
     Notes:
     
-    i. If you have the mnemonic handy for your original vuser, oracle, and nft users, you can just add them to the new validator with the following:
+    i. If you have the mnemonic handy for your original vuser user, you can just add them to the new validator with the following:
     
     ```
     blzcli keys add vuser --recover
-    blzcli keys add oracle --recover
-    blzcli keys add nft --recover
     ```
     
     Paste in the mnemonic, when asked.
@@ -360,13 +381,39 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     
     ```
     blzcli keys add vuser --ledger --account <i>
-    blzcli keys add oracle --ledger --account <i+1>
-    blzcli keys add nft --ledger --account <i+2>
     ```
     
     Typically, the value of i will be 0, unless you have multiple HD-derived accounts. 
 
-25. Verify your accounts have the tokens you expect, by asking the local node:
+26. Start the Bluzelle daemon
+
+    ```text
+    blzd start
+    ```
+
+    The node will start and catch up to the rest of the zone. Occasionally, this command will fail, in that case run the following command first
+
+    ```text
+    blzd unsafe-reset-all
+    ```
+
+    and then retry the start command.
+
+    Notes.
+    
+    i. If you want extra info for logging or analysis or debugging purposes, you can alternatively add the `--log_level info` flag to `blzd start`. 
+    
+    ii. Don't get alarmed if you are following the **FORK** PATH and your validator starts up stating it is not a validator. This is NORMAL. Your validator is currently in jail, so it does not yet appear in the active validator set. That's all this message means. We will unjail you later.
+
+27. If you are creating a validator, wait till your new node catches up to the rest of the zone. It will be obvious as the node will slow down output and be getting blocks every 4-5 seconds. 
+
+    To be sure, run the following command in another terminal on the validator and look for the output of `true`:
+
+    ```
+    watch 'blzcli status | jq ".sync_info.catching_up == false"'
+    ```
+
+28. Verify your accounts have the tokens you expect, by asking the local node:
 
     ```text
     blzcli q account $(blzcli keys show vuser -a) | jq ".value.coins"
@@ -374,7 +421,7 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     blzcli q account $(blzcli keys show nft -a) | jq ".value.coins"
     ```  
 
-26. If you are following the **FORK** PATH, SKIP this step. 
+29. If you are following the **FORK** PATH, SKIP this step. 
 
     At this point, the new "vuser" account will also reflect the BNT tokens that were funded to it. We now need to add this node as a validator, as follows:
 
@@ -428,7 +475,7 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
       --from vuser
     ```
 
-27. ONLY do this step if you are following the **FORK** PATH. 
+30. ONLY do this step if you are following the **FORK** PATH. 
     
     You will now unjail your validator to bring it back into the active validator set. Once you do this, the network will expect your validator to be running and it will once again be subject to all the requirements of being a validator, including slashing penalties, etc. Note that once unjailed, you CANNOT "re-jail" your validator. 
 
@@ -436,13 +483,13 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     blzcli tx slashing unjail --gas-prices 0.002ubnt --gas=auto --gas-adjustment=2.0 --from vuser --chain-id <chain id>
     ```   
 
-28. Verify that your validator is now active and running with the following command, and look for your validator's moniker:
+31. Verify that your validator is now active and running with the following command, and look for your validator's moniker:
 
     ```
     blzcli q staking validators | jq -r '.[] | select(.status == 2) | .description.moniker'
     ```
 
-29. Optionally, you can also get the current validator set with the commands \(be sure to check all available pages -- the limit cannot exceed 100\):
+32. Optionally, you can also get the current validator set with the commands \(be sure to check all available pages -- the limit cannot exceed 100\):
 
     ```text
     blzcli q tendermint-validator-set --limit 100 --page 1
@@ -473,7 +520,7 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
 
     Look for your pubkey here, as confirmation.
 
-30. Furthermore, within a few minutes, you should also see your validator listed listed at the Bluzelle Explorer:
+33. Furthermore, within a few minutes, you should also see your validator listed listed at the Bluzelle Explorer:
 
     **MAIN NET** (including **FORK** path):
 
