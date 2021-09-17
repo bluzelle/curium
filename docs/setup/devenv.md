@@ -55,5 +55,7 @@
    mkdir ~/nft
    ```
 
+   CRITICAL: The "nft-base-dir" is where NFT files from the new Bluzelle NFT service will get stored to. It is vital that the volume this folder is in, be monitored and that it not fill up. NFT files can quickly overwhelm a small volume. If that volume happens to be the same one used by the blzd daemon, it can cause your node to crash completely, when full. In the case of a validator, your node could come down, and get slashed. It is recommended to keep this as a separate volume on a larger, monitored drive.
+
 [prev](os.md) \| [next](build.md)
 
