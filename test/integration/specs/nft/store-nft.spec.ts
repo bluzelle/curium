@@ -13,6 +13,7 @@ import {getSwarmAndClient} from "../../helpers/bluzelle-client";
 import {sha256} from "js-sha256";
 import {TruthyValue, waitUntil} from 'async-wait-until'
 import {Some} from "monet";
+import delay from "delay";
 
 const cksum = require('cksum');
 
@@ -21,7 +22,7 @@ global.fetch = require('node-fetch')
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-const defaultGasParams = (gasInfo: GasInfo = {}): GasInfo => ({gas_price: 10, max_gas: 100000000, ...gasInfo})
+const defaultGasParams = (gasInfo: GasInfo = {}): GasInfo => ({gas_price: 0.002, max_gas: 100000000, ...gasInfo})
 const LOOP_TIMEOUT = 10_000;
 
 describe("Store and retrieve a NFT", function () {
@@ -83,7 +84,7 @@ describe("Store and retrieve a NFT", function () {
         });
 
         it('should allow one client to send multiple createNft() in parallel to the same sentry', () => {
-            const COUNT = 6
+            const COUNT = 3
             return Promise.all(
                 times(COUNT).map(n =>
 //                    delay(n * 100)
