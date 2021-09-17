@@ -203,6 +203,8 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     nft-p2p-port = "5500"
     ```
     
+    CRITICAL: The "nft-base-dir" is where NFT files from the new Bluzelle NFT service will get stored to. It is vital that the volume this folder is in, be monitored and that it not fill up. NFT files can quickly overwhelm a small volume. If that volume happens to be the same one used by the blzd daemon, it can cause your node to crash completely, when full. In the case of a validator, your node could come down, and get slashed. It is recommended to keep this as a separate volume on a larger, monitored drive.
+    
 22. Copy into your "~/.blzd/config/" directory the network's existing genesis.json file. You can interactively view it as follows, from our sentry nodes:
 
     **MAIN NET** (including **FORK** path):
