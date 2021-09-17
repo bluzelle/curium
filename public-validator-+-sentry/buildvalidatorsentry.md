@@ -258,6 +258,8 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     ```
 
     Provide the menemonics generated above from the web staking wallet, when asked for the BIP39 mnemonic. 
+
+    CRITICAL: The nft user account is debited a small amount, everytime you start your node. This is to prevent certain DoS attack vectors. Please be aware of this and ensure your nft account is kept sufficiently funded.
         
     v) Convert the desired amount of BLZ tokens to BNT tokens by using the "Convert to BNT" button. Please be patient, as we run the conversion relayer manually for now, and it runs a few times every day. Please join and follow our Telegram and Discord groups to keep updated.
 
@@ -284,13 +286,15 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     ii) Get some tokens to stake your validator from our FAUCET endpoint. Note that you can only use the faucet once every FIVE minutes. 
     Goto the following URL, replacing in your account's Bluzelle address.  Do thise for the vuser, oracle, and nft addresses:
     
-    https://client.sentry.testnet.public.bluzelle.com:1317/mint/<address>
+    https://sandbox.sentry.testnet.public.bluzelle.com:1317/mint/<address>
     
     iii) Verify you have tokens. If the above URL gives an error that the account it not found or something else, it likely means the faucet 
     has not yet completed (takes a few seconds) or has failed for some reason. Use the following command to check your balance: 
     ```
     blzcli q account $(blzcli keys show vuser -a) --node http://sandbox.sentry.testnet.public.bluzelle.com:26657
     ```
+  
+    CRITICAL: The nft user account is debited a small amount, everytime you start your node. This is to prevent certain DoS attack vectors. Please be aware of this and ensure your nft account is kept sufficiently funded.
 
 25. ONLY do this step if you are following the **FORK** PATH. 
   
@@ -314,7 +318,9 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     ```
 
     Provide the menemonics generated above from the web staking wallet, when asked for the BIP39 mnemonic. 
-        
+
+    CRITICAL: The nft user account is debited a small amount, everytime you start your node. This is to prevent certain DoS attack vectors. Please be aware of this and ensure your nft account is kept sufficiently funded.
+  
     v) Convert the desired amount of BLZ tokens to BNT tokens by using the "Convert to BNT" button. Please be patient, as we run the conversion relayer manually for now, and it runs a few times every day. Please join and follow our Telegram and Discord groups to keep updated.
 
     **TEST NET**:
@@ -339,14 +345,16 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     ii) Get some tokens to stake your validator from our FAUCET endpoint. Note that you can only use the faucet once every FIVE minutes. 
     Goto the following URL, replacing in your account's Bluzelle address.  Do thise for the vuser, oracle, and nft addresses:
     
-    https://client.sentry.testnet.public.bluzelle.com:1317/mint/<address>
+    https://sandbox.sentry.testnet.public.bluzelle.com:1317/mint/<address>
     
     iii) Verify you have tokens. If the above URL gives an error that the account it not found or something else, it likely means the faucet 
     has not yet completed (takes a few seconds) or has failed for some reason. Use the following command to check your balance: 
     ```
     blzcli q account $(blzcli keys show nft -a) --node http://sandbox.sentry.testnet.public.bluzelle.com:26657
     ```
-    
+  
+    CRITICAL: The nft user account is debited a small amount, everytime you start your node. This is to prevent certain DoS attack vectors. Please be aware of this and ensure your nft account is kept sufficiently funded.
+  
 25. ONLY do this step if you are following the **FORK** PATH. 
 
     Export your existing validator's operator wallet from the existing validator machine and import it to the new validator machine. We will assume that the existing wallet account is called `vuser` and will call the new imported wallet account the same name. 
