@@ -49,7 +49,7 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
    **MAIN NET** (including **FORK** path):
    
    ```text
-   curl --location --request GET 'https://client.sentry.net.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
+   curl --location --request GET 'https://client.sentry.bluzellenet.bluzelle.com:1317/node_info' -s | jq '.node_info.network' | tr -d '"'
    ```
 
    **TEST NET**:
@@ -100,7 +100,7 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
    **MAIN NET** (including **FORK** path):
    
    ```text
-   curl -s http://sandbox.sentry.net.bluzelle.com:26657/net_info | jq -C '[.result.peers[] | select(.node_info.moniker | startswith("daemon-sentry-gateway")) | {moniker: .node_info.moniker, id: .node_info.id, ip_address: .remote_ip}] | sort_by(.moniker)'
+   curl -s http://sandbox.sentry.bluzellenet.bluzelle.com:26657/net_info | jq -C '[.result.peers[] | select(.node_info.moniker | startswith("daemon-sentry-gateway")) | {moniker: .node_info.moniker, id: .node_info.id, ip_address: .remote_ip}] | sort_by(.moniker)'
    ```
 
    **TEST NET**:
@@ -204,12 +204,14 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     ```
     
     CRITICAL: The "nft-base-dir" is where NFT files from the new Bluzelle NFT service will get stored to. It is vital that the volume this folder is in, be monitored and that it not fill up. NFT files can quickly overwhelm a small volume. If that volume happens to be the same one used by the blzd daemon, it can cause your node to crash completely, when full. In the case of a validator, your node could come down, and get slashed. It is recommended to keep this as a separate volume on a larger, monitored drive.
+
+    CRITICAL: If the "nft-base-dir" volume does run out of space on your validator, NFT-related transactions will fail, on your node. Your validator will get an "app-hash" error, and will crash. If you don't correct the situation immediately, you run the risk of being jailed, and slashed. To correct the situation, you'd have to likely make more space on the nft volume, and re-sync your node from the start ("blzd unsafe-reset-all"), which can be a long process. PLEASE ensure this "nft-base-dir" folder is monitored closely.
     
 22. Copy into your "~/.blzd/config/" directory the network's existing genesis.json file. You can interactively view it as follows, from our sentry nodes:
 
     **MAIN NET** (including **FORK** path):
     ```text
-    curl http://sandbox.sentry.net.bluzelle.com:26657/genesis | jq -C '.result.genesis' | more -r
+    curl http://sandbox.sentry.bluzellenet.bluzelle.com:26657/genesis | jq -C '.result.genesis' | more -r
     ```
 
     **TEST NET**:
@@ -221,7 +223,7 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
 
     **MAIN NET** (including **FORK** path):
     ```text
-    curl http://sandbox.sentry.net.bluzelle.com:26657/genesis | jq '.result.genesis' > genesis.json
+    curl http://sandbox.sentry.bluzellenet.bluzelle.com:26657/genesis | jq '.result.genesis' > genesis.json
     ```
 
     **TEST NET**:
@@ -261,7 +263,7 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
 
     Provide the menemonics generated above from the web staking wallet, when asked for the BIP39 mnemonic. 
 
-    CRITICAL: The nft user account is debited a small amount, everytime you start your node. This is to prevent certain DoS attack vectors. Please be aware of this and ensure your nft account is kept sufficiently funded.
+    CRITICAL: The nft user account is debited a small nominal amount, everytime you start your node. This is to prevent certain DoS attack vectors. Please be aware of this and ensure your nft account is kept sufficiently funded.
         
     v) Convert the desired amount of BLZ tokens to BNT tokens by using the "Convert to BNT" button. Please be patient, as we run the conversion relayer manually for now, and it runs a few times every day. Please join and follow our Telegram and Discord groups to keep updated.
 
@@ -296,7 +298,7 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     blzcli q account $(blzcli keys show vuser -a) --node http://sandbox.sentry.testnet.public.bluzelle.com:26657
     ```
   
-    CRITICAL: The nft user account is debited a small amount, everytime you start your node. This is to prevent certain DoS attack vectors. Please be aware of this and ensure your nft account is kept sufficiently funded.
+    CRITICAL: The nft user account is debited a small nominal amount, everytime you start your node. This is to prevent certain DoS attack vectors. Please be aware of this and ensure your nft account is kept sufficiently funded.
 
 25. ONLY do this step if you are following the **FORK** PATH. 
   
@@ -321,7 +323,7 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
 
     Provide the menemonics generated above from the web staking wallet, when asked for the BIP39 mnemonic. 
 
-    CRITICAL: The nft user account is debited a small amount, everytime you start your node. This is to prevent certain DoS attack vectors. Please be aware of this and ensure your nft account is kept sufficiently funded.
+    CRITICAL: The nft user account is debited a small nominal amount, everytime you start your node. This is to prevent certain DoS attack vectors. Please be aware of this and ensure your nft account is kept sufficiently funded.
   
     v) Convert the desired amount of BLZ tokens to BNT tokens by using the "Convert to BNT" button. Please be patient, as we run the conversion relayer manually for now, and it runs a few times every day. Please join and follow our Telegram and Discord groups to keep updated.
 
@@ -355,7 +357,7 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     blzcli q account $(blzcli keys show nft -a) --node http://sandbox.sentry.testnet.public.bluzelle.com:26657
     ```
   
-    CRITICAL: The nft user account is debited a small amount, everytime you start your node. This is to prevent certain DoS attack vectors. Please be aware of this and ensure your nft account is kept sufficiently funded.
+    CRITICAL: The nft user account is debited a small nominal amount, everytime you start your node. This is to prevent certain DoS attack vectors. Please be aware of this and ensure your nft account is kept sufficiently funded.
   
 25. ONLY do this step if you are following the **FORK** PATH. 
 
@@ -534,7 +536,7 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
 
     **MAIN NET** (including **FORK** path):
 
-    http://bigdipper.net.bluzelle.com/validators
+    http://bigdipper.bluzellenet.bluzelle.com/validators
     
     **TEST NET**:
 
