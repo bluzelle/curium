@@ -195,7 +195,9 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     bluzelle_crud = true
     ```
 
-21. Edit ".blzd/config/app.toml" to include the nft user, the nft directory (the directory you created in the [devenv docs step #6](../docs/setup/devenv.md)), and nft p2p port (tcp and udp port that was opened in [step #1 of os docs](../docs/setup/os.md)). It is vital to specify these values accurately -- for example, if the nft-base-dir is not writable by the blzd daemon and/or the nft-user-name is not funded when the blzd daemon is started, your chain sync will likely fail:
+21. Edit ".blzd/config/app.toml" to include the nft user, the nft directory (the directory you created in the [devenv docs step #6](../docs/setup/devenv.md)), and nft p2p port (tcp and udp port that was opened in [step #1 of os docs](../docs/setup/os.md)). It is vital to specify these values accurately -- for example, if the nft-base-dir is not writable by the blzd daemon and/or the nft-user-name is not funded when the blzd daemon is started, your chain sync will likely fail. 
+
+    CRITICAL: Every node (validator or sentry) must have its own UNIQUE nft user account on the chain. Of course, you can locally name each such user "nft" on each node, if you want, but as you will see later, you must create a unique such account on every node, sentry or validator. Do not share the nft user account between nodes.
 
     ```text
     nft-user-name = "nft"
@@ -241,7 +243,7 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
 
 24. If you are following the **FORK** PATH, SKIP this step. 
 
-    If you are creating a validator, you will now need to acquire BNT tokens. Following are instructions depending on if you are targeting the MAIN NET or TEST NET.
+    If you are creating a validator and/or sentry, you will now need to acquire BNT tokens. Following are instructions depending on if you are targeting the MAIN NET or TEST NET.
 
     **MAIN NET**:
    
@@ -251,13 +253,12 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     
     https://staking.bluzelle.com/ 
    
-    iii) Create 3 separate new BNT mnemonics for our MAIN NET, and store and secure these BNT mnemonics securely. **If you lose these mnemonics, you will lose ALL your funds.** Bluzelle is not responsible and there is no policy to "refund" anything. Note that this web wallet is **100% client side**. Your BNT mnemonics are generated on the local browser only and is never transmitted over the network. You are 100% responsible for storing and securing these mnemonics. 
+    iii) For a validator, create TWO separate new BNT mnemonics on our MAIN NET, and store and secure these BNT mnemonics securely. **If you lose these mnemonics, you will lose ALL your funds.** Bluzelle is not responsible and there is no policy to "refund" anything. Note that this web wallet is **100% client side**. Your BNT mnemonics are generated on the local browser only and is never transmitted over the network. You are 100% responsible for storing and securing these mnemonics. 
     
-    iv) Add new local keypairs for the account that will be the operator for the validator on this node:
+    iv) Add new local keypairs onto your validator node:
 
     ```text
     blzcli keys add vuser --recover
-    blzcli keys add oracle --recover (only on a validator node, do not add on a sentry)
     blzcli keys add nft --recover
     ```
 
@@ -265,19 +266,32 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
 
     CRITICAL: The nft user account is debited a small nominal amount, everytime you start your node. This is to prevent certain DoS attack vectors. Please be aware of this and ensure your nft account is kept sufficiently funded.
         
-    v) Convert the desired amount of BLZ tokens to BNT tokens by using the "Convert to BNT" button. Please be patient, as we run the conversion relayer manually for now, and it runs a few times every day. Please join and follow our Telegram and Discord groups to keep updated.
+    v) Convert the desired amount of BLZ tokens to BNT tokens by using the "Convert to BNT" button for EACH of the above TWO accounts. Please be patient, as we run the conversion relayer manually for now, and it runs a few times every day. Please join and follow our Telegram and Discord groups to keep updated. The nft and vuser accounts should be adequately funded.
+
+    vi) For EACH sentry, create ONE UNIQUE new BNT mnemonic on our MAIN NET, and store and secure this BNT mnemonic securely. **If you lose this mnemonic, you will lose ALL your funds.** Bluzelle is not responsible and there is no policy to "refund" anything. Note that this web wallet is **100% client side**. Your BNT mnemonics are generated on the local browser only and is never transmitted over the network. You are 100% responsible for storing and securing these mnemonics. 
+    
+    vii) Add a new local keypair onto your sentry node:
+
+    ```text
+    blzcli keys add nft --recover
+    ```
+
+    Provide the menemonic generated above from the web staking wallet, when asked for the BIP39 mnemonic. 
+
+    CRITICAL: The nft user account is debited a small nominal amount, everytime you start your node. This is to prevent certain DoS attack vectors. Please be aware of this and ensure your nft account is kept sufficiently funded.
+        
+    viii) Convert the desired amount of BLZ tokens to BNT tokens by using the "Convert to BNT" button. Please be patient, as we run the conversion relayer manually for now, and it runs a few times every day. Please join and follow our Telegram and Discord groups to keep updated. 
 
     **TEST NET**:
    
-    i) Add new local keypairs for the account that will be the operator for the validator on this node:
+    i) For a validator, add TWO new local keypairs on the node:
 
     ```text
     blzcli keys add vuser
-    blzcli keys add oracle (only on a validator node, do not add on a sentry)
     blzcli keys add nft
     ```
 
-    which will produce the following output for vuser, oracle, and nft (vuser as an example):
+    which will produce the following output for vuser and nft (vuser as an example):
 
     * name: vuser type: local address: bluzelle1z&lt;...&gt; pubkey: bluzellepub1&lt;...&gt; mnemonic: "" threshold: 0 pubkeys: \[\]
 
@@ -287,8 +301,8 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
 
     CRITICAL: Note the Bluzelle address (starting with "bluzelle") and mnemonic phrase values. You will need these on a long term basis.
 
-    ii) Get some tokens to stake your validator from our FAUCET endpoint. Note that you can only use the faucet once every FIVE minutes. 
-    Goto the following URL, replacing in your account's Bluzelle address.  Do thise for the vuser, oracle, and nft addresses:
+    ii) Get some tokens from our FAUCET endpoint. Note that you can only use the faucet once every FIVE minutes. 
+    Goto the following URL, replacing in your account's Bluzelle address.  Do this for the vuser and nft addresses:
     
     https://sandbox.sentry.testnet.public.bluzelle.com:1317/mint/<address>
     
@@ -300,6 +314,35 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
   
     CRITICAL: The nft user account is debited a small nominal amount, everytime you start your node. This is to prevent certain DoS attack vectors. Please be aware of this and ensure your nft account is kept sufficiently funded.
 
+    iv) For EACH sentry, add ONE new UNIQUE local keypair on the node:
+
+    ```text
+    blzcli keys add nft
+    ```
+
+    which will produce the following output for nft (nft as an example):
+
+    * name: nft type: local address: bluzelle1z&lt;...&gt; pubkey: bluzellepub1&lt;...&gt; mnemonic: "" threshold: 0 pubkeys: \[\]
+
+      **Important** write this mnemonic phrase in a safe place. It is the only way to recover your account if you ever forget your password.
+
+      poem reason &lt;...&gt; palace
+
+    CRITICAL: Note the Bluzelle address (starting with "bluzelle") and mnemonic phrase values. You will need these on a long term basis.
+
+    v) Get some tokens from our FAUCET endpoint. Note that you can only use the faucet once every FIVE minutes. 
+    Goto the following URL, replacing in your account's Bluzelle address.  Do this for the nft address on every node:
+    
+    https://sandbox.sentry.testnet.public.bluzelle.com:1317/mint/<address>
+    
+    iii) Verify you have tokens. If the above URL gives an error that the account it not found or something else, it likely means the faucet 
+    has not yet completed (takes a few seconds) or has failed for some reason. Use the following command to check your balance: 
+    ```
+    blzcli q account $(blzcli keys show nft -a) --node http://sandbox.sentry.testnet.public.bluzelle.com:26657
+    ```
+  
+    CRITICAL: The nft user account is debited a small nominal amount, everytime you start your node. This is to prevent certain DoS attack vectors. Please be aware of this and ensure your nft account is kept sufficiently funded.    
+
 25. ONLY do this step if you are following the **FORK** PATH. 
   
     If you are creating a validator, you will now need to acquire BNT tokens. Following are instructions depending on if you are targeting the MAIN NET or TEST NET.
@@ -312,12 +355,11 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     
     https://staking.bluzelle.com/ 
    
-    iii) Create 2 separate new BNT mnemonics for our MAIN NET, and store and secure these BNT mnemonics securely. **If you lose these mnemonics, you will lose ALL your funds.** Bluzelle is not responsible and there is no policy to "refund" anything. Note that this web wallet is **100% client side**. Your BNT mnemonics are generated on the local browser only and is never transmitted over the network. You are 100% responsible for storing and securing these mnemonics. 
+    iii) Create a new BNT mnemonic for our MAIN NET, and store and secure this BNT mnemonic securely. **If you lose this mnemonic, you will lose ALL your funds.** Bluzelle is not responsible and there is no policy to "refund" anything. Note that this web wallet is **100% client side**. Your BNT mnemonics are generated on the local browser only and is never transmitted over the network. You are 100% responsible for storing and securing these mnemonics. 
     
-    iv) Add new local keypairs for the account that will be the operator for the validator on this node:
+    iv) Add a new local UNIQUE keypair on EVERY node (validators and sentries):
 
     ```text
-    blzcli keys add oracle --recover (only on a validator node, do not add on a sentry)
     blzcli keys add nft --recover
     ```
 
@@ -329,14 +371,13 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
 
     **TEST NET**:
    
-    i) Add new local keypairs for the account that will be the operator for the validator on this node:
+    i) Add a new local UNIQUE keypair on EVERY node (validators and sentries):
 
     ```text
-    blzcli keys add oracle (only on a validator node, do not add on a sentry)
     blzcli keys add nft
     ```
 
-    which will produce the following output for oracle, and nft (nft as an example):
+    which will produce the following output for nft:
 
     * name: nft type: local address: bluzelle1z&lt;...&gt; pubkey: bluzellepub1&lt;...&gt; mnemonic: "" threshold: 0 pubkeys: \[\]
 
@@ -346,8 +387,8 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
 
     CRITICAL: Note the Bluzelle address (starting with "bluzelle") and mnemonic phrase values. You will need these on a long term basis.
 
-    ii) Get some tokens to stake your validator from our FAUCET endpoint. Note that you can only use the faucet once every FIVE minutes. 
-    Goto the following URL, replacing in your account's Bluzelle address.  Do thise for the vuser, oracle, and nft addresses:
+    ii) Get some tokens from our FAUCET endpoint. Note that you can only use the faucet once every FIVE minutes. 
+    Goto the following URL, replacing in your account's Bluzelle address.  Do this for the nft address on every node:
     
     https://sandbox.sentry.testnet.public.bluzelle.com:1317/mint/<address>
     
@@ -359,11 +400,11 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
   
     CRITICAL: The nft user account is debited a small nominal amount, everytime you start your node. This is to prevent certain DoS attack vectors. Please be aware of this and ensure your nft account is kept sufficiently funded.
   
-25. ONLY do this step if you are following the **FORK** PATH. 
+26. ONLY do this step if you are following the **FORK** PATH. 
 
     Export your existing validator's operator wallet from the existing validator machine and import it to the new validator machine. We will assume that the existing wallet account is called `vuser` and will call the new imported wallet account the same name. 
 
-    **Important** if you do not have nft and oracle user on your existing validator, you must create and fund them before you export them out.  See step #24 on how to do that.
+    **Important** if you do not have an nft user on your existing validator, you must create and fund them before you export them out.  See step #24 on how to do that.
 
     i. On the existing validator machine: 
     
@@ -389,7 +430,7 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     
     Paste in the mnemonic, when asked.
     
-    ii. If your vuser for your original vuser is secured with a Ledger device, add it to the new validator machine as follows (ensure your Ledger device is plugged in and running the COSMOS app).  Do these for nft and oracle users as well.:
+    ii. If your vuser for your original vuser is secured with a Ledger device, add it to the new validator machine as follows (ensure your Ledger device is plugged in and running the COSMOS app).  Do these for nft users as well.:
     
     ```
     blzcli keys add vuser --ledger --account <i>
@@ -397,7 +438,7 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     
     Typically, the value of i will be 0, unless you have multiple HD-derived accounts. 
 
-26. Start the Bluzelle daemon
+27. Start the Bluzelle daemon
 
     ```text
     blzd start
@@ -417,7 +458,7 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     
     ii. Don't get alarmed if you are following the **FORK** PATH and your validator starts up stating it is not a validator. This is NORMAL. Your validator is currently in jail, so it does not yet appear in the active validator set. That's all this message means. We will unjail you later.
 
-27. If you are creating a validator, wait till your new node catches up to the rest of the zone. It will be obvious as the node will slow down output and be getting blocks every 4-5 seconds. 
+28. If you are creating a validator, wait till your new node catches up to the rest of the zone. It will be obvious as the node will slow down output and be getting blocks every 4-5 seconds. 
 
     To be sure, run the following command in another terminal on the validator and look for the output of `true`:
 
@@ -425,15 +466,14 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     watch 'blzcli status | jq ".sync_info.catching_up == false"'
     ```
 
-28. Verify your accounts have the tokens you expect, by asking the local node:
+29. Verify your accounts have the tokens you expect, by asking the local node:
 
     ```text
     blzcli q account $(blzcli keys show vuser -a) | jq ".value.coins"
-    blzcli q account $(blzcli keys show oracle -a) | jq ".value.coins"
     blzcli q account $(blzcli keys show nft -a) | jq ".value.coins"
     ```  
 
-29. If you are following the **FORK** PATH, SKIP this step. 
+30. If you are following the **FORK** PATH, SKIP this step. 
 
     At this point, the new "vuser" account will also reflect the BNT tokens that were funded to it. We now need to add this node as a validator, as follows:
 
@@ -487,7 +527,7 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
       --from vuser
     ```
 
-30. ONLY do this step if you are following the **FORK** PATH. 
+31. ONLY do this step if you are following the **FORK** PATH. 
     
     You will now unjail your validator to bring it back into the active validator set. Once you do this, the network will expect your validator to be running and it will once again be subject to all the requirements of being a validator, including slashing penalties, etc. Note that once unjailed, you CANNOT "re-jail" your validator. 
 
@@ -495,13 +535,13 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
     blzcli tx slashing unjail --gas-prices 0.002ubnt --gas=auto --gas-adjustment=2.0 --from vuser --chain-id <chain id>
     ```   
 
-31. Verify that your validator is now active and running with the following command, and look for your validator's moniker:
+32. Verify that your validator is now active and running with the following command, and look for your validator's moniker:
 
     ```
     blzcli q staking validators | jq -r '.[] | select(.status == 2) | .description.moniker'
     ```
 
-32. Optionally, you can also get the current validator set with the commands \(be sure to check all available pages -- the limit cannot exceed 100\):
+33. Optionally, you can also get the current validator set with the commands \(be sure to check all available pages -- the limit cannot exceed 100\):
 
     ```text
     blzcli q tendermint-validator-set --limit 100 --page 1
@@ -532,7 +572,7 @@ Please be extra careful to ensure you setup the new validator carefully, only ta
 
     Look for your pubkey here, as confirmation.
 
-33. Furthermore, within a few minutes, you should also see your validator listed listed at the Bluzelle Explorer:
+34. Furthermore, within a few minutes, you should also see your validator listed listed at the Bluzelle Explorer:
 
     **MAIN NET** (including **FORK** path):
 
